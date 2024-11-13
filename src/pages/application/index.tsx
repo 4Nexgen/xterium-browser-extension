@@ -8,22 +8,15 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import {
-  Check,
-  ChevronDown,
-  ChevronsUpDown,
-  ChevronUp,
-  Coins,
-  DollarSign,
-  Inbox,
-  Network,
-  Settings,
-  User,
-  Wallet
-} from "lucide-react"
+import { Coins, DollarSign, MessageCircle, Network, Wallet } from "lucide-react"
 import React, { useState } from "react"
 
+import IndexAssets from "./assets"
+import IndexBalance from "./balance"
+import IndexImUrAi from "./imurai"
 import Layout from "./layout"
+import IndexNetworkStatus from "./network-status"
+import IndexWallets from "./wallets"
 
 const IndexApplication = () => {
   const [currentPage, setCurrentPage] = useState<string>("")
@@ -73,18 +66,19 @@ const IndexApplication = () => {
               {currentPage === "Assets" && <Coins size="26" />}
               {currentPage === "Network Status" && <Network size="26" />}
               {currentPage === "Wallets" && <Wallet size="26" />}
+              {currentPage === "ImUrAi" && <MessageCircle size="26" />}
               &nbsp;
               {currentPage}
             </span>
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col gap-4 p-4">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="aspect-video rounded-xl bg-muted/50"></div>
-            <div className="aspect-video rounded-xl bg-muted/50"></div>
-            <div className="aspect-video rounded-xl bg-muted/50"></div>
-          </div>
+        <div className="px-4 py-2">
+          {currentPage === "Balance" && <IndexBalance />}
+          {currentPage === "Assets" && <IndexAssets />}
+          {currentPage === "Network Status" && <IndexNetworkStatus />}
+          {currentPage === "Wallets" && <IndexWallets />}
+          {currentPage === "ImUrAi" && <IndexImUrAi />}
         </div>
       </Layout>
     </>

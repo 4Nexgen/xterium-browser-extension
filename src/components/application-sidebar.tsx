@@ -14,7 +14,6 @@ import {
   DropdownMenuItem,
   DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
@@ -41,14 +40,12 @@ import { cn } from "@/lib/utils"
 import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
 import {
   Check,
-  ChevronDown,
   ChevronsUpDown,
   ChevronUp,
   Coins,
   DollarSign,
-  Inbox,
+  MessageCircle,
   Network,
-  Settings,
   User,
   Wallet
 } from "lucide-react"
@@ -70,6 +67,11 @@ const applicationItems = [
     title: "Network Status",
     url: "#",
     icon: Network
+  },
+  {
+    title: "ImUrAi",
+    url: "#",
+    icon: MessageCircle
   }
 ]
 
