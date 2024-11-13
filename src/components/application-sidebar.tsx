@@ -92,7 +92,7 @@ const networks = [
   }
 ]
 
-const ApplicationSidebar = () => {
+const ApplicationSidebar = ({ onSetCurrentPage }) => {
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState("")
   const { setTheme } = useTheme()
@@ -167,7 +167,9 @@ const ApplicationSidebar = () => {
             <SidebarMenu>
               {applicationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton
+                    asChild
+                    onClick={() => onSetCurrentPage(item.title)}>
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
@@ -185,7 +187,9 @@ const ApplicationSidebar = () => {
             <SidebarMenu>
               {setupItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton
+                    asChild
+                    onClick={() => onSetCurrentPage(item.title)}>
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
