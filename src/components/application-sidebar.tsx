@@ -59,7 +59,7 @@ const applicationItems = [
     icon: DollarSign
   },
   {
-    title: "Assets",
+    title: "Tokens",
     url: "#",
     icon: Coins
   },
@@ -110,59 +110,6 @@ const ApplicationSidebar = ({ onSetCurrentPage }) => {
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Select Network</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={open}
-                  className="w-full justify-between"
-                  size="lg">
-                  {value
-                    ? networks.find((network) => network.value === value)?.label
-                    : "Select network..."}
-                  <ChevronsUpDown className="opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[240px] p-0">
-                <Command>
-                  <CommandInput
-                    placeholder="Search network..."
-                    className="h-9"
-                  />
-                  <CommandList>
-                    <CommandEmpty>No framework found.</CommandEmpty>
-                    <CommandGroup>
-                      {networks.map((network) => (
-                        <CommandItem
-                          key={network.value}
-                          value={network.value}
-                          onSelect={(currentValue) => {
-                            setValue(currentValue === value ? "" : currentValue)
-                            setOpen(false)
-                          }}>
-                          {network.label}
-                          <Check
-                            className={cn(
-                              "ml-auto",
-                              value === network.value
-                                ? "opacity-100"
-                                : "opacity-0"
-                            )}
-                          />
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>

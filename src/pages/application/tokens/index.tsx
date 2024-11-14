@@ -1,5 +1,4 @@
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -9,19 +8,6 @@ import {
   CardTitle
 } from "@/components/ui/card"
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList
-} from "@/components/ui/command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from "@/components/ui/popover"
-import {
   Table,
   TableBody,
   TableCaption,
@@ -30,75 +16,17 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import { cn } from "@/lib/utils"
 import AZKLogo from "data-base64:/assets/tokens/azk.png"
 import IXONLogo from "data-base64:/assets/tokens/ixon.png"
 import XAVLogo from "data-base64:/assets/tokens/xav.png"
 import XGMLogo from "data-base64:/assets/tokens/xgm.png"
 import XONLogo from "data-base64:/assets/tokens/xon.png"
-import { Check, ChevronsUpDown, Pencil } from "lucide-react"
+import { Pencil } from "lucide-react"
 import React from "react"
 
-const addresses = [
-  {
-    value: "5Clkajsdlashlili3y123211294798910h237",
-    label: "Noah (5Clkajsdlashlili3y123211294798910h237)"
-  },
-  {
-    value: "5Blkajsdlaslili3y123211294798910h237",
-    label: "Oliver (5Blkajsdlaslili3y123211294798910h237)"
-  }
-]
-
-const IndexBalance = () => {
-  const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState("")
-
+const IndexTokens = () => {
   return (
     <>
-      <div className="text-base mb-2">Select Address:</div>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-full mb-3 justify-between"
-            size="lg">
-            {value
-              ? addresses.find((address) => address.value === value)?.label
-              : "Select address"}
-            <ChevronsUpDown className="opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="min-w-[400px] w-[400px] p-0">
-          <Command>
-            <CommandInput placeholder="Search address..." className="h-9" />
-            <CommandList>
-              <CommandEmpty>No address found.</CommandEmpty>
-              <CommandGroup>
-                {addresses.map((address) => (
-                  <CommandItem
-                    key={address.value}
-                    value={address.value}
-                    onSelect={(currentValue) => {
-                      setValue(currentValue === value ? "" : currentValue)
-                      setOpen(false)
-                    }}>
-                    {address.label}
-                    <Check
-                      className={cn(
-                        "ml-auto",
-                        value === address.value ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
       <Card className="mb-3">
         <CardHeader>
           <CardTitle>
@@ -118,8 +46,8 @@ const IndexBalance = () => {
                   </div>
                   <Badge>Xode Native Token</Badge>
                 </TableCell>
-                <TableCell className="w-[50px] justify-end pr-2 text-right">
-                  <span className="text-lg font-bold">1,000.00</span>
+                <TableCell className="w-[50px] justify-end pr-2">
+                  <Pencil size="20" />
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -145,8 +73,8 @@ const IndexBalance = () => {
                   </div>
                   <Badge>Xode Native Token</Badge>
                 </TableCell>
-                <TableCell className="w-[50px] justify-end pr-2 text-right">
-                  <span className="text-lg font-bold">100.00</span>
+                <TableCell className="w-[50px] justify-end pr-2">
+                  <Pencil size="20" />
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -159,8 +87,8 @@ const IndexBalance = () => {
                   </div>
                   <Badge>Xode Native Token</Badge>
                 </TableCell>
-                <TableCell className="w-[50px] justify-end pr-2 text-right">
-                  <span className="text-lg font-bold">500.00</span>
+                <TableCell className="w-[50px] justify-end pr-2">
+                  <Pencil size="20" />
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -173,8 +101,8 @@ const IndexBalance = () => {
                   </div>
                   <Badge>Xode Native Token</Badge>
                 </TableCell>
-                <TableCell className="w-[50px] justify-end pr-2 text-right">
-                  <span className="text-lg font-bold">1,000.00</span>
+                <TableCell className="w-[50px] justify-end pr-2">
+                  <Pencil size="20" />
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -187,8 +115,8 @@ const IndexBalance = () => {
                   </div>
                   <Badge>Xode Native Token</Badge>
                 </TableCell>
-                <TableCell className="w-[50px] justify-end pr-2 text-right">
-                  <span className="text-lg font-bold">4,021.00</span>
+                <TableCell className="w-[50px] justify-end pr-2">
+                  <Pencil size="20" />
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -199,4 +127,4 @@ const IndexBalance = () => {
   )
 }
 
-export default IndexBalance
+export default IndexTokens
