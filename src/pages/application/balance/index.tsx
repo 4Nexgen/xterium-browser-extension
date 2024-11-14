@@ -99,7 +99,7 @@ const IndexBalance = () => {
           </Command>
         </PopoverContent>
       </Popover>
-      <Card className="mb-3">
+      <Card className="mb-3 card-bg-image">
         <CardHeader>
           <CardTitle>
             <b>NATIVE</b>

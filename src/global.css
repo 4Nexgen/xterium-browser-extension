@@ -123,4 +123,7 @@ html, body {
   .dark main {
     background-image: var(--background-gradient);
   }
+  .dark .card-bg-image {
+    background: url("../assets/covers/universe.png");
+  }
 }
