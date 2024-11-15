@@ -52,8 +52,8 @@ const networks = [
 
 const IndexApplication = () => {
   const [currentPage, setCurrentPage] = useState<string>("")
-  const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState("")
+  const [open, setOpen] = useState(false)
+  const [value, setValue] = useState("")
   const { theme } = useTheme()
 
   const handleSetCurrentPage = (currentPage: string) => {

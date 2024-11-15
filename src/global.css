@@ -46,7 +46,7 @@ html, body {
     --chart-5: 27 87% 67%;
 
     /* Radius */
-    --radius: 1rem;
+    --radius: 1.5rem;
 
     /* Sidebar */
     --sidebar-background: 0 0% 98%;
@@ -96,7 +96,7 @@ html, body {
     --chart-5: 340 75% 55%;
 
     /* Radius */
-    --radius: 0.5rem;
+    --radius: 1.5rem;
 
     /* Sidebar */
     --sidebar-background: 222, 30%, 15%;
@@ -122,8 +122,23 @@ html, body {
   }
   .dark main {
     background-image: var(--background-gradient);
+    /* background: url("../assets/covers/cover.png");
+    background-size: cover;
+    background-repeat: no-repeat; */
+  }
+  .light .card-bg-image {
+    background: url("../assets/covers/xon-cover.png") no-repeat;
+    background-size: cover;
+    background-position: center -20px;
+    border-radius: 20px; 
+    overflow: hidden;
   }
   .dark .card-bg-image {
-    background: url("../assets/covers/universe.png");
+    background: url("../assets/covers/xon-cover.png") no-repeat;
+    background-size: cover;
+    background-position: center -20px;
+    border-radius: 20px; 
+    overflow: hidden;
+    border: 0;
   }
 }

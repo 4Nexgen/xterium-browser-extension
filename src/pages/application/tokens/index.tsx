@@ -27,10 +27,10 @@ import React from "react"
 const IndexTokens = () => {
   return (
     <>
-      <Card className="mb-3">
+      <Card className="mb-3 card-bg-image">
         <CardHeader>
           <CardTitle>
-            <b>NATIVE</b>
+            <b className="text-white">NATIVE TOKEN</b>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -42,12 +42,12 @@ const IndexTokens = () => {
                 </TableCell>
                 <TableCell>
                   <div className="mb-[2px]">
-                    <span className="text-lg font-bold">XON</span>
+                    <span className="text-lg font-bold text-white">XON</span>
                   </div>
                   <Badge>Xode Native Token</Badge>
                 </TableCell>
                 <TableCell className="w-[50px] justify-end pr-2">
-                  <Pencil size="20" />
+                  <Pencil size="20" color="white" />
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -71,7 +71,7 @@ const IndexTokens = () => {
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">XGM</span>
                   </div>
-                  <Badge>Xode Native Token</Badge>
+                  <Badge>XGame</Badge>
                 </TableCell>
                 <TableCell className="w-[50px] justify-end pr-2">
                   <Pencil size="20" />
@@ -85,7 +85,7 @@ const IndexTokens = () => {
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">XAV</span>
                   </div>
-                  <Badge>Xode Native Token</Badge>
+                  <Badge>Xavier</Badge>
                 </TableCell>
                 <TableCell className="w-[50px] justify-end pr-2">
                   <Pencil size="20" />
@@ -99,7 +99,7 @@ const IndexTokens = () => {
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">AZK</span>
                   </div>
-                  <Badge>Xode Native Token</Badge>
+                  <Badge>Azkal</Badge>
                 </TableCell>
                 <TableCell className="w-[50px] justify-end pr-2">
                   <Pencil size="20" />
@@ -113,7 +113,7 @@ const IndexTokens = () => {
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">iXON</span>
                   </div>
-                  <Badge>Xode Native Token</Badge>
+                  <Badge>Private XON Token</Badge>
                 </TableCell>
                 <TableCell className="w-[50px] justify-end pr-2">
                   <Pencil size="20" />

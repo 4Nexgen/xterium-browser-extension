@@ -37,7 +37,7 @@ import XAVLogo from "data-base64:/assets/tokens/xav.png"
 import XGMLogo from "data-base64:/assets/tokens/xgm.png"
 import XONLogo from "data-base64:/assets/tokens/xon.png"
 import { Check, ChevronsUpDown, Pencil } from "lucide-react"
-import React from "react"
+import React, { useState } from "react"
 
 const addresses = [
   {
@@ -51,8 +51,8 @@ const addresses = [
 ]
 
 const IndexBalance = () => {
-  const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState("")
+  const [open, setOpen] = useState(false)
+  const [value, setValue] = useState("")
 
   return (
     <>
@@ -99,14 +99,14 @@ const IndexBalance = () => {
           </Command>
         </PopoverContent>
       </Popover>
-      <Card className="mb-3 card-bg-image">
+      <Card className="mb-3">
         <CardHeader>
           <CardTitle>
-            <b>NATIVE</b>
+            <b>TOKENS</b>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Table className="">
+          <Table>
             <TableBody>
               <TableRow>
                 <TableCell className="w-[50px] justify-center">
@@ -122,19 +122,6 @@ const IndexBalance = () => {
                   <span className="text-lg font-bold">1,000.00</span>
                 </TableCell>
               </TableRow>
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-      <Card className="mb-3">
-        <CardHeader>
-          <CardTitle>
-            <b>ASSETS</b>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableBody>
               <TableRow>
                 <TableCell className="w-[50px] justify-center">
                   <img src={XGMLogo} className="ml-1 w-10" />
@@ -143,7 +130,7 @@ const IndexBalance = () => {
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">XGM</span>
                   </div>
-                  <Badge>Xode Native Token</Badge>
+                  <Badge>XGame</Badge>
                 </TableCell>
                 <TableCell className="w-[50px] justify-end pr-2 text-right">
                   <span className="text-lg font-bold">100.00</span>
@@ -157,7 +144,7 @@ const IndexBalance = () => {
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">XAV</span>
                   </div>
-                  <Badge>Xode Native Token</Badge>
+                  <Badge>Xavier</Badge>
                 </TableCell>
                 <TableCell className="w-[50px] justify-end pr-2 text-right">
                   <span className="text-lg font-bold">500.00</span>
@@ -171,7 +158,7 @@ const IndexBalance = () => {
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">AZK</span>
                   </div>
-                  <Badge>Xode Native Token</Badge>
+                  <Badge>Azkal</Badge>
                 </TableCell>
                 <TableCell className="w-[50px] justify-end pr-2 text-right">
                   <span className="text-lg font-bold">1,000.00</span>
@@ -185,7 +172,7 @@ const IndexBalance = () => {
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">iXON</span>
                   </div>
-                  <Badge>Xode Native Token</Badge>
+                  <Badge>Private XON Token</Badge>
                 </TableCell>
                 <TableCell className="w-[50px] justify-end pr-2 text-right">
                   <span className="text-lg font-bold">4,021.00</span>

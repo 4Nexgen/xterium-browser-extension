@@ -50,7 +50,7 @@ import {
   Wallet
 } from "lucide-react"
 import { useTheme } from "next-themes"
-import React from "react"
+import React, { useState } from "react"
 
 const applicationItems = [
   {
@@ -95,8 +95,8 @@ const networks = [
 ]
 
 const ApplicationSidebar = ({ onSetCurrentPage }) => {
-  const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState("")
+  const [open, setOpen] = useState(false)
+  const [value, setValue] = useState("")
   const { setTheme } = useTheme()
 
   return (
