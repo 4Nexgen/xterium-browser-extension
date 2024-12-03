@@ -75,7 +75,7 @@ export default function IndexCreatePassword() {
         />
 
       <div
-        className="p-4 flex justify-center py-10"
+        className="flex justify-center py-14"
         style={{
           background: "linear-gradient(180deg, #2E266D 0%, #121B26 100%)",
         }}
@@ -102,7 +102,7 @@ export default function IndexCreatePassword() {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="w-full max-w-md space-y-6"
+                className="w-full max-w-md space-y-4"
               >
                 <FormField
                   control={form.control}
@@ -110,7 +110,7 @@ export default function IndexCreatePassword() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel
-                        className="font-inter font-extrabold text-base leading-[15px] tracking-[0.15em] text-[#9AB3EB]"
+                        className="font-inter font-extrabold text-[12px] leading-[15px] tracking-[0.15em] text-[#9AB3EB]"
                       >
                         Enter Password:
                       </FormLabel>
@@ -119,7 +119,6 @@ export default function IndexCreatePassword() {
                           type="password"
                           placeholder="Enter password"
                           {...field}
-                          className="bg-[#1B2232] text-[#9AB3EB]  text-xs border border-[#3A3D58]"
                         />
                       </FormControl>
                       <FormMessage />
@@ -132,7 +131,7 @@ export default function IndexCreatePassword() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel 
-                        className="font-inter font-extrabold text-base leading-[15px] tracking-[0.15em] text-[#9AB3EB]"
+                        className="font-inter font-extrabold text-[12px] leading-[15px] tracking-[0.15em] text-[#9AB3EB]"
                       >
                         Confirm Password:
                       </FormLabel>
@@ -141,14 +140,13 @@ export default function IndexCreatePassword() {
                           type="password"
                           placeholder="Confirm password"
                           {...field}
-                          className="bg-[#1B2232] text-[#9AB3EB] placeholder-[#9AB3EB] text-xs border border-[#3A3D58]"
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <p className="font-inter text-sm text-[#9AB3EB] mt-2 text-extrabold text-justify">
+                <p className="font-inter text-[12px] text-[#9AB3EB] mt-2 text-bold text-justify">
                   Your password is used to unlock your wallet and is securely
                   stored. We recommend 12 characters with uppercase, lowercase,
                   symbols, and numbers.
