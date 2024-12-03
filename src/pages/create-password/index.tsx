@@ -148,7 +148,7 @@ export default function IndexCreatePassword() {
                     </FormItem>
                   )}
                 />
-                <p className="text-sm text-[#9AB3EB] mt-2 text-bold">
+                <p className="font-inter text-sm text-[#9AB3EB] mt-2 text-extrabold text-justify">
                   Your password is used to unlock your wallet and is securely
                   stored. We recommend 12 characters with uppercase, lowercase,
                   symbols, and numbers.
