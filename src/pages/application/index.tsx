@@ -87,7 +87,7 @@ const IndexApplication = () => {
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button
-                  variant="outline"
+                  variant="roundedOutline"
                   role="combobox"
                   aria-expanded={open}
                   className="w-full float-right"
