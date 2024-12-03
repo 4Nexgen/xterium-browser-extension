@@ -25,17 +25,6 @@ const IndexApplication = () => {
             currentPage={currentPage}
             onSetCurrentPage={handleSetCurrentPage}
         />
-          {theme === "light" && (
-            <Separator orientation="vertical" className="mr-2 h-4" />
-          )}
-          {theme === "dark" && (
-            <Separator orientation="vertical" className="mr-2 h-4 bg-white" />
-          )}
-          {theme === "system" && (
-            <Separator orientation="vertical" className="mr-2 h-4 bg-white" />
-          )}
-          
-
         <div className="px-4">
           {currentPage === "Balance" && <IndexBalance />}
           {currentPage === "Tokens" && <IndexTokens />}
