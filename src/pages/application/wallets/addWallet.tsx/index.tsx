@@ -86,7 +86,7 @@ const IndexAddWallet: React.FC<IndexAddWalletProps> = ({ isDrawerOpen, toggleDra
               {/* Save Button */}
               <Button
                 type="button"
-                className="relative w-full py-3 border-2 border-white bg-gradient-to-b from-[#9242AB] via-[#B375DC] to-[#805DC4] text-white font-semibold rounded-full transition-all duration-300 hover:from-[#4247AB] hover:via-[#7C75DC] hover:to-[#805DC4]"
+                variant="violet"
                 >
                 <span className="relative z-10">ADD NEW WALLET</span>
 

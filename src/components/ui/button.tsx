@@ -21,6 +21,10 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        violet:"relative w-full py-3 border-2 border-white bg-gradient-to-b from-[#9242AB] via-[#B375DC] to-[#805DC4] text-white font-semibold rounded-full transition-all duration-300 hover:from-[#4247AB] hover:via-[#7C75DC] hover:to-[#805DC4]",
+        red: "relative w-full py-3 border-2 border-white bg-gradient-to-b from-[#FF5050] via-[#E32525] to-[#E32525] text-white font-semibold rounded-full transition-all duration-300 hover:from-[#4247AB] hover:via-[#7C75DC] hover:to-[#805DC4]"
+
+
       },
       size: {
         default: "h-9 px-4 py-2",

@@ -25,7 +25,7 @@ const IndexWallet = () => {
   };
 
   return (
-    <div className="relative p-4 flex flex-col h-screen">
+    <div className="relative p-4 flex flex-col justify-between h-screen">
       <Card className="mb-3">
         <CardContent>
           <Table>
@@ -88,7 +88,7 @@ const IndexWallet = () => {
       {/* Add Wallet Button */}
       <Button 
         onClick={toggleDrawer} 
-        className="relative w-full py-3 border-2 border-white bg-gradient-to-b from-[#9242AB] via-[#B375DC] to-[#805DC4] text-white font-semibold rounded-full transition-all duration-300 hover:from-[#4247AB] hover:via-[#7C75DC] hover:to-[#805DC4] mt-auto"
+        variant="violet"
         >
         ADD WALLET
       </Button>
