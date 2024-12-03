@@ -59,7 +59,7 @@ const Header: React.FC<HeaderProps> = ({
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
-                variant="roundedOutline"
+                variant="outline"
                 role="combobox"
                 aria-expanded={open}
                 className="w-full float-right"
@@ -130,7 +130,7 @@ const Header: React.FC<HeaderProps> = ({
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
-                variant="roundedOutline"
+                variant="outline"
                 role="combobox"
                 aria-expanded={open}
                 className="w-full float-right"
@@ -208,7 +208,7 @@ const Header: React.FC<HeaderProps> = ({
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
-              variant="roundedOutline"
+              variant="outline"
               role="combobox"
               aria-expanded={open}
               className="w-full float-right"
