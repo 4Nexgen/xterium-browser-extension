@@ -1,6 +1,5 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Drawer } from "@/components/ui/drawer"
 import {
   Card,
   CardContent,
@@ -17,6 +16,7 @@ import {
   CommandItem,
   CommandList
 } from "@/components/ui/command"
+import { Drawer } from "@/components/ui/drawer"
 import {
   Popover,
   PopoverContent,
@@ -31,49 +31,26 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
+import { address_data } from "@/data/addresses.data"
+import { token_data } from "@/data/tokens.data"
 import { cn } from "@/lib/utils"
-import AZKLogo from "data-base64:/assets/tokens/azk.png"
-import IXONLogo from "data-base64:/assets/tokens/ixon.png"
-import XAVLogo from "data-base64:/assets/tokens/xav.png"
-import XGMLogo from "data-base64:/assets/tokens/xgm.png"
-import XONLogo from "data-base64:/assets/tokens/xon.png"
-import IXAVLogo from "data-base64:/assets/tokens/ixav.png"
 import { Check, ChevronsUpDown, Pencil } from "lucide-react"
 import React, { useState } from "react"
+
 import IndexTokenDetails from "./token-details"
-
-const addresses = [
-  {
-    value: "5Clkajsdlashlili3y123211294798910h237",
-    label: "Noah (5Clka...0h237)"
-  },
-  {
-    value: "5Blkajsdlaslili3y123211294798910h237",
-    label: "Oliver (5Blka...0h237)"
-  }
-]
-
-const tokens = [
-  { symbol: "XON", name: "Native XON Token", balance: "1,000.00", logo: XONLogo },
-  { symbol: "XGM", name: "XGame Utility Token", balance: "100.00", logo: XGMLogo },
-  { symbol: "XAV", name: "Xaver Utility Token", balance: "500.00", logo: XAVLogo },
-  { symbol: "AZK", name: "Azkal Meme Token", balance: "1,000.00", logo: AZKLogo },
-  { symbol: "IXON", name: "Private XON Token", balance: "4,021.00", logo: IXONLogo },
-  { symbol: "IXAV", name: "Private XAV Token", balance: "4,021.00", logo: IXAVLogo },
-];
 
 const IndexBalance = () => {
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState("")
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [selectedToken, setSelectedToken] = useState({
     symbol: "",
-    logo: "",
-  });
+    logo: ""
+  })
   const handleCellClick = (symbol: string, logo: string) => {
-    setSelectedToken({ symbol, logo });
-    setIsDrawerOpen(true);
-  };
+    setSelectedToken({ symbol, logo })
+    setIsDrawerOpen(true)
+  }
 
   return (
     <>
@@ -87,7 +64,7 @@ const IndexBalance = () => {
             className="w-full mb-3 justify-between"
             size="lg">
             {value
-              ? addresses.find((address) => address.value === value)?.label
+              ? address_data.find((address) => address.value === value)?.label
               : "Select address"}
             <ChevronsUpDown className="opacity-50" />
           </Button>
@@ -98,7 +75,7 @@ const IndexBalance = () => {
             <CommandList>
               <CommandEmpty>No address found.</CommandEmpty>
               <CommandGroup>
-                {addresses.map((address) => (
+                {address_data.map((address) => (
                   <CommandItem
                     key={address.value}
                     value={address.value}
@@ -121,38 +98,39 @@ const IndexBalance = () => {
         </PopoverContent>
       </Popover>
       <Card className="mb-3">
-        <CardContent>
         <Table>
-        <TableBody>
-          {tokens.map((token) => (
-            <TableRow
-              key={token.symbol}
-              onClick={() => handleCellClick(token.symbol, token.logo)} // Use the correct function
-              className="cursor-pointer hover:bg-gray-800"
-            >
-              <TableCell className="w-[50px] justify-center">
-                <img src={token.logo} className="ml-1 w-10" alt={token.symbol} />
-              </TableCell>
-              <TableCell>
-                <div className="mb-[2px]">
-                  <span className="text-lg font-bold">{token.symbol}</span>
-                </div>
-                <span>{token.name}</span>
-              </TableCell>
-              <TableCell className="w-[50px] justify-end pr-2 text-right">
-                <span className="text-lg font-bold">{token.balance}</span>
-              </TableCell>
-            </TableRow>          
-          ))}
-        </TableBody>
-      </Table>
+          <TableBody>
+            {token_data.map((token) => (
+              <TableRow
+                key={token.symbol}
+                onClick={() => handleCellClick(token.symbol, token.logo)} // Use the correct function
+                className="cursor-pointer hover:bg-gray-800">
+                <TableCell className="w-[50px] justify-center">
+                  <img
+                    src={token.logo}
+                    className="ml-1 w-10"
+                    alt={token.symbol}
+                  />
+                </TableCell>
+                <TableCell>
+                  <div className="mb-[2px]">
+                    <span className="text-lg font-bold">{token.symbol}</span>
+                  </div>
+                  <span>{token.name}</span>
+                </TableCell>
+                <TableCell className="w-[50px] justify-end pr-2 text-right">
+                  <span className="text-lg font-bold">{token.balance}</span>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
 
-      <IndexTokenDetails
-        isDrawerOpen={isDrawerOpen}
-        toggleDrawer={() => setIsDrawerOpen(!isDrawerOpen)}
-        selectedToken={selectedToken}
-      />
-        </CardContent>
+        <IndexTokenDetails
+          isDrawerOpen={isDrawerOpen}
+          toggleDrawer={() => setIsDrawerOpen(!isDrawerOpen)}
+          selectedToken={selectedToken}
+        />
       </Card>
     </>
   )
