@@ -1,6 +1,9 @@
 import React from "react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Form } from "@/components/ui/form";
 
 interface IndexAddWalletProps {
   isDrawerOpen: boolean;
@@ -10,89 +13,90 @@ interface IndexAddWalletProps {
 const IndexAddWallet: React.FC<IndexAddWalletProps> = ({ isDrawerOpen, toggleDrawer }) => {
   return (
     <Drawer open={isDrawerOpen} onOpenChange={toggleDrawer}>
-      <DrawerContent className="bg-gradient-to-b from-[#32436A] to-[#121B26] text-white">
+      <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle className="text-lg font-bold text-purple-400">ADD WALLET</DrawerTitle>
+          <DrawerTitle>
+            ADD WALLET
+          </DrawerTitle>
         </DrawerHeader>
         <DrawerDescription>
-          {/* Drawer Content */}
           <div className="p-6">
-            <form>
-              {/* Wallet Name */}
+            <Form>
               <div className="mb-4">
-                <label className="block text-sm mb-1 text-[#9AB3EB]">Enter a unique wallet name</label>
-                <input
+                <Label>
+                  Enter a unique wallet name:
+                </Label>
+                <Input
                   type="text"
                   placeholder="Wallet Name"
-                  className="w-full px-3 py-2 bg-[#1B2232] text-[#657AA2] rounded focus:outline-none"
                 />
               </div>
 
-              {/* Address Type */}
               <div className="mb-4">
-                <label className="block text-sm mb-1 text-[#9AB3EB]">Address Type</label>
-                <input
+                <Label>
+                  Address Type:
+                </Label>
+                <Input
                   type="text"
                   value="Xode"
                   readOnly
-                  className="w-full px-3 py-2 bg-[#1B2232] text-gray-400 rounded focus:outline-none"
                 />
               </div>
 
-              {/* Mnemonic Phrase */}
               <div className="mb-4">
-                <label className="block text-sm mb-1 text-[#9AB3EB]">Mnemonic Phrase:</label>
+                <Label>
+                  Mnemonic Phrase:
+                </Label>
                 <div className="flex items-center gap-2">
-                  <input
+                  <Input
                     type="text"
                     placeholder="Mnemonic Phrase"
-                    className="flex-1 px-3 py-2 bg-[#1B2232] text-white rounded focus:outline-none"
                   />
-                  <Button type="button" className="bg-[#64629B] text-white hover:bg-[#64629B]">
+                  <Button 
+                    type="button"
+                    variant="variant1"
+                  >
                     ↻
                   </Button>
                 </div>
               </div>
 
-              {/* Create Key Button */}
-              <div className="mb-4">
+              <div className="mb-4 flex items-center justify-center">
                 <Button
                   type="button"
-                  className="w-full py-2 bg-[#64629B] text-white hover:bg-[#64629B]"
+                  variant="variant2"
                 >
                   Create Key
                 </Button>
               </div>
 
-              {/* Secret Key */}
               <div className="mb-4">
-                <label className="block text-sm mb-1 text-[#9AB3EB]">Secret Key:</label>
-                <input
+                <Label>
+                  Secret Key:
+                </Label>
+                <Input
                   type="text"
                   placeholder="Secret Key"
-                  className="w-full px-3 py-2 bg-[#1B2232] text-white rounded focus:outline-none"
                 />
               </div>
 
-              {/* Public Key */}
               <div className="mb-4">
-                <label className="block text-sm mb-1 text-[#9AB3EB]">Public Key:</label>
-                <input
+                <Label>
+                  Public Key:
+                </Label>
+                <Input
                   type="text"
                   placeholder="Public Key"
-                  className="w-full px-3 py-2 text-white bg-[#1B2232] rounded focus:outline-none"
                 />
               </div>
-              {/* Save Button */}
+
               <Button
                 type="button"
                 variant="violet"
                 >
-                <span className="relative z-10">ADD NEW WALLET</span>
-
+                ADD NEW WALLET
               </Button>
-
-            </form>
+            </Form>
           </div>
         </DrawerDescription>
       </DrawerContent>
