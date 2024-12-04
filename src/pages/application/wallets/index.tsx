@@ -26,7 +26,7 @@ const IndexWallet = () => {
       <Card className="mb-3">
           <Table>
             <TableBody>
-              <TableRow className="hover:bg-muted/50">
+              <TableRow className="hover:bg-[#32436A]/100">
                 <TableCell className="px-4">
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">Xterium</span>
@@ -43,7 +43,7 @@ const IndexWallet = () => {
                   <Trash />
                 </TableCell>
               </TableRow>
-              <TableRow className="hover:bg-muted/50">
+              <TableRow className="hover:bg-[#32436A]/100">
                 <TableCell className="px-4">
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">Xterium</span>
@@ -60,7 +60,7 @@ const IndexWallet = () => {
                   <Trash />
                 </TableCell>
               </TableRow>
-              <TableRow className="hover:bg-muted/50">
+              <TableRow className="hover:bg-[#32436A]/100">
                 <TableCell className="px-4">
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">Xterium</span>
