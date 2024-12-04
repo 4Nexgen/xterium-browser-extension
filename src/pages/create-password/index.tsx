@@ -83,7 +83,6 @@ export default function IndexCreatePassword() {
         <img src={XteriumLogo} className="w-229" alt="Xterium Logo" />
       </div>
 
-      {/* Gradient line */}
       <div
         className="h-3 mt-7"
         style={{
@@ -146,7 +145,7 @@ export default function IndexCreatePassword() {
                     </FormItem>
                   )}
                 />
-                <p className="font-inter text-[12px] text-[#9AB3EB] mt-2 text-bold text-justify">
+                <p className="font-inter text-[12px] text-[#9AB3EB] mt-2 font-base text-justify">
                   Your password is used to unlock your wallet and is securely
                   stored. We recommend 8 characters with uppercase, lowercase,
                   symbols, and numbers.

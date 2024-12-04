@@ -82,7 +82,7 @@ export default function IndexLogin() {
       >
         <img src={XteriumLogo} className="w-229" alt="Xterium Logo" />
       </div>
-      <div className="flex justify-center text-extrabold text-xl py-6">
+      <div className="flex justify-center font-bold text-xl py-6">
         <h1>Welcome!</h1>
       </div>
 

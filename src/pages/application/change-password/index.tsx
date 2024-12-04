@@ -23,7 +23,7 @@ const IndexChangePassword: React.FC<IndexChangePasswordProps> = ({ isDrawerOpen,
           <div className="p-6">
             <Form>
               <div className="mb-4">
-                <Label>
+                <Label className="font-bold">
                   Enter old password:
                 </Label>
                 <Input
@@ -32,7 +32,7 @@ const IndexChangePassword: React.FC<IndexChangePasswordProps> = ({ isDrawerOpen,
                 />
               </div>
               <div className="mb-4">
-                <Label>
+                <Label className="font-bold">
                   Enter new password:
                 </Label>
                 <Input
@@ -41,7 +41,7 @@ const IndexChangePassword: React.FC<IndexChangePasswordProps> = ({ isDrawerOpen,
                 />
               </div>
               <div className="mb-4">
-                <Label>
+                <Label className="font-bold">
                   Confirm new password:
                 </Label>
                 <Input
