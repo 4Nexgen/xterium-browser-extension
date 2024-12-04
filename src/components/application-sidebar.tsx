@@ -97,7 +97,6 @@ const ApplicationSidebar = ({ onSetCurrentPage }) => {
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
- 
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupLabel>Application</SidebarGroupLabel>

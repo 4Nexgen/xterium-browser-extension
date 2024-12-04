@@ -190,7 +190,7 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="flex top-0 h-16 shrink-0 items-center gap-2 px-4">
-      <SidebarTrigger className="p-2" />
+      <SidebarTrigger className="p-2 rounded" />
       <Separator
         orientation="vertical"
         className={`mr-2 h-4 ${theme === "light" ? "" : "bg-white"}`}
