@@ -14,8 +14,8 @@ const IndexExportWallet: React.FC<IndexExportWalletProps> = ({ isDrawerOpen, tog
   return (
     <Drawer open={isDrawerOpen} onOpenChange={toggleDrawer}>
       <DrawerContent>
-        <DrawerHeader className="border-b border[#2B3856]">
-          <DrawerTitle className="font-inter font-extrabold text-[12px] leading-[15px] tracking-[0.15em] text-[#9AB3EB]">
+        <DrawerHeader>
+          <DrawerTitle>
             EXPORT WALLET DATA
           </DrawerTitle>
         </DrawerHeader>

@@ -22,7 +22,7 @@ const IndexAddWallet: React.FC<IndexAddWalletProps> = ({ isDrawerOpen, toggleDra
         <DrawerDescription>
           <div className="p-6">
             <Form>
-              <div className="mb-4">
+              <div className="mb-3">
                 <Label>
                   Enter a unique wallet name:
                 </Label>
@@ -32,7 +32,7 @@ const IndexAddWallet: React.FC<IndexAddWalletProps> = ({ isDrawerOpen, toggleDra
                 />
               </div>
 
-              <div className="mb-4">
+              <div className="mb-3">
                 <Label>
                   Address Type:
                 </Label>
@@ -43,7 +43,7 @@ const IndexAddWallet: React.FC<IndexAddWalletProps> = ({ isDrawerOpen, toggleDra
                 />
               </div>
 
-              <div className="mb-4">
+              <div className="mb-3">
                 <Label>
                   Mnemonic Phrase:
                 </Label>
@@ -55,22 +55,24 @@ const IndexAddWallet: React.FC<IndexAddWalletProps> = ({ isDrawerOpen, toggleDra
                   <Button 
                     type="button"
                     variant="variant1"
+                    size="icon"
                   >
                     ↻
                   </Button>
                 </div>
               </div>
 
-              <div className="mb-4 flex items-center justify-center">
+              <div className="mb-2 flex items-center justify-center">
                 <Button
                   type="button"
                   variant="variant2"
+                  size="lg"
                 >
                   Create Key
                 </Button>
               </div>
 
-              <div className="mb-4">
+              <div className="mb-3">
                 <Label>
                   Secret Key:
                 </Label>
@@ -80,7 +82,7 @@ const IndexAddWallet: React.FC<IndexAddWalletProps> = ({ isDrawerOpen, toggleDra
                 />
               </div>
 
-              <div className="mb-4">
+              <div className="mb-3">
                 <Label>
                   Public Key:
                 </Label>

@@ -14,8 +14,8 @@ const IndexChangePassword: React.FC<IndexChangePasswordProps> = ({ isDrawerOpen,
   return (
     <Drawer open={isDrawerOpen} onOpenChange={toggleDrawer}>
       <DrawerContent>
-        <DrawerHeader className="border-b border[#2B3856]">
-          <DrawerTitle className="font-inter font-extrabold text-[12px] leading-[15px] tracking-[0.15em] text-[#9AB3EB]">
+        <DrawerHeader>
+          <DrawerTitle>
             Change Password
           </DrawerTitle>
         </DrawerHeader>

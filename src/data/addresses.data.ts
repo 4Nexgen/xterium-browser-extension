@@ -8,6 +8,10 @@ export const address_data: address[] = [
   {
     value: "5Blkajsdlaslili3y123211294798910h237",
     label: "Oliver"
+  },
+  {
+    value: "5FK4dDQcYdTPxMAHk9mcjitbkfaF1NRd6x",
+    label: "Test"
   }
   
 ]

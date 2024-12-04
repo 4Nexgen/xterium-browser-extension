@@ -15,6 +15,12 @@ import {
   Download,
   Trash
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { address_data } from "@/data/addresses.data";
 
 const IndexWallet = () => {
@@ -22,7 +28,7 @@ const IndexWallet = () => {
   const [copyMessage, setCopyMessage] = useState("");
   const [isExportDrawerOpen, setExportDrawerOpen] = useState(false);
   const [isDeleteDrawerOpen, setDeleteDrawerOpen] = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState<any>(null); // To store the selected address for deletion
+  const [selectedAddress, setSelectedAddress] = useState<any>(null); 
 
   const toggleDrawer = () => {
     setDrawerOpen(!isDrawerOpen);
@@ -39,27 +45,31 @@ const IndexWallet = () => {
   const handleCopy = (value: string) => {
     navigator.clipboard.writeText(value)
       .then(() => {
-        setCopyMessage("Copied to clipboard!");
-        setTimeout(() => {
-          setCopyMessage("");
-        }, 2000);
+        toast({
+          description: "Copied to clipboard!",
+        });
       })
       .catch((err) => {
         console.error("Failed to copy: ", err);
+        toast({
+          description: "Failed to copy text.",
+          variant: "destructive",
+        });
       });
   };
+  
 
   const handleDownload = () => {
     toggleExportDrawer();
   };
 
   const handleTrash = (addressItem: any) => {
-    setSelectedAddress(addressItem); // Set the address that is selected for deletion
+    setSelectedAddress(addressItem); 
     toggleDeleteDrawer();
   };
 
   return (
-    <div className="relative p-4 flex flex-col h-screen">
+    <div className="p-4 flex flex-col">
       <Card className="mb-3">
         <Table>
           <TableBody>
@@ -74,28 +84,55 @@ const IndexWallet = () => {
                   <span style={{ color: '#657AA2' }}>{addressItem.value.slice(-4)}</span>
                 </TableCell>
                 <TableCell className="w-[40px] justify-center text-center">
-                  <button 
-                    onClick={() => handleCopy(addressItem.value)} 
-                    className="w-full h-full flex items-center justify-center text-white"
-                  >
-                    <Copy />
-                  </button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <button 
+                          onClick={() => handleCopy(addressItem.value)} 
+                          className="w-full h-full flex items-center justify-center text-white"
+                        >
+                          <Copy />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Copy Address</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </TableCell>
                 <TableCell className="w-[40px] justify-center text-center">
-                  <button 
-                    onClick={handleDownload} 
-                    className="w-full h-full flex items-center justify-center text-white"
-                  >
-                    <Download />
-                  </button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <button 
+                        onClick={handleDownload} 
+                        className="w-full h-full flex items-center justify-center text-white"
+                      >
+                        <Download />
+                      </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Export Wallet</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </TableCell>
                 <TableCell className="w-[30px] justify-center text-center text-red-500 pr-4">
-                  <button 
-                    onClick={() => handleTrash(addressItem)} // Pass addressItem to handleTrash
-                    className="w-full h-full flex items-center justify-center"
-                  >
-                   <Trash />
-                  </button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <button 
+                          onClick={() => handleTrash(addressItem)} 
+                          className="w-full h-full flex items-center justify-center"
+                        >
+                        <Trash />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Delete Wallet</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </TableCell>
               </TableRow>
             ))}
@@ -112,7 +149,7 @@ const IndexWallet = () => {
       <Button 
         onClick={toggleDrawer} 
         variant="violet"
-        className="mt-auto"
+        className="my-auto"
       >
         ADD WALLET
       </Button>
@@ -122,7 +159,7 @@ const IndexWallet = () => {
       <IndexDeleteWallet 
         isDrawerOpen={isDeleteDrawerOpen} 
         toggleDrawer={toggleDeleteDrawer} 
-        addressItem={selectedAddress} // Pass selected address for deletion
+        addressItem={selectedAddress} 
       />
     </div>
   );
