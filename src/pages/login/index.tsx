@@ -75,12 +75,15 @@ export default function IndexLogin() {
         />
 
       <div
-        className="flex justify-center py-14"
+        className="flex justify-center pt-14"
         style={{
           background: "linear-gradient(180deg, #2E266D 0%, #121B26 100%)",
         }}
       >
         <img src={XteriumLogo} className="w-229" alt="Xterium Logo" />
+      </div>
+      <div className="flex justify-center text-extrabold text-xl py-6">
+        <h1>Welcome!</h1>
       </div>
 
       {/* Gradient line */}
@@ -93,7 +96,7 @@ export default function IndexLogin() {
 
       <div className="flex justify-center items-center w-full h-full">
         <Card className="w-full max-w-full sm:max-w-md lg:max-w-lg">
-          <CardContent
+          <div
             className="p-6 w-full"
             style={{
               background: "linear-gradient(180deg, #32436A 0%, #121826 100%)",
@@ -134,7 +137,7 @@ export default function IndexLogin() {
                 </Button>
               </form>
             </Form>
-          </CardContent>
+          </div>
         </Card>
       </div>
 
