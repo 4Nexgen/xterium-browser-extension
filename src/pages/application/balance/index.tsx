@@ -103,7 +103,7 @@ const IndexBalance = () => {
               <TableRow
                 key={token.symbol}
                 onClick={() => handleCellClick(token.symbol, token.logo)} // Use the correct function
-                className="cursor-pointer hover:bg-[#32436A]/100">
+                className="cursor-pointer hover:bg-[#32436A]/100 px-4">
                 <TableCell className="w-[50px] justify-center">
                   <img
                     src={token.logo}

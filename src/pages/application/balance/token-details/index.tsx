@@ -35,12 +35,14 @@ const IndexTokenDetails: React.FC<IndexTokenDetailsProps> = ({
           </div>
         </DrawerHeader>
         <DrawerDescription>
-          <Button
-            variant="violet"
-            type="submit"
-          >
-            TRANSFER
-          </Button>
+          <div className="p-6">
+            <Button
+              variant="violet"
+              type="submit"
+            >
+              TRANSFER
+            </Button>
+          </div>
         </DrawerDescription>
       </DrawerContent>
     </Drawer>

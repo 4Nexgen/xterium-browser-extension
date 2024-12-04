@@ -54,7 +54,7 @@ const Header: React.FC<HeaderProps> = ({
             background: "#2E266D",
         }}
       >
-        <h1 className="text-base font-semibold">Setup Password</h1>
+        <h1 className="text-base font-semibold tracking-[0.15em]">Setup Password</h1>
         <div className="w-[200px]">
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
@@ -125,7 +125,7 @@ const Header: React.FC<HeaderProps> = ({
             background: "#2E266D",
         }}
       >
-        <h1 className="text-base font-semibold">Login</h1>
+        <h1 className="text-base font-semibold tracking-[0.15em]">Login</h1>
         <div className="w-[200px]">
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
@@ -195,7 +195,7 @@ const Header: React.FC<HeaderProps> = ({
         orientation="vertical"
         className={`mr-2 h-4 ${theme === "light" ? "" : "bg-white"}`}
       />
-      <Breadcrumb className="w-full">
+      <Breadcrumb className="w-full tracking-[0.15em]">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbPage>
