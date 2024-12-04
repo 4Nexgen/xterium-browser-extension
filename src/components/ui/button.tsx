@@ -19,12 +19,18 @@ const buttonVariants = cva(
           "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground rounded",
         secondary:
           "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-        violet:"relative w-full py-3 border-4 border-white bg-gradient-to-b from-[#9242AB] via-[#B375DC] to-[#805DC4] text-white font-inter tracking-[0.15em] font-bold text-xs rounded-full transition-all duration-300 hover:from-[#4247AB] hover:via-[#7C75DC] hover:to-[#805DC4]",
-        red: "relative w-full py-3 border-4 border-white bg-gradient-to-b from-[#FF5050] via-[#E32525] to-[#E32525] text-white tracking-[0.15em] font-inter font-bold text-xs rounded-full transition-all duration-300 hover:from-[#4247AB] hover:via-[#7C75DC] hover:to-[#805DC4]",
-        variant1: "bg-[#64629B] text-white hover:bg-[#64629B]",
-        variant2: "py-2 bg-[#64629B] rounded text-white hover:bg-[#64629B]"
+        ghost: 
+          "hover:bg-accent hover:text-accent-foreground",
+        link: 
+          "text-primary underline-offset-4 hover:underline",
+        violet:
+          "relative w-full py-3 border-4 border-white bg-gradient-to-b from-[var(--violet-start)] via-[var(--violet-middle)] to-[var(--violet-end)] text-white font-inter tracking-[0.15em] font-bold text-xs rounded-full transition-all duration-300 hover:from-[var(--violet-hover-start)] hover:via-[var(--violet-hover-middle)] hover:to-[var(--violet-hover-end)]",
+        red: 
+          "relative w-full py-3 border-4 border-white bg-gradient-to-b from-[var(--red-start)] via-[var(--red-middle)] to-[var(--red-end)] text-white tracking-[0.15em] font-inter font-bold text-xs rounded-full transition-all duration-300 hover:from-[var(--red-hover-start)] hover:via-[var(--red-hover-middle)] hover:to-[var(--red-hover-end)]",
+        variant1: 
+          "bg-[var(--variant1-bg)] text-white hover:bg-[var(--variant1-bg)]",
+        variant2: 
+          "py-2 bg-[var(--variant1-bg)] rounded text-white hover:bg-[var(--variant1-bg)]"
 
       },
       size: {

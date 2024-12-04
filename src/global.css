@@ -16,6 +16,7 @@ html, body {
     /* Card */
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
+    --default-bg: rgba(50, 67, 106, 0.5);
 
     /* Popover */
     --popover: 0 0% 100%;
@@ -57,6 +58,34 @@ html, body {
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Define the default badge color */
+    --badge-default-bg-color: #4D48F9;
+
+    /*Button violet variant*/
+    --violet-start: #9242AB;
+    --violet-middle: #B375DC;
+    --violet-end: #805DC4;
+    --violet-hover-start: #4247AB;
+    --violet-hover-middle: #7C75DC;
+    --violet-hover-end: #805DC4;
+
+    /*Button red variant*/
+    --red-start: #FF5050;
+    --red-middle: #E32525;
+    --red-end: #E32525;
+    --red-hover-start: #4247AB;
+    --red-hover-middle: #7C75DC;
+    --red-hover-end: #805DC4;
+
+    /*Button variant1*/
+    --variant1-bg: #64629B;
+
+    /*Button variant2*/
+    --variant2-bg: #64629B;
+
+
+
   }
   .dark {
     /* Root or body background */
@@ -66,6 +95,7 @@ html, body {
     /* Card */
     --card: 222, 30%, 15%;
     --card-foreground: 0 0% 98%;
+    --card-background: #32436A/50;
 
     /* Popover */
     --popover: 213, 36%, 11%;
@@ -110,6 +140,27 @@ html, body {
 
     /* custom */
     --background-gradient: linear-gradient(180deg, #2e266d 0%, #121B26 100%);
+  }
+
+  .drawer-gradient {
+    background: linear-gradient(180deg, #32436A 0%, #121B26 100%);
+  }
+
+  .input-style {
+    background-color: #1B2232;
+    color: #657AA2;
+  }
+
+  .input-style::placeholder {
+    color: #657AA2;
+  }
+
+  .table-border {
+    border-color: #3E477D;
+  }
+
+  .text-label-color {
+    color: #9AB3EB;
   }
 }
 
