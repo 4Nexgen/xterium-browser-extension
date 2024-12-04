@@ -93,7 +93,7 @@ export default function IndexCreatePassword() {
 
       <div className="flex justify-center w-full flex-grow">
         <Card>
-          <CardContent 
+          <div 
             className="p-6 w-full"
             style={{
               background: "linear-gradient(180deg, #32436A 0%, #121826 100%)",
@@ -102,7 +102,7 @@ export default function IndexCreatePassword() {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="w-full max-w-md space-y-4"
+                className="w-full max-w-md space-y-3"
               >
                 <FormField
                   control={form.control}
@@ -148,7 +148,7 @@ export default function IndexCreatePassword() {
                 />
                 <p className="font-inter text-[12px] text-[#9AB3EB] mt-2 text-bold text-justify">
                   Your password is used to unlock your wallet and is securely
-                  stored. We recommend 12 characters with uppercase, lowercase,
+                  stored. We recommend 8 characters with uppercase, lowercase,
                   symbols, and numbers.
                 </p>
                 <Button
@@ -159,7 +159,7 @@ export default function IndexCreatePassword() {
                 </Button>
               </form>
             </Form>
-          </CardContent>
+          </div>
         </Card>
       </div>
     </div>
