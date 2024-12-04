@@ -61,7 +61,7 @@ const IndexTokens = () => {
         </CardHeader>
           <Table>
             <TableBody>
-              <TableRow>
+              <TableRow className="cursor-pointer hover:bg-[#32436A]/100">
                 <TableCell className="w-[50px] justify-center">
                   <Image src={XGMLogo} alt="XGM Logo" className="ml-1" width={40} height={40} />
                 </TableCell>
@@ -69,13 +69,13 @@ const IndexTokens = () => {
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">XGM</span>
                   </div>
-                  <Badge>XGame</Badge>
+                  <Badge>XGame Utility Token</Badge>
                 </TableCell>
                 <TableCell className="w-[50px] justify-end pr-2">
                   <Pencil size="20" />
                 </TableCell>
               </TableRow>
-              <TableRow>
+              <TableRow className="cursor-pointer hover:bg-[#32436A]/100">
                 <TableCell className="w-[50px] justify-center">
                   <Image src={XAVLogo} alt="XAV Logo" className="ml-1" width={40} height={40} />
                 </TableCell>
@@ -83,13 +83,13 @@ const IndexTokens = () => {
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">XAV</span>
                   </div>
-                  <Badge>Xavier</Badge>
+                  <Badge>Xaver Utility Token</Badge>
                 </TableCell>
                 <TableCell className="w-[50px] justify-end pr-2">
                   <Pencil size="20" />
                 </TableCell>
               </TableRow>
-              <TableRow>
+              <TableRow className="cursor-pointer hover:bg-[#32436A]/100">
                 <TableCell className="w-[50px] justify-center">
                   <Image src={AZKLogo} alt="AZK Logo" className="ml-1" width={40} height={40} />
                 </TableCell>
@@ -97,13 +97,13 @@ const IndexTokens = () => {
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">AZK</span>
                   </div>
-                  <Badge>Azkal</Badge>
+                  <Badge>Azkal Meme Token</Badge>
                 </TableCell>
                 <TableCell className="w-[50px] justify-end pr-2">
                   <Pencil size="20" />
                 </TableCell>
               </TableRow>
-              <TableRow>
+              <TableRow className="cursor-pointer hover:bg-[#32436A]/100">
                 <TableCell className="w-[50px] justify-center">
                   <Image src={IXONLogo} alt="IXON Logo" className="ml-1" width={40} height={40} />
                 </TableCell>
