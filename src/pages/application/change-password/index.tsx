@@ -16,7 +16,7 @@ const IndexChangePassword: React.FC<IndexChangePasswordProps> = ({ isDrawerOpen,
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>
-            Change Password
+            CHANGE PASSWORD
           </DrawerTitle>
         </DrawerHeader>
         <DrawerDescription>

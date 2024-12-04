@@ -45,6 +45,10 @@ const IndexWallet = () => {
   const handleCopy = (value: string) => {
     navigator.clipboard.writeText(value)
       .then(() => {
+        setCopyMessage("Copied to clipboard!");
+        setTimeout(() => {
+          setCopyMessage("");
+        }, 2000);
         toast({
           description: "Copied to clipboard!",
         });
