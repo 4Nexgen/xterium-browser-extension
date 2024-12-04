@@ -84,8 +84,6 @@ html, body {
     /*Button variant2*/
     --variant2-bg: #64629B;
 
-
-
   }
   .dark {
     /* Root or body background */
@@ -146,6 +144,14 @@ html, body {
     background: linear-gradient(180deg, #32436A 0%, #121B26 100%);
   }
 
+  .drawer {
+    background-color: #2F3F62;
+  }
+
+  .drawer-title-text-color {
+    color: #938FFB;
+  }
+
   .input-style {
     background-color: #1B2232;
     color: #657AA2;
@@ -161,6 +167,10 @@ html, body {
 
   .text-label-color {
     color: #9AB3EB;
+  }
+  
+  .text-purple {
+    color: #B375DC;
   }
 }
 
@@ -191,5 +201,8 @@ html, body {
     border-radius: 20px; 
     overflow: hidden;
     border: 0;
+  }
+  .bg-tablecell-detail {
+    @apply bg-[#32436A]/50 border border-[#3B4C74];
   }
 }
