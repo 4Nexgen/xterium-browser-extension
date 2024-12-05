@@ -1,3 +1,5 @@
+import Header from "@/components/Header"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { useTheme } from "next-themes"
 import React, { useState } from "react"
 
@@ -7,7 +9,6 @@ import Layout from "./layout"
 import IndexNetworkStatus from "./network-status"
 import IndexTokens from "./tokens"
 import IndexWallets from "./wallets"
-import Header from "@/components/Header"
 
 const IndexApplication = () => {
   const [currentPage, setCurrentPage] = useState<string>("")
@@ -18,21 +19,25 @@ const IndexApplication = () => {
   }
 
   return (
-    <>
+    <main className="max-h-screen">
       <Layout onSetCurrentPage={handleSetCurrentPage}>
-        <Header
+        <div>
+          <Header
             currentPage={currentPage}
             onSetCurrentPage={handleSetCurrentPage}
-        />
-        <div className="px-4">
-          {currentPage === "Balance" && <IndexBalance />}
-          {currentPage === "Tokens" && <IndexTokens />}
-          {currentPage === "Network Status" && <IndexNetworkStatus />}
-          {currentPage === "Wallets" && <IndexWallets />}
-          {currentPage === "ImUrAi" && <IndexImUrAi />}
+          />
+          <div className="h-[calc(100vh-60px)]">
+            <ScrollArea className="px-4 h-full">
+              {currentPage === "Balance" && <IndexBalance />}
+              {currentPage === "Tokens" && <IndexTokens />}
+              {currentPage === "Network Status" && <IndexNetworkStatus />}
+              {currentPage === "Wallets" && <IndexWallets />}
+              {currentPage === "ImUrAi" && <IndexImUrAi />}
+            </ScrollArea>
+          </div>
         </div>
       </Layout>
-    </>
+    </main>
   )
 }
 

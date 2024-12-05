@@ -16,6 +16,8 @@ import {
   CommandList
 } from "@/components/ui/command"
 import { Drawer } from "@/components/ui/drawer"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
   Popover,
   PopoverContent,
@@ -37,8 +39,6 @@ import { Check, ChevronsUpDown, Pencil } from "lucide-react"
 import React, { useState } from "react"
 
 import IndexTokenDetails from "./token-details"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 
 const IndexBalance = () => {
   const [open, setOpen] = useState(false)
@@ -51,7 +51,7 @@ const IndexBalance = () => {
     owner: "",
     description: "",
     balance: "",
-    reserveBalance: "",
+    reserveBalance: ""
   })
   const handleCellClick = (
     symbol: string,
@@ -62,13 +62,20 @@ const IndexBalance = () => {
     balance: string,
     reserveBalance: string
   ) => {
-    setSelectedToken({ symbol, logo, network, owner, description, balance, reserveBalance });
-    setIsDrawerOpen(true);
-  };
-  
+    setSelectedToken({
+      symbol,
+      logo,
+      network,
+      owner,
+      description,
+      balance,
+      reserveBalance
+    })
+    setIsDrawerOpen(true)
+  }
 
   return (
-    <>
+    <div className="py-4">
       <Label className="text-base mb-2">Address:</Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
@@ -80,9 +87,7 @@ const IndexBalance = () => {
             size="lg">
             {value ? (
               <>
-                {
-                  address_data.find((address) => address.value === value)?.label
-                }{" "}
+                {address_data.find((address) => address.value === value)?.label}{" "}
                 {"{"}
                 {value.slice(0, 6)}...{value.slice(-6)}
                 {"}"}
@@ -106,8 +111,7 @@ const IndexBalance = () => {
                     onSelect={(currentValue) => {
                       setValue(currentValue === value ? "" : currentValue)
                       setOpen(false)
-                    }}
-                  >
+                    }}>
                     <div className="flex flex-col text-label-color">
                       <span>
                         {address.label} {"{"}
@@ -134,7 +138,17 @@ const IndexBalance = () => {
             {token_data.map((token) => (
               <TableRow
                 key={token.symbol}
-                onClick={() => handleCellClick(token.symbol, token.logo, token.network, token.owner, token.description, token.balance, token.reserveBalance)} // Use the correct function
+                onClick={() =>
+                  handleCellClick(
+                    token.symbol,
+                    token.logo,
+                    token.network,
+                    token.owner,
+                    token.description,
+                    token.balance,
+                    token.reserveBalance
+                  )
+                } // Use the correct function
                 className="cursor-pointer hover-bg-custom">
                 <TableCell className="w-[50px] justify-center">
                   <img
@@ -150,7 +164,9 @@ const IndexBalance = () => {
                   <Badge>{token.name}</Badge>
                 </TableCell>
                 <TableCell className="w-[50px] justify-end pr-2 text-right">
-                  <span className="text-lg font-bold text-purple">{token.balance}</span>
+                  <span className="text-lg font-bold text-purple">
+                    {token.balance}
+                  </span>
                 </TableCell>
               </TableRow>
             ))}
@@ -163,7 +179,7 @@ const IndexBalance = () => {
           selectedToken={selectedToken}
         />
       </Card>
-    </>
+    </div>
   )
 }
 

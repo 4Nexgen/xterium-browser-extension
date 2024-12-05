@@ -34,7 +34,7 @@ const IndexNetworkStatus = () => {
     fetchData()
   }, [])
   return (
-    <>
+    <div className="py-4">
       <Table className="mt-0">
         <TableBody>
           <TableRow className="flex flex-wrap justify-center">
@@ -97,7 +97,7 @@ const IndexNetworkStatus = () => {
           </TableRow>
         </TableBody>
       </Table>
-    </>
+    </div>
   )
 }
 
