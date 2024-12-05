@@ -1,4 +1,4 @@
-import { address } from "@/models/address.model"
+import type { address } from "@/models/address.model"
 
 export const address_data: address[] = [
   {

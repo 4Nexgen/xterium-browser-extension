@@ -58,6 +58,7 @@ html, body {
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-icon-background: #B375DC;
 
     /* Define the default badge color */
     --badge-default-bg-color: #4D48F9;
@@ -171,6 +172,10 @@ html, body {
   
   .text-purple {
     color: #B375DC;
+  }
+
+  .active-item {
+    background-color: #B375DC;
   }
 }
 

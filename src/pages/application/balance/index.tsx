@@ -37,6 +37,8 @@ import { Check, ChevronsUpDown, Pencil } from "lucide-react"
 import React, { useState } from "react"
 
 import IndexTokenDetails from "./token-details"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 const IndexBalance = () => {
   const [open, setOpen] = useState(false)
@@ -67,24 +69,33 @@ const IndexBalance = () => {
 
   return (
     <>
-      <div className="text-base mb-2">Address:</div>
+      <Label className="text-base mb-2">Address:</Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="roundedOutline"
             role="combobox"
             aria-expanded={open}
-            className="w-full mb-3 justify-between"
+            className="w-full mb-3 justify-between text-label-color"
             size="lg">
-            {value
-              ? address_data.find((address) => address.value === value)?.label
-              : "Select address"}
+            {value ? (
+              <>
+                {
+                  address_data.find((address) => address.value === value)?.label
+                }{" "}
+                {"{"}
+                {value.slice(0, 6)}...{value.slice(-6)}
+                {"}"}
+              </>
+            ) : (
+              "Select address"
+            )}
             <ChevronsUpDown className="opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="min-w-[400px] w-[400px] p-0">
+        <PopoverContent className="min-w-[420px] w-[420px] p-1">
           <Command>
-            <CommandInput placeholder="Search address..." className="h-9" />
+            <CommandInput placeholder="Search address..." className="h-9 " />
             <CommandList>
               <CommandEmpty>No address found.</CommandEmpty>
               <CommandGroup>
@@ -96,8 +107,14 @@ const IndexBalance = () => {
                       setValue(currentValue === value ? "" : currentValue)
                       setOpen(false)
                     }}
-                    >
-                    {address.label}
+                  >
+                    <div className="flex flex-col text-label-color">
+                      <span>
+                        {address.label} {"{"}
+                        {address.value.slice(0, 6)}...{address.value.slice(-6)}
+                        {"}"}
+                      </span>
+                    </div>
                     <Check
                       className={cn(
                         "ml-auto",
@@ -130,7 +147,7 @@ const IndexBalance = () => {
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">{token.symbol}</span>
                   </div>
-                  <span>{token.name}</span>
+                  <Badge>{token.name}</Badge>
                 </TableCell>
                 <TableCell className="w-[50px] justify-end pr-2 text-right">
                   <span className="text-lg font-bold text-purple">{token.balance}</span>

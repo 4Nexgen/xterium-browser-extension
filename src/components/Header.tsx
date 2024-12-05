@@ -230,7 +230,7 @@ const Header: React.FC<HeaderProps> = ({
               <ChevronsUpDown className="opacity-50 ml-2" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[240px] p-0">
+          <PopoverContent className="w-[200px]">
             <Command>
               <CommandInput placeholder="Search network..." className="h-9" />
               <CommandList>
