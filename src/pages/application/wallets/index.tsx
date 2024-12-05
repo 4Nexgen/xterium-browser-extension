@@ -22,6 +22,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { address_data } from "@/data/addresses.data";
+import { useToast } from "@/hooks/use-toast"
 
 const IndexWallet = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
@@ -29,6 +30,7 @@ const IndexWallet = () => {
   const [isExportDrawerOpen, setExportDrawerOpen] = useState(false);
   const [isDeleteDrawerOpen, setDeleteDrawerOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<any>(null); 
+  const { toast } = useToast()
 
   const toggleDrawer = () => {
     setDrawerOpen(!isDrawerOpen);
@@ -43,25 +45,15 @@ const IndexWallet = () => {
   };
 
   const handleCopy = (value: string) => {
-    navigator.clipboard.writeText(value)
+    navigator.clipboard
+      .writeText(value)
       .then(() => {
-        setCopyMessage("Copied to clipboard!");
-        setTimeout(() => {
-          setCopyMessage("");
-        }, 2000);
-        toast({
-          description: "Copied to clipboard!",
-        });
+        toast({ description: "Copied to clipboard!", variant: "default"});
       })
-      .catch((err) => {
-        console.error("Failed to copy: ", err);
-        toast({
-          description: "Failed to copy text.",
-          variant: "destructive",
-        });
+      .catch(() => {
+        toast({ description: "Failed to copy text.", variant: "destructive" });
       });
   };
-  
 
   const handleDownload = () => {
     toggleExportDrawer();
@@ -111,9 +103,9 @@ const IndexWallet = () => {
                         <button 
                         onClick={handleDownload} 
                         className="w-full h-full flex items-center justify-center text-white"
-                      >
-                        <Download />
-                      </button>
+                        >
+                         <Download />
+                        </button>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Export Wallet</p>
@@ -149,7 +141,6 @@ const IndexWallet = () => {
           {copyMessage}
         </div>
       )}
-
       <Button 
         onClick={toggleDrawer} 
         variant="violet"
