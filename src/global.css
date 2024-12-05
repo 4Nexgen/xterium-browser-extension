@@ -206,3 +206,8 @@ html, body {
     @apply bg-[#32436A]/50 border border-[#3B4C74];
   }
 }
+@layer utilities {
+  .hover-bg-custom {
+    @apply hover:bg-[#32436A]/100;
+  }
+}

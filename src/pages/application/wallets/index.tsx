@@ -82,7 +82,7 @@ const IndexWallet = () => {
         <Table>
           <TableBody>
             {address_data.map((addressItem, index) => (
-              <TableRow key={index} className="hover:bg-[#32436A]/100">
+              <TableRow key={index} className="hover-bg-custom">
                 <TableCell className="px-4">
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">{addressItem.label}</span>

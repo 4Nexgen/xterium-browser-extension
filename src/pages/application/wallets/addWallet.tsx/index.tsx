@@ -96,7 +96,7 @@ const IndexAddWallet: React.FC<IndexAddWalletProps> = ({ isDrawerOpen, toggleDra
                 type="button"
                 variant="violet"
                 >
-                ADD NEW WALLET
+                SAVE
               </Button>
             </Form>
           </div>

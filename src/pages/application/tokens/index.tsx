@@ -61,7 +61,7 @@ const IndexTokens = () => {
         </CardHeader>
           <Table>
             <TableBody>
-              <TableRow className="cursor-pointer hover:bg-[#32436A]/100">
+              <TableRow className="cursor-pointer hover-bg-custom">
                 <TableCell className="w-[50px] justify-center">
                   <Image src={XGMLogo} alt="XGM Logo" className="ml-1" width={40} height={40} />
                 </TableCell>
@@ -75,7 +75,7 @@ const IndexTokens = () => {
                   <Pencil size="20" />
                 </TableCell>
               </TableRow>
-              <TableRow className="cursor-pointer hover:bg-[#32436A]/100">
+              <TableRow className="cursor-pointer hover-bg-custom">
                 <TableCell className="w-[50px] justify-center">
                   <Image src={XAVLogo} alt="XAV Logo" className="ml-1" width={40} height={40} />
                 </TableCell>
@@ -89,7 +89,7 @@ const IndexTokens = () => {
                   <Pencil size="20" />
                 </TableCell>
               </TableRow>
-              <TableRow className="cursor-pointer hover:bg-[#32436A]/100">
+              <TableRow className="cursor-pointer hover-bg-custom">
                 <TableCell className="w-[50px] justify-center">
                   <Image src={AZKLogo} alt="AZK Logo" className="ml-1" width={40} height={40} />
                 </TableCell>
@@ -103,7 +103,7 @@ const IndexTokens = () => {
                   <Pencil size="20" />
                 </TableCell>
               </TableRow>
-              <TableRow className="cursor-pointer hover:bg-[#32436A]/100">
+              <TableRow className="cursor-pointer hover-bg-custom">
                 <TableCell className="w-[50px] justify-center">
                   <Image src={IXONLogo} alt="IXON Logo" className="ml-1" width={40} height={40} />
                 </TableCell>
@@ -117,7 +117,7 @@ const IndexTokens = () => {
                   <Pencil size="20" />
                 </TableCell>
               </TableRow>
-              <TableRow>
+              <TableRow className="cursor-pointer hover-bg-custom">
                 <TableCell className="w-[50px] justify-center">
                   <Image src={IXAVLogo} alt="IXON Logo" className="ml-1" width={40} height={40} />
                 </TableCell>

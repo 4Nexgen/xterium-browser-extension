@@ -95,7 +95,8 @@ const IndexBalance = () => {
                     onSelect={(currentValue) => {
                       setValue(currentValue === value ? "" : currentValue)
                       setOpen(false)
-                    }}>
+                    }}
+                    >
                     {address.label}
                     <Check
                       className={cn(
@@ -117,7 +118,7 @@ const IndexBalance = () => {
               <TableRow
                 key={token.symbol}
                 onClick={() => handleCellClick(token.symbol, token.logo, token.network, token.owner, token.description, token.balance, token.reserveBalance)} // Use the correct function
-                className="cursor-pointer hover:bg-gray-800">
+                className="cursor-pointer hover-bg-custom">
                 <TableCell className="w-[50px] justify-center">
                   <img
                     src={token.logo}
@@ -132,7 +133,7 @@ const IndexBalance = () => {
                   <span>{token.name}</span>
                 </TableCell>
                 <TableCell className="w-[50px] justify-end pr-2 text-right">
-                  <span className="text-lg font-bold">{token.balance}</span>
+                  <span className="text-lg font-bold text-purple">{token.balance}</span>
                 </TableCell>
               </TableRow>
             ))}
