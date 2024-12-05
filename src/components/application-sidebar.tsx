@@ -126,14 +126,14 @@ const ApplicationSidebar = ({ onSetCurrentPage }) => {
                             "rounded ", 
                             activeItem === item.title
                               ? "text-white bg-[var(--sidebar-icon-background)]" 
-                              : "bg-transparent text-white"
+                              : "bg-transparent primary"
                           )}
                         >
                           <item.icon
                             className={cn(
                               activeItem === item.title
-                                ? "text-white" 
-                                : "text-white" ,
+                                ? "primary" 
+                                : "primary" ,
                               "rounded",
                               "px-1"
                             )}
@@ -143,7 +143,7 @@ const ApplicationSidebar = ({ onSetCurrentPage }) => {
                           className={cn(
                             activeItem === item.title
                               ? "text-purple"
-                              : "text-white" 
+                              : "primary" 
                           )}
                         >
                           {item.title}
@@ -185,15 +185,15 @@ const ApplicationSidebar = ({ onSetCurrentPage }) => {
                           className={cn(
                             "rounded ", 
                             activeItem === item.title
-                              ? "text-white bg-[var(--sidebar-icon-background)]" 
-                              : "bg-transparent text-white" 
+                              ? "primary bg-[var(--sidebar-icon-background)]" 
+                              : "bg-transparent primary" 
                           )}
                         >
                           <item.icon
                             className={cn(
                               activeItem === item.title
-                                ? "text-white" 
-                                : "text-white" ,
+                                ? "primary" 
+                                : "primary" ,
                               "rounded",
                               "px-1"
                             )}
@@ -203,7 +203,7 @@ const ApplicationSidebar = ({ onSetCurrentPage }) => {
                           className={cn(
                             activeItem === item.title
                               ? "text-purple" 
-                              : "text-white"
+                              : "primary"
                           )}
                         >
                           {item.title}

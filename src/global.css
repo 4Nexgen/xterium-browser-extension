@@ -90,6 +90,8 @@ html, body {
     /* Root or body background */
     --background: 213, 36%, 11%;
     --foreground: 0 0% 98%;
+    --default-bg: rgba(50, 67, 106, 0.5);
+
 
     /* Card */
     --card: 222, 30%, 15%;
@@ -136,6 +138,32 @@ html, body {
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 222, 30%, 15%;
     --sidebar-ring: 222, 30%, 15%;
+    --sidebar-icon-background: #B375DC;
+
+    /* Define the default badge color */
+    --badge-default-bg-color: #4D48F9;
+
+    /*Button violet variant*/
+    --violet-start: #9242AB;
+    --violet-middle: #B375DC;
+    --violet-end: #805DC4;
+    --violet-hover-start: #4247AB;
+    --violet-hover-middle: #7C75DC;
+    --violet-hover-end: #805DC4;
+
+    /*Button red variant*/
+    --red-start: #FF5050;
+    --red-middle: #E32525;
+    --red-end: #E32525;
+    --red-hover-start: #4247AB;
+    --red-hover-middle: #7C75DC;
+    --red-hover-end: #805DC4;
+
+    /*Button variant1*/
+    --variant1-bg: #64629B;
+
+    /*Button variant2*/
+    --variant2-bg: #64629B;
 
     /* custom */
     --background-gradient: linear-gradient(180deg, #2e266d 0%, #121B26 100%);
