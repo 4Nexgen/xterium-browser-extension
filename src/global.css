@@ -2,8 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
-  min-width: 450px; 
+html,
+body {
+  min-width: 450px;
   min-height: 600px;
 }
 
@@ -47,7 +48,7 @@ html, body {
     --chart-5: 27 87% 67%;
 
     /* Radius */
-    --radius: 1.5rem;
+    --radius: 0.5rem;
 
     /* Sidebar */
     --sidebar-background: 0 0% 98%;
@@ -58,40 +59,38 @@ html, body {
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-    --sidebar-icon-background: #B375DC;
+    --sidebar-icon-background: #b375dc;
 
     /* Define the default badge color */
-    --badge-default-bg-color: #4D48F9;
+    --badge-default-bg-color: #4d48f9;
 
     /*Button violet variant*/
-    --violet-start: #9242AB;
-    --violet-middle: #B375DC;
-    --violet-end: #805DC4;
-    --violet-hover-start: #4247AB;
-    --violet-hover-middle: #7C75DC;
-    --violet-hover-end: #805DC4;
+    --violet-start: #9242ab;
+    --violet-middle: #b375dc;
+    --violet-end: #805dc4;
+    --violet-hover-start: #4247ab;
+    --violet-hover-middle: #7c75dc;
+    --violet-hover-end: #805dc4;
 
     /*Button red variant*/
-    --red-start: #FF5050;
-    --red-middle: #E32525;
-    --red-end: #E32525;
-    --red-hover-start: #4247AB;
-    --red-hover-middle: #7C75DC;
-    --red-hover-end: #805DC4;
+    --red-start: #ff5050;
+    --red-middle: #e32525;
+    --red-end: #e32525;
+    --red-hover-start: #4247ab;
+    --red-hover-middle: #7c75dc;
+    --red-hover-end: #805dc4;
 
     /*Button variant1*/
-    --variant1-bg: #64629B;
+    --variant1-bg: #64629b;
 
     /*Button variant2*/
-    --variant2-bg: #64629B;
-
+    --variant2-bg: #64629b;
   }
   .dark {
     /* Root or body background */
     --background: 213, 36%, 11%;
     --foreground: 0 0% 98%;
     --default-bg: rgba(50, 67, 106, 0.5);
-
 
     /* Card */
     --card: 222, 30%, 15%;
@@ -127,7 +126,7 @@ html, body {
     --chart-5: 340 75% 55%;
 
     /* Radius */
-    --radius: 1.5rem;
+    --radius: 0.5rem;
 
     /* Sidebar */
     --sidebar-background: 222, 30%, 15%;
@@ -138,72 +137,72 @@ html, body {
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 222, 30%, 15%;
     --sidebar-ring: 222, 30%, 15%;
-    --sidebar-icon-background: #B375DC;
+    --sidebar-icon-background: #b375dc;
 
     /* Define the default badge color */
-    --badge-default-bg-color: #4D48F9;
+    --badge-default-bg-color: #4d48f9;
 
     /*Button violet variant*/
-    --violet-start: #9242AB;
-    --violet-middle: #B375DC;
-    --violet-end: #805DC4;
-    --violet-hover-start: #4247AB;
-    --violet-hover-middle: #7C75DC;
-    --violet-hover-end: #805DC4;
+    --violet-start: #9242ab;
+    --violet-middle: #b375dc;
+    --violet-end: #805dc4;
+    --violet-hover-start: #4247ab;
+    --violet-hover-middle: #7c75dc;
+    --violet-hover-end: #805dc4;
 
     /*Button red variant*/
-    --red-start: #FF5050;
-    --red-middle: #E32525;
-    --red-end: #E32525;
-    --red-hover-start: #4247AB;
-    --red-hover-middle: #7C75DC;
-    --red-hover-end: #805DC4;
+    --red-start: #ff5050;
+    --red-middle: #e32525;
+    --red-end: #e32525;
+    --red-hover-start: #4247ab;
+    --red-hover-middle: #7c75dc;
+    --red-hover-end: #805dc4;
 
     /*Button variant1*/
-    --variant1-bg: #64629B;
+    --variant1-bg: #64629b;
 
     /*Button variant2*/
-    --variant2-bg: #64629B;
+    --variant2-bg: #64629b;
 
     /* custom */
-    --background-gradient: linear-gradient(180deg, #2e266d 0%, #121B26 100%);
+    --background-gradient: linear-gradient(180deg, #2e266d 0%, #121b26 100%);
   }
 
   .drawer-gradient {
-    background: linear-gradient(180deg, #32436A 0%, #121B26 100%);
+    background: linear-gradient(180deg, #32436a 0%, #121b26 100%);
   }
 
   .drawer {
-    background-color: #2F3F62;
+    background-color: #2f3f62;
   }
 
   .drawer-title-text-color {
-    color: #938FFB;
+    color: #938ffb;
   }
 
   .input-style {
-    background-color: #1B2232;
-    color: #657AA2;
+    background-color: #1b2232;
+    color: #657aa2;
   }
 
   .input-style::placeholder {
-    color: #657AA2;
+    color: #657aa2;
   }
 
   .table-border {
-    border-color: #3E477D;
+    border-color: #3e477d;
   }
 
   .text-label-color {
-    color: #9AB3EB;
+    color: #9ab3eb;
   }
-  
+
   .text-purple {
-    color: #B375DC;
+    color: #b375dc;
   }
 
   .active-item {
-    background-color: #B375DC;
+    background-color: #b375dc;
   }
 }
 
@@ -224,14 +223,14 @@ html, body {
     background: url("../assets/covers/xon-cover.png") no-repeat;
     background-size: cover;
     background-position: center -20px;
-    border-radius: 20px; 
+    border-radius: 20px;
     overflow: hidden;
   }
   .dark .card-bg-image {
     background: url("../assets/covers/xon-cover.png") no-repeat;
     background-size: cover;
     background-position: center -20px;
-    border-radius: 20px; 
+    border-radius: 20px;
     overflow: hidden;
     border: 0;
   }
