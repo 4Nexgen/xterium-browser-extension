@@ -1,12 +1,7 @@
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
-import Addresses from "data-base64:/assets/app-logo/Address.png"
-import Historical from "data-base64:/assets/app-logo/Historical.png"
-import NFTCollection from "data-base64:/assets/app-logo/NFTCollection.png"
-import Pay from "data-base64:/assets/app-logo/Pay.png"
-// import { Banknote, Blocks, Hourglass, Wallet } from "lucide-react"
+import { Blocks, HandCoins, Hourglass, Wallet } from "lucide-react"
 import { useTheme } from "next-themes"
-import Image from "next/image"
 import React, { useEffect, useState } from "react"
 
 const formatNumber = (num) => {
@@ -46,12 +41,9 @@ const IndexNetworkStatus = () => {
             <TableCell className="w-40 h-40 relative">
               <div className="flex items-center justify-center bg-tablecell-detail rounded-xl h-full w-full">
                 <div className="text-center p-10 w-full">
-                  <Image
-                    src={NFTCollection}
-                    alt="NFTCollection"
-                    className="absolute top-0 left-0 ml-6 mt-6"
-                    width={35}
-                    height={35}
+                  <Blocks
+                    className="absolute top-0 left-0 ml-6 mt-6 opacity-50"
+                    size="40"
                   />
                   <p className="text-2xl font-extrabold text-purple mt-6">
                     {formatNumber(networkStatus.totalBlocks)}
@@ -63,12 +55,9 @@ const IndexNetworkStatus = () => {
             <TableCell className="w-40 h-40 relative">
               <div className="flex items-center justify-center bg-tablecell-detail rounded-xl h-full w-full">
                 <div className="text-center p-10 w-full">
-                  <Image
-                    src={Addresses}
-                    alt="Addresses"
-                    className="absolute top-0 left-0 ml-6 mt-6"
-                    width={35}
-                    height={35}
+                  <Wallet
+                    className="absolute top-0 left-0 ml-6 mt-6 opacity-50"
+                    size="40"
                   />
                   <p className="text-2xl font-extrabold text-purple mt-6">
                     {formatNumber(networkStatus.totalAddresses)}
@@ -80,12 +69,9 @@ const IndexNetworkStatus = () => {
             <TableCell className="w-40 h-40 relative">
               <div className="flex items-center justify-center bg-tablecell-detail rounded-xl h-full w-full">
                 <div className="text-center p-10 w-full">
-                  <Image
-                    src={Historical}
-                    alt="Historical"
-                    className="absolute top-0 left-0 ml-6 mt-6"
-                    width={35}
-                    height={35}
+                  <Hourglass
+                    className="absolute top-0 left-0 ml-6 mt-6 opacity-50"
+                    size="40"
                   />
                   <p className="text-2xl font-extrabold text-purple">
                     {networkStatus.avgBlockInterval}
@@ -97,12 +83,9 @@ const IndexNetworkStatus = () => {
             <TableCell className="w-40 h-40 relative">
               <div className="flex items-center justify-center bg-tablecell-detail rounded-xl h-full w-full">
                 <div className="text-center p-10 w-full">
-                  <Image
-                    src={Pay}
-                    alt="Pay"
-                    className="absolute top-0 left-0 ml-6 mt-6"
-                    width={35}
-                    height={35}
+                  <HandCoins
+                    className="absolute top-0 left-0 ml-6 mt-6 opacity-50"
+                    size="40"
                   />
                   <p className="text-2xl font-extrabold text-purple">
                     {networkStatus.lastGasFee}
