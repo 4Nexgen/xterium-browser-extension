@@ -1,6 +1,12 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card"
 import {
   Command,
   CommandEmpty,
@@ -9,6 +15,7 @@ import {
   CommandItem,
   CommandList
 } from "@/components/ui/command"
+import { Drawer } from "@/components/ui/drawer"
 import {
   Popover,
   PopoverContent,
@@ -17,7 +24,10 @@ import {
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
+  TableHead,
+  TableHeader,
   TableRow
 } from "@/components/ui/table"
 import { address_data } from "@/data/addresses.data"
@@ -34,12 +44,26 @@ const IndexBalance = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [selectedToken, setSelectedToken] = useState({
     symbol: "",
-    logo: ""
+    logo: "",
+    network: "",
+    owner: "",
+    description: "",
+    balance: "",
+    reserveBalance: "",
   })
-  const handleCellClick = (symbol: string, logo: string) => {
-    setSelectedToken({ symbol, logo })
-    setIsDrawerOpen(true)
-  }
+  const handleCellClick = (
+    symbol: string,
+    logo: string,
+    network: string,
+    owner: string,
+    description: string,
+    balance: string,
+    reserveBalance: string
+  ) => {
+    setSelectedToken({ symbol, logo, network, owner, description, balance, reserveBalance });
+    setIsDrawerOpen(true);
+  };
+  
 
   return (
     <>
@@ -92,8 +116,8 @@ const IndexBalance = () => {
             {token_data.map((token) => (
               <TableRow
                 key={token.symbol}
-                onClick={() => handleCellClick(token.symbol, token.logo)} // Use the correct function
-                className="cursor-pointer hover:bg-[#32436A]/100 ">
+                onClick={() => handleCellClick(token.symbol, token.logo, token.network, token.owner, token.description, token.balance, token.reserveBalance)} // Use the correct function
+                className="cursor-pointer hover:bg-gray-800">
                 <TableCell className="w-[50px] justify-center">
                   <img
                     src={token.logo}
@@ -105,7 +129,7 @@ const IndexBalance = () => {
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">{token.symbol}</span>
                   </div>
-                  <Badge>{token.name}</Badge>
+                  <span>{token.name}</span>
                 </TableCell>
                 <TableCell className="w-[50px] justify-end pr-2 text-right">
                   <span className="text-lg font-bold">{token.balance}</span>

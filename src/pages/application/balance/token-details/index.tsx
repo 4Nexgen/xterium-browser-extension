@@ -21,7 +21,7 @@ interface IndexTokenDetailsProps {
     network: string;
     owner: string;
     description: string;
-    currentBalance: string;
+    balance: string;
     reserveBalance: string;
   };
 }

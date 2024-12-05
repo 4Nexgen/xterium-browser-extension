@@ -18,7 +18,7 @@ interface IndexTransferProps {
     owner: string;
     symbol: string;
     description: string;
-    currentBalance: string;
+    balance: string;
     reserveBalance: string;
   };
 }
@@ -33,7 +33,7 @@ const IndexTransfer: React.FC<IndexTransferProps> = ({
     owner,
     symbol,
     description,
-    currentBalance,
+    balance,
     reserveBalance,
   } = tokenDetails;
 
@@ -43,16 +43,13 @@ const IndexTransfer: React.FC<IndexTransferProps> = ({
         <DrawerHeader>
           <DrawerTitle className="text-center text-purple">TRANSFER</DrawerTitle>
         </DrawerHeader>
-        <div>
-            
-        </div>
         <DrawerDescription>
           <div className="p-4 mt-5 rounded-md border border-2 table-border m-4">
             <Label className="pb-2">Network:<span className="p-2 font-extrabold">{network}</span></Label>
             <Label className="pb-2">Owner:<span className="p-2 font-extrabold">{owner}</span></Label>
             <Label className="pb-2">Symbol:<span className="p-2 font-extrabold">{symbol}</span></Label>
             <Label className="pb-2">Description:<span className="p-2 font-extrabold">{description}</span></Label>
-            <Label className="pb-2">Current Balance:<span className="p-2 font-extrabold">{currentBalance}</span></Label>
+            <Label className="pb-2">Current Balance:<span className="p-2 font-extrabold">{balance}</span></Label>
             <Label className="pb-2">Reserve Balance:<span className="p-2 font-extrabold">{reserveBalance}</span></Label>
           </div>
           <div className="mt-4 px-4 font-bold">
