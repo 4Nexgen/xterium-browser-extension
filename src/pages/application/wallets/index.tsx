@@ -13,7 +13,8 @@ import {
 import {
   Copy,
   Download,
-  Trash
+  Trash,
+  Check
 } from "lucide-react";
 import {
   Tooltip,
@@ -48,10 +49,21 @@ const IndexWallet = () => {
     navigator.clipboard
       .writeText(value)
       .then(() => {
-        toast({ description: "Copied to clipboard!", variant: "default"});
+        toast({
+          description: (
+            <div className="flex items-center">
+              <Check className="mr-2 text-green-500" /> {/* Check icon */}
+              Copied to clipboard!
+            </div>
+          ),
+          variant: "default"
+        });
       })
       .catch(() => {
-        toast({ description: "Failed to copy text.", variant: "destructive" });
+        toast({
+          description: "Failed to copy text.",
+          variant: "destructive"
+        });
       });
   };
 
