@@ -6,55 +6,111 @@ export class WalletService {
   private storage = new Storage()
   private key = "userPassword"
 
-  async createWallet(walletModel: Wallet): Promise<void> {
-    let currentId = (await this.storage.get<number>(this.key + "_counter")) || 0
-    const newId = currentId + 1
+  async createWallet(walletModel: Wallet): Promise<string> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const currentId =
+          (await this.storage.get<number>(this.key + "_counter")) || 0
+        const newId = currentId + 1
 
-    walletModel.id = newId
+        walletModel.id = newId
 
-    await this.storage.set(this.key, JSON.stringify([walletModel]))
+        const existingWallets = await this.storage.get<string>(this.key)
+        const wallet: Wallet[] = existingWallets
+          ? JSON.parse(existingWallets)
+          : []
+
+        wallet.push(walletModel)
+
+        await this.storage.set(this.key, JSON.stringify(wallet))
+        await this.storage.set(this.key + "_counter", newId)
+
+        resolve("Wallet created successfully")
+      } catch (error) {
+        reject(error)
+      }
+    })
   }
 
-  async getWallet(): Promise<Wallet[]> {
-    const storedData = await this.storage.get<string>(this.key)
-    return storedData ? JSON.parse(storedData) : []
+  async getWallets(): Promise<Wallet[]> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const storedData = await this.storage.get<string>(this.key)
+
+        if (!storedData) {
+          return resolve([])
+        }
+
+        const wallets: Wallet[] = JSON.parse(storedData)
+        resolve(wallets)
+      } catch (error) {
+        reject(error)
+      }
+    })
   }
 
-  async getWalletById(id: number): Promise<Wallet | null> {
-    const storedData = await this.storage.get<string>(this.key)
-    if (!storedData) {
-      return null
-    }
+  async getWalletById(id: number): Promise<Wallet> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const storedData = await this.storage.get<string>(this.key)
 
-    const wallets: Wallet[] = JSON.parse(storedData)
-    const wallet = wallets.find((wallet) => wallet.id === id)
+        if (!storedData) {
+          return reject(new Error("No stored data found."))
+        }
+        const wallets: Wallet[] = JSON.parse(storedData)
+        const wallet = wallets.find((wallet) => wallet.id === id)
 
-    return wallet
+        if (!wallet) {
+          return reject(new Error(`Wallet with id ${id} not found.`))
+        }
+
+        resolve(wallet)
+      } catch (error) {
+        reject(error)
+      }
+    })
   }
 
-  async updateWallet(id: number, updatedWallet: Wallet): Promise<void> {
-    const wallets = await this.getWallet()
+  async updateWallet(id: number, updatedWallet: Wallet): Promise<string> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const wallets = await this.getWallets()
 
-    const index = wallets.findIndex((wallet) => wallet.id !== id)
+        const index = wallets.findIndex((wallet) => wallet.id === id)
 
-    if (index === -1) {
-      throw new Error("Wallet not found.")
-    }
+        if (index === -1) {
+          reject(new Error("Wallet not found."))
+          return
+        }
 
-    wallets[index] = updatedWallet
+        wallets[index] = updatedWallet
 
-    await this.storage.set(this.key, JSON.stringify(wallets))
+        await this.storage.set(this.key, JSON.stringify(wallets))
+
+        resolve("Wallet updated successfully")
+      } catch (error) {
+        reject(error)
+      }
+    })
   }
 
-  async deleteWallet(id: number): Promise<void> {
-    const wallets = await this.getWallet()
+  async deleteWallet(id: number): Promise<boolean> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const wallets = await this.getWallets()
 
-    const filteredWallet = wallets.filter((wallet) => wallet.id !== id)
+        const filteredWallets = wallets.filter((wallet) => wallet.id !== id)
 
-    if (wallets.length === filteredWallet.length) {
-      throw new Error("Wallet not found.")
-    }
+        if (wallets.length === filteredWallets.length) {
+          return reject(new Error("Wallet not found."))
+        }
 
-    await this.storage.set(this.key, JSON.stringify(filteredWallet))
+        await this.storage.set(this.key, JSON.stringify(filteredWallets))
+
+        resolve(true)
+      } catch (error) {
+        reject(error)
+      }
+    })
   }
 }
