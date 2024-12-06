@@ -4,27 +4,13 @@ import {
   BreadcrumbList,
   BreadcrumbPage
 } from "@/components/ui/breadcrumb"
-import { Button } from "@/components/ui/button"
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList
-} from "@/components/ui/command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from "@/components/ui/popover"
+import { Popover } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { cn } from "@/lib/utils"
 import XONLogo from "data-base64:/assets/tokens/xon.png"
-import { Check, ChevronsUpDown } from "lucide-react"
 import { useTheme } from "next-themes"
 import Image from "next/image"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import React, { useState } from "react"
 
 const networks = [{ value: "Mainnet", label: "Mainnet" }]
@@ -44,6 +30,10 @@ const Header: React.FC<HeaderProps> = ({
   const [value, setValue] = useState("")
   const { theme } = useTheme()
 
+  const handleNetworkChange = (value: string) => {
+    setValue(value)
+  }
+
   if (variant === "create-password") {
     return (
       <header
@@ -56,58 +46,26 @@ const Header: React.FC<HeaderProps> = ({
         </h1>
         <div className="w-[200px]">
           <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={open}
-                className="w-full float-right"
-                size="lg">
-                {value && (
-                  <div className="w-5 h-5 mr-2 relative">
-                    <Image
-                      src={XONLogo}
-                      alt="XON Logo"
-                      layout="fill"
-                      objectFit="contain"
-                    />
+            <Select value={value} onValueChange={handleNetworkChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select network" />
+              </SelectTrigger>
+              <SelectContent className="w-[130px] p-0">
+                <SelectItem value="Mainnet">
+                  <div className="flex items-center">
+                    <div className="w-5 h-5 mr-2 relative">
+                      <Image
+                        src={XONLogo}
+                        alt="XON Logo"
+                        layout="fill"
+                        objectFit="contain"
+                      />
+                    </div>
+                    Mainnet
                   </div>
-                )}
-                {value
-                  ? networks.find((network) => network.value === value)?.label
-                  : "Select network"}
-                <ChevronsUpDown className="opacity-50 ml-2" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[240px] p-0">
-              <Command>
-                <CommandInput placeholder="Search network..." className="h-9" />
-                <CommandList>
-                  <CommandEmpty>No network found.</CommandEmpty>
-                  <CommandGroup>
-                    {networks.map((network) => (
-                      <CommandItem
-                        key={network.value}
-                        value={network.value}
-                        onSelect={(currentValue) => {
-                          setValue(currentValue === value ? "" : currentValue)
-                          setOpen(false)
-                        }}>
-                        {network.label}
-                        <Check
-                          className={cn(
-                            "ml-auto",
-                            value === network.value
-                              ? "opacity-100"
-                              : "opacity-0"
-                          )}
-                        />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </Popover>
         </div>
       </header>
@@ -122,58 +80,26 @@ const Header: React.FC<HeaderProps> = ({
         <h1 className="text-base font-semibold tracking-[0.15em]">Login</h1>
         <div className="w-[200px]">
           <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={open}
-                className="w-full float-right"
-                size="lg">
-                {value && (
-                  <div className="w-5 h-5 mr-2 relative">
-                    <Image
-                      src={XONLogo}
-                      alt="XON Logo"
-                      layout="fill"
-                      objectFit="contain"
-                    />
+            <Select value={value} onValueChange={handleNetworkChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select network" />
+              </SelectTrigger>
+              <SelectContent className="w-[130px] p-0">
+                <SelectItem value="Mainnet">
+                  <div className="flex items-center">
+                    <div className="w-5 h-5 mr-2 relative">
+                      <Image
+                        src={XONLogo}
+                        alt="XON Logo"
+                        layout="fill"
+                        objectFit="contain"
+                      />
+                    </div>
+                    Mainnet
                   </div>
-                )}
-                {value
-                  ? networks.find((network) => network.value === value)?.label
-                  : "Select network"}
-                <ChevronsUpDown className="opacity-50 ml-2" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[240px] p-0">
-              <Command>
-                <CommandInput placeholder="Search network..." className="h-9" />
-                <CommandList>
-                  <CommandEmpty>No network found.</CommandEmpty>
-                  <CommandGroup>
-                    {networks.map((network) => (
-                      <CommandItem
-                        key={network.value}
-                        value={network.value}
-                        onSelect={(currentValue) => {
-                          setValue(currentValue === value ? "" : currentValue)
-                          setOpen(false)
-                        }}>
-                        {network.label}
-                        <Check
-                          className={cn(
-                            "ml-auto",
-                            value === network.value
-                              ? "opacity-100"
-                              : "opacity-0"
-                          )}
-                        />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </Popover>
         </div>
       </header>
@@ -196,58 +122,28 @@ const Header: React.FC<HeaderProps> = ({
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <div className="w-[200px]">
+      <div className="w-[228px]">
         <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              role="combobox"
-              aria-expanded={open}
-              className="w-full float-right"
-              size="lg">
-              {value && (
-                <div className="w-5 h-5 mr-2 relative">
-                  <Image
-                    src={XONLogo}
-                    alt="XON Logo"
-                    layout="fill"
-                    objectFit="contain"
-                  />
+          <Select value={value} onValueChange={handleNetworkChange}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select network" />
+            </SelectTrigger>
+            <SelectContent className="w-[125px] p-0 hover-bg-custom">
+              <SelectItem value="Mainnet">
+                <div className="flex items-center">
+                  <div className="w-5 h-5 mr-2 relative">
+                    <Image
+                      src={XONLogo}
+                      alt="XON Logo"
+                      layout="fill"
+                      objectFit="contain"
+                    />
+                  </div>
+                  Mainnet
                 </div>
-              )}
-              {value
-                ? networks.find((network) => network.value === value)?.label
-                : "Select network"}
-              <ChevronsUpDown className="opacity-50 ml-2" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[200px]">
-            <Command>
-              <CommandInput placeholder="Search network..." className="h-9" />
-              <CommandList>
-                <CommandEmpty>No network found.</CommandEmpty>
-                <CommandGroup>
-                  {networks.map((network) => (
-                    <CommandItem
-                      key={network.value}
-                      value={network.value}
-                      onSelect={(currentValue) => {
-                        setValue(currentValue === value ? "" : currentValue)
-                        setOpen(false)
-                      }}>
-                      {network.label}
-                      <Check
-                        className={cn(
-                          "ml-auto",
-                          value === network.value ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </Popover>
       </div>
     </header>
