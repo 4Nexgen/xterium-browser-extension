@@ -32,6 +32,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import IndexChangePassword from "@/pages/application/change-password";
+import IndexPages from "@/pages";
 import { cn } from "@/lib/utils";
 import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png";
 import {
@@ -260,7 +261,7 @@ const ApplicationSidebar = ({ onSetCurrentPage }) => {
                   <DropdownMenuItem onClick={toggleDrawer}>
                     <span>Change Password</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onSetCurrentPage("login")}>
                     <span>Sign out</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

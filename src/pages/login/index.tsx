@@ -33,40 +33,36 @@ import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import XONLogo from "data-base64:/assets/tokens/xon.png"
 import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
-import { Card, CardContent } from "@/components/ui/card"
 import Header from "@/components/Header"
+import { LoginService } from "@/services/login.service"
 
+interface Props {
+  onSetCurrentPage: (page: string) => void
+}
 
-// Zod schema for form validation
-const formSchema = z
-  .object({
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters.")
-      .regex(/[A-Z]/, "Password must include at least one uppercase letter.")
-      .regex(/[a-z]/, "Password must include at least one lowercase letter.")
-      .regex(/[0-9]/, "Password must include at least one number."),
-    confirmPassword: z.string().min(8, "Please confirm your password."),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match.",
-    path: ["confirmPassword"],
-  })
-
-export default function IndexLogin() {
-
+export default function IndexLogin({ onSetCurrentPage }: Props) {
   const form = useForm({
-    resolver: zodResolver(formSchema),
     defaultValues: {
       password: "",
-      confirmPassword: "",
     },
   })
 
-  const onSubmit = (data: { password: string; confirmPassword: string }) => {
-    console.log("Password setup successful!", data)
-    alert("Password setup successful!")
-  }
+  const [decryptionError, setDecryptionError] = useState<string>("")
+
+  const onSubmit = (data: { password: string }) => {
+    const encryptedPassword = localStorage.getItem("userPassword");  
+    const loginService = new LoginService();
+
+    try {
+        if (loginService.login(encryptedPassword, data.password)) {
+            onSetCurrentPage("application");
+        }
+    } catch (error) {
+        setDecryptionError(error.message || "Error logging in.");
+    }
+}
+
+
 
   return (
     <div className="flex flex-col justify-between min-h-screentext-white">
@@ -86,7 +82,6 @@ export default function IndexLogin() {
         <h1>Welcome!</h1>
       </div>
 
-      {/* Gradient line */}
       <div
         className="h-3 mt-7"
         style={{
@@ -95,7 +90,7 @@ export default function IndexLogin() {
       />
 
       <div className="flex justify-center items-center w-full h-full">
-        <Card className="w-full max-w-full sm:max-w-md lg:max-w-lg">
+        <div className="w-full max-w-full sm:max-w-md lg:max-w-lg">
           <div
             className="p-6 w-full"
             style={{
@@ -137,8 +132,9 @@ export default function IndexLogin() {
                 </Button>
               </form>
             </Form>
+            
           </div>
-        </Card>
+        </div>
       </div>
 
     </div>

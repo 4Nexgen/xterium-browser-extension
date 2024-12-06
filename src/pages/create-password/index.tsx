@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { useState } from "react"
-
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import {
@@ -16,28 +15,14 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command"
-import { Check, ChevronsUpDown } from "lucide-react"
-import { cn } from "@/lib/utils"
-import XONLogo from "data-base64:/assets/tokens/xon.png"
 import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
-import { Card, CardContent } from "@/components/ui/card"
 import Header from "@/components/Header"
+import { CreatePasswordService } from "@/services/create-password.service"
 
+interface Props {
+  onSetCurrentPage: (page: string) => void
+}
 
-// Zod schema for form validation
 const formSchema = z
   .object({
     password: z
@@ -53,8 +38,7 @@ const formSchema = z
     path: ["confirmPassword"],
   })
 
-export default function IndexCreatePassword() {
-
+export default function IndexCreatePassword({ onSetCurrentPage }: Props) {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -63,16 +47,20 @@ export default function IndexCreatePassword() {
     },
   })
 
+  const [passwordStrength, setPasswordStrength] = useState<string>("")
+
   const onSubmit = (data: { password: string; confirmPassword: string }) => {
     console.log("Password setup successful!", data)
-    alert("Password setup successful!")
-  }
+
+    const passwordService = new CreatePasswordService()
+    passwordService.createPassword(data.password)
+
+    onSetCurrentPage("application")
+}
 
   return (
-    <div className="flex flex-col justify-between min-h-screentext-white">
-        <Header
-          variant="create-password"
-        />
+    <div className="flex flex-col justify-between min-h-screen text-white">
+      <Header variant="create-password" />
 
       <div
         className="flex justify-center py-14"
@@ -91,8 +79,8 @@ export default function IndexCreatePassword() {
       />
 
       <div className="flex justify-center w-full flex-grow">
-        <Card>
-          <div 
+        <div>
+          <div
             className="p-6 w-full"
             style={{
               background: "linear-gradient(180deg, #32436A 0%, #121826 100%)",
@@ -118,9 +106,18 @@ export default function IndexCreatePassword() {
                           type="password"
                           placeholder="Enter password"
                           {...field}
+                          onChange={(e) => {
+                            field.onChange(e)
+                            checkPasswordStrength(e.target.value)
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
+                      {passwordStrength && (
+                        <p className="text-sm text-[#9AB3EB] mt-2">
+                          Password Strength: {passwordStrength}
+                        </p>
+                      )}
                     </FormItem>
                   )}
                 />
@@ -129,7 +126,7 @@ export default function IndexCreatePassword() {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel 
+                      <FormLabel
                         className="font-inter font-extrabold text-[12px] leading-[15px] tracking-[0.15em] text-[#9AB3EB]"
                       >
                         Confirm Password:
@@ -150,16 +147,13 @@ export default function IndexCreatePassword() {
                   stored. We recommend 8 characters with uppercase, lowercase,
                   symbols, and numbers.
                 </p>
-                <Button
-                  type="submit"
-                  variant="violet"
-                  >
+                <Button type="submit" variant="violet">
                   SETUP PASSWORD
                 </Button>
               </form>
             </Form>
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   )
