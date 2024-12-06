@@ -7,14 +7,12 @@ export class WalletService {
   private key = "userPassword"
 
   async createWallet(walletModel: Wallet): Promise<void> {
-    const wallet = await this.getWallet()
-    const lastId =
-      wallet.length > 0 ? Math.max(...wallet.map((wallet) => wallet.id)) : 0
-    const newId = lastId + 1
+    let currentId = (await this.storage.get<number>(this.key + "_counter")) || 0
+    const newId = currentId + 1
 
     walletModel.id = newId
-    wallet.push(walletModel)
-    await this.storage.set(this.key, JSON.stringify(wallet))
+
+    await this.storage.set(this.key, JSON.stringify([walletModel]))
   }
 
   async getWallet(): Promise<Wallet[]> {
@@ -51,12 +49,12 @@ export class WalletService {
   async deleteWallet(id: number): Promise<void> {
     const wallets = await this.getWallet()
 
-    const filteredWallets = wallets.filter((wallet) => wallet.id !== id)
+    const filteredWallet = wallets.filter((wallet) => wallet.id !== id)
 
-    if (wallets.length === filteredWallets.length) {
+    if (wallets.length === filteredWallet.length) {
       throw new Error("Wallet not found.")
     }
 
-    await this.storage.set(this.key, JSON.stringify(filteredWallets))
+    await this.storage.set(this.key, JSON.stringify(filteredWallet))
   }
 }
