@@ -1,4 +1,4 @@
-export interface address {
+export class Address {
   value: string
   label: string
 }

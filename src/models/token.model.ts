@@ -1,10 +1,9 @@
-export interface Token {
-  symbol: string
-  name: string
-  logo: string
-  network: string
-  owner: string
-  description: string
-  balance: string
-  reserveBalance: string
-}
+export class Token {
+    logo: string;
+    category: "Native" | "Asset";
+    network: string;
+    network_id: number;
+    symbol: string;
+    description: string;
+  }
+  
