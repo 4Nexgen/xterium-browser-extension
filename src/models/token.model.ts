@@ -1,4 +1,5 @@
 export class Token {
+  id: number
   type: "Native" | "Asset"
   network: string
   network_id: number
