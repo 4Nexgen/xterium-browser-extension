@@ -17,7 +17,7 @@ interface IndexTokenDetailsProps {
   toggleDrawer: () => void;
   selectedToken: {
     symbol: string;
-    logo: string;
+    image_url: string;
     network: string;
     owner: string;
     description: string;
@@ -31,7 +31,7 @@ const IndexTokenDetails: React.FC<IndexTokenDetailsProps> = ({
   toggleDrawer,
   selectedToken,
 }) => {
-  const { symbol, logo } = selectedToken;
+  const { symbol, image_url } = selectedToken;
 
   const [isTransferOpen, setIsTransferOpen] = useState(false);
 
@@ -50,9 +50,9 @@ const IndexTokenDetails: React.FC<IndexTokenDetailsProps> = ({
         <DrawerContent>
           <DrawerHeader>
             <div className="flex justify-center items-center w-full">
-              {logo && (
+              {image_url && (
                 <Image
-                  src={logo}
+                  src={image_url}
                   alt={symbol}
                   width={32}
                   height={32}

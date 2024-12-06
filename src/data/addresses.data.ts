@@ -1,6 +1,6 @@
-import type { address } from "@/models/address.model"
+import type { Address } from "@/models/address.model"
 
-export const address_data: address[] = [
+export const address_data: Address[] = [
   {
     value: "5Clkajsdlashlili3y123211294798910h237",
     label: "Noah"

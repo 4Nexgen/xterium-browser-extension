@@ -18,7 +18,6 @@ import IndexExportWallet from "./exportWallet"
 
 const IndexWallet = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
-  const [copyMessage, setCopyMessage] = useState("")
   const [isExportDrawerOpen, setExportDrawerOpen] = useState(false)
   const [isDeleteDrawerOpen, setDeleteDrawerOpen] = useState(false)
   const [selectedAddress, setSelectedAddress] = useState<any>(null)

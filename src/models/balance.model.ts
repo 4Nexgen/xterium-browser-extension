@@ -1,10 +1,9 @@
 export class Balance {
   symbol: string
-  name: string
-  logo: string
+  description: string
+  image_url: string
   network: string
   owner: string
-  description: string
   balance: string
   reserveBalance: string
 }

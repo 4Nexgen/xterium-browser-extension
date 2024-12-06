@@ -1,12 +1,6 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import {
   Command,
   CommandEmpty,
@@ -15,8 +9,6 @@ import {
   CommandItem,
   CommandList
 } from "@/components/ui/command"
-import { Drawer } from "@/components/ui/drawer"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
   Popover,
@@ -26,14 +18,11 @@ import {
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow
 } from "@/components/ui/table"
 import { address_data } from "@/data/addresses.data"
-import { token_data } from "@/data/tokens.data"
+import { balance_data } from "@/data/balance.data"
 import { cn } from "@/lib/utils"
 import { Check, ChevronsUpDown, Pencil } from "lucide-react"
 import React, { useState } from "react"
@@ -46,7 +35,7 @@ const IndexBalance = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [selectedToken, setSelectedToken] = useState({
     symbol: "",
-    logo: "",
+    image_url: "",
     network: "",
     owner: "",
     description: "",
@@ -55,7 +44,7 @@ const IndexBalance = () => {
   })
   const handleCellClick = (
     symbol: string,
-    logo: string,
+    image_url: string,
     network: string,
     owner: string,
     description: string,
@@ -64,7 +53,7 @@ const IndexBalance = () => {
   ) => {
     setSelectedToken({
       symbol,
-      logo,
+      image_url,
       network,
       owner,
       description,
@@ -135,13 +124,13 @@ const IndexBalance = () => {
       <Card className="mb-3">
         <Table>
           <TableBody>
-            {token_data.map((token) => (
+            {balance_data.map((token) => (
               <TableRow
                 key={token.symbol}
                 onClick={() =>
                   handleCellClick(
                     token.symbol,
-                    token.logo,
+                    token.image_url,
                     token.network,
                     token.owner,
                     token.description,
@@ -152,7 +141,7 @@ const IndexBalance = () => {
                 className="cursor-pointer hover-bg-custom">
                 <TableCell className="w-[50px] justify-center">
                   <img
-                    src={token.logo}
+                    src={token.image_url}
                     className="ml-1 w-10"
                     alt={token.symbol}
                   />
@@ -161,7 +150,7 @@ const IndexBalance = () => {
                   <div className="mb-[2px]">
                     <span className="text-lg font-bold">{token.symbol}</span>
                   </div>
-                  <Badge>{token.name}</Badge>
+                  <Badge>{token.description}</Badge>
                 </TableCell>
                 <TableCell className="w-[50px] justify-end pr-2 text-right">
                   <span className="text-lg font-bold text-purple">
