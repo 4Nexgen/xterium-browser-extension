@@ -243,3 +243,9 @@ body {
     @apply hover:bg-[#32436A]/100;
   }
 }
+
+.dev-bg-image {
+  background: url("../assets/covers/xon-cover.png") no-repeat;
+  background-size: cover;
+  background-position: center -20px;
+}
