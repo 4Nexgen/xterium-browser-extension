@@ -16,22 +16,6 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command"
-import { Check, ChevronsUpDown } from "lucide-react"
-import { cn } from "@/lib/utils"
-import XONLogo from "data-base64:/assets/tokens/xon.png"
 import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
 import Header from "@/components/Header"
 import { LoginService } from "@/services/login.service"
@@ -131,8 +115,7 @@ export default function IndexLogin({ onSetCurrentPage }: Props) {
                   UNLOCK
                 </Button>
               </form>
-            </Form>
-            
+            </Form> 
           </div>
         </div>
       </div>
