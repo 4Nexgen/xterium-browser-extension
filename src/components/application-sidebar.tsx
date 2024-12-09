@@ -76,6 +76,12 @@ const ApplicationSidebar = ({ onSetCurrentPage }) => {
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
   };
+  const handleSignOut = () => {
+    console.log("Signing out...");
+    localStorage.removeItem("lastAccessTime");
+    sessionStorage.clear();
+    window.location.reload();
+  };
 
   return (
     <>
@@ -249,7 +255,7 @@ const ApplicationSidebar = ({ onSetCurrentPage }) => {
                   <DropdownMenuItem onClick={toggleDrawer}>
                     <span>Change Password</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSignOut}>
                     <span>Sign out</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

@@ -115,9 +115,9 @@ export default function IndexLogin({ onSetCurrentPage }: Props) {
                             className="absolute inset-y-0 right-0 px-3 text-sm font-semibold"
                           >
                             {showPassword ? (
-                              <EyeOff size={20} />
-                            ) : (
                               <Eye size={20} />
+                            ) : (
+                              <EyeOff size={20} />
                             )}
                           </button>
                         </div>
@@ -126,6 +126,9 @@ export default function IndexLogin({ onSetCurrentPage }: Props) {
                     </FormItem>
                   )}
                 />
+                {decryptionError && (
+                  <div className="text-xs text-[#FD2400] mt-2">{decryptionError}</div>
+                )}
                 <Button
                   type="submit"
                   variant="violet"
