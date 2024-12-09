@@ -18,7 +18,11 @@ interface IndexEditTokenProps {
   };
 }
 
-const IndexEditToken: React.FC<IndexEditTokenProps> = ({ isDrawerOpen, toggleDrawer, selectedToken }) => {
+const IndexEditToken: React.FC<IndexEditTokenProps> = ({ 
+  isDrawerOpen, 
+  toggleDrawer, 
+  selectedToken 
+}) => {
   const [formData, setFormData] = useState(selectedToken);
 
   useEffect(() => {
@@ -29,16 +33,17 @@ const IndexEditToken: React.FC<IndexEditTokenProps> = ({ isDrawerOpen, toggleDra
     <Drawer open={isDrawerOpen} onOpenChange={toggleDrawer}>
       <DrawerContent>
         <DrawerHeader>
-        <DrawerTitle className="flex items-center space-x-2">
+          <DrawerTitle className="flex items-center justify-center space-x-2">
+            <span>Edit</span>
             <Image
               src={selectedToken.image_url}
-              alt={`${selectedToken.symbol} image_url`}
-              width={24}
-              height={24}
+              alt={`${selectedToken.symbol} logo`}
+              width={18}
+              height={18}
               className="rounded"
             />
-            <span className="text-lg font-bold">{selectedToken.symbol}</span>
-            <span className="ml-2 text-sm text-muted">EDIT TOKEN</span>
+            <span className="font-bold text-md">{selectedToken.symbol}</span>
+            <span>Token</span>
           </DrawerTitle>
         </DrawerHeader>
         <DrawerDescription>

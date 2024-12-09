@@ -1,12 +1,3 @@
-import { Button } from "@/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,8 +26,6 @@ import IndexChangePassword from "@/pages/application/change-password";
 import { cn } from "@/lib/utils";
 import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png";
 import {
-  Check,
-  ChevronsUpDown,
   ChevronUp,
   Coins,
   DollarSign,
@@ -185,7 +174,7 @@ const ApplicationSidebar = ({ onSetCurrentPage }) => {
                           className={cn(
                             "rounded ", 
                             activeItem === item.title
-                              ? "primary bg-[var(--sidebar-icon-background)]" 
+                              ? "text-white bg-[var(--sidebar-icon-background)]" 
                               : "bg-transparent primary" 
                           )}
                         >

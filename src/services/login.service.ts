@@ -1,19 +1,29 @@
-import { Storage } from "@plasmohq/storage"
+import { EncryptionService } from './encryption.service';
 
 export class LoginService {
-    private storage = new Storage()
-    private key = "userPassword"
+    private encryptionService: EncryptionService;
 
-    async login(encryptedPassword: string): Promise<boolean> {
-        const existingPassword = await this.storage.get<string>(this.key)
-        if (!existingPassword) {
-            throw new Error("No password data found to update.")
+    constructor() {
+        this.encryptionService = new EncryptionService();
+    }
+
+    login(userPassword: string | null, password: string): boolean {
+        if (!userPassword) {
+            throw new Error("No password found in storage.");
         }
 
-        if (encryptedPassword != existingPassword) {
-            throw new Error("Password mismatched!")
-        }
+        try {
+            
+            const decryptedPassword = this.encryptionService.decrypt(userPassword);
 
-        return true
+            if (decryptedPassword === password) {
+                return true; 
+            } else {
+                throw new Error("Incorrect password.");
+            }
+        } catch (error) {
+            console.error("Error decrypting the password:", error);
+            throw new Error("Error decrypting the password.");
+        }
     }
 }

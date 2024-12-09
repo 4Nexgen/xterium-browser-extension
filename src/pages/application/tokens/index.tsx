@@ -14,11 +14,13 @@ import {
 import { Pencil } from "lucide-react"
 import Image from "next/image" 
 import IndexAddToken from "./addToken"
+import IndexEditToken from "./editToken"
 import { Button } from "@/components/ui/button"
 import { token_data } from "@/data/token.data"
 
 const IndexTokens = () => {
-  const [isDrawerOpen, setDrawerOpen] = useState(false)
+  const [isAddDrawerOpen, setAddDrawerOpen] = useState(false);
+  const [isEditDrawerOpen, setEditDrawerOpen] = useState(false); 
   const [selectedToken, setSelectedToken] = useState({
     image_url: "",
     type: "",
@@ -43,11 +45,11 @@ const IndexTokens = () => {
       symbol,
       description,
     })
-    setDrawerOpen(true)
+    setEditDrawerOpen(true);
   }
 
-  const toggleDrawer = () => {
-    setDrawerOpen(!isDrawerOpen)
+  const toggleAddDrawer = () => {
+    setAddDrawerOpen(!isAddDrawerOpen)
   }
 
   return (
@@ -82,8 +84,20 @@ const IndexTokens = () => {
                       </div>
                       <Badge>{token.description}</Badge>
                     </TableCell>
-                    <TableCell className="w-[50px] justify-end pr-2">
-                      <Pencil size="20" color="white" />
+                    <TableCell
+                      className="w-[50px] justify-end pr-2"
+                      onClick={() =>
+                        handleCellClick(
+                          token.image_url,
+                          token.type,
+                          token.network,
+                          token.network_id,
+                          token.symbol,
+                          token.description
+                        )
+                      }
+                    >
+                      <Pencil size="20" color="white" className="cursor-pointer" />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -122,8 +136,20 @@ const IndexTokens = () => {
                       </div>
                       <Badge>{token.description}</Badge>
                     </TableCell>
-                    <TableCell className="w-[50px] justify-end pr-2">
-                      <Pencil size="20" />
+                    <TableCell
+                      className="w-[50px] justify-end pr-2"
+                      onClick={() =>
+                        handleCellClick(
+                          token.image_url,
+                          token.type,
+                          token.network,
+                          token.network_id,
+                          token.symbol,
+                          token.description
+                        )
+                      }
+                    >
+                      <Pencil size="20" className="cursor-pointer" />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -131,13 +157,18 @@ const IndexTokens = () => {
           </Table>
         </Card>
       </div>
-      <Button onClick={toggleDrawer} variant="violet" className="my-auto">
+      <Button onClick={toggleAddDrawer} variant="violet" className="my-auto">
         ADD NEW TOKEN
       </Button>
 
       <IndexAddToken 
-        isDrawerOpen={isDrawerOpen} 
-        toggleDrawer={toggleDrawer} 
+        isDrawerOpen={isAddDrawerOpen} 
+        toggleDrawer={toggleAddDrawer} />
+
+      <IndexEditToken
+        isDrawerOpen={isEditDrawerOpen}
+        toggleDrawer={() => setEditDrawerOpen(false)}
+        selectedToken={selectedToken}
       />
     </div>
   )

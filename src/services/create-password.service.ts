@@ -1,28 +1,37 @@
-import { Storage } from "@plasmohq/storage"
+import { EncryptionService } from './encryption.service';
 
 export class CreatePasswordService {
-    private storage = new Storage()
     private key = "userPassword"
+    private encryptionService: EncryptionService
 
-    async createPassword(encryptedPassword: string): Promise<void> {
-        await this.storage.set(this.key, JSON.stringify(encryptedPassword))
+    constructor() {
+        this.encryptionService = new EncryptionService()
     }
 
-    async getPassword(): Promise<string | null> {
-        const storedData = await this.storage.get<string>(this.key)
-        return storedData ? JSON.parse(storedData) : null
+    createPassword(password: string): void {
+        const encryptedPassword = this.encryptionService.encrypt(password)
+        localStorage.setItem(this.key, encryptedPassword)
     }
 
-    async updatePassword(encryptedPassword: string): Promise<void> {
-        const existingPassword = await this.getPassword()
+    getPassword(): string | null {
+        const storedData = localStorage.getItem(this.key)
+        if (storedData) {
+            return this.encryptionService.decrypt(storedData) 
+        }
+        return null
+    }
+
+    updatePassword(password: string): void {
+        const existingPassword = this.getPassword()
         if (!existingPassword) {
             throw new Error("No password data found to update.")
         }
 
-        await this.storage.set(this.key, JSON.stringify(encryptedPassword))
+        const encryptedPassword = this.encryptionService.encrypt(password)
+        localStorage.setItem(this.key, encryptedPassword)
     }
 
-    async removePassword(): Promise<void> {
-        await this.storage.remove(this.key)
+    removePassword(): void {
+        localStorage.removeItem(this.key)
     }
 }
