@@ -82,7 +82,7 @@ export default function IndexLogin({ onSetCurrentPage }: Props) {
       <div className="flex justify-center items-center w-full h-full">
         <div className="w-full max-w-full sm:max-w-md lg:max-w-lg">
           <div
-            className="p-6 w-full h-[290px]"
+            className="p-6 w-full h-full"
             style={{
               background: "linear-gradient(180deg, #32436A 0%, #121826 100%)",
             }}

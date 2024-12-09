@@ -102,7 +102,7 @@ export default function IndexCreatePassword({ onSetCurrentPage }: Props) {
       <div className="flex justify-center w-full flex-grow">
         <div>
           <div
-            className="p-6 w-full h-[290px]"
+            className="p-6 w-full h-full"
             style={{
               background: "linear-gradient(180deg, #32436A 0%, #121826 100%)",
             }}
@@ -139,9 +139,9 @@ export default function IndexCreatePassword({ onSetCurrentPage }: Props) {
                             className="absolute inset-y-0 right-3 flex items-center text-[#9AB3EB] hover:[#9AB3EB]"
                           >
                             {showPassword ? (
-                              <EyeOff size={20} />
-                            ) : (
                               <Eye size={20} />
+                            ) : (
+                              <EyeOff size={20} />
                             )}
                           </button>
                         </div>
@@ -173,9 +173,9 @@ export default function IndexCreatePassword({ onSetCurrentPage }: Props) {
                             className="absolute inset-y-0 right-3 flex items-center text-[#9AB3EB] hover:text-[#9AB3EB]"
                           >
                             {showConfirmPassword ? (
-                              <EyeOff size={20} />
-                            ) : (
                               <Eye size={20} />
+                            ) : (
+                              <EyeOff size={20} />
                             )}
                           </button>
                         </div>
