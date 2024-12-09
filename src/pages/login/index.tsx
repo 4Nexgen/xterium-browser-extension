@@ -82,7 +82,7 @@ export default function IndexLogin({ onSetCurrentPage }: Props) {
       <div className="flex justify-center items-center w-full h-full">
         <div className="w-full max-w-full sm:max-w-md lg:max-w-lg">
           <div
-            className="p-6 w-full h-full"
+            className="p-6 w-full h-[290px]"
             style={{
               background: "linear-gradient(180deg, #32436A 0%, #121826 100%)",
             }}
@@ -115,9 +115,9 @@ export default function IndexLogin({ onSetCurrentPage }: Props) {
                             className="absolute inset-y-0 right-0 px-3 text-sm font-semibold"
                           >
                             {showPassword ? (
-                              <EyeOff size={20} />
-                            ) : (
                               <Eye size={20} />
+                            ) : (
+                              <EyeOff size={20} />
                             )}
                           </button>
                         </div>
@@ -126,6 +126,9 @@ export default function IndexLogin({ onSetCurrentPage }: Props) {
                     </FormItem>
                   )}
                 />
+                {decryptionError && (
+                  <div className="text-xs text-[#FD2400] mt-2">{decryptionError}</div>
+                )}
                 <Button
                   type="submit"
                   variant="violet"

@@ -23,7 +23,7 @@ export class LoginService {
             }
         } catch (error) {
             console.error("Error decrypting the password:", error);
-            throw new Error("Error decrypting the password.");
+            throw new Error("Incorrect password.");
         }
     }
 }

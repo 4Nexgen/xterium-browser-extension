@@ -99,10 +99,10 @@ export default function IndexCreatePassword({ onSetCurrentPage }: Props) {
         }}
       />
 
-      <div className="flex justify-center w-full flex-grow">
+      <div className="flex justify-center w-full flex-grow ">
         <div>
           <div
-            className="p-6 w-full h-full"
+            className="pt-6 px-6 w-full h-full"
             style={{
               background: "linear-gradient(180deg, #32436A 0%, #121826 100%)",
             }}
@@ -110,16 +110,14 @@ export default function IndexCreatePassword({ onSetCurrentPage }: Props) {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="w-full max-w-md space-y-3"
+                className="w-full max-w-md space-y-0 h-full"
               >
                 <FormField
                   control={form.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel
-                        className="font-inter font-extrabold text-xs leading-[15px] tracking-[0.15em] "
-                      >
+                      <FormLabel className="font-inter font-extrabold text-xs leading-[15px] tracking-[0.15em] text-[#9AB3EB]">
                         Enter Password:
                       </FormLabel>
                       <FormControl>
@@ -138,15 +136,18 @@ export default function IndexCreatePassword({ onSetCurrentPage }: Props) {
                             onClick={togglePasswordVisibility}
                             className="absolute inset-y-0 right-3 flex items-center text-[#9AB3EB] hover:[#9AB3EB]"
                           >
-                            {showPassword ? (
-                              <Eye size={20} />
-                            ) : (
-                              <EyeOff size={20} />
-                            )}
+                            {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
                           </button>
                         </div>
                       </FormControl>
-                      <FormMessage />
+
+                      <div className="p-0 mt-0 text-[10px]">
+                        {form.formState.errors.password ? (
+                          <FormMessage className="text-[#FD2400] text-[10px] mt-0" />
+                        ) : (
+                          <span>&nbsp;</span> 
+                        )}
+                      </div>
                     </FormItem>
                   )}
                 />
@@ -155,9 +156,7 @@ export default function IndexCreatePassword({ onSetCurrentPage }: Props) {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel
-                        className="font-inter font-extrabold text-xs leading-[15px] tracking-[0.15em] text-[#9AB3EB]"
-                      >
+                      <FormLabel className="font-inter font-extrabold text-xs pt-1 leading-[15px] tracking-[0.15em] text-[#9AB3EB]">
                         Confirm Password:
                       </FormLabel>
                       <FormControl>
@@ -172,24 +171,22 @@ export default function IndexCreatePassword({ onSetCurrentPage }: Props) {
                             onClick={toggleConfirmPasswordVisibility}
                             className="absolute inset-y-0 right-3 flex items-center text-[#9AB3EB] hover:text-[#9AB3EB]"
                           >
-                            {showConfirmPassword ? (
-                              <Eye size={20} />
-                            ) : (
-                              <EyeOff size={20} />
-                            )}
+                            {showConfirmPassword ? <Eye size={20} /> : <EyeOff size={20} />}
                           </button>
                         </div>
                       </FormControl>
-                      <FormMessage />
-                      {passwordStrength && (
-                        <p className="text-xs text-[#9AB3EB]">
-                          Password Strength: {passwordStrength}
-                        </p>
-                      )}
+
+                      <div className="p-0 mt-0 text-[10px]">
+                        {form.formState.errors.confirmPassword ? (
+                          <FormMessage className="text-[#FD2400] text-[10px] mt-0" />
+                        ) : (
+                          <span>&nbsp;</span> 
+                        )}
+                      </div>
                     </FormItem>
                   )}
                 />
-                <p className="font-inter text-xs text-[#9AB3EB]  font-base text-justify">
+                <p className="font-inter text-[12px] text-[#9AB3EB] pb-2  font-base text-justify">
                   Your password is used to unlock your wallet and is securely
                   stored. We recommend 8 characters with uppercase, lowercase,
                   symbols, and numbers.
