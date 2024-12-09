@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input"
 import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
 import Header from "@/components/Header"
 import { LoginService } from "@/services/login.service"
+import { Eye, EyeOff } from "lucide-react";
 
 interface Props {
   onSetCurrentPage: (page: string) => void
@@ -32,6 +33,11 @@ export default function IndexLogin({ onSetCurrentPage }: Props) {
   })
 
   const [decryptionError, setDecryptionError] = useState<string>("")
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const onSubmit = (data: { password: string }) => {
     const encryptedPassword = localStorage.getItem("userPassword");  
@@ -76,7 +82,7 @@ export default function IndexLogin({ onSetCurrentPage }: Props) {
       <div className="flex justify-center items-center w-full h-full">
         <div className="w-full max-w-full sm:max-w-md lg:max-w-lg">
           <div
-            className="p-6 w-full"
+            className="p-6 w-full h-[290px]"
             style={{
               background: "linear-gradient(180deg, #32436A 0%, #121826 100%)",
             }}
@@ -97,11 +103,24 @@ export default function IndexLogin({ onSetCurrentPage }: Props) {
                         Enter Password:
                       </FormLabel>
                       <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Enter password"
-                          {...field}
-                        />
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Enter password"
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            onClick={togglePasswordVisibility}
+                            className="absolute inset-y-0 right-0 px-3 text-sm font-semibold"
+                          >
+                            {showPassword ? (
+                              <EyeOff size={20} />
+                            ) : (
+                              <Eye size={20} />
+                            )}
+                          </button>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

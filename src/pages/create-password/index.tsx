@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input"
 import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
 import Header from "@/components/Header"
 import { CreatePasswordService } from "@/services/create-password.service"
+import { Eye, EyeOff } from "lucide-react";
 
 interface Props {
   onSetCurrentPage: (page: string) => void
@@ -48,6 +49,26 @@ export default function IndexCreatePassword({ onSetCurrentPage }: Props) {
   })
 
   const [passwordStrength, setPasswordStrength] = useState<string>("")
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
+  const checkPasswordStrength = (value: string) => {
+    if (value.length >= 8) {
+      setPasswordStrength("Strong");
+    } else if (value.length >= 5) {
+      setPasswordStrength("Medium");
+    } else {
+      setPasswordStrength("Weak");
+    }
+  };
 
   const onSubmit = (data: { password: string; confirmPassword: string }) => {
     console.log("Password setup successful!", data)
@@ -81,7 +102,7 @@ export default function IndexCreatePassword({ onSetCurrentPage }: Props) {
       <div className="flex justify-center w-full flex-grow">
         <div>
           <div
-            className="p-6 w-full"
+            className="p-6 w-full h-[290px]"
             style={{
               background: "linear-gradient(180deg, #32436A 0%, #121826 100%)",
             }}
@@ -97,27 +118,35 @@ export default function IndexCreatePassword({ onSetCurrentPage }: Props) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel
-                        className="font-inter font-extrabold text-[12px] leading-[15px] tracking-[0.15em] text-[#9AB3EB]"
+                        className="font-inter font-extrabold text-xs leading-[15px] tracking-[0.15em] "
                       >
                         Enter Password:
                       </FormLabel>
                       <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Enter password"
-                          {...field}
-                          onChange={(e) => {
-                            field.onChange(e)
-                            checkPasswordStrength(e.target.value)
-                          }}
-                        />
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Enter password"
+                            {...field}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              checkPasswordStrength(e.target.value);
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={togglePasswordVisibility}
+                            className="absolute inset-y-0 right-3 flex items-center text-[#9AB3EB] hover:[#9AB3EB]"
+                          >
+                            {showPassword ? (
+                              <EyeOff size={20} />
+                            ) : (
+                              <Eye size={20} />
+                            )}
+                          </button>
+                        </div>
                       </FormControl>
                       <FormMessage />
-                      {passwordStrength && (
-                        <p className="text-sm text-[#9AB3EB] mt-2">
-                          Password Strength: {passwordStrength}
-                        </p>
-                      )}
                     </FormItem>
                   )}
                 />
@@ -127,22 +156,40 @@ export default function IndexCreatePassword({ onSetCurrentPage }: Props) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel
-                        className="font-inter font-extrabold text-[12px] leading-[15px] tracking-[0.15em] text-[#9AB3EB]"
+                        className="font-inter font-extrabold text-xs leading-[15px] tracking-[0.15em] text-[#9AB3EB]"
                       >
                         Confirm Password:
                       </FormLabel>
                       <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Confirm password"
-                          {...field}
-                        />
+                        <div className="relative">
+                          <Input
+                            type={showConfirmPassword ? "text" : "password"}
+                            placeholder="Confirm password"
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            onClick={toggleConfirmPasswordVisibility}
+                            className="absolute inset-y-0 right-3 flex items-center text-[#9AB3EB] hover:text-[#9AB3EB]"
+                          >
+                            {showConfirmPassword ? (
+                              <EyeOff size={20} />
+                            ) : (
+                              <Eye size={20} />
+                            )}
+                          </button>
+                        </div>
                       </FormControl>
                       <FormMessage />
+                      {passwordStrength && (
+                        <p className="text-xs text-[#9AB3EB]">
+                          Password Strength: {passwordStrength}
+                        </p>
+                      )}
                     </FormItem>
                   )}
                 />
-                <p className="font-inter text-[12px] text-[#9AB3EB] mt-2 font-base text-justify">
+                <p className="font-inter text-xs text-[#9AB3EB]  font-base text-justify">
                   Your password is used to unlock your wallet and is securely
                   stored. We recommend 8 characters with uppercase, lowercase,
                   symbols, and numbers.
