@@ -1,4 +1,4 @@
-export class Address {
+export class AddressModel {
   value: string
   label: string
 }
