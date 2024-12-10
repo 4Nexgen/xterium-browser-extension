@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
-import Header from "@/components/Header"
+import Header from "@/components/header"
 import { LoginService } from "@/services/login.service"
 import { Eye, EyeOff } from "lucide-react";
 

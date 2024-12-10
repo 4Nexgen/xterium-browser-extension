@@ -1,4 +1,4 @@
-import Header from "@/components/Header"
+import Header from "@/components/header"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useTheme } from "next-themes"
 import React, { useState } from "react"
