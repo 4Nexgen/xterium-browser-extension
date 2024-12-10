@@ -1,5 +1,5 @@
 import { Message, userMessage } from "@/models/message.model"
-import { SendHorizonal } from "lucide-react"
+import { BotMessageSquare, SendHorizonal } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 
 import { Storage } from "@plasmohq/storage"
@@ -136,14 +136,39 @@ const IndexImUrAi = () => {
 
   return (
     <div className="pt-4 flex flex-col gap-4 h-[calc(100vh-80px)]">
-      <div className="flex-1">
+      <div className="flex-1 w-full">
         {conversation.length ? (
           <div>
-            <ul>
+            <ul className="flex flex-col gap-2">
               {conversation.map((item, k) => {
-                return <li key={`conv-item-${k}`}>{item.content}</li>
+                return (
+                  <li
+                    key={`conv-item-${k}`}
+                    className={`flex gap-1 py-2 ${item.role == "user" ? "self-end max-w-80" : ""}`}>
+                    {item.role != "user" ? (
+                      <div>
+                        <BotMessageSquare className="size-6" />
+                      </div>
+                    ) : (
+                      ""
+                    )}
+                    <p
+                      className={`flex-1 px-4 rounded-lg ${item.role == "user" ? "justify-end bg-primary py-2" : ""}`}>
+                      {item.content}
+                    </p>
+                  </li>
+                )
               })}
-              {messageComposition != "" ? <li>{messageComposition}</li> : ""}
+              {messageComposition != "" ? (
+                <li className="flex py-2 gap-1">
+                  <div>
+                    <BotMessageSquare className="size-6" />
+                  </div>
+                  <p className="flex-1 px-4 rounded-lg">{messageComposition}</p>
+                </li>
+              ) : (
+                ""
+              )}
             </ul>
           </div>
         ) : (
