@@ -1,6 +1,7 @@
-import { Message } from "@/models/message.model"
+import { Message, userMessage } from "@/models/message.model"
+import { connectWS, sendMessage } from "@/services/websocket"
 import { SendHorizonal } from "lucide-react"
-import React from "react"
+import React, { useEffect, useState } from "react"
 
 import { Storage } from "@plasmohq/storage"
 
@@ -38,14 +39,43 @@ const default_convo: Message[] = [
 storage.set("conversation", default_convo)
 
 const IndexImUrAi = () => {
+  useEffect(() => {
+    connectWS()
+  }, [])
+
+  const [chatMessage, setChatMessage] = useState("")
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setChatMessage(e.target.value)
+  }
+
+  const sendChatMessage = (e: React.FormEvent) => {
+    e.preventDefault()
+    const message_object: userMessage = {
+      chat_message: {
+        content: chatMessage,
+        role: "user",
+        use_agent: false
+      },
+      conversation_id: "",
+      user_id: "",
+      virtual_assistant_id: "671b58c186045a333b74388c"
+    }
+    sendMessage(message_object)
+    setChatMessage("")
+  }
+
   return (
     <div className="pt-4 flex flex-col gap-4 h-[calc(100vh-80px)]">
       <Conversation />
-      <form className="bg-white p-2 rounded-lg flex gap-2">
+      <form
+        className="bg-white p-2 rounded-lg flex gap-2"
+        onSubmit={sendChatMessage}>
         <input
           type="text"
           placeholder="Type your message here..."
           className="w-full bg-white text-black outline-none"
+          value={chatMessage}
+          onChange={handleChange}
         />
         <button className="bg-transparent text-primary" type="submit">
           <SendHorizonal />
