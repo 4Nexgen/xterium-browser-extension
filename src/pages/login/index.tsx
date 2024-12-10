@@ -39,19 +39,22 @@ export default function IndexLogin({ onSetCurrentPage }: Props) {
     setShowPassword(!showPassword);
   };
 
-  const onSubmit = (data: { password: string }) => {
-    const encryptedPassword = localStorage.getItem("userPassword");  
+  const onSubmit = async (data: { password: string }) => {
     const loginService = new LoginService();
-
+  
     try {
-        if (loginService.login(encryptedPassword, data.password)) {
-            onSetCurrentPage("application");
-        }
-    } catch (error) {
-        setDecryptionError(error.message || "Error logging in.");
+      const isLoggedIn = await loginService.login(data.password);
+  
+      if (isLoggedIn) {
+        onSetCurrentPage("application");
+      } else {
+        setDecryptionError("Incorrect password.");
+      }
+    } catch (error: any) {
+      setDecryptionError(error.message || "Error logging in.");
     }
-}
-
+  };
+  
 
 
   return (
