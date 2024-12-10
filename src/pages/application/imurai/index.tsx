@@ -1,41 +1,8 @@
 import { Message, userMessage } from "@/models/message.model"
-import { BotMessageSquare, SendHorizonal } from "lucide-react"
+import { BotMessageSquare, Loader2, SendHorizonal } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 
 import { Storage } from "@plasmohq/storage"
-
-import Conversation from "./conversation"
-
-const storage = new Storage()
-const default_convo: Message[] = [
-  {
-    id: "6752a78d55d61b3701719712",
-    user_id: "user_id",
-    conversation_id: "6752a78855d61b3701719711",
-    content: "hello",
-    role: "user",
-    created_at: "2024-12-06T07:28:13.051201"
-  },
-  {
-    id: "6752a78d55d61b3701719712",
-    user_id: "user_id",
-    conversation_id: "6752a78855d61b3701719711",
-    content:
-      'Agent is attempting to call \'general_knowledge\' function with arguments: {"virtual_assistant_id":"671b58c186045a333b74388c"} ..',
-    role: "agent",
-    created_at: "2024-12-06T07:28:13.051201"
-  },
-  {
-    id: "6752a78d55d61b3701719712",
-    user_id: "user_id",
-    conversation_id: "6752a78855d61b3701719711",
-    content:
-      "Hello! It's nice to meet you. My name is JINA, and I'm a friendly AI assistant here to help answer your questions and provide information on various topics, including business registration in the Philippines. How can I assist you today?",
-    role: "assistant",
-    created_at: "2024-12-06T07:28:13.051201"
-  }
-]
-storage.set("conversation", default_convo)
 
 const IndexImUrAi = () => {
   const storage = new Storage()
@@ -44,6 +11,7 @@ const IndexImUrAi = () => {
   const [chatMessage, setChatMessage] = useState("")
   const [messageComposition, setMessageComposition] = useState("")
   const [conversation, setConversation] = useState<Message[]>([])
+  const [thinking, setThinking] = useState(false)
 
   useEffect(() => {
     const socket = new WebSocket(url)
@@ -56,6 +24,7 @@ const IndexImUrAi = () => {
     socket.onmessage = (event: MessageEvent) => {
       const ai_response = JSON.parse(event.data)
       console.log("con", ai_response)
+      setThinking(false)
 
       setMessageComposition((prevComposition) => {
         const newComposition =
@@ -75,7 +44,7 @@ const IndexImUrAi = () => {
           ])
 
           // Clear composition
-          storage.set("conversation", default_convo)
+          // storage.set("conversation", default_convo)
           return "" // Reset composition for a new message
         }
       })
@@ -104,6 +73,7 @@ const IndexImUrAi = () => {
 
   const sendChatMessage = (e: React.FormEvent) => {
     e.preventDefault()
+    setThinking(true)
 
     setConversation((prevConversation) => [
       ...prevConversation,
@@ -136,10 +106,10 @@ const IndexImUrAi = () => {
 
   return (
     <div className="pt-4 flex flex-col gap-4 h-[calc(100vh-80px)]">
-      <div className="flex-1 w-full">
+      <div className="flex-1 overflow-auto">
         {conversation.length ? (
           <div>
-            <ul className="flex flex-col gap-2">
+            <ul className="flex flex-col gap-2 px-[10px]">
               {conversation.map((item, k) => {
                 return (
                   <li
@@ -169,6 +139,20 @@ const IndexImUrAi = () => {
               ) : (
                 ""
               )}
+
+              {thinking ? (
+                <li className="flex py-2 gap-1">
+                  <div>
+                    <BotMessageSquare className="size-6" />
+                  </div>
+                  <p className="flex-1 px-4 rounded-lg flex items-center gap-2">
+                    <Loader2 className="animate-spin" />
+                    Please wait...
+                  </p>
+                </li>
+              ) : (
+                ""
+              )}
             </ul>
           </div>
         ) : (
@@ -178,18 +162,20 @@ const IndexImUrAi = () => {
         )}
       </div>
       <form
-        className="bg-white p-2 rounded-lg flex gap-2"
+        className="h-[60px] py-[5px] flex items-center"
         onSubmit={sendChatMessage}>
-        <input
-          type="text"
-          placeholder="Type your message here..."
-          className="w-full bg-white text-black outline-none"
-          value={chatMessage}
-          onChange={handleChange}
-        />
-        <button className="bg-transparent text-primary" type="submit">
-          <SendHorizonal />
-        </button>
+        <div className="bg-white rounded-lg flex gap-2 overflow-hidden py-2 px-4 w-full">
+          <input
+            type="text"
+            placeholder="Type your message here..."
+            className="w-full bg-white text-black outline-none"
+            value={chatMessage}
+            onChange={handleChange}
+          />
+          <button className="bg-transparent text-primary" type="submit">
+            <SendHorizonal />
+          </button>
+        </div>
       </form>
     </div>
   )
