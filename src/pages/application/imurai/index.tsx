@@ -156,8 +156,15 @@ const IndexImUrAi = () => {
             </ul>
           </div>
         ) : (
-          <div className="h-[150px] bg-primary rounded-lg relative mb-[100px] dev-bg-image">
-            <div className="absolute -bottom-[50px] left-[50%]  -translate-x-[50%] w-[100px] h-[100px] rounded-full bg-white border-primary"></div>
+          <div>
+            <div className="h-[150px] bg-primary rounded-lg relative mb-[100px] dev-bg-image">
+              <div className="absolute -bottom-[50px] left-[50%]  -translate-x-[50%] w-[100px] h-[100px] rounded-full bg-white border-primary flex items-center justify-center">
+                <BotMessageSquare className="block size-16 text-primary" />
+              </div>
+            </div>
+            <div className="flex flex-col items-center w-full">
+              <h3 className="text-lg">Hello, How can I help you?</h3>
+            </div>
           </div>
         )}
       </div>
