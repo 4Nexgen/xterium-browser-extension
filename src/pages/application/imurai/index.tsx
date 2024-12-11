@@ -73,6 +73,9 @@ const IndexImUrAi = () => {
 
   const sendChatMessage = (e: React.FormEvent) => {
     e.preventDefault()
+    if (chatMessage == "") {
+      return false
+    }
     setThinking(true)
 
     setConversation((prevConversation) => [
@@ -169,7 +172,10 @@ const IndexImUrAi = () => {
             value={chatMessage}
             onChange={handleChange}
           />
-          <button className="bg-transparent text-primary" type="submit">
+          <button
+            className="bg-transparent text-primary"
+            type="submit"
+            disabled={thinking || messageComposition != ""}>
             <SendHorizonal />
           </button>
         </div>
