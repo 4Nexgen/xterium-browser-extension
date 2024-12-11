@@ -14,11 +14,13 @@ import {
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover"
+import { useToast } from "@/hooks/use-toast"
 import { TokenModel } from "@/models/token.model"
 import { TokenService } from "@/services/token.service"
+import { Check } from "lucide-react"
 import React, { useEffect, useState } from "react"
 
-const IndexAddToken = ({ handleSaveAndUpdateToken }) => {
+const IndexAddToken = ({ handleCallbacks }) => {
   const [tokenData, setTokenData] = useState<TokenModel>({
     id: 0,
     type: "",
@@ -32,6 +34,8 @@ const IndexAddToken = ({ handleSaveAndUpdateToken }) => {
   const [openTokenType, setOpenTokenType] = useState(false)
   const [tokenTypes, setTokenTypes] = useState<string[]>([])
   const [selectedTokenType, setSelectedTokenType] = useState<string>("")
+
+  const { toast } = useToast()
 
   useEffect(() => {
     setTokenTypes(["Native", "Asset"])
@@ -48,9 +52,21 @@ const IndexAddToken = ({ handleSaveAndUpdateToken }) => {
     tokenData.type = selectedTokenType
 
     let tokenService = new TokenService()
-    tokenService.createToken(tokenData)
+    tokenService.createToken(tokenData).then((result) => {
+      if (result != null) {
+        toast({
+          description: (
+            <div className="flex items-center">
+              <Check className="mr-2 text-green-500" />
+              Token Saved Successfully!
+            </div>
+          ),
+          variant: "default"
+        })
+      }
+    })
 
-    handleSaveAndUpdateToken()
+    handleCallbacks()
   }
 
   return (
@@ -117,7 +133,7 @@ const IndexAddToken = ({ handleSaveAndUpdateToken }) => {
             onChange={(e) => handleInputChange("symbol", e.target.value)}
           />
         </div>
-        <div className="mb-3">
+        <div className="mb-8">
           <Label>Description:</Label>
           <Input
             type="text"

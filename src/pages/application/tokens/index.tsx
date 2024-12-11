@@ -81,6 +81,10 @@ const IndexTokens = () => {
     return tokenImages.getBase64Image(imageName)
   }
 
+  useEffect(() => {
+    getTokens()
+  }, [])
+
   const addToken = () => {
     setIsAddTokenDrawerOpen(true)
   }
@@ -92,14 +96,12 @@ const IndexTokens = () => {
 
   const saveAndUpdateToken = () => {
     setIsAddTokenDrawerOpen(false)
+    setIsEditTokenDrawerOpen(false)
+
     setTimeout(() => {
       getTokens()
     }, 100)
   }
-
-  useEffect(() => {
-    getTokens()
-  }, [])
 
   return (
     <>
@@ -204,7 +206,7 @@ const IndexTokens = () => {
             <DrawerHeader>
               <DrawerTitle>ADD NEW TOKEN</DrawerTitle>
             </DrawerHeader>
-            <IndexAddToken handleSaveAndUpdateToken={saveAndUpdateToken} />
+            <IndexAddToken handleCallbacks={saveAndUpdateToken} />
           </DrawerContent>
         </Drawer>
 
@@ -229,7 +231,10 @@ const IndexTokens = () => {
                 <span>Token</span>
               </DrawerTitle>
             </DrawerHeader>
-            <IndexEditToken selectedToken={selectedToken} handleSaveAndUpdateToken={saveAndUpdateToken} />
+            <IndexEditToken
+              selectedToken={selectedToken}
+              handleCallbacks={saveAndUpdateToken}
+            />
           </DrawerContent>
         </Drawer>
       </div>

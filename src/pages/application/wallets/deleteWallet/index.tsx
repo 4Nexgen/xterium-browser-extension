@@ -1,47 +1,54 @@
-import React from "react";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Form } from "@/components/ui/form";
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { useToast } from "@/hooks/use-toast"
+import type { WalletModel } from "@/models/wallet.model"
+import { WalletService } from "@/services/wallet.service"
+import { Check } from "lucide-react"
+import React, { useState } from "react"
 
-interface IndexDeleteWalletProps {
-  isDrawerOpen: boolean;
-  toggleDrawer: () => void;
-  addressItem: { label: string, value: string }; // Accept addressItem as a prop
+const IndexDeleteWallet = ({ selectedWallet, handleCallbacks }) => {
+  const [walletData, setWalletData] = useState<WalletModel>(selectedWallet)
+  const { toast } = useToast()
+
+  const deleteWallet = () => {
+    let walletService = new WalletService()
+    walletService.deleteWallet(walletData.id).then((result) => {
+      if (result != null) {
+        toast({
+          description: (
+            <div className="flex items-center">
+              <Check className="mr-2 text-green-500" />
+              Wallet Deleted Successfully!
+            </div>
+          ),
+          variant: "default"
+        })
+      }
+    })
+
+    handleCallbacks()
+  }
+
+  return (
+    <>
+      <div className="p-6">
+        <div className="mb-8">
+          <Label className="text-center tracking-[0.15em] font-semibold leading-2 font-Inter text-base text-white">
+            Are you sure you want to delete <br />
+            <span className="text-lg font-bold text-[#B375DC]">
+              {walletData.name}
+            </span>{" "}
+            from your wallet list?
+          </Label>
+        </div>
+        <div className="flex flex-row space-x-3">
+          <Button type="button" variant="red" onClick={deleteWallet}>
+            DELETE
+          </Button>
+        </div>
+      </div>
+    </>
+  )
 }
 
-const IndexDeleteWallet: React.FC<IndexDeleteWalletProps> = ({ isDrawerOpen, toggleDrawer, addressItem }) => {
-  return (
-    <Drawer open={isDrawerOpen} onOpenChange={toggleDrawer}>
-      <DrawerContent>
-        <DrawerHeader >
-          <DrawerTitle>
-            DELETE WALLET
-          </DrawerTitle>
-        </DrawerHeader>
-        <DrawerDescription>
-          <div className="p-6">
-            <Form>
-              <div className="mb-8">
-                <Label className="text-center tracking-[0.15em] font-semibold leading-2 font-Inter text-base text-white">
-                  Are you sure you want to delete <br/>
-                  <span className="text-lg font-bold text-[#B375DC]">{addressItem?.label}</span> from your wallet list?
-                </Label>
-              </div>
-              <div className="flex flex-row space-x-3">
-                <Button type="button" variant="violet">
-                  YES
-                </Button>
-                <Button type="button" variant="red">
-                  NO
-                </Button>
-              </div>
-            </Form>
-          </div>
-        </DrawerDescription>
-      </DrawerContent>
-    </Drawer>
-  );
-};
-
-export default IndexDeleteWallet;
+export default IndexDeleteWallet

@@ -1,29 +1,26 @@
-import { Wallet } from "@/models/wallet.model"
+import { WalletModel } from "@/models/wallet.model"
 
 import { Storage } from "@plasmohq/storage"
 
 export class WalletService {
-  private storage = new Storage()
-  private key = "userPassword"
+  private storage = new Storage({
+    area: 'local',
+    allCopied: true
+  })
+  private key = "wallets"
 
-  async createWallet(walletModel: Wallet): Promise<string> {
+  async createWallet(data: WalletModel): Promise<string> {
     return new Promise(async (resolve, reject) => {
       try {
-        const currentId =
-          (await this.storage.get<number>(this.key + "_counter")) || 0
-        const newId = currentId + 1
-
-        walletModel.id = newId
-
         const existingWallets = await this.storage.get<string>(this.key)
-        const wallet: Wallet[] = existingWallets
-          ? JSON.parse(existingWallets)
-          : []
+        const wallets: WalletModel[] = existingWallets ? JSON.parse(existingWallets) : []
 
-        wallet.push(walletModel)
+        const lastId = wallets.length > 0 ? wallets[wallets.length - 1].id : 0;
+        data.id = lastId + 1
 
-        await this.storage.set(this.key, JSON.stringify(wallet))
-        await this.storage.set(this.key + "_counter", newId)
+        wallets.push(data)
+
+        await this.storage.set(this.key, JSON.stringify(wallets))
 
         resolve("Wallet created successfully")
       } catch (error) {
@@ -32,7 +29,7 @@ export class WalletService {
     })
   }
 
-  async getWallets(): Promise<Wallet[]> {
+  async getWallets(): Promise<WalletModel[]> {
     return new Promise(async (resolve, reject) => {
       try {
         const storedData = await this.storage.get<string>(this.key)
@@ -41,7 +38,7 @@ export class WalletService {
           return resolve([])
         }
 
-        const wallets: Wallet[] = JSON.parse(storedData)
+        const wallets: WalletModel[] = JSON.parse(storedData)
         resolve(wallets)
       } catch (error) {
         reject(error)
@@ -49,7 +46,7 @@ export class WalletService {
     })
   }
 
-  async getWalletById(id: number): Promise<Wallet> {
+  async getWalletById(id: number): Promise<WalletModel> {
     return new Promise(async (resolve, reject) => {
       try {
         const storedData = await this.storage.get<string>(this.key)
@@ -57,7 +54,7 @@ export class WalletService {
         if (!storedData) {
           return reject(new Error("No stored data found."))
         }
-        const wallets: Wallet[] = JSON.parse(storedData)
+        const wallets: WalletModel[] = JSON.parse(storedData)
         const wallet = wallets.find((wallet) => wallet.id === id)
 
         if (!wallet) {
@@ -71,7 +68,7 @@ export class WalletService {
     })
   }
 
-  async updateWallet(id: number, updatedWallet: Wallet): Promise<string> {
+  async updateWallet(id: number, data: WalletModel): Promise<string> {
     return new Promise(async (resolve, reject) => {
       try {
         const wallets = await this.getWallets()
@@ -83,7 +80,7 @@ export class WalletService {
           return
         }
 
-        wallets[index] = updatedWallet
+        wallets[index] = data
 
         await this.storage.set(this.key, JSON.stringify(wallets))
 
