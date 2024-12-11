@@ -8,8 +8,8 @@ import {
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
 import {
   Sidebar,
   SidebarContent,
@@ -20,11 +20,11 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import IndexChangePassword from "@/pages/application/change-password";
-import { cn } from "@/lib/utils";
-import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png";
+  SidebarMenuItem
+} from "@/components/ui/sidebar"
+import { cn } from "@/lib/utils"
+import IndexChangePassword from "@/pages/application/change-password"
+import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
 import {
   ChevronUp,
   Coins,
@@ -32,56 +32,60 @@ import {
   MessageCircle,
   Network,
   User,
-  Wallet,
-} from "lucide-react";
-import { useTheme } from "next-themes";
-import React, { useState } from "react";
- 
+  Wallet
+} from "lucide-react"
+import { useTheme } from "next-themes"
+import React, { useEffect, useState } from "react"
+
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "./ui/drawer"
+
 const applicationItems = [
   {
     title: "Balance",
     url: "#",
-    icon: DollarSign,
+    icon: DollarSign
   },
   {
     title: "Tokens",
     url: "#",
-    icon: Coins,
+    icon: Coins
   },
   {
     title: "Network Status",
     url: "#",
-    icon: Network,
+    icon: Network
   },
   {
     title: "ImUrAi",
     url: "#",
-    icon: MessageCircle,
-  },
-];
- 
+    icon: MessageCircle
+  }
+]
+
 const setupItems = [
   {
     title: "Wallets",
     url: "#",
-    icon: Wallet,
-  },
-];
- 
-const ApplicationSidebar = ({ onSetCurrentPage }) => {
-  const [drawerOpen, setDrawerOpen] = useState(false); // State for drawer
-  const { setTheme } = useTheme();
-  const [activeItem, setActiveItem] = useState<string>("");
+    icon: Wallet
+  }
+]
+
+const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
+  const [isChangePasswordDrawerOpen, setIsChangePasswordDrawerOpen] = useState(false) // State for drawer
+  const { setTheme } = useTheme()
+  const [activeItem, setActiveItem] = useState<string>("")
 
   const toggleDrawer = () => {
-    setDrawerOpen(!drawerOpen);
-  };
+    setIsChangePasswordDrawerOpen(true)
+  }
+
   const handleSignOut = () => {
-    console.log("Signing out...");
-    localStorage.removeItem("lastAccessTime");
-    sessionStorage.clear();
-    window.location.reload();
-  };
+    onSetIsLogout()
+  }
+
+  const callbackUpdates = () => {
+    setIsChangePasswordDrawerOpen(false)
+  }
 
   return (
     <>
@@ -103,32 +107,25 @@ const ApplicationSidebar = ({ onSetCurrentPage }) => {
                     <SidebarMenuButton
                       asChild
                       onClick={() => {
-                        setActiveItem(item.title);
-                        onSetCurrentPage(item.title);
-                      }}
-                    >
+                        setActiveItem(item.title)
+                        onSetCurrentPage(item.title)
+                      }}>
                       <a
                         href={item.url}
                         className={cn(
                           "flex items-center space-x-2 p-3 text-sm",
-                          activeItem === item.title
-                            ? "text-purple bg-sidebar-accent"
-                            : "" 
-                        )}
-                      >
+                          activeItem === item.title ? "text-purple bg-sidebar-accent" : ""
+                        )}>
                         <div
                           className={cn(
-                            "rounded ", 
+                            "rounded ",
                             activeItem === item.title
-                              ? "text-white bg-[var(--sidebar-icon-background)]" 
+                              ? "text-white bg-[var(--sidebar-icon-background)]"
                               : "bg-transparent primary"
-                          )}
-                        >
+                          )}>
                           <item.icon
                             className={cn(
-                              activeItem === item.title
-                                ? "primary" 
-                                : "primary" ,
+                              activeItem === item.title ? "primary" : "primary",
                               "rounded",
                               "px-1"
                             )}
@@ -136,11 +133,8 @@ const ApplicationSidebar = ({ onSetCurrentPage }) => {
                         </div>
                         <span
                           className={cn(
-                            activeItem === item.title
-                              ? "text-purple"
-                              : "primary" 
-                          )}
-                        >
+                            activeItem === item.title ? "text-purple" : "primary"
+                          )}>
                           {item.title}
                         </span>
                         {activeItem === item.title && (
@@ -163,32 +157,25 @@ const ApplicationSidebar = ({ onSetCurrentPage }) => {
                     <SidebarMenuButton
                       asChild
                       onClick={() => {
-                        setActiveItem(item.title); 
-                        onSetCurrentPage(item.title);
-                      }}
-                    >
+                        setActiveItem(item.title)
+                        onSetCurrentPage(item.title)
+                      }}>
                       <a
                         href={item.url}
                         className={cn(
                           "flex items-center space-x-2 p-3 text-sm",
-                          activeItem === item.title
-                            ? "text-purple bg-sidebar-accent" 
-                            : "" 
-                        )}
-                      >
+                          activeItem === item.title ? "text-purple bg-sidebar-accent" : ""
+                        )}>
                         <div
                           className={cn(
-                            "rounded ", 
+                            "rounded ",
                             activeItem === item.title
-                              ? "text-white bg-[var(--sidebar-icon-background)]" 
-                              : "bg-transparent primary" 
-                          )}
-                        >
+                              ? "text-white bg-[var(--sidebar-icon-background)]"
+                              : "bg-transparent primary"
+                          )}>
                           <item.icon
                             className={cn(
-                              activeItem === item.title
-                                ? "primary" 
-                                : "primary" ,
+                              activeItem === item.title ? "primary" : "primary",
                               "rounded",
                               "px-1"
                             )}
@@ -196,11 +183,8 @@ const ApplicationSidebar = ({ onSetCurrentPage }) => {
                         </div>
                         <span
                           className={cn(
-                            activeItem === item.title
-                              ? "text-purple" 
-                              : "primary"
-                          )}
-                        >
+                            activeItem === item.title ? "text-purple" : "primary"
+                          )}>
                           {item.title}
                         </span>
                         {activeItem === item.title && (
@@ -227,8 +211,7 @@ const ApplicationSidebar = ({ onSetCurrentPage }) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   side="top"
-                  className="w-[--radix-popper-anchor-width]"
-                >
+                  className="w-[--radix-popper-anchor-width]">
                   <DropdownMenuGroup>
                     <DropdownMenuSub>
                       <DropdownMenuSubTrigger>Theme</DropdownMenuSubTrigger>
@@ -265,12 +248,16 @@ const ApplicationSidebar = ({ onSetCurrentPage }) => {
         </SidebarFooter>
       </Sidebar>
 
-      <IndexChangePassword
-        isDrawerOpen={drawerOpen}
-        toggleDrawer={toggleDrawer}
-      />
+      <Drawer open={isChangePasswordDrawerOpen} onOpenChange={setIsChangePasswordDrawerOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>CHANGE PASSWORD</DrawerTitle>
+          </DrawerHeader>
+          <IndexChangePassword handleCallbacks={callbackUpdates} />
+        </DrawerContent>
+      </Drawer>
     </>
-  );
-};
+  )
+}
 
-export default ApplicationSidebar;
+export default ApplicationSidebar

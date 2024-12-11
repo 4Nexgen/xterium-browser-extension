@@ -3,20 +3,21 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import type { WalletModel } from "@/models/wallet.model"
-import { LoginService } from "@/services/login.service"
+import { UserService } from "@/services/user.service"
 import { WalletService } from "@/services/wallet.service"
 import { Check } from "lucide-react"
 import React, { useState } from "react"
 
 const IndexExportWallet = ({ selectedWallet, handleCallbacks }) => {
+  const userService = new UserService()
+
   const [walletData, setWalletData] = useState<WalletModel>(selectedWallet)
   const [inputedPassword, setInputedPassword] = useState<string>("")
 
   const { toast } = useToast()
 
   const exportWallet = () => {
-    let loginService = new LoginService()
-    loginService.login(inputedPassword).then((isValid) => {
+    userService.login(inputedPassword).then((isValid) => {
       if (isValid == true) {
         let walletService = new WalletService()
         walletService.getWalletById(walletData.id).then((result) => {

@@ -1,45 +1,59 @@
-import * as React from "react";
-import { useState, useEffect } from "react";
-import IndexCreatePassword from "./create-password";
-import IndexLogin from "./login";
-import IndexApplication from "./application";
+import { UserService } from "@/services/user.service"
+import * as React from "react"
+import { useEffect, useState } from "react"
+
+import IndexApplication from "./application"
+import IndexCreatePassword from "./create-password"
+import IndexLogin from "./login"
 
 const IndexPages = () => {
-  const [currentPage, setCurrentPage] = useState<string>("create-password");
+  const userService = new UserService()
+  const [currentPage, setCurrentPage] = useState<string>("create-password")
 
   useEffect(() => {
-    const encryptedPassword = localStorage.getItem("userPassword");
-    const lastAccessTime = localStorage.getItem("lastAccessTime");
-    const currentTime = new Date().getTime();
-
-    if (encryptedPassword) {
-      if (!lastAccessTime || currentTime - parseInt(lastAccessTime) > 120000) {
-        setCurrentPage("login");
+    userService.isUserExists().then((isExisted) => {
+      if (isExisted == true) {
+        const currentTime = new Date().getTime()
+        userService
+          .getLastAccessTime()
+          .then((lastAccessTime) => {
+            if (lastAccessTime != null) {
+              if (!lastAccessTime || currentTime - parseInt(lastAccessTime) > 120000) {
+                setCurrentPage("login")
+              } else {
+                setCurrentPage("application")
+              }
+            } else {
+              setCurrentPage("login")
+            }
+          })
+          .catch((error) => {
+            setCurrentPage("login")
+          })
       } else {
-        setCurrentPage("application");
+        setCurrentPage("create-password")
       }
-    } else {
-      setCurrentPage("create-password");
-    }
-  }, []); 
+    })
+  }, [])
 
   const handleSetCurrentPage = (page: string) => {
-    setCurrentPage(page);
+    setCurrentPage(page)
 
     if (page === "application") {
-      localStorage.setItem("lastAccessTime", new Date().getTime().toString());
+      let lastAccessTime = new Date().getTime().toString()
+      userService.setLastAccessTime(lastAccessTime)
     }
-  };
+  }
 
   return (
-    <div>
+    <>
       {currentPage === "create-password" && (
         <IndexCreatePassword onSetCurrentPage={handleSetCurrentPage} />
       )}
       {currentPage === "login" && <IndexLogin onSetCurrentPage={handleSetCurrentPage} />}
       {currentPage === "application" && <IndexApplication />}
-    </div>
-  );
-};
+    </>
+  )
+}
 
-export default IndexPages;
+export default IndexPages

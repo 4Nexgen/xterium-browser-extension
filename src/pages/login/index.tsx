@@ -1,84 +1,88 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { useState } from "react"
-
+import Header from "@/components/header"
 import { Button } from "@/components/ui/button"
-import Image from "next/image"
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { useToast } from "@/hooks/use-toast"
+import { UserService } from "@/services/user.service"
+import { zodResolver } from "@hookform/resolvers/zod"
 import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
-import Header from "@/components/header"
-import { LoginService } from "@/services/login.service"
-import { Eye, EyeOff } from "lucide-react";
+import { Check, Eye, EyeOff } from "lucide-react"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 
-interface Props {
-  onSetCurrentPage: (page: string) => void
-}
+const IndexLogin = ({ onSetCurrentPage }) => {
+  const userService = new UserService()
 
-export default function IndexLogin({ onSetCurrentPage }: Props) {
-  const form = useForm({
-    defaultValues: {
-      password: "",
-    },
+  const [showPassword, setShowPassword] = useState<boolean>(false)
+
+  const { toast } = useToast()
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword)
+  }
+
+  const FormSchema = z.object({
+    password: z.string().min(2, {
+      message: ""
+    })
   })
 
-  const [decryptionError, setDecryptionError] = useState<string>("")
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const onSubmit = async (data: { password: string }) => {
-    const loginService = new LoginService();
-  
-    try {
-      const isLoggedIn = await loginService.login(data.password);
-  
-      if (isLoggedIn) {
-        onSetCurrentPage("application");
-      } else {
-        setDecryptionError("Incorrect password.");
-      }
-    } catch (error: any) {
-      setDecryptionError(error.message || "Error logging in.");
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      password: ""
     }
-  };
-  
+  })
 
+  function onSubmit(data: z.infer<typeof FormSchema>) {
+    login(data)
+  }
+
+  const login = (data: z.infer<typeof FormSchema>) => {
+    userService.login(data.password).then((isValid) => {
+      if (isValid == true) {
+        onSetCurrentPage("application")
+      } else {
+        toast({
+          description: (
+            <div className="flex items-center">
+              <Check className="mr-2 text-green-500" />
+              Incorrect password!
+            </div>
+          ),
+          variant: "default"
+        })
+      }
+    })
+  }
 
   return (
     <div className="flex flex-col justify-between min-h-screentext-white">
-        <Header
-          variant="login"
-        />
+      <Header variant="login" />
 
       <div
-        className="flex justify-center pt-14"
+        className="flex justify-center pt-14 pb-14"
         style={{
-          background: "linear-gradient(180deg, #2E266D 0%, #121B26 100%)",
-        }}
-      >
-        <img src={XteriumLogo} className="w-229" alt="Xterium Logo" />
-      </div>
-      <div className="flex justify-center font-bold text-xl py-6">
-        <h1>Welcome!</h1>
+          background: "linear-gradient(180deg, #2E266D 0%, #121B26 100%)"
+        }}>
+        <img src={XteriumLogo} className="w-229 mb-8" alt="Xterium Logo" />
       </div>
 
       <div
         className="h-3 mt-7"
         style={{
-          background: "linear-gradient(90deg, #7292DD 0%, #50B8FF 100%)",
+          background: "linear-gradient(90deg, #7292DD 0%, #50B8FF 100%)"
         }}
       />
 
@@ -87,22 +91,16 @@ export default function IndexLogin({ onSetCurrentPage }: Props) {
           <div
             className="p-6 w-full h-[290px]"
             style={{
-              background: "linear-gradient(180deg, #32436A 0%, #121826 100%)",
-            }}
-          >
+              background: "linear-gradient(180deg, #32436A 0%, #121826 100%)"
+            }}>
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="w-full space-y-4"
-              >
+              <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4">
                 <FormField
                   control={form.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel
-                        className="font-inter font-extrabold text-[12px] leading-[15px] tracking-[0.15em] text-[#9AB3EB]"
-                      >
+                      <FormLabel className="font-inter font-extrabold text-[12px] leading-[15px] tracking-[0.15em] text-[#9AB3EB] mb-2">
                         Enter Password:
                       </FormLabel>
                       <FormControl>
@@ -114,14 +112,9 @@ export default function IndexLogin({ onSetCurrentPage }: Props) {
                           />
                           <button
                             type="button"
-                            onClick={togglePasswordVisibility}
-                            className="absolute inset-y-0 right-0 px-3 text-sm font-semibold"
-                          >
-                            {showPassword ? (
-                              <Eye size={20} />
-                            ) : (
-                              <EyeOff size={20} />
-                            )}
+                            onClick={toggleShowPassword}
+                            className="absolute inset-y-0 right-0 px-3 text-sm font-semibold">
+                            {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
                           </button>
                         </div>
                       </FormControl>
@@ -129,22 +122,16 @@ export default function IndexLogin({ onSetCurrentPage }: Props) {
                     </FormItem>
                   )}
                 />
-                {decryptionError && (
-                  <div className="text-xs text-[#FD2400] mt-2">{decryptionError}</div>
-                )}
-                <Button
-                  type="submit"
-                  variant="violet"
-                  className="w-full"
-                >
+                <Button type="submit" variant="violet" className="w-full">
                   UNLOCK
                 </Button>
               </form>
-            </Form> 
+            </Form>
           </div>
         </div>
       </div>
-
     </div>
   )
 }
+
+export default IndexLogin

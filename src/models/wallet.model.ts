@@ -1,4 +1,4 @@
-export class Wallet {
+export class WalletModel {
   id: number
   name: string
   address_type: string

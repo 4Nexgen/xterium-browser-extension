@@ -1,10 +1,5 @@
 import { Button } from "@/components/ui/button"
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle
-} from "@/components/ui/drawer"
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
@@ -25,9 +20,11 @@ import React, { useState } from "react"
 import "@polkadot/wasm-crypto/initOnlyAsm"
 
 import { EncryptionService } from "@/services/encryption.service"
-import { LoginService } from "@/services/login.service"
+import { UserService } from "@/services/user.service"
 
 const IndexAddWallet = ({ handleCallbacks }) => {
+  const userService = new UserService()
+  
   const [isInputPasswordDrawerOpen, setIsInputPasswordDrawerOpen] =
     useState<boolean>(false)
   const [walletData, setWalletData] = useState<WalletModel>({
@@ -72,8 +69,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
   }
 
   const saveWithPassword = () => {
-    let loginService = new LoginService()
-    loginService.login(inputedPassword).then((isValid) => {
+    userService.login(inputedPassword).then((isValid) => {
       if (isValid == true) {
         let encryptionService = new EncryptionService()
 
@@ -81,10 +77,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
           inputedPassword,
           walletData.mnemonic_phrase
         )
-        let secret_key = encryptionService.encrypt(
-          inputedPassword,
-          walletData.secret_key
-        )
+        let secret_key = encryptionService.encrypt(inputedPassword, walletData.secret_key)
 
         walletData.mnemonic_phrase = mnemonic_phrase
         walletData.secret_key = secret_key
@@ -147,9 +140,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
               type="text"
               placeholder="Mnemonic Phrase"
               value={walletData.mnemonic_phrase}
-              onChange={(e) =>
-                handleInputChange("mnemonic_phrase", e.target.value)
-              }
+              onChange={(e) => handleInputChange("mnemonic_phrase", e.target.value)}
             />
             <Button
               type="button"
