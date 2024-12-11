@@ -145,10 +145,7 @@ const IndexImUrAi = () => {
                   <div>
                     <BotMessageSquare className="size-6" />
                   </div>
-                  <p className="flex-1 px-4 rounded-lg flex items-center gap-2">
-                    <Loader2 className="animate-spin" />
-                    Please wait...
-                  </p>
+                  <div class="loader"></div>
                 </li>
               ) : (
                 ""
