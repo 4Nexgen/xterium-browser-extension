@@ -2,36 +2,31 @@ import { EncryptionService } from './encryption.service';
 import { Storage } from "@plasmohq/storage";
 
 export class LoginService {
-    private storage: Storage;
-    private encryptionService: EncryptionService;
+    private storage = new Storage({
+        area: 'local',
+        allCopied: true
+    })
+    private storageKey = "user"
+    private encryptionService = new EncryptionService()
 
-    constructor() {
-        this.storage = new Storage({
-            area: "local",
-            allCopied: true
-        });
-        this.encryptionService = new EncryptionService();
-    }
+    async login(password: string): Promise<boolean | any> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const userPassword = await this.storage.getItem(this.storageKey);
+                if (!userPassword) {
+                    reject("No password found in storage.")
+                }
 
-    async login(password: string): Promise<boolean> {
-        const userPassword = await this.storage.getItem("userPassword");
+                let isMatched = false
+                const decryptedPassword = this.encryptionService.decrypt(password, userPassword);
+                if (decryptedPassword === password) {
+                    isMatched = true;
+                }
 
-        if (!userPassword) {
-            throw new Error("No password found in storage.");
-        }
-
-        try {
-    
-            const decryptedPassword = this.encryptionService.decrypt(userPassword);
-
-            if (decryptedPassword === password) {
-                return true; 
-            } else {
-                throw new Error("Incorrect password.");
+                resolve(isMatched)
+            } catch (error) {
+                reject(error)
             }
-        } catch (error) {
-            console.error("Error decrypting the password:", error);
-            throw new Error("Incorrect password.");
-        }
+        })
     }
 }

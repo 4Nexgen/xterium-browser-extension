@@ -10,8 +10,22 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import type { WalletModel } from "@/models/wallet.model"
 import { WalletService } from "@/services/wallet.service"
+import { u8aToHex } from "@polkadot/util"
+import {
+  cryptoWaitReady,
+  encodeAddress,
+  mnemonicGenerate,
+  mnemonicToMiniSecret,
+  mnemonicValidate,
+  sr25519PairFromSeed
+} from "@polkadot/util-crypto"
 import { Check } from "lucide-react"
 import React, { useState } from "react"
+
+import "@polkadot/wasm-crypto/initOnlyAsm"
+
+import { EncryptionService } from "@/services/encryption.service"
+import { LoginService } from "@/services/login.service"
 
 const IndexAddWallet = ({ handleCallbacks }) => {
   const [isInputPasswordDrawerOpen, setIsInputPasswordDrawerOpen] =
@@ -24,6 +38,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
     secret_key: "",
     public_key: ""
   })
+  const [inputedPassword, setInputedPassword] = useState<string>("")
 
   const { toast } = useToast()
 
@@ -34,27 +49,74 @@ const IndexAddWallet = ({ handleCallbacks }) => {
     }))
   }
 
+  const generateMnemonic = () => {
+    let generatedMnemonicPhrase = mnemonicGenerate()
+    handleInputChange("mnemonic_phrase", generatedMnemonicPhrase)
+    createKeys(generatedMnemonicPhrase)
+  }
+
+  const createKeys = (generatedMnemonicPhrase) => {
+    cryptoWaitReady().then((isReady) => {
+      if (mnemonicValidate(generatedMnemonicPhrase)) {
+        const seed = mnemonicToMiniSecret(generatedMnemonicPhrase)
+        const { publicKey, secretKey } = sr25519PairFromSeed(seed)
+
+        handleInputChange("secret_key", u8aToHex(secretKey))
+        handleInputChange("public_key", encodeAddress(publicKey))
+      }
+    })
+  }
+
   const saveWallet = () => {
     setIsInputPasswordDrawerOpen(true)
   }
 
   const saveWithPassword = () => {
-    let walletService = new WalletService()
-    walletService.createWallet(walletData).then((result) => {
-      if (result != null) {
+    let loginService = new LoginService()
+    loginService.login(inputedPassword).then((isValid) => {
+      if (isValid == true) {
+        let encryptionService = new EncryptionService()
+
+        let mnemonic_phrase = encryptionService.encrypt(
+          inputedPassword,
+          walletData.mnemonic_phrase
+        )
+        let secret_key = encryptionService.encrypt(
+          inputedPassword,
+          walletData.secret_key
+        )
+
+        walletData.mnemonic_phrase = mnemonic_phrase
+        walletData.secret_key = secret_key
+
+        let walletService = new WalletService()
+        walletService.createWallet(walletData).then((result) => {
+          if (result != null) {
+            toast({
+              description: (
+                <div className="flex items-center">
+                  <Check className="mr-2 text-green-500" />
+                  Wallet Saved Successfully!
+                </div>
+              ),
+              variant: "default"
+            })
+          }
+        })
+
+        handleCallbacks()
+      } else {
         toast({
           description: (
             <div className="flex items-center">
               <Check className="mr-2 text-green-500" />
-              Wallet Saved Successfully!
+              Invalid Password!
             </div>
           ),
           variant: "default"
         })
       }
     })
-
-    handleCallbacks()
   }
 
   return (
@@ -89,7 +151,11 @@ const IndexAddWallet = ({ handleCallbacks }) => {
                 handleInputChange("mnemonic_phrase", e.target.value)
               }
             />
-            <Button type="button" variant="variant1" size="icon">
+            <Button
+              type="button"
+              variant="variant1"
+              size="icon"
+              onClick={generateMnemonic}>
               ↻
             </Button>
           </div>
@@ -129,7 +195,12 @@ const IndexAddWallet = ({ handleCallbacks }) => {
           <div className="p-6">
             <div className="mb-8">
               <Label className="font-bold pb-2">Enter your password:</Label>
-              <Input type="password" placeholder="********" />
+              <Input
+                type="password"
+                placeholder="********"
+                value={inputedPassword}
+                onChange={(e) => setInputedPassword(e.target.value)}
+              />
             </div>
             <div className="mt-3 mb-3">
               <Button type="button" variant="violet" onClick={saveWithPassword}>

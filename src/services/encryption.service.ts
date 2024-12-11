@@ -1,14 +1,12 @@
 import CryptoJS from "crypto-js"
 
 export class EncryptionService {
-    private key = 'secret-key'  
-
-    encrypt(data: string): string {
-        return CryptoJS.AES.encrypt(data, this.key).toString()
+    encrypt(key: string, data: string): string {
+        return CryptoJS.AES.encrypt(data, key).toString()
     }
 
-    decrypt(data: string): string {
-        const bytes = CryptoJS.AES.decrypt(data, this.key)
+    decrypt(key: string, data: string): string {
+        const bytes = CryptoJS.AES.decrypt(data, key)
         return bytes.toString(CryptoJS.enc.Utf8)
     }
 }

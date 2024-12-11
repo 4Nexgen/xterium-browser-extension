@@ -8,6 +8,7 @@ import React, { useState } from "react"
 
 const IndexDeleteWallet = ({ selectedWallet, handleCallbacks }) => {
   const [walletData, setWalletData] = useState<WalletModel>(selectedWallet)
+  
   const { toast } = useToast()
 
   const deleteWallet = () => {
