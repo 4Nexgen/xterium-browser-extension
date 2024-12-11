@@ -1,27 +1,25 @@
-import { Token } from "@/models/token.model"
-
+import { TokenModel } from "@/models/token.model"
 import { Storage } from "@plasmohq/storage"
 
 export class TokenService {
-  private storage = new Storage()
-  private key = "userPassword"
+  private storage = new Storage({
+    area: 'local',
+    allCopied: true
+  })
+  private storageKey = "tokens"
 
-  async createToken(tokenModel: Token): Promise<string> {
+  async createToken(data: TokenModel): Promise<string> {
     return new Promise(async (resolve, reject) => {
       try {
-        const currentId =
-          (await this.storage.get<number>(this.key + "_counter")) || 0
-        const newId = currentId + 1
+        const existingTokens = await this.storage.get<string>(this.storageKey)
+        const tokens: TokenModel[] = existingTokens ? JSON.parse(existingTokens) : []
 
-        tokenModel.id = newId
+        const lastId = tokens.length > 0 ? tokens[tokens.length - 1].id : 0;
+        data.id = lastId + 1
 
-        const existingTokens = await this.storage.get<string>(this.key)
-        const token: Token[] = existingTokens ? JSON.parse(existingTokens) : []
+        tokens.push(data)
 
-        token.push(tokenModel)
-
-        await this.storage.set(this.key, JSON.stringify(token))
-        await this.storage.set(this.key + "_counter", newId)
+        await this.storage.set(this.storageKey, JSON.stringify(tokens))
 
         resolve("Token created successfully")
       } catch (error) {
@@ -30,16 +28,16 @@ export class TokenService {
     })
   }
 
-  async getTokens(): Promise<Token[]> {
+  async getTokens(): Promise<TokenModel[]> {
     return new Promise(async (resolve, reject) => {
       try {
-        const storedData = await this.storage.get<string>(this.key)
+        const storedData = await this.storage.get<string>(this.storageKey)
 
         if (!storedData) {
           return resolve([])
         }
 
-        const tokens: Token[] = JSON.parse(storedData)
+        const tokens: TokenModel[] = JSON.parse(storedData)
         resolve(tokens)
       } catch (error) {
         reject(error)
@@ -47,15 +45,15 @@ export class TokenService {
     })
   }
 
-  async getTokenById(id: number): Promise<Token> {
+  async getTokenById(id: number): Promise<TokenModel> {
     return new Promise(async (resolve, reject) => {
       try {
-        const storedData = await this.storage.get<string>(this.key)
+        const storedData = await this.storage.get<string>(this.storageKey)
 
         if (!storedData) {
           return reject(new Error("No stored data found."))
         }
-        const tokens: Token[] = JSON.parse(storedData)
+        const tokens: TokenModel[] = JSON.parse(storedData)
         const token = tokens.find((token) => token.id === id)
 
         if (!token) {
@@ -69,7 +67,7 @@ export class TokenService {
     })
   }
 
-  async updateToken(id: number, updatedToken: Token): Promise<string> {
+  async updateToken(id: number, data: TokenModel): Promise<string> {
     return new Promise(async (resolve, reject) => {
       try {
         const tokens = await this.getTokens()
@@ -81,9 +79,9 @@ export class TokenService {
           return
         }
 
-        tokens[index] = updatedToken
+        tokens[index] = data
 
-        await this.storage.set(this.key, JSON.stringify(tokens))
+        await this.storage.set(this.storageKey, JSON.stringify(tokens))
 
         resolve("Token updated successfully")
       } catch (error) {
@@ -103,7 +101,7 @@ export class TokenService {
           return reject(new Error("Token not found."))
         }
 
-        await this.storage.set(this.key, JSON.stringify(filteredTokens))
+        await this.storage.set(this.storageKey, JSON.stringify(filteredTokens))
 
         resolve(true)
       } catch (error) {

@@ -1,15 +1,16 @@
-import { Token } from "@/models/token.model"
+import { TokenModel } from "@/models/token.model"
 import AZKLogo from "data-base64:/assets/tokens/azk.png"
 import IXAVLogo from "data-base64:/assets/tokens/ixav.png"
 import IXONLogo from "data-base64:/assets/tokens/ixon.png"
 import XAVLogo from "data-base64:/assets/tokens/xav.png"
 import XGMLogo from "data-base64:/assets/tokens/xgm.png"
 import XONLogo from "data-base64:/assets/tokens/xon.png"
+import DefaultLogo from "data-base64:/assets/tokens/default.png"
 
-export const token_data: Token[] = [
+export const TokenData: TokenModel[] = [
   {
     id: 1,
-    image_url: XONLogo,
+    image_url: "XONLogo",
     type: "Native",
     network: "Xode",
     network_id: 0,
@@ -18,7 +19,7 @@ export const token_data: Token[] = [
   },
   {
     id: 1,
-    image_url: XGMLogo,
+    image_url: "XGMLogo",
     type: "Asset",
     network: "Xode",
     network_id: 1,
@@ -27,7 +28,7 @@ export const token_data: Token[] = [
   },
   {
     id: 1,
-    image_url: XAVLogo,
+    image_url: "XAVLogo",
     type: "Asset",
     network: "Xode",
     network_id: 2,
@@ -36,7 +37,7 @@ export const token_data: Token[] = [
   },
   {
     id: 1,
-    image_url: AZKLogo,
+    image_url: "AZKLogo",
     type: "Asset",
     network: "Xode",
     network_id: 3,
@@ -45,7 +46,7 @@ export const token_data: Token[] = [
   },
   {
     id: 1,
-    image_url: IXONLogo,
+    image_url: "IXONLogo",
     type: "Asset",
     network: "Xode",
     network_id: 4,
@@ -54,7 +55,7 @@ export const token_data: Token[] = [
   },
   {
     id: 1,
-    image_url: IXAVLogo,
+    image_url: "IXAVLogo",
     type: "Asset",
     network: "Xode",
     network_id: 5,
@@ -62,3 +63,17 @@ export const token_data: Token[] = [
     description: "Private XAV Token"
   }
 ]
+
+export class TokenImages {
+  getBase64Image(imageName: string) {
+    switch (imageName) {
+      case "XONLogo": return XONLogo
+      case "XGMLogo": return XGMLogo
+      case "XAVLogo": return XAVLogo
+      case "AZKLogo": return AZKLogo
+      case "IXONLogo": return IXONLogo
+      case "IXAVLogo": return IXAVLogo
+      default: return DefaultLogo
+    }
+  }
+}

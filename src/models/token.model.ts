@@ -1,6 +1,6 @@
-export class Token {
+export class TokenModel {
   id: number
-  type: "Native" | "Asset"
+  type: string
   network: string
   network_id: number
   symbol: string
