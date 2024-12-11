@@ -232,9 +232,6 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
                     </DropdownMenuSub>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <span>Account</span>
-                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={toggleDrawer}>
                     <span>Change Password</span>
                   </DropdownMenuItem>
