@@ -73,6 +73,9 @@ const IndexImUrAi = () => {
 
   const sendChatMessage = (e: React.FormEvent) => {
     e.preventDefault()
+    if (chatMessage == "") {
+      return false
+    }
     setThinking(true)
 
     setConversation((prevConversation) => [
@@ -145,10 +148,7 @@ const IndexImUrAi = () => {
                   <div>
                     <BotMessageSquare className="size-6" />
                   </div>
-                  <p className="flex-1 px-4 rounded-lg flex items-center gap-2">
-                    <Loader2 className="animate-spin" />
-                    Please wait...
-                  </p>
+                  <div class="loader"></div>
                 </li>
               ) : (
                 ""
@@ -156,8 +156,15 @@ const IndexImUrAi = () => {
             </ul>
           </div>
         ) : (
-          <div className="h-[150px] bg-primary rounded-lg relative mb-[100px] dev-bg-image">
-            <div className="absolute -bottom-[50px] left-[50%]  -translate-x-[50%] w-[100px] h-[100px] rounded-full bg-white border-primary"></div>
+          <div>
+            <div className="h-[150px] bg-primary rounded-lg relative mb-[100px] dev-bg-image">
+              <div className="absolute -bottom-[50px] left-[50%]  -translate-x-[50%] w-[100px] h-[100px] rounded-full bg-white border-primary flex items-center justify-center">
+                <BotMessageSquare className="block size-16 text-primary" />
+              </div>
+            </div>
+            <div className="flex flex-col items-center w-full">
+              <h3 className="text-lg">Hello, How can I help you?</h3>
+            </div>
           </div>
         )}
       </div>
@@ -172,7 +179,10 @@ const IndexImUrAi = () => {
             value={chatMessage}
             onChange={handleChange}
           />
-          <button className="bg-transparent text-primary" type="submit">
+          <button
+            className="bg-transparent text-primary"
+            type="submit"
+            disabled={thinking || messageComposition != ""}>
             <SendHorizonal />
           </button>
         </div>
