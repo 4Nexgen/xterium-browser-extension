@@ -14,7 +14,7 @@ import {
   mnemonicValidate,
   sr25519PairFromSeed
 } from "@polkadot/util-crypto"
-import { Check } from "lucide-react"
+import { Check, X } from "lucide-react"
 import React, { useState } from "react"
 
 import "@polkadot/wasm-crypto/initOnlyAsm"
@@ -66,6 +66,18 @@ const IndexAddWallet = ({ handleCallbacks }) => {
   }
 
   const saveWallet = () => {
+    if (!walletData.name || !walletData.mnemonic_phrase || !walletData.secret_key || !walletData.public_key) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-red-500" />
+            All fields must be filled out!
+          </div>
+        ),
+        variant: "destructive", 
+      });
+      return;
+    }
     setIsInputPasswordDrawerOpen(true)
   }
 
@@ -136,12 +148,13 @@ const IndexAddWallet = ({ handleCallbacks }) => {
         <div className="mb-3">
           <Label>Mnemonic Phrase:</Label>
           <div className="flex items-center gap-2">
-            <Input
-              type="text"
+            <textarea
               placeholder="Mnemonic Phrase"
               value={walletData.mnemonic_phrase}
               onChange={(e) => handleInputChange("mnemonic_phrase", e.target.value)}
-            />
+              className="w-full p-2 rounded input-style text-sm font-semibold"
+              rows={2} 
+            ></textarea>
             <Button
               type="button"
               variant="variant1"
@@ -153,23 +166,26 @@ const IndexAddWallet = ({ handleCallbacks }) => {
         </div>
         <div className="mb-3">
           <Label>Secret Key:</Label>
-          <Input
-            type="text"
+          <textarea
             placeholder="Secret Key"
             value={walletData.secret_key}
             onChange={(e) => handleInputChange("secret_key", e.target.value)}
-          />
+            className="w-full p-2 rounded input-style text-sm font-semibold"
+            rows={3} 
+            readOnly
+          ></textarea>
         </div>
-        <div className="mb-8">
+        <div className="mb-3">
           <Label>Public Key:</Label>
           <Input
             type="text"
             placeholder="Public Key"
             value={walletData.public_key}
             onChange={(e) => handleInputChange("public_key", e.target.value)}
+            readOnly
           />
         </div>
-        <div className="mt-3 mb-3">
+        <div className="mt-5 mb-3">
           <Button type="button" variant="violet" onClick={saveWallet}>
             SAVE
           </Button>

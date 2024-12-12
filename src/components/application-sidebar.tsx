@@ -31,7 +31,7 @@ import {
   DollarSign,
   MessageCircle,
   Network,
-  User,
+  Settings,
   Wallet
 } from "lucide-react"
 import { useTheme } from "next-themes"
@@ -205,7 +205,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton>
-                    <User /> Username
+                    <Settings /> Settings
                     <ChevronUp className="ml-auto" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>

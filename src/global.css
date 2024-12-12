@@ -38,6 +38,7 @@ body {
     /* Border and inputs */
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
+    --primary-input: 0, 0%, 0%;
     --ring: 240 10% 3.9%;
 
     /* Charts */
@@ -85,6 +86,16 @@ body {
 
     /*Button variant2*/
     --variant2-bg: #64629b;
+
+    /*Input component*/
+    .input-style {
+      background-color: #1b2232;
+    }
+  
+    .input-style::placeholder {
+      color: #000000;
+      opacity: 0.5;
+    }
   }
   .dark {
     /* Root or body background */
@@ -116,6 +127,7 @@ body {
     /* Border and inputs */
     --border: 213, 36%, 11%;
     --input: 213, 36%, 11%;
+    --primary-input: 0, 0%, 100%;
     --ring: 213, 36%, 11%;
 
     /* Charts */
@@ -166,6 +178,16 @@ body {
 
     /* custom */
     --background-gradient: linear-gradient(180deg, #2e266d 0%, #121b26 100%);
+
+    /*Input component*/
+    .input-style {
+      background-color: #1b2232;
+    }
+  
+    .input-style::placeholder {
+      color: #ffffff;
+      opacity: 0.5;
+    }
   }
 
   .drawer-gradient {
@@ -178,15 +200,6 @@ body {
 
   .drawer-title-text-color {
     color: #938ffb;
-  }
-
-  .input-style {
-    background-color: #1b2232;
-    color: #657aa2;
-  }
-
-  .input-style::placeholder {
-    color: #657aa2;
   }
 
   .table-border {
