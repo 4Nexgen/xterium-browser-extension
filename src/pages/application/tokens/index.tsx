@@ -233,9 +233,7 @@ const IndexTokens = () => {
                       token.network === (selectedNetwork ? selectedNetwork.name : "")
                   )
                   .map((token) => (
-                    <TableRow
-                      key={token.symbol}
-                      className="cursor-pointer hover-bg-custom">
+                    <TableRow key={token.symbol} className="cursor-pointer">
                       <TableCell className="w-[50px] justify-center">
                         <Image
                           src={getTokenImage(token.image_url)}
