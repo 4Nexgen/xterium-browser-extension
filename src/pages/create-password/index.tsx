@@ -94,7 +94,7 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
 
   return (
     <>
-      <div className="flex flex-col justify-between min-h-screen text-white">
+      <div className="flex flex-col justify-between text-white">
         <Header variant="create-password" />
 
         <div
@@ -105,17 +105,16 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
           <img src={XteriumLogo} className="w-229 mb-4" alt="Xterium Logo" />
         </div>
 
-        <div
-          className="h-3 mt-7"
-          style={{
-            background: "linear-gradient(90deg, #7292DD 0%, #50B8FF 100%)"
-          }}
-        />
-
-        <div className="flex justify-center w-full flex-grow ">
-          <div>
+        <div className="flex justify-center items-center w-full h-full">
+          <div className="w-full lg:w-[32rem]">
             <div
-              className="pt-6 px-6 w-full h-full"
+              className="h-3 mt-7"
+              style={{
+                background: "linear-gradient(90deg, #7292DD 0%, #50B8FF 100%)"
+              }}
+            />
+            <div
+              className="p-6 w-full h-[290px]"
               style={{
                 background: "linear-gradient(180deg, #32436A 0%, #121826 100%)"
               }}>
@@ -184,7 +183,11 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
                               type="button"
                               onClick={toggleShowConfirmPassword}
                               className="absolute inset-y-0 right-3 flex items-center text-[#9AB3EB] hover:[#9AB3EB]">
-                              {showConfirmPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                              {showConfirmPassword ? (
+                                <Eye size={20} />
+                              ) : (
+                                <EyeOff size={20} />
+                              )}
                             </button>
                           </div>
                         </FormControl>

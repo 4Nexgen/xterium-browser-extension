@@ -87,6 +87,12 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
     setIsChangePasswordDrawerOpen(false)
   }
 
+  const expandView = () => {
+    const extensionId = chrome.runtime.id
+    const url = `chrome-extension://${extensionId}/popup.html#`
+    window.open(url, "_blank")
+  }
+
   return (
     <>
       <Sidebar>
@@ -230,6 +236,9 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
                         </DropdownMenuSubContent>
                       </DropdownMenuPortal>
                     </DropdownMenuSub>
+                    <DropdownMenuItem onClick={expandView}>
+                      <span>Expand View</span>
+                    </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={toggleDrawer}>
@@ -245,7 +254,9 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
         </SidebarFooter>
       </Sidebar>
 
-      <Drawer open={isChangePasswordDrawerOpen} onOpenChange={setIsChangePasswordDrawerOpen}>
+      <Drawer
+        open={isChangePasswordDrawerOpen}
+        onOpenChange={setIsChangePasswordDrawerOpen}>
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>CHANGE PASSWORD</DrawerTitle>
