@@ -16,5 +16,7 @@ const IndexPopup = () => {
   )
 }
 
-const root = createRoot(document.getElementById("root"))
-root.render(<IndexPopup />)
+export default IndexPopup
+
+// const root = createRoot(document.getElementById("root"))
+// root.render(<IndexPopup />)

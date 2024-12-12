@@ -24,6 +24,7 @@ import { UserService } from "@/services/user.service"
 
 const IndexAddWallet = ({ handleCallbacks }) => {
   const userService = new UserService()
+  const walletService = new WalletService()
   
   const [isInputPasswordDrawerOpen, setIsInputPasswordDrawerOpen] =
     useState<boolean>(false)
@@ -81,8 +82,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
 
         walletData.mnemonic_phrase = mnemonic_phrase
         walletData.secret_key = secret_key
-
-        let walletService = new WalletService()
+        
         walletService.createWallet(walletData).then((result) => {
           if (result != null) {
             toast({
