@@ -11,7 +11,7 @@ import IndexTokens from "./tokens"
 import IndexWallets from "./wallets"
 
 const IndexApplication = () => {
-  const [currentPage, setCurrentPage] = useState<string>("")
+  const [currentPage, setCurrentPage] = useState<string>("Balance")
   const { theme } = useTheme()
 
   const handleSetCurrentPage = (currentPage: string) => {
