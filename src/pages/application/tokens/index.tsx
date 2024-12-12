@@ -148,7 +148,7 @@ const IndexTokens = () => {
           <Card className="mb-3 card-bg-image">
             <CardHeader>
               <CardTitle>
-                <b className="text-white">NATIVE TOKEN</b>
+                <b>NATIVE TOKEN</b>
               </CardTitle>
             </CardHeader>
             <Table>
@@ -172,9 +172,7 @@ const IndexTokens = () => {
                       </TableCell>
                       <TableCell>
                         <div className="mb-[2px]">
-                          <span className="text-lg font-bold text-white">
-                            {token.symbol}
-                          </span>
+                          <span className="text-lg font-bold">{token.symbol}</span>
                         </div>
                         <Badge>{token.description}</Badge>
                       </TableCell>
