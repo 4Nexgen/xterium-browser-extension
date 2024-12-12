@@ -6,4 +6,5 @@ export class TokenModel {
   symbol: string
   description: string
   image_url: string
+  preloaded?: boolean
 }
