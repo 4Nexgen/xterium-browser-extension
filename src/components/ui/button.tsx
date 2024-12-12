@@ -1,52 +1,42 @@
-import * as React from "react"
+import { cn } from "@/lib/utils"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
-
-import { cn } from "@/lib/utils"
+import * as React from "react"
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default:
-          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+        default: "bg-primary text-primary-foreground shadow hover:bg-primary/90",
         destructive:
           "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
         outline:
           "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground rounded-lg",
-        roundedOutline:
-          "border border-input bg-background shadow-sm rounded",
+        roundedOutline: "border border-input bg-background shadow-sm rounded",
         secondary:
           "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: 
-          "hover:bg-accent hover:text-accent-foreground",
-        link: 
-          "text-primary underline-offset-4 hover:underline",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
         violet:
-          "relative w-full py-3 border-4 border-white bg-gradient-to-b from-[var(--violet-start)] via-[var(--violet-middle)] to-[var(--violet-end)] text-white font-inter tracking-[0.15em] font-bold text-xs rounded-full transition-all duration-300 hover:from-[var(--violet-hover-start)] hover:via-[var(--violet-hover-middle)] hover:to-[var(--violet-hover-end)]",
-        red: 
-          "relative w-full py-3 border-4 border-white bg-gradient-to-b from-[var(--red-start)] via-[var(--red-middle)] to-[var(--red-end)] text-white tracking-[0.15em] font-inter font-bold text-xs rounded-full transition-all duration-300 hover:from-[var(--red-hover-start)] hover:via-[var(--red-hover-middle)] hover:to-[var(--red-hover-end)]",
-        variant1: 
-          "bg-[var(--variant1-bg)] text-white hover:bg-[var(--variant1-bg)]",
-        variant2: 
-          "py-2 bg-[var(--variant1-bg)] rounded text-white hover:bg-[var(--variant1-bg)]"
-
+          "relative w-full py-3 border-4 bg-gradient-to-b from-[var(--violet-start)] via-[var(--violet-middle)] to-[var(--violet-end)] font-inter tracking-[0.15em] font-bold text-xs rounded-full transition-all duration-300 hover:from-[var(--violet-hover-start)] hover:via-[var(--violet-hover-middle)] hover:to-[var(--violet-hover-end)]",
+        red: "relative w-full py-3 border-4 bg-gradient-to-b from-[var(--red-start)] via-[var(--red-middle)] to-[var(--red-end)] tracking-[0.15em] font-inter font-bold text-xs rounded-full transition-all duration-300 hover:from-[var(--red-hover-start)] hover:via-[var(--red-hover-middle)] hover:to-[var(--red-hover-end)]",
+        variant1: "bg-[var(--variant1-bg)] hover:bg-[var(--variant1-bg)]",
+        variant2: "py-2 bg-[var(--variant1-bg)] rounded hover:bg-[var(--variant1-bg)]"
       },
       size: {
         default: "h-[50px] px-4 py-2",
         sm: "h-8 px-3 text-xs",
         lg: "h-10 px-8",
-        icon: "h-9 w-9",
-      },
+        icon: "h-9 w-9"
+      }
     },
     defaultVariants: {
       variant: "default",
-      size: "default",
-    },
+      size: "default"
+    }
   }
 )
-
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
