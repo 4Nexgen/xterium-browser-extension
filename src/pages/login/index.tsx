@@ -58,11 +58,11 @@ const IndexLogin = ({ onSetCurrentPage }) => {
         toast({
           description: (
             <div className="flex items-center">
-              <X className="mr-2 text-red-500" />
+              <X className="mr-2 text-white-500" />
               Incorrect password!
             </div>
           ),
-          variant: "default"
+          variant: "destructive"
         })
       }
     })

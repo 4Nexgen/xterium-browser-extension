@@ -9,15 +9,23 @@ import {
   DrawerTrigger
 } from "@/components/ui/drawer"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip"
 import { TokenData, TokenImages } from "@/data/token.data"
 import { TokenModel } from "@/models/token.model"
 import { TokenService } from "@/services/token.service"
-import { Pencil } from "lucide-react"
+import { Pencil, Trash, X } from "lucide-react"
 import Image from "next/image"
 import React, { useEffect, useState } from "react"
 
 import IndexAddToken from "./addToken"
+import IndexDeleteToken from "./deleteToken"
 import IndexEditToken from "./editToken"
+import { toast } from "@/hooks/use-toast"
 
 const IndexTokens = () => {
   const [tokens, setTokens] = useState<TokenModel[]>([])
@@ -34,6 +42,8 @@ const IndexTokens = () => {
     useState<boolean>(false)
   const [isEditTokenDrawerOpen, setIsEditTokenDrawerOpen] =
     useState<boolean>(false)
+  const [isDeleteTokenDrawerOpen, setIsDeleteTokenDrawerOpen] =
+  useState(false)
 
   const preloadTokens = () => {
     let tokenList: any[] = []
@@ -48,10 +58,10 @@ const IndexTokens = () => {
           )[0]
 
           if (existingToken != null) {
-            tokenList.push(existingToken)
+            tokenList.push({ ...existingToken, preloaded: true })
           } else {
             tokenService.createToken(preloadedTokenData[i])
-            tokenList.push(preloadedTokenData[i])
+            tokenList.push({ ...preloadedTokenData[i], preloaded: true })
           }
         }
       }
@@ -94,9 +104,27 @@ const IndexTokens = () => {
     setSelectedToken(data)
   }
 
+  const deleteToken = (data: TokenModel) => {
+    if (data.preloaded) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-red-500" />
+            This token is preloaded and cannot be deleted!
+          </div>
+        ),
+        variant: "default"
+      })
+      return
+    }
+    setIsDeleteTokenDrawerOpen(true)
+    setSelectedToken(data)
+  }
+
   const saveAndUpdateToken = () => {
     setIsAddTokenDrawerOpen(false)
     setIsEditTokenDrawerOpen(false)
+    setIsDeleteTokenDrawerOpen(false)
 
     setTimeout(() => {
       getTokens()
@@ -136,13 +164,40 @@ const IndexTokens = () => {
                         </div>
                         <Badge>{token.description}</Badge>
                       </TableCell>
-                      <TableCell className="w-[50px] justify-end pr-2">
-                        <Pencil
-                          size="20"
-                          color="white"
-                          className="cursor-pointer"
-                          onClick={() => editToken(token)}
-                        />
+                      <TableCell className="w-[30px] justify-center text-center text-white-500 pr-4">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <button
+                                onClick={() => editToken(token)}
+                                className="w-full h-full flex items-center justify-center">
+                                <Pencil />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Edit Token</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </TableCell>
+                      <TableCell className="w-[30px] justify-center text-center text-red-500 pr-4">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <button
+                                onClick={() => deleteToken(token)}
+                                className={`w-full h-full flex items-center justify-center ${
+                                  token.preloaded ? "opacity-50 cursor-not-allowed" : ""
+                                }`}
+                              >
+                                <Trash />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Delete Token</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -181,12 +236,40 @@ const IndexTokens = () => {
                         </div>
                         <Badge>{token.description}</Badge>
                       </TableCell>
-                      <TableCell className="w-[50px] justify-end pr-2">
-                        <Pencil
-                          size="20"
-                          className="cursor-pointer"
-                          onClick={() => editToken(token)}
-                        />
+                      <TableCell className="w-[30px] justify-center text-center text-white-500 pr-4">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <button
+                                onClick={() => editToken(token)}
+                                className="w-full h-full flex items-center justify-center">
+                                <Pencil />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Edit Token</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </TableCell>
+                      <TableCell className="w-[30px] justify-center text-center text-red-500 pr-4">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <button
+                                onClick={() => deleteToken(token)}
+                                className={`w-full h-full flex items-center justify-center ${
+                                  token.preloaded ? "opacity-50 cursor-not-allowed" : ""
+                                }`}
+                              >
+                                <Trash />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Delete Token</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -232,6 +315,20 @@ const IndexTokens = () => {
               </DrawerTitle>
             </DrawerHeader>
             <IndexEditToken
+              selectedToken={selectedToken}
+              handleCallbacks={saveAndUpdateToken}
+            />
+          </DrawerContent>
+        </Drawer>
+
+        <Drawer
+          open={isDeleteTokenDrawerOpen}
+          onOpenChange={setIsDeleteTokenDrawerOpen}>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>DELETE TOKEN</DrawerTitle>
+            </DrawerHeader>
+            <IndexDeleteToken
               selectedToken={selectedToken}
               handleCallbacks={saveAndUpdateToken}
             />

@@ -82,6 +82,18 @@ const IndexAddWallet = ({ handleCallbacks }) => {
   }
 
   const saveWithPassword = () => {
+    if (!inputedPassword.trim()) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-red-500" />
+            Password cannot be empty!
+          </div>
+        ),
+        variant: "destructive",
+      });
+      return;
+    }
     userService.login(inputedPassword).then((isValid) => {
       if (isValid == true) {
         let encryptionService = new EncryptionService()
@@ -114,11 +126,11 @@ const IndexAddWallet = ({ handleCallbacks }) => {
         toast({
           description: (
             <div className="flex items-center">
-              <Check className="mr-2 text-green-500" />
-              Invalid Password!
+              <X className="mr-2 text-red-500" />
+              Invalid Password! Please try again.
             </div>
           ),
-          variant: "default"
+          variant: "destructive"
         })
       }
     })

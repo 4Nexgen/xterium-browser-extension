@@ -55,7 +55,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
       toast({
         description: (
           <div className="flex items-center">
-            <Check className="mr-2 text-red-500" />
+            <X className="mr-2 text-white-500" />
             All fields must be filled out!
           </div>
         ),
@@ -72,7 +72,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
         toast({
           description: (
             <div className="flex items-center">
-              <X className="mr-2 text-green-500" />
+              <Check className="mr-2 text-green-500" />
               Token Saved Successfully!
             </div>
           ),
