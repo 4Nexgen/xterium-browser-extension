@@ -9,11 +9,7 @@ import {
 } from "@/components/ui/command"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from "@/components/ui/popover"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useToast } from "@/hooks/use-toast"
 import { TokenModel } from "@/models/token.model"
 import { TokenService } from "@/services/token.service"
@@ -49,8 +45,8 @@ const IndexAddToken = ({ handleCallbacks }) => {
   }
 
   const saveToken = () => {
-    const { network, network_id, symbol, description } = tokenData;
-  
+    const { network, network_id, symbol, description } = tokenData
+
     if (!selectedTokenType || !network || !network_id || !symbol || !description) {
       toast({
         description: (
@@ -59,14 +55,14 @@ const IndexAddToken = ({ handleCallbacks }) => {
             All fields must be filled out!
           </div>
         ),
-        variant: "destructive",
-      });
-      return;
+        variant: "destructive"
+      })
+      return
     }
-  
-    tokenData.type = selectedTokenType;
-  
-    let tokenService = new TokenService();
+
+    tokenData.type = selectedTokenType
+
+    let tokenService = new TokenService()
     tokenService.createToken(tokenData).then((result) => {
       if (result != null) {
         toast({
@@ -76,13 +72,13 @@ const IndexAddToken = ({ handleCallbacks }) => {
               Token Saved Successfully!
             </div>
           ),
-          variant: "default",
-        });
+          variant: "default"
+        })
       }
-    });
-  
-    handleCallbacks();
-  };  
+    })
+
+    handleCallbacks()
+  }
 
   return (
     <>
@@ -91,8 +87,13 @@ const IndexAddToken = ({ handleCallbacks }) => {
           <Label>Token Type</Label>
           <Popover open={openTokenType} onOpenChange={setOpenTokenType}>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-between h-10 ">
-                {selectedTokenType ? selectedTokenType: ("Select Token Type")}
+              <Button
+                variant="roundedOutline"
+                role="combobox"
+                aria-expanded={openTokenType}
+                className="w-full justify-between text-input-primary p-3"
+                size="lg">
+                {selectedTokenType ? selectedTokenType : "Select Token Type"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="p-0" align="start">
@@ -107,8 +108,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
                         value={tokenType}
                         onSelect={(value) => {
                           setSelectedTokenType(
-                            tokenTypes.find((priority) => priority === value) ||
-                              null
+                            tokenTypes.find((priority) => priority === value) || null
                           )
                           setOpenTokenType(false)
                         }}>

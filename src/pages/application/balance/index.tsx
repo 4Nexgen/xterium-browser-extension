@@ -72,7 +72,7 @@ const IndexBalance = () => {
             variant="roundedOutline"
             role="combobox"
             aria-expanded={open}
-            className="w-full mb-3 justify-between text-input-primary"
+            className="w-full mb-3 justify-between text-input-primary p-3"
             size="lg">
             {value ? (
               <>
@@ -87,7 +87,7 @@ const IndexBalance = () => {
             <ChevronsUpDown className="opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="min-w-[420px] w-[420px] p-1">
+        <PopoverContent className="p-0" align="start">
           <Command>
             <CommandInput placeholder="Search address..." className="h-9 " />
             <CommandList>
