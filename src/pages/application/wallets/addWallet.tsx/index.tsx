@@ -158,6 +158,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
             placeholder="Secret Key"
             value={walletData.secret_key}
             onChange={(e) => handleInputChange("secret_key", e.target.value)}
+            readOnly
           />
         </div>
         <div className="mb-8">
@@ -167,6 +168,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
             placeholder="Public Key"
             value={walletData.public_key}
             onChange={(e) => handleInputChange("public_key", e.target.value)}
+            readOnly
           />
         </div>
         <div className="mt-3 mb-3">

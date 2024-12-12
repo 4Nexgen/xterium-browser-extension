@@ -76,8 +76,8 @@ const IndexAddToken = ({ handleCallbacks }) => {
           <Label>Token Type</Label>
           <Popover open={openTokenType} onOpenChange={setOpenTokenType}>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-between h-10">
-                {selectedTokenType ? <>{selectedTokenType}</> : <></>}
+              <Button variant="outline" className="w-full justify-between h-10 ">
+                {selectedTokenType ? selectedTokenType: ("Select Token Type")}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="p-0" align="start">
