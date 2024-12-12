@@ -180,7 +180,13 @@ const IndexImUrAi = () => {
           </div>
         ) : (
           <div>
-            <div className="h-[150px] bg-primary rounded-lg relative mb-[100px] dev-bg-image">
+            <div
+              className="h-[150px] bg-primary rounded-lg relative mb-[100px] dev-bg-image"
+              style={{
+                backgroundImage: virtualAssistant
+                  ? `url(${virtualAssistant.cover_photo_url})`
+                  : ""
+              }}>
               <div className="absolute -bottom-[50px] left-[50%]  -translate-x-[50%] w-[100px] h-[100px] rounded-full bg-white border-primary flex items-center justify-center">
                 {virtualAssistant ? (
                   <img src={virtualAssistant.photo_url} alt="" />
@@ -191,6 +197,9 @@ const IndexImUrAi = () => {
             </div>
             <div className="flex flex-col items-center w-full">
               <h3 className="text-lg">Hello, How can I help you?</h3>
+              <p className="w-80 text-center mt-4 opacity-50">
+                {virtualAssistant?.description}
+              </p>
             </div>
           </div>
         )}
