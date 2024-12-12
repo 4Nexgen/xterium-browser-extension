@@ -5,16 +5,21 @@ import { useToast } from "@/hooks/use-toast"
 import type { WalletModel } from "@/models/wallet.model"
 import { UserService } from "@/services/user.service"
 import { WalletService } from "@/services/wallet.service"
-import { Check } from "lucide-react"
 import React, { useState } from "react"
+import { Eye, EyeOff, X } from "lucide-react"
 
 const IndexExportWallet = ({ selectedWallet, handleCallbacks }) => {
   const userService = new UserService()
 
   const [walletData, setWalletData] = useState<WalletModel>(selectedWallet)
   const [inputedPassword, setInputedPassword] = useState<string>("")
+  const [showPassword, setShowPassword] = useState<boolean>(false)
 
   const { toast } = useToast()
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword)
+  }
 
   const exportWallet = () => {
     userService.login(inputedPassword).then((isValid) => {
@@ -48,11 +53,11 @@ const IndexExportWallet = ({ selectedWallet, handleCallbacks }) => {
         toast({
           description: (
             <div className="flex items-center">
-              <Check className="mr-2 text-green-500" />
+              <X className="mr-2 text-white-500" />
               Invalid Password!
             </div>
           ),
-          variant: "default"
+          variant: "destructive"
         })
       }
     })
@@ -63,12 +68,20 @@ const IndexExportWallet = ({ selectedWallet, handleCallbacks }) => {
       <div className="p-6">
         <div className="mb-8">
           <Label className="font-bold pb-2">Enter your password:</Label>
-          <Input
-            type="password"
-            placeholder="********"
-            value={inputedPassword}
-            onChange={(e) => setInputedPassword(e.target.value)}
-          />
+          <div className="relative">
+            <Input
+              type={showPassword ? "text" : "password"}
+              placeholder="********"
+              value={inputedPassword}
+              onChange={(e) => setInputedPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={toggleShowPassword}
+              className="absolute inset-y-0 right-0 px-3 text-sm font-semibold">
+              {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+            </button>
+          </div>
         </div>
         <div className="mt-3 mb-3">
           <Button type="button" variant="violet" onClick={exportWallet}>
