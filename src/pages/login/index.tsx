@@ -17,7 +17,7 @@ import { useToast } from "@/hooks/use-toast"
 import { UserService } from "@/services/user.service"
 import { zodResolver } from "@hookform/resolvers/zod"
 import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
-import { Check, Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff, X } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -58,7 +58,7 @@ const IndexLogin = ({ onSetCurrentPage }) => {
         toast({
           description: (
             <div className="flex items-center">
-              <Check className="mr-2 text-green-500" />
+              <X className="mr-2 text-red-500" />
               Incorrect password!
             </div>
           ),
@@ -78,7 +78,7 @@ const IndexLogin = ({ onSetCurrentPage }) => {
           style={{
             background: "linear-gradient(180deg, #2E266D 0%, #121B26 100%)"
           }}>
-          <img src={XteriumLogo} className="w-229 mb-8" alt="Xterium Logo" />
+          <img src={XteriumLogo} className="w-229 mb-4" alt="Xterium Logo" />
         </div>
 
         <div
@@ -89,7 +89,7 @@ const IndexLogin = ({ onSetCurrentPage }) => {
         />
 
         <div className="flex justify-center items-center w-full h-full">
-          <div className="w-full max-w-full sm:max-w-md lg:max-w-lg">
+          <div className="w-full">
             <div
               className="p-6 w-full h-[290px]"
               style={{

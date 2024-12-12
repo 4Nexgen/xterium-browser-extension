@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast"
 import { UserService } from "@/services/user.service"
 import { zodResolver } from "@hookform/resolvers/zod"
 import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
-import { Check, Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff, X } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -82,7 +82,7 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
         toast({
           description: (
             <div className="flex items-center">
-              <Check className="mr-2 text-green-500" />
+              <X className="mr-2 text-red-500" />
               Incorrect password!
             </div>
           ),
@@ -102,7 +102,7 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
           style={{
             background: "linear-gradient(180deg, #2E266D 0%, #121B26 100%)"
           }}>
-          <img src={XteriumLogo} className="w-229 mb-8" alt="Xterium Logo" />
+          <img src={XteriumLogo} className="w-229 mb-4" alt="Xterium Logo" />
         </div>
 
         <div
@@ -122,7 +122,7 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
-                  className="w-full max-w-md space-y-0 h-full">
+                  className="w-full space-y-0 h-full">
                   <FormField
                     control={form.control}
                     name="password"
@@ -184,14 +184,14 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
                               type="button"
                               onClick={toggleShowConfirmPassword}
                               className="absolute inset-y-0 right-3 flex items-center text-[#9AB3EB] hover:[#9AB3EB]">
-                              {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                              {showConfirmPassword ? <Eye size={20} /> : <EyeOff size={20} />}
                             </button>
                           </div>
                         </FormControl>
 
                         <div className="p-0 mt-0 text-[10px]">
                           {form.formState.errors.confirmPassword ? (
-                            <FormMessage className="text-[#FD2400] text-[10px] mt-0 mb-4" />
+                            <FormMessage className="text-[#FD2400] text-[10px] mt-0 mb-0" />
                           ) : (
                             <span>&nbsp;</span>
                           )}
@@ -199,7 +199,7 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
                       </FormItem>
                     )}
                   />
-                  <p className="font-inter text-[12px] text-[#9AB3EB] pb-2  font-base text-justify">
+                  <p className="font-inter text-[11px] text-[#9AB3EB] p-0 font-base text-justify">
                     Your password is used to unlock your wallet and is securely stored. We
                     recommend 8 characters with uppercase, lowercase, symbols, and
                     numbers.
