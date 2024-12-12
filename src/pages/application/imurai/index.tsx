@@ -1,20 +1,32 @@
-import { Message, userMessage } from "@/models/message.model"
+import type { VAModel } from "@/models/imurai.model"
+import type { Message, userMessage } from "@/models/message.model"
+import {
+  defaultVirtualAssistantID,
+  ImuraiService,
+  imuraiWSURL
+} from "@/services/imurai.service"
 import { BotMessageSquare, Loader2, SendHorizonal } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 
 import { Storage } from "@plasmohq/storage"
 
 const IndexImUrAi = () => {
-  const storage = new Storage()
-  const url: string = "wss://sme-api.jina.bot/api/llm/connect-socket/"
   const socketRef = useRef<WebSocket | null>(null)
   const [chatMessage, setChatMessage] = useState("")
   const [messageComposition, setMessageComposition] = useState("")
   const [conversation, setConversation] = useState<Message[]>([])
   const [thinking, setThinking] = useState(false)
+  const service = new ImuraiService()
+  const [virtualAssistant, setVirtualAssistant] = useState<VAModel | null>(null)
 
   useEffect(() => {
-    const socket = new WebSocket(url)
+    service.getVirtualAssistant().then((data: VAModel) => {
+      setVirtualAssistant(data)
+    })
+  }, [])
+
+  useEffect(() => {
+    const socket = new WebSocket(imuraiWSURL)
     socketRef.current = socket
 
     socket.onopen = () => {
@@ -27,8 +39,7 @@ const IndexImUrAi = () => {
       setThinking(false)
 
       setMessageComposition((prevComposition) => {
-        const newComposition =
-          prevComposition + ai_response.chat_message.content
+        const newComposition = prevComposition + ai_response.chat_message.content
 
         if (!ai_response.done) {
           return newComposition // Keep accumulating
@@ -65,7 +76,7 @@ const IndexImUrAi = () => {
         socketRef.current = null
       }
     }
-  }, [url])
+  }, [imuraiWSURL])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setChatMessage(e.target.value)
@@ -95,7 +106,7 @@ const IndexImUrAi = () => {
       },
       conversation_id: "",
       user_id: "",
-      virtual_assistant_id: "671b58c186045a333b74388c"
+      virtual_assistant_id: defaultVirtualAssistantID
     }
 
     const socket = socketRef.current
@@ -119,8 +130,12 @@ const IndexImUrAi = () => {
                     key={`conv-item-${k}`}
                     className={`flex gap-1 py-2 ${item.role == "user" ? "self-end max-w-80" : ""}`}>
                     {item.role != "user" ? (
-                      <div>
-                        <BotMessageSquare className="size-6" />
+                      <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-2">
+                        {virtualAssistant ? (
+                          <img src={virtualAssistant.photo_url} alt="" />
+                        ) : (
+                          <BotMessageSquare className="size-6" />
+                        )}
                       </div>
                     ) : (
                       ""
@@ -134,8 +149,12 @@ const IndexImUrAi = () => {
               })}
               {messageComposition != "" ? (
                 <li className="flex py-2 gap-1">
-                  <div>
-                    <BotMessageSquare className="size-6" />
+                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-2">
+                    {virtualAssistant ? (
+                      <img src={virtualAssistant.photo_url} alt="" />
+                    ) : (
+                      <BotMessageSquare className="size-6" />
+                    )}
                   </div>
                   <p className="flex-1 px-4 rounded-lg">{messageComposition}</p>
                 </li>
@@ -145,10 +164,14 @@ const IndexImUrAi = () => {
 
               {thinking ? (
                 <li className="flex py-2 gap-1">
-                  <div>
-                    <BotMessageSquare className="size-6" />
+                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-2">
+                    {virtualAssistant ? (
+                      <img src={virtualAssistant.photo_url} alt="" />
+                    ) : (
+                      <BotMessageSquare className="size-6" />
+                    )}
                   </div>
-                  <div class="loader"></div>
+                  <div className="loader"></div>
                 </li>
               ) : (
                 ""
@@ -159,7 +182,11 @@ const IndexImUrAi = () => {
           <div>
             <div className="h-[150px] bg-primary rounded-lg relative mb-[100px] dev-bg-image">
               <div className="absolute -bottom-[50px] left-[50%]  -translate-x-[50%] w-[100px] h-[100px] rounded-full bg-white border-primary flex items-center justify-center">
-                <BotMessageSquare className="block size-16 text-primary" />
+                {virtualAssistant ? (
+                  <img src={virtualAssistant.photo_url} alt="" />
+                ) : (
+                  <BotMessageSquare className="block size-16 text-primary" />
+                )}
               </div>
             </div>
             <div className="flex flex-col items-center w-full">
@@ -168,9 +195,7 @@ const IndexImUrAi = () => {
           </div>
         )}
       </div>
-      <form
-        className="h-[60px] py-[5px] flex items-center"
-        onSubmit={sendChatMessage}>
+      <form className="h-[60px] py-[5px] flex items-center" onSubmit={sendChatMessage}>
         <div className="bg-white rounded-lg flex gap-2 overflow-hidden py-2 px-4 w-full">
           <input
             type="text"
