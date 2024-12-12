@@ -176,39 +176,39 @@ const IndexTokens = () => {
                         </div>
                         <Badge>{token.description}</Badge>
                       </TableCell>
-                      <TableCell className="w-[30px] justify-center text-center text-white-500 pr-4">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <button
-                                onClick={() => editToken(token)}
-                                className="w-full h-full flex items-center justify-center">
-                                <Pencil />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Edit Token</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </TableCell>
-                      <TableCell className="w-[30px] justify-center text-center text-red-500 pr-4">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <button
-                                onClick={() => deleteToken(token)}
-                                className={`w-full h-full flex items-center justify-center ${
-                                  token.preloaded ? "opacity-50 cursor-not-allowed" : ""
-                                }`}>
-                                <Trash />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Delete Token</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                      <TableCell className="w-[30px] justify-center text-center pr-4">
+                        <div className="flex gap-2 items-center">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <button
+                                  onClick={() => editToken(token)}
+                                  className="w-full h-full flex items-center justify-center">
+                                  <Pencil />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Edit Token</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <button
+                                  onClick={() => deleteToken(token)}
+                                  className={`w-full h-full flex items-center justify-center ${
+                                    token.preloaded ? "opacity-50 cursor-not-allowed" : ""
+                                  }`}>
+                                  <Trash />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Delete Token</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -247,39 +247,39 @@ const IndexTokens = () => {
                         </div>
                         <Badge>{token.description}</Badge>
                       </TableCell>
-                      <TableCell className="w-[30px] justify-center text-center text-white-500 pr-4">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <button
-                                onClick={() => editToken(token)}
-                                className="w-full h-full flex items-center justify-center">
-                                <Pencil />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Edit Token</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </TableCell>
-                      <TableCell className="w-[30px] justify-center text-center text-red-500 pr-4">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <button
-                                onClick={() => deleteToken(token)}
-                                className={`w-full h-full flex items-center justify-center ${
-                                  token.preloaded ? "opacity-50 cursor-not-allowed" : ""
-                                }`}>
-                                <Trash />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Delete Token</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                      <TableCell className="w-[30px] justify-center text-center pr-4">
+                        <div className="flex gap-2 items-center">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <button
+                                  onClick={() => editToken(token)}
+                                  className="w-full h-full flex items-center justify-center">
+                                  <Pencil />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Edit Token</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <button
+                                  onClick={() => deleteToken(token)}
+                                  className={`w-full h-full flex items-center justify-center ${
+                                    token.preloaded ? "opacity-50 cursor-not-allowed" : ""
+                                  }`}>
+                                  <Trash />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Delete Token</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
