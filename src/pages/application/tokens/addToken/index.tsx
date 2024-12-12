@@ -17,7 +17,7 @@ import {
 import { useToast } from "@/hooks/use-toast"
 import { TokenModel } from "@/models/token.model"
 import { TokenService } from "@/services/token.service"
-import { Check } from "lucide-react"
+import { Check, X } from "lucide-react"
 import React, { useEffect, useState } from "react"
 
 const IndexAddToken = ({ handleCallbacks }) => {
@@ -49,25 +49,40 @@ const IndexAddToken = ({ handleCallbacks }) => {
   }
 
   const saveToken = () => {
-    tokenData.type = selectedTokenType
-
-    let tokenService = new TokenService()
+    const { network, network_id, symbol, description } = tokenData;
+  
+    if (!selectedTokenType || !network || !network_id || !symbol || !description) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <Check className="mr-2 text-red-500" />
+            All fields must be filled out!
+          </div>
+        ),
+        variant: "destructive",
+      });
+      return;
+    }
+  
+    tokenData.type = selectedTokenType;
+  
+    let tokenService = new TokenService();
     tokenService.createToken(tokenData).then((result) => {
       if (result != null) {
         toast({
           description: (
             <div className="flex items-center">
-              <Check className="mr-2 text-green-500" />
+              <X className="mr-2 text-green-500" />
               Token Saved Successfully!
             </div>
           ),
-          variant: "default"
-        })
+          variant: "default",
+        });
       }
-    })
-
-    handleCallbacks()
-  }
+    });
+  
+    handleCallbacks();
+  };  
 
   return (
     <>

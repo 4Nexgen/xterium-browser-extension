@@ -14,7 +14,7 @@ import {
   mnemonicValidate,
   sr25519PairFromSeed
 } from "@polkadot/util-crypto"
-import { Check } from "lucide-react"
+import { Check, X } from "lucide-react"
 import React, { useState } from "react"
 
 import "@polkadot/wasm-crypto/initOnlyAsm"
@@ -66,6 +66,18 @@ const IndexAddWallet = ({ handleCallbacks }) => {
   }
 
   const saveWallet = () => {
+    if (!walletData.name || !walletData.mnemonic_phrase || !walletData.secret_key || !walletData.public_key) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-red-500" />
+            All fields must be filled out!
+          </div>
+        ),
+        variant: "destructive", 
+      });
+      return;
+    }
     setIsInputPasswordDrawerOpen(true)
   }
 

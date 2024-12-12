@@ -72,7 +72,7 @@ const IndexBalance = () => {
             variant="roundedOutline"
             role="combobox"
             aria-expanded={open}
-            className="w-full mb-3 justify-between text-label-color"
+            className="w-full mb-3 justify-between text-input-primary"
             size="lg">
             {value ? (
               <>
@@ -101,7 +101,7 @@ const IndexBalance = () => {
                       setValue(currentValue === value ? "" : currentValue)
                       setOpen(false)
                     }}>
-                    <div className="flex flex-col text-label-color">
+                    <div className="flex flex-col text-input-primary">
                       <span>
                         {address.label} {"{"}
                         {address.value.slice(0, 6)}...{address.value.slice(-6)}
