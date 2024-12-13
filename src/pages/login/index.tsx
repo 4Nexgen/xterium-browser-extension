@@ -70,30 +70,16 @@ const IndexLogin = ({ onSetCurrentPage }) => {
 
   return (
     <>
-      <div className="flex flex-col justify-between text-white">
+      <div className="flex flex-col h-screen justify-between background-theme">
         <Header variant="login" />
 
-        <div
-          className="flex justify-center pt-14 pb-14"
-          style={{
-            background: "linear-gradient(180deg, #2E266D 0%, #121B26 100%)"
-          }}>
-          <img src={XteriumLogo} className="w-229 mb-4" alt="Xterium Logo" />
+        <div className="flex justify-center pt-13">
+          <img src={XteriumLogo} className="w-80 mb-4" alt="Xterium Logo" />
         </div>
 
-        <div className="flex justify-center items-center w-full h-full">
+        <div className="flex flex-1 justify-center items-center w-full h-full background-box pt-14 flex-col items-center">
           <div className="w-full lg:w-[32rem]">
-            <div
-              className="h-3 mt-7"
-              style={{
-                background: "linear-gradient(90deg, #7292DD 0%, #50B8FF 100%)"
-              }}
-            />
-            <div
-              className="p-6 w-full h-[290px]"
-              style={{
-                background: "linear-gradient(180deg, #32436A 0%, #121826 100%)"
-              }}>
+            <div className="p-6 w-full h-[290px] flex flex-col justify-center">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4">
                   <FormField
@@ -101,7 +87,7 @@ const IndexLogin = ({ onSetCurrentPage }) => {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-inter font-extrabold text-[12px] leading-[15px] tracking-[0.15em] text-[#9AB3EB] mb-2">
+                        <FormLabel className="font-inter text-white font-extrabold text-[12px] leading-[15px] tracking-[0.15em] mb-2">
                           Enter Password:
                         </FormLabel>
                         <FormControl>
@@ -123,7 +109,7 @@ const IndexLogin = ({ onSetCurrentPage }) => {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" variant="violet" className="w-full">
+                  <Button type="submit" variant="violet" className="w-full text-white">
                     UNLOCK
                   </Button>
                 </form>
