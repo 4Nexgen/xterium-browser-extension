@@ -8,7 +8,7 @@ export class NetworkService {
     })
     private storageKey = "networks"
 
-    async getNetwork(): Promise<NetworkModel | any> {
+    async getNetwork(): Promise<NetworkModel> {
         return new Promise(async (resolve, reject) => {
             try {
                 const storedData = await this.storage.get<string>(this.storageKey)

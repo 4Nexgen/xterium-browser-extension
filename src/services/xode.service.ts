@@ -1,18 +1,28 @@
 import { ApiPromise, WsProvider } from "@polkadot/api"
+import { NetworkService } from "./network.service"
 
 export class XodeService {
+  private networkService = new NetworkService()
   private api: ApiPromise | null = null
-  private readonly wsUrl = "wss://rpcnodea01.xode.net/n7yoxCmcIrCF6VziCcDmYTwL8R03a/rpc"
 
   async connect(): Promise<ApiPromise | any> {
     return new Promise(async (resolve, reject) => {
       try {
-        if (!this.api) {
-          const wsProvider = new WsProvider(this.wsUrl)
-          this.api = await ApiPromise.create({ provider: wsProvider })
-        }
+        this.networkService.getNetwork().then(data => {
+          let wsUrl = data.rpc
 
-        resolve(this.api)
+          if (!this.api) {
+            const wsProvider = new WsProvider(wsUrl)
+            ApiPromise.create({ provider: wsProvider }).then(api => {
+              this.api = api
+              resolve(this.api)
+            }).catch(error => {
+              reject(error)
+            })
+          }
+        }).catch(error => {
+          reject(error)
+        })
       } catch (error) {
         reject("Failed to connect to RPC")
       }
@@ -22,7 +32,11 @@ export class XodeService {
   async getTotalBlocks(): Promise<number | any> {
     return new Promise(async (resolve, reject) => {
       try {
-        const api = await this.connect()
+        let api = this.api
+        if (this.api == null) {
+          api = await this.connect()
+        }
+
         const latestBlockHash = await api.rpc.chain.getBlock()
         const totalBlocks = latestBlockHash.block.header.number.toNumber()
 
@@ -36,7 +50,11 @@ export class XodeService {
   async getTotalAddresses(): Promise<number | any> {
     return new Promise(async (resolve, reject) => {
       try {
-        const api = await this.connect()
+        let api = this.api
+        if (this.api == null) {
+          api = await this.connect()
+        }
+
         const walletKeys = await api.query.system.account.keys()
         const totalAddresses = walletKeys.length
 
