@@ -113,7 +113,7 @@ export class BalanceServices {
     });
   }
 
-  transfer(owner: string, value: number, recipient: string, password: string): Promise<any> {
+  async transfer(owner: string, value: number, recipient: string, password: string): Promise<any> {
     return new Promise(async (resolve, reject) => {
       try {
         let api = this.api
@@ -153,7 +153,7 @@ export class BalanceServices {
     });
   }
 
-  transferAssets(owner: string, assetId: number, value: number, recipient: string, password: string): Promise<any> {
+  async transferAssets(owner: string, assetId: number, value: number, recipient: string, password: string): Promise<any> {
     return new Promise(async (resolve, reject) => {
       try {
         let api = this.api

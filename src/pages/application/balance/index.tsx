@@ -102,12 +102,12 @@ const IndexBalance = () => {
         }
       }
 
+      setBalances(emptyBalances)
+
       setTimeout(() => {
         getBalances()
       }, 100)
     })
-
-    setBalances(emptyBalances)
   }
 
   const getTokens = () => {
@@ -178,8 +178,13 @@ const IndexBalance = () => {
     }, 100)
   }, [])
 
-  const selectBalance = (data) => {
+  const selectBalance = (data: BalanceModel) => {
     setIsTokenDetailDrawerOpen(true)
+
+    if (selectedWallet != null) {
+      data.owner = selectedWallet.public_key
+    }
+
     setSelectedBalance(data)
   }
 
@@ -317,15 +322,6 @@ const IndexBalance = () => {
                   </div>
                 </DrawerHeader>
                 <IndexTokenDetails selectedBalance={selectedBalance} />
-
-                {/* {isTransferOpen && (
-                  <IndexTransfer
-                    isTransferOpen={isTransferOpen}
-                    closeTransfer={closeTransfer}
-                    walletPublicKey={walletPublicKey}
-                    selectedToken={selectedToken}
-                  />
-                )} */}
               </DrawerContent>
             </Drawer>
           </Card>
