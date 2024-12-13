@@ -30,8 +30,8 @@ import IndexDeleteToken from "./deleteToken"
 import IndexEditToken from "./editToken"
 
 const IndexTokens = () => {
-  const tokenService = new TokenService()
   const networkService = new NetworkService()
+  const tokenService = new TokenService()
 
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
   const [tokens, setTokens] = useState<TokenModel[]>([])

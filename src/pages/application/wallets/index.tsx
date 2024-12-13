@@ -1,11 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle
-} from "@/components/ui/drawer"
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import {
   Tooltip,
@@ -14,7 +9,9 @@ import {
   TooltipTrigger
 } from "@/components/ui/tooltip"
 import { useToast } from "@/hooks/use-toast"
+import type { NetworkModel } from "@/models/network.model.js"
 import type { WalletModel } from "@/models/wallet.model.js"
+import { NetworkService } from "@/services/network.service.js"
 import { WalletService } from "@/services/wallet.service.js"
 import { Check, Copy, Download, Trash } from "lucide-react"
 import React, { useEffect, useState } from "react"
@@ -24,6 +21,10 @@ import IndexDeleteWallet from "./deleteWallet"
 import IndexExportWallet from "./exportWallet"
 
 const IndexWallet = () => {
+  const networkService = new NetworkService()
+  const walletService = new WalletService()
+
+  const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
   const [wallets, setWallets] = useState<WalletModel[]>([])
   const [selectedWallet, setSelectedWallet] = useState<WalletModel>({
     id: 0,
@@ -34,22 +35,29 @@ const IndexWallet = () => {
     public_key: ""
   })
   const [isAddWalletDrawerOpen, setIsAddWalletDrawerOpen] = useState(false)
-  const [isExportWalletDrawerOpen, setIsExportWalletDrawerOpen] =
-    useState(false)
-  const [isDeleteWalletDrawerOpen, setIsDeleteWalletDrawerOpen] =
-    useState(false)
+  const [isExportWalletDrawerOpen, setIsExportWalletDrawerOpen] = useState(false)
+  const [isDeleteWalletDrawerOpen, setIsDeleteWalletDrawerOpen] = useState(false)
 
   const { toast } = useToast()
 
+  const getNetwork = () => {
+    networkService.getNetwork().then((data) => {
+      setSelectedNetwork(data)
+    })
+  }
+
   const getWallets = () => {
-    let walletService = new WalletService()
     walletService.getWallets().then((data) => {
       setWallets(data)
     })
   }
 
   useEffect(() => {
-    getWallets()
+    getNetwork()
+
+    setTimeout(() => {
+      getWallets()
+    }, 100)
   }, [])
 
   const addWallet = () => {
@@ -105,72 +113,76 @@ const IndexWallet = () => {
           <Card className="mb-3">
             <Table>
               <TableBody>
-                {wallets.map((address, index) => (
-                  <TableRow key={index} className="hover-bg-custom">
-                    <TableCell className="px-4">
-                      <div className="mb-[2px]">
-                        <span className="text-lg font-bold">
-                          {address.name}
+                {wallets
+                  .filter(
+                    (wallet) =>
+                      wallet.address_type ===
+                      (selectedNetwork ? selectedNetwork.name : "")
+                  )
+                  .map((address, index) => (
+                    <TableRow key={index} className="hover-bg-custom">
+                      <TableCell className="px-4">
+                        <div className="mb-[2px]">
+                          <span className="text-lg font-bold">{address.name}</span>
+                        </div>
+                        <span style={{ color: "#657AA2" }}>
+                          {address.public_key.slice(0, 6)}
                         </span>
-                      </div>
-                      <span style={{ color: "#657AA2" }}>
-                        {address.public_key.slice(0, 6)}
-                      </span>
-                      <span className="text-gray-500">...</span>
-                      <span style={{ color: "#657AA2" }}>
-                        {address.public_key.slice(-4)}
-                      </span>
-                    </TableCell>
-                    <TableCell className="w-[40px] justify-center text-center">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <button
-                              onClick={() => copyWallet(address.public_key)}
-                              className="w-full h-full flex items-center justify-center text-white">
-                              <Copy />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Copy Address</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </TableCell>
-                    <TableCell className="w-[40px] justify-center text-center">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <button
-                              onClick={() => exportWallet(address)}
-                              className="w-full h-full flex items-center justify-center text-white">
-                              <Download />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Export Wallet</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </TableCell>
-                    <TableCell className="w-[30px] justify-center text-center text-red-500 pr-4">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <button
-                              onClick={() => deleteWallet(address)}
-                              className="w-full h-full flex items-center justify-center">
-                              <Trash />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Delete Wallet</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                        <span className="text-gray-500">...</span>
+                        <span style={{ color: "#657AA2" }}>
+                          {address.public_key.slice(-4)}
+                        </span>
+                      </TableCell>
+                      <TableCell className="w-[40px] justify-center text-center">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <button
+                                onClick={() => copyWallet(address.public_key)}
+                                className="w-full h-full flex items-center justify-center text-white">
+                                <Copy />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Copy Address</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </TableCell>
+                      <TableCell className="w-[40px] justify-center text-center">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <button
+                                onClick={() => exportWallet(address)}
+                                className="w-full h-full flex items-center justify-center text-white">
+                                <Download />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Export Wallet</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </TableCell>
+                      <TableCell className="w-[30px] justify-center text-center text-red-500 pr-4">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <button
+                                onClick={() => deleteWallet(address)}
+                                className="w-full h-full flex items-center justify-center">
+                                <Trash />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Delete Wallet</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           </Card>
@@ -180,9 +192,7 @@ const IndexWallet = () => {
           ADD WALLET
         </Button>
 
-        <Drawer
-          open={isAddWalletDrawerOpen}
-          onOpenChange={setIsAddWalletDrawerOpen}>
+        <Drawer open={isAddWalletDrawerOpen} onOpenChange={setIsAddWalletDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
               <DrawerTitle>ADD NEW WALLET</DrawerTitle>

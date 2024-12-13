@@ -15,17 +15,21 @@ import {
   sr25519PairFromSeed
 } from "@polkadot/util-crypto"
 import { Check, X } from "lucide-react"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 
 import "@polkadot/wasm-crypto/initOnlyAsm"
 
+import type { NetworkModel } from "@/models/network.model"
 import { EncryptionService } from "@/services/encryption.service"
+import { NetworkService } from "@/services/network.service"
 import { UserService } from "@/services/user.service"
 
 const IndexAddWallet = ({ handleCallbacks }) => {
+  const networkService = new NetworkService()
   const userService = new UserService()
   const walletService = new WalletService()
-  
+
+  const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
   const [isInputPasswordDrawerOpen, setIsInputPasswordDrawerOpen] =
     useState<boolean>(false)
   const [walletData, setWalletData] = useState<WalletModel>({
@@ -39,6 +43,16 @@ const IndexAddWallet = ({ handleCallbacks }) => {
   const [inputedPassword, setInputedPassword] = useState<string>("")
 
   const { toast } = useToast()
+
+  const getNetwork = () => {
+    networkService.getNetwork().then((data) => {
+      setSelectedNetwork(data)
+    })
+  }
+
+  useEffect(() => {
+    getNetwork()
+  }, [])
 
   const handleInputChange = (field: keyof typeof walletData, value: string) => {
     setWalletData((prev) => ({
@@ -66,7 +80,12 @@ const IndexAddWallet = ({ handleCallbacks }) => {
   }
 
   const saveWallet = () => {
-    if (!walletData.name || !walletData.mnemonic_phrase || !walletData.secret_key || !walletData.public_key) {
+    if (
+      !walletData.name ||
+      !walletData.mnemonic_phrase ||
+      !walletData.secret_key ||
+      !walletData.public_key
+    ) {
       toast({
         description: (
           <div className="flex items-center">
@@ -74,9 +93,9 @@ const IndexAddWallet = ({ handleCallbacks }) => {
             All fields must be filled out!
           </div>
         ),
-        variant: "destructive", 
-      });
-      return;
+        variant: "destructive"
+      })
+      return
     }
     setIsInputPasswordDrawerOpen(true)
   }
@@ -90,10 +109,11 @@ const IndexAddWallet = ({ handleCallbacks }) => {
             Password cannot be empty!
           </div>
         ),
-        variant: "destructive",
-      });
-      return;
+        variant: "destructive"
+      })
+      return
     }
+
     userService.login(inputedPassword).then((isValid) => {
       if (isValid == true) {
         let encryptionService = new EncryptionService()
@@ -106,7 +126,8 @@ const IndexAddWallet = ({ handleCallbacks }) => {
 
         walletData.mnemonic_phrase = mnemonic_phrase
         walletData.secret_key = secret_key
-        
+        walletData.address_type = selectedNetwork ? selectedNetwork.name : ""
+
         walletService.createWallet(walletData).then((result) => {
           if (result != null) {
             toast({
@@ -149,15 +170,6 @@ const IndexAddWallet = ({ handleCallbacks }) => {
           />
         </div>
         <div className="mb-3">
-          <Label>Address Type:</Label>
-          <Input
-            type="text"
-            value={walletData.address_type}
-            onChange={(e) => handleInputChange("address_type", e.target.value)}
-            readOnly
-          />
-        </div>
-        <div className="mb-3">
           <Label>Mnemonic Phrase:</Label>
           <div className="flex items-center gap-2">
             <textarea
@@ -165,8 +177,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
               value={walletData.mnemonic_phrase}
               onChange={(e) => handleInputChange("mnemonic_phrase", e.target.value)}
               className="w-full p-2 rounded input-style text-sm font-semibold"
-              rows={2} 
-            ></textarea>
+              rows={2}></textarea>
             <Button
               type="button"
               variant="variant1"
@@ -183,9 +194,8 @@ const IndexAddWallet = ({ handleCallbacks }) => {
             value={walletData.secret_key}
             onChange={(e) => handleInputChange("secret_key", e.target.value)}
             className="w-full p-2 rounded input-style text-sm font-semibold"
-            rows={3} 
-            readOnly
-          ></textarea>
+            rows={3}
+            readOnly></textarea>
         </div>
         <div className="mb-3">
           <Label>Public Key:</Label>

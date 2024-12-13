@@ -20,6 +20,7 @@ import React, { useEffect, useState } from "react"
 
 const IndexAddToken = ({ handleCallbacks }) => {
   const networkService = new NetworkService()
+  const tokenService = new TokenService()
 
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
   const [tokenData, setTokenData] = useState<TokenModel>({
@@ -79,7 +80,6 @@ const IndexAddToken = ({ handleCallbacks }) => {
     tokenData.network = selectedNetwork ? selectedNetwork.name : ""
     tokenData.type = selectedTokenType
 
-    let tokenService = new TokenService()
     tokenService.createToken(tokenData).then((result) => {
       if (result != null) {
         toast({
