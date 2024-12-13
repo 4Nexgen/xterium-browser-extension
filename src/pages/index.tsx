@@ -18,7 +18,7 @@ const IndexPages = () => {
           .getLastAccessTime()
           .then((lastAccessTime) => {
             if (lastAccessTime != null) {
-              if (!lastAccessTime || currentTime - parseInt(lastAccessTime) > 120000) {
+              if (!lastAccessTime || currentTime - parseInt(lastAccessTime) > 1800000) {
                 setCurrentPage("login")
               } else {
                 setCurrentPage("application")
