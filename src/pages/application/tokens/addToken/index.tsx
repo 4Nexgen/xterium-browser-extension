@@ -108,7 +108,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
                 variant="roundedOutline"
                 role="combobox"
                 aria-expanded={openTokenType}
-                className="w-full justify-between text-input-primary p-3"
+                className="w-full bg-input justify-between text-input-primary p-3"
                 size="lg">
                 {selectedTokenType ? selectedTokenType : "Select Token Type"}
               </Button>
