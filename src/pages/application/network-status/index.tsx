@@ -1,43 +1,58 @@
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
+import { XodeService } from "@/services/xode.service"
 import { Blocks, HandCoins, Hourglass, Wallet } from "lucide-react"
 import { useTheme } from "next-themes"
 import React, { useEffect, useState } from "react"
 
-const formatNumber = (num) => {
+const formatNumber = (num: number) => {
+  if (num >= 1_000_000_000_000) {
+    return `${(num / 1_000_000_000_000).toFixed(1)}T`
+  }
+  if (num >= 1_000_000_000) {
+    return `${(num / 1_000_000_000).toFixed(1)}B`
+  }
   if (num >= 1_000_000) {
     return `${(num / 1_000_000).toFixed(1)}M`
+  } else {
+    return num.toLocaleString()
   }
-  return num.toLocaleString()
 }
 
 const IndexNetworkStatus = () => {
-  const { theme } = useTheme()
   const [networkStatus, setNetworkStatus] = useState({
     totalBlocks: 0,
     totalAddresses: 0,
-    avgBlockInterval: "0 secs",
+    avgBlockInterval: "0",
     lastGasFee: 0
   })
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = {
-        totalBlocks: 1_125_915,
-        totalAddresses: 528,
-        avgBlockInterval: "12 s",
-        lastGasFee: 0.002
-      }
-      setNetworkStatus(data)
-    }
+  const { theme } = useTheme()
+  const xodeService = new XodeService()
 
-    fetchData()
+  const getNetworkStatus = () => {
+    xodeService.getTotalBlocks().then((totalBlocks) => {
+      xodeService.getTotalAddresses().then((totalAddresses) => {
+        setNetworkStatus((prevStatus) => ({
+          prevStatus,
+          totalBlocks,
+          totalAddresses,
+          avgBlockInterval: "12 secs",
+          lastGasFee: 0.002
+        }))
+      })
+    })
+  }
+
+  useEffect(() => {
+    getNetworkStatus()
   }, [])
+
   return (
     <div className="py-4">
       <Table className="mt-0">
         <TableBody>
-          <TableRow className="flex flex-wrap justify-center">
+          <TableRow className="border-none flex flex-wrap justify-center">
             <TableCell className="w-40 h-40 relative">
               <div className="flex items-center justify-center bg-tablecell-detail rounded-xl h-full w-full">
                 <div className="text-center p-10 w-full">
@@ -66,6 +81,8 @@ const IndexNetworkStatus = () => {
                 </div>
               </div>
             </TableCell>
+          </TableRow>
+          <TableRow className="border-none flex flex-wrap justify-center">
             <TableCell className="w-40 h-40 relative">
               <div className="flex items-center justify-center bg-tablecell-detail rounded-xl h-full w-full">
                 <div className="text-center p-10 w-full">
@@ -73,7 +90,7 @@ const IndexNetworkStatus = () => {
                     className="absolute top-0 left-0 ml-6 mt-6 opacity-50"
                     size="40"
                   />
-                  <p className="text-2xl font-extrabold text-purple">
+                  <p className="text-2xl font-extrabold text-purple mt-11">
                     {networkStatus.avgBlockInterval}
                   </p>
                   <Label className="text-sm">AVG Block Intervals</Label>
@@ -87,7 +104,7 @@ const IndexNetworkStatus = () => {
                     className="absolute top-0 left-0 ml-6 mt-6 opacity-50"
                     size="40"
                   />
-                  <p className="text-2xl font-extrabold text-purple">
+                  <p className="text-2xl font-extrabold text-purple mt-6">
                     {networkStatus.lastGasFee}
                   </p>
                   <Label className="text-sm">Last Gas Fee</Label>
