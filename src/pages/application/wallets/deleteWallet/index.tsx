@@ -8,7 +8,7 @@ import React, { useState } from "react"
 
 const IndexDeleteWallet = ({ selectedWallet, handleCallbacks }) => {
   const [walletData, setWalletData] = useState<WalletModel>(selectedWallet)
-  
+
   const { toast } = useToast()
 
   const deleteWallet = () => {
@@ -43,7 +43,7 @@ const IndexDeleteWallet = ({ selectedWallet, handleCallbacks }) => {
           </Label>
         </div>
         <div className="flex flex-row space-x-3">
-          <Button type="button" variant="red" onClick={deleteWallet}>
+          <Button type="button" variant="jellyDestructive" onClick={deleteWallet}>
             DELETE
           </Button>
         </div>

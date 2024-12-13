@@ -123,7 +123,7 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
           />
         </div>
         <div className="mt-3 mb-3">
-          <Button type="button" variant="violet" onClick={updateToken}>
+          <Button type="button" variant="jelly" onClick={updateToken}>
             UPDATE
           </Button>
         </div>

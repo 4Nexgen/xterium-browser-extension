@@ -99,7 +99,7 @@ const IndexLogin = ({ onSetCurrentPage }) => {
                 </FormItem>
               )}
             />
-            <Button type="submit" variant="violet" className="w-full text-white">
+            <Button type="submit" variant="jelly" className="w-full text-white">
               UNLOCK
             </Button>
           </form>

@@ -73,7 +73,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
         ),
         variant: "destructive"
       })
-      
+
       return
     }
 
@@ -166,7 +166,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
           />
         </div>
         <div className="mt-3 mb-3">
-          <Button type="button" variant="violet" onClick={saveToken}>
+          <Button type="button" variant="jelly" onClick={saveToken}>
             SAVE
           </Button>
         </div>

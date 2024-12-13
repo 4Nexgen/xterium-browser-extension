@@ -288,7 +288,7 @@ const IndexTokens = () => {
           </Card>
         </div>
 
-        <Button variant="violet" className="my-auto" onClick={addToken}>
+        <Button variant="jelly" className="my-auto" onClick={addToken}>
           ADD NEW TOKEN
         </Button>
 

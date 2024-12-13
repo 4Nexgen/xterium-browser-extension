@@ -172,7 +172,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
               </Label>
             </div>
             <div className="flex flex-row space-x-3">
-              <Button type="button" variant="violet" onClick={confirmChangeNetwork}>
+              <Button type="button" variant="jelly" onClick={confirmChangeNetwork}>
                 CONFIRM
               </Button>
             </div>

@@ -208,7 +208,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
           />
         </div>
         <div className="mt-5 mb-3">
-          <Button type="button" variant="violet" onClick={saveWallet}>
+          <Button type="button" variant="jelly" onClick={saveWallet}>
             SAVE
           </Button>
         </div>
@@ -232,7 +232,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
               />
             </div>
             <div className="mt-3 mb-3">
-              <Button type="button" variant="violet" onClick={saveWithPassword}>
+              <Button type="button" variant="jelly" onClick={saveWithPassword}>
                 SAVE
               </Button>
             </div>

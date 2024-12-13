@@ -182,7 +182,7 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
               recommend 8 characters with uppercase, lowercase, symbols, and numbers.
             </p>
             <br />
-            <Button type="submit" variant="violet" className="text-white">
+            <Button type="submit" variant="jelly" className="text-white">
               SETUP PASSWORD
             </Button>
           </form>

@@ -18,9 +18,10 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        violet:
-          "relative w-full py-3 border-4 bg-gradient-to-b from-[var(--violet-start)] via-[var(--violet-middle)] to-[var(--violet-end)] font-inter tracking-[0.15em] font-bold text-xs rounded-full transition-all duration-300 hover:from-[var(--violet-hover-start)] hover:via-[var(--violet-hover-middle)] hover:to-[var(--violet-hover-end)]",
-        red: "relative w-full py-3 border-4 bg-gradient-to-b from-[var(--red-start)] via-[var(--red-middle)] to-[var(--red-end)] tracking-[0.15em] font-inter font-bold text-xs rounded-full transition-all duration-300 hover:from-[var(--red-hover-start)] hover:via-[var(--red-hover-middle)] hover:to-[var(--red-hover-end)]",
+        jelly:
+          "relative w-full py-3 border-4 bg-gradient-to-b from-muted to-primary font-inter tracking-[0.15em] font-bold text-xs rounded-full transition-all duration-300 hover:from-muted hover:to-white dark:text-white",
+        jellyDestructive:
+          "relative w-full py-3 border-4 bg-gradient-to-b from-destructive/60 to-destructive tracking-[0.15em] font-inter font-bold text-xs rounded-full transition-all duration-300 hover:from-destructive hover:to-background",
         variant1: "bg-[var(--variant1-bg)] hover:bg-[var(--variant1-bg)]",
         variant2: "py-2 bg-[var(--variant1-bg)] rounded hover:bg-[var(--variant1-bg)]"
       },
