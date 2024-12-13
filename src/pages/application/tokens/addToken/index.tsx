@@ -11,12 +11,17 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useToast } from "@/hooks/use-toast"
+import type { NetworkModel } from "@/models/network.model"
 import { TokenModel } from "@/models/token.model"
+import { NetworkService } from "@/services/network.service"
 import { TokenService } from "@/services/token.service"
 import { Check, X } from "lucide-react"
 import React, { useEffect, useState } from "react"
 
 const IndexAddToken = ({ handleCallbacks }) => {
+  const networkService = new NetworkService()
+
+  const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
   const [tokenData, setTokenData] = useState<TokenModel>({
     id: 0,
     type: "",
@@ -33,8 +38,18 @@ const IndexAddToken = ({ handleCallbacks }) => {
 
   const { toast } = useToast()
 
+  const getNetwork = () => {
+    networkService.getNetwork().then((data) => {
+      setSelectedNetwork(data)
+    })
+  }
+
   useEffect(() => {
-    setTokenTypes(["Native", "Asset"])
+    getNetwork()
+
+    setTimeout(() => {
+      setTokenTypes(["Native", "Asset"])
+    }, 100)
   }, [])
 
   const handleInputChange = (field: keyof typeof tokenData, value: string) => {
@@ -45,9 +60,9 @@ const IndexAddToken = ({ handleCallbacks }) => {
   }
 
   const saveToken = () => {
-    const { network, network_id, symbol, description } = tokenData
+    const { network_id, symbol, description } = tokenData
 
-    if (!selectedTokenType || !network || !network_id || !symbol || !description) {
+    if (!selectedTokenType || !symbol || !description) {
       toast({
         description: (
           <div className="flex items-center">
@@ -57,9 +72,11 @@ const IndexAddToken = ({ handleCallbacks }) => {
         ),
         variant: "destructive"
       })
+      
       return
     }
 
+    tokenData.network = selectedNetwork ? selectedNetwork.name : ""
     tokenData.type = selectedTokenType
 
     let tokenService = new TokenService()
@@ -122,18 +139,9 @@ const IndexAddToken = ({ handleCallbacks }) => {
           </Popover>
         </div>
         <div className="mb-3">
-          <Label>Network:</Label>
-          <Input
-            type="text"
-            placeholder="Enter Network"
-            value={tokenData.network}
-            onChange={(e) => handleInputChange("network", e.target.value)}
-          />
-        </div>
-        <div className="mb-3">
           <Label>Network Id {"(0 if Native)"}:</Label>
           <Input
-            type="text"
+            type="number"
             placeholder="Enter Network"
             value={tokenData.network_id}
             onChange={(e) => handleInputChange("network_id", e.target.value)}
