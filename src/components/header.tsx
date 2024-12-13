@@ -98,7 +98,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
               </PopoverTrigger>
               <PopoverContent className="p-0 z-[1000]" align="start">
                 <Command>
-                  <CommandInput placeholder="Choose token type..." />
+                  <CommandInput placeholder="Choose network..." />
                   <CommandList>
                     <CommandEmpty>No results found.</CommandEmpty>
                     <CommandGroup>
@@ -170,7 +170,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
               </PopoverTrigger>
               <PopoverContent className="p-0 z-[1000]" align="start">
                 <Command>
-                  <CommandInput placeholder="Choose token type..." />
+                  <CommandInput placeholder="Choose network..." />
                   <CommandList>
                     <CommandEmpty>No results found.</CommandEmpty>
                     <CommandGroup>
@@ -249,7 +249,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
           </PopoverTrigger>
           <PopoverContent className="p-0 z-[1000]" align="start">
             <Command>
-              <CommandInput placeholder="Choose token type..." />
+              <CommandInput placeholder="Choose network..." />
               <CommandList>
                 <CommandEmpty>No results found.</CommandEmpty>
                 <CommandGroup>
