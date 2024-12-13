@@ -94,6 +94,12 @@ body {
   background-position: center 15%;
 }
 
+.dark .background-inside-theme {
+  background: url("../assets/covers/bg-inside.png") no-repeat;
+  background-size: cover;
+  background-position: top center;
+}
+
 .background-box {
   background: url("../assets/covers/awesomebox.png") no-repeat;
   background-size: cover;
