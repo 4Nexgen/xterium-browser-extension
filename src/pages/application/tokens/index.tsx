@@ -145,7 +145,7 @@ const IndexTokens = () => {
     <>
       <div className="py-4 flex flex-col justify-between h-full">
         <div className="py-4">
-          <Card className="mb-3 card-bg-image">
+          <Card className="mb-3 card-bg-image border-border">
             <CardHeader>
               <CardTitle>
                 <b>NATIVE TOKEN</b>
@@ -183,7 +183,7 @@ const IndexTokens = () => {
                               <TooltipTrigger>
                                 <button
                                   onClick={() => editToken(token)}
-                                  className="w-full h-full flex items-center justify-center text-primary">
+                                  className="w-full h-full flex items-center justify-center text-primary dark:text-white">
                                   <Pencil />
                                 </button>
                               </TooltipTrigger>
@@ -216,7 +216,7 @@ const IndexTokens = () => {
             </Table>
           </Card>
 
-          <Card className="mb-3">
+          <Card className="mb-3 border-border">
             <CardHeader>
               <CardTitle>
                 <b>ASSETS</b>
@@ -254,7 +254,7 @@ const IndexTokens = () => {
                               <TooltipTrigger>
                                 <button
                                   onClick={() => editToken(token)}
-                                  className="w-full h-full flex items-center justify-center text-primary">
+                                  className="w-full h-full flex items-center justify-center text-primary dark:text-white">
                                   <Pencil />
                                 </button>
                               </TooltipTrigger>
