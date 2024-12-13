@@ -183,7 +183,7 @@ const IndexTokens = () => {
                               <TooltipTrigger>
                                 <button
                                   onClick={() => editToken(token)}
-                                  className="w-full h-full flex items-center justify-center">
+                                  className="w-full h-full flex items-center justify-center text-primary">
                                   <Pencil />
                                 </button>
                               </TooltipTrigger>
@@ -197,7 +197,7 @@ const IndexTokens = () => {
                               <TooltipTrigger>
                                 <button
                                   onClick={() => deleteToken(token)}
-                                  className={`w-full h-full flex items-center justify-center ${
+                                  className={`w-full h-full flex items-center justify-center text-destructive ${
                                     token.preloaded ? "opacity-50 cursor-not-allowed" : ""
                                   }`}>
                                   <Trash />
@@ -254,7 +254,7 @@ const IndexTokens = () => {
                               <TooltipTrigger>
                                 <button
                                   onClick={() => editToken(token)}
-                                  className="w-full h-full flex items-center justify-center">
+                                  className="w-full h-full flex items-center justify-center text-primary">
                                   <Pencil />
                                 </button>
                               </TooltipTrigger>
@@ -268,7 +268,7 @@ const IndexTokens = () => {
                               <TooltipTrigger>
                                 <button
                                   onClick={() => deleteToken(token)}
-                                  className={`w-full h-full flex items-center justify-center ${
+                                  className={`w-full h-full flex items-center justify-center text-destructive ${
                                     token.preloaded ? "opacity-50 cursor-not-allowed" : ""
                                   }`}>
                                   <Trash />
