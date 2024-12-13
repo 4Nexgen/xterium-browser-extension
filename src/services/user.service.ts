@@ -7,7 +7,7 @@ export class UserService {
         allCopied: true
     })
     private storageKey = "user"
-    private lastAccessTimeKey = "last_access_time"
+    private lastAccessTimeKey = "user_last_access_time"
     private encryptionService = new EncryptionService()
 
     async createPassword(password: string): Promise<boolean | any> {

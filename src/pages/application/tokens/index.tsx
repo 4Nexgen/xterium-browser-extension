@@ -16,7 +16,10 @@ import {
   TooltipTrigger
 } from "@/components/ui/tooltip"
 import { TokenData, TokenImages } from "@/data/token.data"
+import { toast } from "@/hooks/use-toast"
+import type { NetworkModel } from "@/models/network.model"
 import { TokenModel } from "@/models/token.model"
+import { NetworkService } from "@/services/network.service"
 import { TokenService } from "@/services/token.service"
 import { Pencil, Trash, X } from "lucide-react"
 import Image from "next/image"
@@ -25,9 +28,12 @@ import React, { useEffect, useState } from "react"
 import IndexAddToken from "./addToken"
 import IndexDeleteToken from "./deleteToken"
 import IndexEditToken from "./editToken"
-import { toast } from "@/hooks/use-toast"
 
 const IndexTokens = () => {
+  const tokenService = new TokenService()
+  const networkService = new NetworkService()
+
+  const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
   const [tokens, setTokens] = useState<TokenModel[]>([])
   const [selectedToken, setSelectedToken] = useState<TokenModel>({
     id: 0,
@@ -38,17 +44,13 @@ const IndexTokens = () => {
     description: "",
     image_url: "Default"
   })
-  const [isAddTokenDrawerOpen, setIsAddTokenDrawerOpen] =
-    useState<boolean>(false)
-  const [isEditTokenDrawerOpen, setIsEditTokenDrawerOpen] =
-    useState<boolean>(false)
-  const [isDeleteTokenDrawerOpen, setIsDeleteTokenDrawerOpen] =
-  useState(false)
+  const [isAddTokenDrawerOpen, setIsAddTokenDrawerOpen] = useState<boolean>(false)
+  const [isEditTokenDrawerOpen, setIsEditTokenDrawerOpen] = useState<boolean>(false)
+  const [isDeleteTokenDrawerOpen, setIsDeleteTokenDrawerOpen] = useState(false)
 
   const preloadTokens = () => {
     let tokenList: any[] = []
 
-    let tokenService = new TokenService()
     tokenService.getTokens().then((data) => {
       let preloadedTokenData = TokenData
       if (preloadedTokenData.length > 0) {
@@ -68,9 +70,7 @@ const IndexTokens = () => {
 
       if (data.length > 0) {
         for (let i = 0; i < data.length; i++) {
-          let existingToken = tokenList.filter(
-            (d) => d.symbol == data[i].symbol
-          )[0]
+          let existingToken = tokenList.filter((d) => d.symbol == data[i].symbol)[0]
 
           if (existingToken == null) {
             tokenList.push(data[i])
@@ -79,6 +79,12 @@ const IndexTokens = () => {
       }
 
       setTokens(tokenList)
+    })
+  }
+
+  const getNetwork = () => {
+    networkService.getNetwork().then((data) => {
+      setSelectedNetwork(data)
     })
   }
 
@@ -92,7 +98,11 @@ const IndexTokens = () => {
   }
 
   useEffect(() => {
-    getTokens()
+    getNetwork()
+
+    setTimeout(() => {
+      getTokens()
+    }, 100)
   }, [])
 
   const addToken = () => {
@@ -144,7 +154,11 @@ const IndexTokens = () => {
             <Table>
               <TableBody>
                 {tokens
-                  .filter((token) => token.type === "Native")
+                  .filter(
+                    (token) =>
+                      token.type === "Native" &&
+                      token.network === (selectedNetwork ? selectedNetwork.name : "")
+                  )
                   .map((token) => (
                     <TableRow key={token.symbol}>
                       <TableCell className="w-[50px] justify-center">
@@ -188,8 +202,7 @@ const IndexTokens = () => {
                                 onClick={() => deleteToken(token)}
                                 className={`w-full h-full flex items-center justify-center ${
                                   token.preloaded ? "opacity-50 cursor-not-allowed" : ""
-                                }`}
-                              >
+                                }`}>
                                 <Trash />
                               </button>
                             </TooltipTrigger>
@@ -214,7 +227,11 @@ const IndexTokens = () => {
             <Table>
               <TableBody>
                 {tokens
-                  .filter((token) => token.type === "Asset")
+                  .filter(
+                    (token) =>
+                      token.type === "Asset" &&
+                      token.network === (selectedNetwork ? selectedNetwork.name : "")
+                  )
                   .map((token) => (
                     <TableRow
                       key={token.symbol}
@@ -230,9 +247,7 @@ const IndexTokens = () => {
                       </TableCell>
                       <TableCell>
                         <div className="mb-[2px]">
-                          <span className="text-lg font-bold">
-                            {token.symbol}
-                          </span>
+                          <span className="text-lg font-bold">{token.symbol}</span>
                         </div>
                         <Badge>{token.description}</Badge>
                       </TableCell>
@@ -260,8 +275,7 @@ const IndexTokens = () => {
                                 onClick={() => deleteToken(token)}
                                 className={`w-full h-full flex items-center justify-center ${
                                   token.preloaded ? "opacity-50 cursor-not-allowed" : ""
-                                }`}
-                              >
+                                }`}>
                                 <Trash />
                               </button>
                             </TooltipTrigger>
@@ -282,9 +296,7 @@ const IndexTokens = () => {
           ADD NEW TOKEN
         </Button>
 
-        <Drawer
-          open={isAddTokenDrawerOpen}
-          onOpenChange={setIsAddTokenDrawerOpen}>
+        <Drawer open={isAddTokenDrawerOpen} onOpenChange={setIsAddTokenDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
               <DrawerTitle>ADD NEW TOKEN</DrawerTitle>
@@ -293,9 +305,7 @@ const IndexTokens = () => {
           </DrawerContent>
         </Drawer>
 
-        <Drawer
-          open={isEditTokenDrawerOpen}
-          onOpenChange={setIsEditTokenDrawerOpen}>
+        <Drawer open={isEditTokenDrawerOpen} onOpenChange={setIsEditTokenDrawerOpen}>
           <DrawerTrigger asChild></DrawerTrigger>
           <DrawerContent>
             <DrawerHeader>
@@ -308,9 +318,7 @@ const IndexTokens = () => {
                   height={18}
                   className="rounded"
                 />
-                <span className="font-bold text-md">
-                  {selectedToken.symbol}
-                </span>
+                <span className="font-bold text-md">{selectedToken.symbol}</span>
                 <span>Token</span>
               </DrawerTitle>
             </DrawerHeader>
@@ -321,9 +329,7 @@ const IndexTokens = () => {
           </DrawerContent>
         </Drawer>
 
-        <Drawer
-          open={isDeleteTokenDrawerOpen}
-          onOpenChange={setIsDeleteTokenDrawerOpen}>
+        <Drawer open={isDeleteTokenDrawerOpen} onOpenChange={setIsDeleteTokenDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
               <DrawerTitle>DELETE TOKEN</DrawerTitle>
