@@ -140,12 +140,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
   if (variant === "login") {
     return (
       <>
-        <header
-          className="flex top-0 h-[60px] justify-between items-center shrink-0 px-4 "
-          style={{
-            background: "#2E266D"
-          }}>
-          <h1 className="text-base font-semibold tracking-[0.15em]">Login</h1>
+        <header className="flex top-0 h-[60px] justify-end items-center shrink-0 px-4 ">
           <div className="w-[160px] min-w-[160px]">
             <Popover open={openNetworks} onOpenChange={setOpenNetworks}>
               <PopoverTrigger asChild>
