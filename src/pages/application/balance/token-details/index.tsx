@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Drawer,
   DrawerContent,
@@ -11,29 +11,50 @@ import Image from "next/image";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
 import IndexTransfer from "./transfer";
+import { TokenImages } from "@/data/token.data";
 
 interface IndexTokenDetailsProps {
   isDrawerOpen: boolean;
   toggleDrawer: () => void;
   selectedToken: {
+    id: number;
+    type: string;
     symbol: string;
     image_url: string;
     network: string;
+    network_id: number;
     owner: string;
     description: string;
     balance: string;
     reserveBalance: string;
+    is_frozen: boolean;
   };
+  handleCallbacks: () => void;
+  walletPublicKey: string;
 }
+
+const getTokenImage = async (imageName: string): Promise<string> => {
+  const tokenImages = new TokenImages();
+  return tokenImages.getBase64Image(imageName);
+};
 
 const IndexTokenDetails: React.FC<IndexTokenDetailsProps> = ({
   isDrawerOpen,
   toggleDrawer,
   selectedToken,
+  walletPublicKey
 }) => {
   const { symbol, image_url } = selectedToken;
-
+  const [tokenImage, setTokenImage] = useState<string | null>(null);
   const [isTransferOpen, setIsTransferOpen] = useState(false);
+
+  useEffect(() => {
+    if (image_url) {
+      getTokenImage(image_url)
+        .then(setTokenImage)
+        .catch((error) => console.error("Error loading image:", error));
+    }
+  }, [image_url]);
 
   const openTransfer = () => {
     toggleDrawer(); 
@@ -44,20 +65,27 @@ const IndexTokenDetails: React.FC<IndexTokenDetailsProps> = ({
     setIsTransferOpen(false); 
   };
 
+  const formatBalance = (balance: string) => {
+    const parsedBalance = parseFloat(balance);
+    return isNaN(parsedBalance) ? "0.00" : parsedBalance.toFixed(2);
+  };
+
   return (
     <>
       <Drawer open={isDrawerOpen} onOpenChange={toggleDrawer}>
         <DrawerContent>
           <DrawerHeader>
             <div className="flex justify-center items-center w-full">
-              {image_url && (
+              {tokenImage ? (
                 <Image
-                  src={image_url}
+                  src={tokenImage}
                   alt={symbol}
                   width={32}
                   height={32}
                   className="mr-2"
                 />
+              ) : (
+                <div>No Image</div>
               )}
               <DrawerTitle>{symbol}</DrawerTitle>
             </div>
@@ -68,15 +96,15 @@ const IndexTokenDetails: React.FC<IndexTokenDetailsProps> = ({
           <Table className="mt-6 w-full">
             <TableBody>
               <TableRow className="flex justify-center gap-4">
-                <TableCell className="w-24 h-24 flex items-center justify-center bg-tablecell-detail rounded-xl">
+                <TableCell className="w-24 h-24 flex items-center justify-center text-center bg-tablecell-detail rounded-xl">
                   <div className="text-center">
-                    <p className="text-2xl font-extrabold text-purple">0.00</p>
+                    <p className="text-2xl font-extrabold text-purple">{formatBalance(selectedToken.balance)}</p>
                     <Label className="text-sm font-semibold">Total</Label>
                   </div>
                 </TableCell>
                 <TableCell className="w-24 h-24 flex items-center justify-center bg-tablecell-detail rounded-xl">
                   <div className="text-center">
-                    <p className="text-2xl font-extrabold text-purple">0.00</p>
+                    <p className="text-2xl font-extrabold text-purple">{formatBalance(selectedToken.balance)}</p>
                     <Label className="text-sm font-semibold">Transferable</Label>
                   </div>
                 </TableCell>
@@ -96,14 +124,16 @@ const IndexTokenDetails: React.FC<IndexTokenDetailsProps> = ({
               </Button>
             </div>
           </DrawerDescription>
+          {isTransferOpen && (
+            <IndexTransfer
+              isTransferOpen={isTransferOpen}
+              closeTransfer={closeTransfer}
+              walletPublicKey={walletPublicKey}
+              selectedToken={selectedToken} 
+            />
+          )}
         </DrawerContent>
       </Drawer>
-
-      <IndexTransfer
-        isOpen={isTransferOpen}
-        toggleDrawer={closeTransfer}
-        tokenDetails={selectedToken}
-      />
     </>
   );
 };
