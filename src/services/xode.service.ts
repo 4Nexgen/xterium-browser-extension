@@ -8,17 +8,16 @@ export class XodeService {
   async connect(): Promise<ApiPromise | any> {
     return new Promise(async (resolve, reject) => {
       try {
-        this.networkService.getNetwork().then(data => {
+        this.networkService.getNetwork().then(async data => {
           let wsUrl = data.rpc
 
           if (!this.api) {
             const wsProvider = new WsProvider(wsUrl)
-            ApiPromise.create({ provider: wsProvider }).then(api => {
-              this.api = api
-              resolve(this.api)
-            }).catch(error => {
-              reject(error)
-            })
+            const api = await ApiPromise.create({ provider: wsProvider })
+
+            this.api = api
+
+            resolve(this.api)
           }
         }).catch(error => {
           reject(error)

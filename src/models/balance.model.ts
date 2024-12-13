@@ -1,13 +1,15 @@
+import type { TokenModel } from "./token.model"
+
+export class SubstrateFeeModel {
+  feeClass: string;
+  weight: string;
+  partialFee: string;
+}
+
 export class BalanceModel {
-  symbol: string
-  mnemonic_phrase?: string
-  description: string
-  image_url: string
-  network: string
-  network_id: number
-  type: string
   owner: string
-  balance: string
-  reserveBalance: string
+  token: TokenModel
+  freeBalance: number
+  reservedBalance: number
   is_frozen: boolean
 }
