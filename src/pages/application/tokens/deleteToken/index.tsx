@@ -8,7 +8,7 @@ import React, { useState } from "react"
 
 const IndexDeleteToken = ({ selectedToken, handleCallbacks }) => {
   const [tokenData, setTokenData] = useState<TokenModel>(selectedToken)
-  
+
   const { toast } = useToast()
 
   const deleteToken = () => {
@@ -43,7 +43,7 @@ const IndexDeleteToken = ({ selectedToken, handleCallbacks }) => {
           </Label>
         </div>
         <div className="flex flex-row space-x-3">
-          <Button type="button" variant="red" onClick={deleteToken}>
+          <Button type="button" variant="jellyDestructive" onClick={deleteToken}>
             DELETE
           </Button>
         </div>

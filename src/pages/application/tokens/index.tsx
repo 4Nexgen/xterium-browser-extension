@@ -145,10 +145,10 @@ const IndexTokens = () => {
     <>
       <div className="py-4 flex flex-col justify-between h-full">
         <div className="py-4">
-          <Card className="mb-3 card-bg-image">
+          <Card className="mb-3 card-bg-image border-border">
             <CardHeader>
               <CardTitle>
-                <b className="text-white">NATIVE TOKEN</b>
+                <b>NATIVE TOKEN</b>
               </CardTitle>
             </CardHeader>
             <Table>
@@ -172,45 +172,43 @@ const IndexTokens = () => {
                       </TableCell>
                       <TableCell>
                         <div className="mb-[2px]">
-                          <span className="text-lg font-bold text-white">
-                            {token.symbol}
-                          </span>
+                          <span className="text-lg font-bold">{token.symbol}</span>
                         </div>
                         <Badge>{token.description}</Badge>
                       </TableCell>
-                      <TableCell className="w-[30px] justify-center text-center text-white-500 pr-4">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <button
-                                onClick={() => editToken(token)}
-                                className="w-full h-full flex items-center justify-center">
-                                <Pencil />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Edit Token</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </TableCell>
-                      <TableCell className="w-[30px] justify-center text-center text-red-500 pr-4">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <button
-                                onClick={() => deleteToken(token)}
-                                className={`w-full h-full flex items-center justify-center ${
-                                  token.preloaded ? "opacity-50 cursor-not-allowed" : ""
-                                }`}>
-                                <Trash />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Delete Token</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                      <TableCell className="w-[30px] justify-center text-center pr-4">
+                        <div className="flex gap-2 items-center">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <button
+                                  onClick={() => editToken(token)}
+                                  className="w-full h-full flex items-center justify-center text-primary dark:text-white">
+                                  <Pencil />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Edit Token</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <button
+                                  onClick={() => deleteToken(token)}
+                                  className={`w-full h-full flex items-center justify-center text-destructive ${
+                                    token.preloaded ? "opacity-50 cursor-not-allowed" : ""
+                                  }`}>
+                                  <Trash />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Delete Token</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -218,7 +216,7 @@ const IndexTokens = () => {
             </Table>
           </Card>
 
-          <Card className="mb-3">
+          <Card className="mb-3 border-border">
             <CardHeader>
               <CardTitle>
                 <b>ASSETS</b>
@@ -233,9 +231,7 @@ const IndexTokens = () => {
                       token.network === (selectedNetwork ? selectedNetwork.name : "")
                   )
                   .map((token) => (
-                    <TableRow
-                      key={token.symbol}
-                      className="cursor-pointer hover-bg-custom">
+                    <TableRow key={token.symbol} className="cursor-pointer">
                       <TableCell className="w-[50px] justify-center">
                         <Image
                           src={getTokenImage(token.image_url)}
@@ -251,39 +247,39 @@ const IndexTokens = () => {
                         </div>
                         <Badge>{token.description}</Badge>
                       </TableCell>
-                      <TableCell className="w-[30px] justify-center text-center text-white-500 pr-4">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <button
-                                onClick={() => editToken(token)}
-                                className="w-full h-full flex items-center justify-center">
-                                <Pencil />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Edit Token</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </TableCell>
-                      <TableCell className="w-[30px] justify-center text-center text-red-500 pr-4">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <button
-                                onClick={() => deleteToken(token)}
-                                className={`w-full h-full flex items-center justify-center ${
-                                  token.preloaded ? "opacity-50 cursor-not-allowed" : ""
-                                }`}>
-                                <Trash />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Delete Token</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                      <TableCell className="w-[30px] justify-center text-center pr-4">
+                        <div className="flex gap-2 items-center">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <button
+                                  onClick={() => editToken(token)}
+                                  className="w-full h-full flex items-center justify-center text-primary dark:text-white">
+                                  <Pencil />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Edit Token</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <button
+                                  onClick={() => deleteToken(token)}
+                                  className={`w-full h-full flex items-center justify-center text-destructive ${
+                                    token.preloaded ? "opacity-50 cursor-not-allowed" : ""
+                                  }`}>
+                                  <Trash />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Delete Token</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -292,7 +288,7 @@ const IndexTokens = () => {
           </Card>
         </div>
 
-        <Button variant="violet" className="my-auto" onClick={addToken}>
+        <Button variant="jelly" className="my-auto" onClick={addToken}>
           ADD NEW TOKEN
         </Button>
 

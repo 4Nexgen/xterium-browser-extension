@@ -66,7 +66,7 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
           <Label>Token Type</Label>
           <Popover open={openTokenType} onOpenChange={setOpenTokenType}>
             <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-between h-10">
+              <Button variant="outline" className="w-full bg-input justify-between h-10">
                 {selectedTokenType ? <>{selectedTokenType}</> : <></>}
               </Button>
             </PopoverTrigger>
@@ -123,7 +123,7 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
           />
         </div>
         <div className="mt-3 mb-3">
-          <Button type="button" variant="violet" onClick={updateToken}>
+          <Button type="button" variant="jelly" onClick={updateToken}>
             UPDATE
           </Button>
         </div>

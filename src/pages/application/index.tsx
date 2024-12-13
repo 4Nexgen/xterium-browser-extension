@@ -38,7 +38,7 @@ const IndexApplication = () => {
   return (
     <main className="max-h-screen">
       <Layout onSetCurrentPage={handleSetCurrentPage}>
-        <div>
+        <div className="background-inside-theme">
           <Header currentPage={currentPage} />
           <div className="h-[calc(100vh-60px)]">
             <ScrollArea className="px-4 h-full">

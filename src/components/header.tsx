@@ -28,7 +28,7 @@ import React, { useEffect, useState } from "react"
 
 interface HeaderProps {
   currentPage?: string
-  variant?: "default" | "create-password" | "login"
+  variant?: "default" | "outside"
 }
 
 const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => {
@@ -65,166 +65,27 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
     })
   }
 
-  if (variant === "create-password") {
-    return (
-      <>
-        <header
-          className="flex top-0 h-[60px] justify-between items-center shrink-0 px-4 "
-          style={{
-            background: "#2E266D"
-          }}>
-          <h1 className="text-base font-semibold tracking-[0.15em]">Setup Password</h1>
-          <div className="w-[160px] min-w-[160px]">
-            <Popover open={openNetworks} onOpenChange={setOpenNetworks}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="roundedOutline"
-                  role="combobox"
-                  aria-expanded={openNetworks}
-                  className="w-full justify-between text-input-primary p-3"
-                  size="lg">
-                  <div className="flex items-center">
-                    <div className="w-5 h-5 mr-2 relative">
-                      <Image
-                        src={getNetworkImage(selectedNetwork ? selectedNetwork.name : "")}
-                        alt="XON Logo"
-                        layout="fill"
-                        objectFit="contain"
-                      />
-                    </div>
-                    {selectedNetwork ? selectedNetwork.name : "Select Network"}
-                  </div>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="p-0 z-[1000]" align="start">
-                <Command>
-                  <CommandInput placeholder="Choose network..." />
-                  <CommandList>
-                    <CommandEmpty>No results found.</CommandEmpty>
-                    <CommandGroup>
-                      {networks.map((network) => (
-                        <CommandItem
-                          key={network.name}
-                          value={network.name}
-                          onSelect={(value) => {
-                            setChosenNetwork(
-                              networks.find((priority) => priority.name === value) || null
-                            )
-                            setOpenNetworks(false)
-                            setIsChangeNetwork(true)
-                          }}>
-                          <div className="flex items-center">
-                            <div className="w-5 h-5 mr-2 relative">
-                              <Image
-                                src={getNetworkImage(network.logo)}
-                                alt="XON Logo"
-                                layout="fill"
-                                objectFit="contain"
-                              />
-                            </div>
-                            {network.name}
-                          </div>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </div>
-        </header>
-      </>
-    )
-  }
-
-  if (variant === "login") {
-    return (
-      <>
-        <header
-          className="flex top-0 h-[60px] justify-between items-center shrink-0 px-4 "
-          style={{
-            background: "#2E266D"
-          }}>
-          <h1 className="text-base font-semibold tracking-[0.15em]">Login</h1>
-          <div className="w-[160px] min-w-[160px]">
-            <Popover open={openNetworks} onOpenChange={setOpenNetworks}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="roundedOutline"
-                  role="combobox"
-                  aria-expanded={openNetworks}
-                  className="w-full justify-between text-input-primary p-3"
-                  size="lg">
-                  <div className="flex items-center">
-                    <div className="w-5 h-5 mr-2 relative">
-                      <Image
-                        src={getNetworkImage(selectedNetwork ? selectedNetwork.name : "")}
-                        alt="XON Logo"
-                        layout="fill"
-                        objectFit="contain"
-                      />
-                    </div>
-                    {selectedNetwork ? selectedNetwork.name : "Select Network"}
-                  </div>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="p-0 z-[1000]" align="start">
-                <Command>
-                  <CommandInput placeholder="Choose network..." />
-                  <CommandList>
-                    <CommandEmpty>No results found.</CommandEmpty>
-                    <CommandGroup>
-                      {networks.map((network) => (
-                        <CommandItem
-                          key={network.name}
-                          value={network.name}
-                          onSelect={(value) => {
-                            setChosenNetwork(
-                              networks.find((priority) => priority.name === value) || null
-                            )
-                            setOpenNetworks(false)
-                            setIsChangeNetwork(true)
-                          }}>
-                          <div className="flex items-center">
-                            <div className="w-5 h-5 mr-2 relative">
-                              <Image
-                                src={getNetworkImage(network.name)}
-                                alt="XON Logo"
-                                layout="fill"
-                                objectFit="contain"
-                              />
-                            </div>
-                            {network.name}
-                          </div>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </div>
-        </header>
-      </>
-    )
-  }
-
   return (
-    <header className="flex top-0 h-[60px] shrink-0 items-center gap-2 px-4">
-      <SidebarTrigger className="p-2 rounded" />
-      <Separator
-        orientation="vertical"
-        className={`mr-2 h-4 ${theme === "light" ? "" : "bg-white"}`}
-      />
-      <Breadcrumb className="w-full tracking-[0.15em]">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbPage>
-              <b>{currentPage}</b>
-            </BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+    <header
+      className={`flex top-0 h-[60px] shrink-0 items-center gap-2 px-4 ${variant == "outside" && "justify-end"}`}>
+      {variant !== "outside" && (
+        <>
+          <SidebarTrigger className="p-2 rounded" />
+          <Separator
+            orientation="vertical"
+            className={`mr-2 h-4 ${theme === "light" ? "" : "bg-white"}`}
+          />
+          <Breadcrumb className="w-full tracking-[0.15em]">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbPage>
+                  <b>{currentPage}</b>
+                </BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </>
+      )}
       <div className="w-[160px] min-w-[160px]">
         <Popover open={openNetworks} onOpenChange={setOpenNetworks}>
           <PopoverTrigger asChild>
@@ -311,7 +172,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
               </Label>
             </div>
             <div className="flex flex-row space-x-3">
-              <Button type="button" variant="violet" onClick={confirmChangeNetwork}>
+              <Button type="button" variant="jelly" onClick={confirmChangeNetwork}>
                 CONFIRM
               </Button>
             </div>

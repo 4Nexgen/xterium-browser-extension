@@ -5,8 +5,8 @@ import { useToast } from "@/hooks/use-toast"
 import type { WalletModel } from "@/models/wallet.model"
 import { UserService } from "@/services/user.service"
 import { WalletService } from "@/services/wallet.service"
-import React, { useState } from "react"
 import { Eye, EyeOff, X } from "lucide-react"
+import React, { useState } from "react"
 
 const IndexExportWallet = ({ selectedWallet, handleCallbacks }) => {
   const userService = new UserService()
@@ -84,7 +84,7 @@ const IndexExportWallet = ({ selectedWallet, handleCallbacks }) => {
           </div>
         </div>
         <div className="mt-3 mb-3">
-          <Button type="button" variant="violet" onClick={exportWallet}>
+          <Button type="button" variant="jelly" onClick={exportWallet}>
             EXPORT
           </Button>
         </div>

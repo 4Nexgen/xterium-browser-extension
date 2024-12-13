@@ -17,6 +17,9 @@ const IndexTokenDetails = ({ selectedBalance }) => {
     const parsedBalance = parseFloat(balance)
     return isNaN(parsedBalance) ? "0.00" : parsedBalance.toFixed(2)
   }
+    const parsedBalance = parseFloat(balance)
+    return isNaN(parsedBalance) ? "0.00" : parsedBalance.toFixed(2)
+  }
 
   return (
     <>
@@ -62,5 +65,8 @@ const IndexTokenDetails = ({ selectedBalance }) => {
     </>
   )
 }
+  )
+}
 
+export default IndexTokenDetails
 export default IndexTokenDetails

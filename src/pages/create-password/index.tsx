@@ -21,6 +21,8 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+import OutsideLayout from "../outsideLayout"
+
 const IndexCreatePassword = ({ onSetCurrentPage }) => {
   const userService = new UserService()
   const [showPassword, setShowPassword] = useState<boolean>(false)
@@ -94,131 +96,98 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
 
   return (
     <>
-      <div className="flex flex-col justify-between text-white">
-        <Header variant="create-password" />
+      <OutsideLayout headerVariant="outside">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="w-full space-y-0 h-full">
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-inter font-extrabold text-[12px] leading-[15px] text-white tracking-[0.15em] mb-1">
+                    Enter Password:
+                  </FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter password"
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e)
+                          checkPasswordStrength(e.target.value)
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={toggleShowPassword}
+                        className="absolute inset-y-0 right-3 flex items-center hover:[#9AB3EB]">
+                        {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                      </button>
+                    </div>
+                  </FormControl>
 
-        <div
-          className="flex justify-center pt-14 pb-14"
-          style={{
-            background: "linear-gradient(180deg, #2E266D 0%, #121B26 100%)"
-          }}>
-          <img src={XteriumLogo} className="w-229 mb-4" alt="Xterium Logo" />
-        </div>
-
-        <div className="flex justify-center items-center w-full h-full">
-          <div className="w-full lg:w-[32rem]">
-            <div
-              className="h-3 mt-7"
-              style={{
-                background: "linear-gradient(90deg, #7292DD 0%, #50B8FF 100%)"
-              }}
+                  <div className="p-0 mt-0 text-[10px]">
+                    {form.formState.errors.password ? (
+                      <FormMessage className="text-[#FD2400] text-[10px] mt-0" />
+                    ) : (
+                      <span>&nbsp;</span>
+                    )}
+                  </div>
+                </FormItem>
+              )}
             />
-            <div
-              className="p-6 w-full h-[290px]"
-              style={{
-                background: "linear-gradient(180deg, #32436A 0%, #121826 100%)"
-              }}>
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="w-full space-y-0 h-full">
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-inter font-extrabold text-[12px] leading-[15px] tracking-[0.15em] text-[#9AB3EB] mb-2">
-                          Enter Password:
-                        </FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Input
-                              type={showPassword ? "text" : "password"}
-                              placeholder="Enter password"
-                              {...field}
-                              onChange={(e) => {
-                                field.onChange(e)
-                                checkPasswordStrength(e.target.value)
-                              }}
-                            />
-                            <button
-                              type="button"
-                              onClick={toggleShowPassword}
-                              className="absolute inset-y-0 right-3 flex items-center text-[#9AB3EB] hover:[#9AB3EB]">
-                              {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
-                            </button>
-                          </div>
-                        </FormControl>
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-inter font-extrabold text-[12px] leading-[15px] text-white tracking-[0.15em] mb-2">
+                    Confirm Password:
+                  </FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="Enter password"
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e)
+                          checkPasswordStrength(e.target.value)
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={toggleShowConfirmPassword}
+                        className="absolute inset-y-0 right-3 flex items-center hover:[#9AB3EB]">
+                        {showConfirmPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                      </button>
+                    </div>
+                  </FormControl>
 
-                        <div className="p-0 mt-0 text-[10px]">
-                          {form.formState.errors.password ? (
-                            <FormMessage className="text-[#FD2400] text-[10px] mt-0" />
-                          ) : (
-                            <span>&nbsp;</span>
-                          )}
-                        </div>
-                      </FormItem>
+                  <div className="p-0 mt-0 text-[10px]">
+                    {form.formState.errors.confirmPassword ? (
+                      <FormMessage className="text-[#FD2400] text-[10px] mt-0 mb-0" />
+                    ) : (
+                      <span>&nbsp;</span>
                     )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="confirmPassword"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-inter font-extrabold text-[12px] leading-[15px] tracking-[0.15em] text-[#9AB3EB] mb-2">
-                          Confirm Password:
-                        </FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Input
-                              type={showConfirmPassword ? "text" : "password"}
-                              placeholder="Enter password"
-                              {...field}
-                              onChange={(e) => {
-                                field.onChange(e)
-                                checkPasswordStrength(e.target.value)
-                              }}
-                            />
-                            <button
-                              type="button"
-                              onClick={toggleShowConfirmPassword}
-                              className="absolute inset-y-0 right-3 flex items-center text-[#9AB3EB] hover:[#9AB3EB]">
-                              {showConfirmPassword ? (
-                                <Eye size={20} />
-                              ) : (
-                                <EyeOff size={20} />
-                              )}
-                            </button>
-                          </div>
-                        </FormControl>
-
-                        <div className="p-0 mt-0 text-[10px]">
-                          {form.formState.errors.confirmPassword ? (
-                            <FormMessage className="text-[#FD2400] text-[10px] mt-0 mb-0" />
-                          ) : (
-                            <span>&nbsp;</span>
-                          )}
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                  <p className="font-inter text-[11px] text-[#9AB3EB] p-0 font-base text-justify">
-                    Your password is used to unlock your wallet and is securely stored. We
-                    recommend 8 characters with uppercase, lowercase, symbols, and
-                    numbers.
-                  </p>
-                  <br />
-                  <Button type="submit" variant="violet">
-                    SETUP PASSWORD
-                  </Button>
-                </form>
-              </Form>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <Toaster />
+                  </div>
+                </FormItem>
+              )}
+            />
+            <p className="font-inter text-[11px] p-0 font-base text-justify text-white opacity-50">
+              Your password is used to unlock your wallet and is securely stored. We
+              recommend 8 characters with uppercase, lowercase, symbols, and numbers.
+            </p>
+            <br />
+            <Button type="submit" variant="jelly" className="text-white">
+              SETUP PASSWORD
+            </Button>
+          </form>
+        </Form>
+      </OutsideLayout>
     </>
   )
 }

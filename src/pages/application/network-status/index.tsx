@@ -1,5 +1,4 @@
 import { Label } from "@/components/ui/label"
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import { XodeService } from "@/services/xode.service"
 import { Blocks, HandCoins, Hourglass, Wallet } from "lucide-react"
 import React, { useEffect, useState } from "react"
@@ -48,71 +47,43 @@ const IndexNetworkStatus = () => {
 
   return (
     <>
-      <div className="py-4">
-        <Table className="mt-0">
-          <TableBody>
-            <TableRow className="border-none flex flex-wrap justify-center">
-              <TableCell className="w-40 h-40 relative">
-                <div className="flex items-center justify-center bg-tablecell-detail rounded-xl h-full w-full">
-                  <div className="text-center p-10 w-full">
-                    <Blocks
-                      className="absolute top-0 left-0 ml-6 mt-6 opacity-50"
-                      size="40"
-                    />
-                    <p className="text-2xl font-extrabold text-purple mt-6">
-                      {formatNumber(networkStatus.totalBlocks)}
-                    </p>
-                    <Label className="text-sm">Total Blocks</Label>
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell className="w-40 h-40 relative">
-                <div className="flex items-center justify-center bg-tablecell-detail rounded-xl h-full w-full">
-                  <div className="text-center p-10 w-full">
-                    <Wallet
-                      className="absolute top-0 left-0 ml-6 mt-6 opacity-50"
-                      size="40"
-                    />
-                    <p className="text-2xl font-extrabold text-purple mt-6">
-                      {formatNumber(networkStatus.totalAddresses)}
-                    </p>
-                    <Label className="text-sm">Total Addresses</Label>
-                  </div>
-                </div>
-              </TableCell>
-            </TableRow>
-            <TableRow className="border-none flex flex-wrap justify-center">
-              <TableCell className="w-40 h-40 relative">
-                <div className="flex items-center justify-center bg-tablecell-detail rounded-xl h-full w-full">
-                  <div className="text-center p-10 w-full">
-                    <Hourglass
-                      className="absolute top-0 left-0 ml-6 mt-6 opacity-50"
-                      size="40"
-                    />
-                    <p className="text-2xl font-extrabold text-purple mt-11">
-                      {networkStatus.avgBlockInterval}
-                    </p>
-                    <Label className="text-sm">AVG Block Intervals</Label>
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell className="w-40 h-40 relative">
-                <div className="flex items-center justify-center bg-tablecell-detail rounded-xl h-full w-full">
-                  <div className="text-center p-10 w-full">
-                    <HandCoins
-                      className="absolute top-0 left-0 ml-6 mt-6 opacity-50"
-                      size="40"
-                    />
-                    <p className="text-2xl font-extrabold text-purple mt-6">
-                      {networkStatus.lastGasFee}
-                    </p>
-                    <Label className="text-sm">Last Gas Fee</Label>
-                  </div>
-                </div>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+      <div className="flex flex-wrap">
+        <div className="flex items-center justify-center h-full w-1/2 p-2">
+          <div className="text-center py-10 w-full relative border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg h-full">
+            <Blocks className="absolute top-0 left-0 ml-6 mt-6 opacity-50" size="30" />
+            <p className="text-2xl font-extrabold mt-6 text-primary dark:text-white">
+              {formatNumber(networkStatus.totalBlocks)}
+            </p>
+            <Label className="text-sm opacity-50">Total Blocks</Label>
+          </div>
+        </div>
+        <div className="flex items-center justify-center h-full w-1/2 p-2">
+          <div className="text-center py-10 w-full relative border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg h-full">
+            <Wallet className="absolute top-0 left-0 ml-6 mt-6 opacity-50" size="30" />
+            <p className="text-2xl font-extrabold mt-6 text-primary dark:text-white">
+              {formatNumber(networkStatus.totalAddresses)}
+            </p>
+            <Label className="text-sm opacity-50">Total Addresses</Label>
+          </div>
+        </div>
+        <div className="flex items-center justify-center h-full w-1/2 p-2">
+          <div className="text-center py-10 w-full relative border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg h-full">
+            <Hourglass className="absolute top-0 left-0 ml-6 mt-6 opacity-50" size="30" />
+            <p className="text-2xl font-extrabold mt-6 text-primary dark:text-white">
+              {networkStatus.avgBlockInterval}
+            </p>
+            <Label className="text-sm opacity-50">AVG Block Intervals</Label>
+          </div>
+        </div>
+        <div className="flex items-center justify-center h-full w-1/2 p-2">
+          <div className="text-center py-10 w-full relative border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg h-full">
+            <HandCoins className="absolute top-0 left-0 ml-6 mt-6 opacity-50" size="30" />
+            <p className="text-2xl font-extrabold mt-6 text-primary dark:text-white">
+              {networkStatus.lastGasFee}
+            </p>
+            <Label className="text-sm opacity-50">Last Gas Fee</Label>
+          </div>
+        </div>
       </div>
     </>
   )
