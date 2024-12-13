@@ -209,7 +209,7 @@ const IndexBalance = () => {
               </Command>
             </PopoverContent>
           </Popover>
-          <Card className="mb-3">
+          <Card className="mb-3 border-border">
             <Table>
               <TableBody>
                 {tokens
