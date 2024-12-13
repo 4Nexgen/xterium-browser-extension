@@ -113,7 +113,6 @@ const IndexWallet = () => {
           <Card className="mb-3">
             <Table>
               <TableBody>
-<<<<<<< HEAD
                 {wallets
                   .filter(
                     (wallet) =>
@@ -184,72 +183,6 @@ const IndexWallet = () => {
                       </TableCell>
                     </TableRow>
                   ))}
-=======
-                {wallets.map((address, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="px-4">
-                      <div className="mb-[2px]">
-                        <span className="text-lg font-bold">{address.name}</span>
-                      </div>
-                      <span style={{ color: "#657AA2" }}>
-                        {address.public_key.slice(0, 6)}
-                      </span>
-                      <span className="text-gray-500">...</span>
-                      <span style={{ color: "#657AA2" }}>
-                        {address.public_key.slice(-4)}
-                      </span>
-                    </TableCell>
-                    <TableCell className="w-[40px] justify-center text-center">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <button
-                              onClick={() => copyWallet(address.public_key)}
-                              className="w-full h-full flex items-center justify-center text-white">
-                              <Copy />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Copy Address</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </TableCell>
-                    <TableCell className="w-[40px] justify-center text-center">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <button
-                              onClick={() => exportWallet(address)}
-                              className="w-full h-full flex items-center justify-center text-white">
-                              <Download />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Export Wallet</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </TableCell>
-                    <TableCell className="w-[30px] justify-center text-center text-red-500 pr-4">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <button
-                              onClick={() => deleteWallet(address)}
-                              className="w-full h-full flex items-center justify-center">
-                              <Trash />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Delete Wallet</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </TableCell>
-                  </TableRow>
-                ))}
->>>>>>> 464b8ee (fix:table hover)
               </TableBody>
             </Table>
           </Card>

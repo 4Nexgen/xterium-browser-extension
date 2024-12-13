@@ -69,7 +69,7 @@ const IndexLogin = ({ onSetCurrentPage }) => {
 
   return (
     <>
-      <OutsideLayout headerVariant="login">
+      <OutsideLayout headerVariant="outside">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4">
             <FormField
