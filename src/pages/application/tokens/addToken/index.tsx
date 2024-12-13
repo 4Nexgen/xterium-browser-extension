@@ -73,7 +73,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
         ),
         variant: "destructive"
       })
-      
+
       return
     }
 
@@ -108,7 +108,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
                 variant="roundedOutline"
                 role="combobox"
                 aria-expanded={openTokenType}
-                className="w-full justify-between text-input-primary p-3"
+                className="w-full bg-input justify-between text-input-primary p-3"
                 size="lg">
                 {selectedTokenType ? selectedTokenType : "Select Token Type"}
               </Button>
@@ -166,7 +166,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
           />
         </div>
         <div className="mt-3 mb-3">
-          <Button type="button" variant="violet" onClick={saveToken}>
+          <Button type="button" variant="jelly" onClick={saveToken}>
             SAVE
           </Button>
         </div>

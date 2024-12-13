@@ -152,7 +152,7 @@ const IndexChangePassword = ({ handleCallbacks }) => {
         </div>
         {error && <div className="text-red-500 mb-4">{error}</div>}
         <div className="mt-3 mb-3">
-          <Button type="button" variant="violet" onClick={changePassword}>
+          <Button type="button" variant="jelly" onClick={changePassword}>
             CONFIRM
           </Button>
         </div>

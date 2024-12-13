@@ -188,7 +188,7 @@ const IndexWallet = () => {
           </Card>
         </div>
 
-        <Button variant="violet" className="my-auto" onClick={addWallet}>
+        <Button variant="jelly" className="my-auto" onClick={addWallet}>
           ADD WALLET
         </Button>
 

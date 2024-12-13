@@ -45,7 +45,7 @@ export default {
         border: "hsl(var(--border))",
         input: {
           DEFAULT: "hsl(var(--input))",
-          primary: "hsl(var(--primary-input))",
+          primary: "hsl(var(--primary-input))"
         },
         ring: "hsl(var(--ring))",
         chart: {
@@ -74,6 +74,11 @@ export default {
       backgroundImage: {
         "background-gradient": "var(--background-gradient)"
       }
+    }
+  },
+  variants: {
+    extend: {
+      backgroundColor: ["hover"] // Enable hover variants
     }
   },
   plugins: [require("tailwindcss-animate")]
