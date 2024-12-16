@@ -311,7 +311,7 @@ const IndexBalance = () => {
               </PopoverContent>
             </Popover>
           </div>
-          {balances?.filter((item) => item.token.network == selectedNetwork.name)
+          {balances?.filter((item) => item.token.network == (selectedNetwork != null ? selectedNetwork.name : ""))
             ?.length ? (
             <>
               <Card className="mb-3">
