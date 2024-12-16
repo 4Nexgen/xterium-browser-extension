@@ -70,7 +70,7 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
                 {selectedTokenType ? <>{selectedTokenType}</> : <></>}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="p-0" align="start">
+            <PopoverContent className="p-0" align="start" style={{ width: "var(--radix-popper-anchor-width)"}}>
               <Command>
                 <CommandInput placeholder="Choose token type..." />
                 <CommandList>
@@ -85,7 +85,9 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
                             tokenTypes.find((priority) => priority === value) || null
                           )
                           setOpenTokenType(false)
-                        }}>
+                        }}
+                        className="cursor-pointer hover:bg-accent"
+                      >
                         {tokenType}
                       </CommandItem>
                     ))}

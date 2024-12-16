@@ -234,7 +234,11 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
           <div className="p-6">
             <div className="mb-8">
               <Label className="font-bold pb-2">Partial Fee:</Label>
-              <b className="text-lg">{partialFee}</b>
+              <Input
+                value={partialFee.toString()}
+                className="text-lg"
+                readOnly
+              />
             </div>
             <div className="mb-8">
               <Label className="font-bold pb-2">Enter your password:</Label>

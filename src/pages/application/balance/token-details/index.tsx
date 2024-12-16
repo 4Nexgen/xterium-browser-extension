@@ -35,8 +35,8 @@ const IndexTokenDetails = ({ selectedBalance }) => {
       </Label>
       <Table className="mt-6 w-full">
         <TableBody>
-          <TableRow className="flex justify-center gap-4">
-            <TableCell className="w-24 h-24 flex items-center justify-center text-center bg-tablecell-detail rounded-xl">
+          <TableRow className="flex justify-center gap-4 hover:bg-transparent hover:cursor-default">
+            <TableCell className="w-24 h-24 flex items-center justify-center text-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
               <div className="text-center">
                 <p className="text-2xl font-extrabold text-purple">
                   {formatBalance(
@@ -46,7 +46,7 @@ const IndexTokenDetails = ({ selectedBalance }) => {
                 <Label className="text-sm font-semibold">Total</Label>
               </div>
             </TableCell>
-            <TableCell className="w-24 h-24 flex items-center justify-center bg-tablecell-detail rounded-xl">
+            <TableCell className="w-24 h-24 flex items-center justify-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
               <div className="text-center">
                 <p className="text-2xl font-extrabold text-purple">
                   {formatBalance(balanceData.freeBalance.toString())}
@@ -54,7 +54,7 @@ const IndexTokenDetails = ({ selectedBalance }) => {
                 <Label className="text-sm font-semibold">Transferable</Label>
               </div>
             </TableCell>
-            <TableCell className="w-24 h-24 flex items-center justify-center bg-tablecell-detail rounded-xl">
+            <TableCell className="w-24 h-24 flex items-center justify-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
               <div className="text-center">
                 <p className="text-2xl font-extrabold text-purple">0.00</p>
                 <Label className="text-sm font-semibold">Locked</Label>
