@@ -260,7 +260,7 @@ const IndexBalance = () => {
                   variant="roundedOutline"
                   role="combobox"
                   aria-expanded={openWallets}
-                  className="w-full justify-between text-input-primary p-3 font-bold"
+                  className="w-full justify-between text-input-primary p-3 font-bold hover:bg-accent"
                   size="lg">
                   {selectedWallet ? (
                     <>
@@ -291,7 +291,9 @@ const IndexBalance = () => {
                           onSelect={(value) => {
                             setSelectedWallet(wallet)
                             setOpenWallets(false)
-                          }}>
+                          }}
+                          className="cursor-pointer hover:bg-accent"
+                        >
                           {wallet ? (
                             <>
                               {wallet.name} &nbsp;

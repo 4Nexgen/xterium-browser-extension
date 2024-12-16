@@ -105,7 +105,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
           <Popover open={openTokenType} onOpenChange={setOpenTokenType}>
             <PopoverTrigger asChild>
               <Button
-                variant="roundedOutline"
+                variant="outline"
                 role="combobox"
                 aria-expanded={openTokenType}
                 className="w-full bg-input justify-between text-input-primary p-3"
@@ -113,7 +113,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
                 {selectedTokenType ? selectedTokenType : "Select Token Type"}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="p-0" align="start">
+            <PopoverContent className="p-0" align="start" style={{ width: "var(--radix-popper-anchor-width)" }}>
               <Command>
                 <CommandInput placeholder="Choose token type..." />
                 <CommandList>
@@ -128,7 +128,9 @@ const IndexAddToken = ({ handleCallbacks }) => {
                             tokenTypes.find((priority) => priority === value) || null
                           )
                           setOpenTokenType(false)
-                        }}>
+                        }}
+                        className="cursor-pointer hover:bg-accent"
+                      >
                         {tokenType}
                       </CommandItem>
                     ))}
