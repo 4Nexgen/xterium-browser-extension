@@ -125,6 +125,8 @@ const IndexBalance = () => {
   }
 
   const getBalances = () => {
+    console.log("Fetching balances for wallet:", selectedWallet);
+
     if (balances.length > 0) {
       const zeroOutBalances = balances.map((existingBalance) => {
         let zeroBalance: BalanceModel = {
@@ -142,6 +144,7 @@ const IndexBalance = () => {
 
     if (selectedWallet != null) {
       balanceService.getBalances(selectedWallet.public_key).then((data) => {
+        console.log("Fetched balance data:", data);
         if (data.length > 0) {
           if (balances.length > 0) {
             const updatedBalances = balances.map((existingBalance) => {
@@ -167,8 +170,18 @@ const IndexBalance = () => {
           }
         }
       })
+      .catch((error) => {
+        console.error("Error fetching balances:", error);
+        setBalances([]); 
+      });
     }
   }
+
+  useEffect(() => {
+    if (selectedWallet) {
+      getBalances();
+    }
+  }, [selectedWallet]);
 
   useEffect(() => {
     getNetwork()
@@ -215,7 +228,7 @@ const IndexBalance = () => {
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="p-0" align="start">
+              <PopoverContent className="p-0" align="start" style={{ width: "var(--radix-popper-anchor-width)" }}>
                 <Command>
                   <CommandInput placeholder="Choose wallet" />
                   <CommandList>
@@ -231,7 +244,6 @@ const IndexBalance = () => {
                                 null
                             )
                             setOpenWallets(false)
-                            getBalances()
                           }}>
                           {wallet ? (
                             <>
