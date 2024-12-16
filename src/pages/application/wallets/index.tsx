@@ -66,9 +66,26 @@ const IndexWallet = () => {
     setIsAddWalletDrawerOpen(true)
   }
 
+  const expandView = () => {
+    const extensionId = chrome.runtime.id
+    const url = `chrome-extension://${extensionId}/popup.html#import`
+    window.open(url, "_blank")
+  }
+
   const importWallet = () => {
     setIsImportWalletDrawerOpen(true)
   }
+
+  const handleButtonClick = () => {
+    expandView()
+    importWallet()
+  }
+
+  useEffect(() => {
+    if (window.location.hash === "#import") {
+      setIsImportWalletDrawerOpen(true)
+    }
+  }, [])
 
   const copyWallet = (value: string) => {
     navigator.clipboard
@@ -137,13 +154,9 @@ const IndexWallet = () => {
                             <div className="mb-[2px]">
                               <span className="text-lg font-bold">{address.name}</span>
                             </div>
-                            <span>
-                              {address.public_key.slice(0, 6)}
-                            </span>
+                            <span>{address.public_key.slice(0, 6)}</span>
                             <span>...</span>
-                            <span>
-                              {address.public_key.slice(-4)}
-                            </span>
+                            <span>{address.public_key.slice(-4)}</span>
                           </TableCell>
                           <TableCell className="w-[40px] justify-center text-center">
                             <TooltipProvider>
@@ -209,12 +222,12 @@ const IndexWallet = () => {
             </div>
           )}
         </div>
-        
+
         <div className="flex flex-row space-x-2">
           <Button variant="jelly" className="my-auto" onClick={addWallet}>
             ADD WALLET
           </Button>
-          <Button variant="jelly" className="my-auto" onClick={importWallet}>
+          <Button variant="jelly" className="my-auto" onClick={handleButtonClick}>
             IMPORT WALLET
           </Button>
         </div>
@@ -228,7 +241,9 @@ const IndexWallet = () => {
           </DrawerContent>
         </Drawer>
 
-        <Drawer open={isImportWalletDrawerOpen} onOpenChange={setIsImportWalletDrawerOpen}>
+        <Drawer
+          open={isImportWalletDrawerOpen}
+          onOpenChange={setIsImportWalletDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
               <DrawerTitle>IMPORT WALLET</DrawerTitle>
