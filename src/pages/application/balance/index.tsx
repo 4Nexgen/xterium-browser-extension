@@ -23,6 +23,7 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import { TokenData, TokenImages } from "@/data/token.data"
 import { BalanceModel } from "@/models/balance.model"
 import type { NetworkModel } from "@/models/network.model.js"
+import type { TokenModel } from "@/models/token.model"
 import { WalletModel } from "@/models/wallet.model"
 import { BalanceServices } from "@/services/balance.service"
 import { NetworkService } from "@/services/network.service.js"
@@ -44,6 +45,9 @@ const IndexBalance = () => {
   const [wallets, setWallets] = useState<WalletModel[]>([])
   const [selectedWallet, setSelectedWallet] = useState<WalletModel>(null)
   const [balances, setBalances] = useState<BalanceModel[]>([])
+  const [balancePerToken, setBalancePerToken] = useState({})
+  const [loadingPerToken, setLoadingPerToken] = useState({})
+
   const [isTokenDetailDrawerOpen, setIsTokenDetailDrawerOpen] = useState(false)
   const [selectedBalance, setSelectedBalance] = useState<BalanceModel>(null)
 
@@ -53,34 +57,29 @@ const IndexBalance = () => {
     })
   }
 
+  useEffect(() => {
+    getNetwork()
+  }, [])
+
   const getWallets = () => {
     walletService.getWallets().then((data) => {
       setWallets(data)
-
-      setTimeout(() => {
-        getTokens()
-      }, 100)
     })
   }
 
   const preloadTokens = () => {
-    tokenService.getTokens().then((data) => {
+    tokenService.getTokens().then(async (data) => {
       let preloadedTokenData = TokenData
       if (preloadedTokenData.length > 0) {
         for (let i = 0; i < preloadedTokenData.length; i++) {
-          let existingToken = data.filter(
-            (d) => d.symbol == preloadedTokenData[i].symbol
-          )[0]
-
+          let existingToken = data.filter((d) => d.id == preloadedTokenData[i].id)[0]
           if (existingToken == null) {
-            tokenService.createToken(preloadedTokenData[i])
+            await tokenService.createToken(preloadedTokenData[i])
           }
         }
       }
 
-      setTimeout(() => {
-        preloadEmptyBalances()
-      }, 100)
+      preloadEmptyBalances()
     })
   }
 
@@ -103,10 +102,6 @@ const IndexBalance = () => {
       }
 
       setBalances(emptyBalances)
-
-      setTimeout(() => {
-        getBalances()
-      }, 100)
     })
   }
 
@@ -119,14 +114,21 @@ const IndexBalance = () => {
     return tokenImages.getBase64Image(imageName)
   }
 
+  useEffect(() => {
+    getWallets()
+    getTokens()
+
+    if (wallets.length > 0) {
+      setSelectedWallet(wallets[0])
+    }
+  }, [selectedNetwork])
+
   const fixBalance = (value: string, decimal: number) => {
     const multiplier = 10 ** decimal
     return parseFloat(value) / multiplier
   }
 
-  const getBalances = () => {
-    console.log("Fetching balances for wallet:", selectedWallet);
-
+  const zeroOutBalances = () => {
     if (balances.length > 0) {
       const zeroOutBalances = balances.map((existingBalance) => {
         let zeroBalance: BalanceModel = {
@@ -141,55 +143,99 @@ const IndexBalance = () => {
 
       setBalances(zeroOutBalances)
     }
+  }
+
+  const getBalances = async () => {
+    zeroOutBalances()
 
     if (selectedWallet != null) {
-      balanceService.getBalances(selectedWallet.public_key).then((data) => {
-        console.log("Fetched balance data:", data);
-        if (data.length > 0) {
-          if (balances.length > 0) {
-            const updatedBalances = balances.map((existingBalance) => {
-              const match = data.find(
-                (data) => data.token.symbol === existingBalance.token.symbol
-              )
-
-              if (match) {
-                let updatedBalance: BalanceModel = {
-                  ...existingBalance,
-                  freeBalance: fixBalance(match.freeBalance.toString(), 12),
-                  reservedBalance: fixBalance(match.reservedBalance.toString(), 12),
-                  is_frozen: match.is_frozen
-                }
-
-                return updatedBalance
-              }
-
-              return existingBalance
-            })
-
-            setBalances(updatedBalances)
-          }
-        }
+      const sortedBalances = balances.sort((a, b) => {
+        if (a.token.id < b.token.id) return -1
+        if (a.token.id > b.token.id) return 1
+        return 0
       })
-      .catch((error) => {
-        console.error("Error fetching balances:", error);
-        setBalances([]); 
-      });
+
+      const balancePromises = sortedBalances.map(async (balance) => {
+        const updatedBalance = await getBalancePerToken(balance.token)
+
+        getBalancePerToken(balance.token)
+        setBalances((prevBalances) =>
+          prevBalances.map((prevBalance) =>
+            prevBalance.token.id === updatedBalance.token.id
+              ? {
+                  ...prevBalance,
+                  freeBalance: fixBalance(updatedBalance.freeBalance.toString(), 12),
+                  reservedBalance: fixBalance(
+                    updatedBalance.reservedBalance.toString(),
+                    12
+                  )
+                }
+              : prevBalance
+          )
+        )
+      })
+
+      await Promise.all(balancePromises)
+    }
+  }
+
+  const getBalancePerToken = async (token: TokenModel): Promise<BalanceModel> => {
+    setLoadingPerToken((prevLoadingPerToken) => ({
+      ...prevLoadingPerToken,
+      [token.symbol]: true
+    }))
+
+    try {
+      const data = await balanceService.getBalancePerToken(
+        selectedWallet.public_key,
+        token
+      )
+
+      setBalancePerToken((prevBalancePerToken) => ({
+        ...prevBalancePerToken,
+        [token.symbol]: data.freeBalance
+      }))
+
+      setLoadingPerToken((prevLoadingToken) => ({
+        ...prevLoadingToken,
+        [token.symbol]: false
+      }))
+
+      const newBalance: BalanceModel = {
+        token,
+        freeBalance: data.freeBalance,
+        reservedBalance: data.reservedBalance,
+        is_frozen: data.is_frozen,
+        owner: selectedWallet.public_key
+      }
+
+      return newBalance
+    } catch (error) {
+      setBalancePerToken((prevBalancePerToken) => ({
+        ...prevBalancePerToken,
+        [token.symbol]: "Error"
+      }))
+
+      setLoadingPerToken((prevLoadingToken) => ({
+        ...prevLoadingToken,
+        [token.symbol]: false
+      }))
+
+      const zeroBalance: BalanceModel = {
+        token,
+        freeBalance: 0,
+        reservedBalance: 0,
+        is_frozen: false,
+        owner: selectedWallet.public_key
+      }
+
+      return zeroBalance
     }
   }
 
   useEffect(() => {
-    if (selectedWallet) {
-      getBalances();
-    }
-  }, [selectedWallet]);
-
-  useEffect(() => {
-    getNetwork()
-
-    setTimeout(() => {
-      getWallets()
-    }, 100)
-  }, [])
+    getBalances()
+  }, [selectedWallet])
 
   const selectBalance = (data: BalanceModel) => {
     setIsTokenDetailDrawerOpen(true)
@@ -228,7 +274,10 @@ const IndexBalance = () => {
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="p-0" align="start" style={{ width: "var(--radix-popper-anchor-width)" }}>
+              <PopoverContent
+                className="p-0"
+                align="start"
+                style={{ width: "var(--radix-popper-anchor-width)" }}>
                 <Command>
                   <CommandInput placeholder="Choose wallet" />
                   <CommandList>
@@ -239,10 +288,7 @@ const IndexBalance = () => {
                           key={wallet.public_key}
                           value={wallet.public_key}
                           onSelect={(value) => {
-                            setSelectedWallet(
-                              wallets.find((priority) => priority.public_key === value) ||
-                                null
-                            )
+                            setSelectedWallet(wallet)
                             setOpenWallets(false)
                           }}>
                           {wallet ? (
@@ -303,7 +349,16 @@ const IndexBalance = () => {
                       </TableCell>
                       <TableCell className="w-[50px] justify-end pr-2 text-right">
                         <span className="text-lg font-bold text-purple">
-                          {balance.freeBalance}
+                          {loadingPerToken[balance.token.symbol] ? (
+                            <span className="text-sm font-normal">Loading...</span>
+                          ) : balancePerToken[balance.token.symbol] ? (
+                            fixBalance(
+                              balancePerToken[balance.token.symbol].toString(),
+                              12
+                            )
+                          ) : (
+                            0
+                          )}
                         </span>
                       </TableCell>
                     </TableRow>

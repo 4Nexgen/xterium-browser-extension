@@ -51,7 +51,7 @@ const IndexTokens = () => {
   const preloadTokens = () => {
     let tokenList: any[] = []
 
-    tokenService.getTokens().then((data) => {
+    tokenService.getTokens().then(async (data) => {
       let preloadedTokenData = TokenData
       if (preloadedTokenData.length > 0) {
         for (let i = 0; i < preloadedTokenData.length; i++) {
@@ -62,7 +62,7 @@ const IndexTokens = () => {
           if (existingToken != null) {
             tokenList.push({ ...existingToken, preloaded: true })
           } else {
-            tokenService.createToken(preloadedTokenData[i])
+            await tokenService.createToken(preloadedTokenData[i])
             tokenList.push({ ...preloadedTokenData[i], preloaded: true })
           }
         }
