@@ -18,7 +18,7 @@ export const TokenData: TokenModel[] = [
     description: "Native XON Token"
   },
   {
-    id: 1,
+    id: 2,
     image_url: "XGMLogo",
     type: "Asset",
     network: "Xode",
@@ -27,7 +27,7 @@ export const TokenData: TokenModel[] = [
     description: "XGame Utility Token"
   },
   {
-    id: 1,
+    id: 3,
     image_url: "XAVLogo",
     type: "Asset",
     network: "Xode",
@@ -36,7 +36,7 @@ export const TokenData: TokenModel[] = [
     description: "Xaver Utility Token"
   },
   {
-    id: 1,
+    id: 4,
     image_url: "AZKLogo",
     type: "Asset",
     network: "Xode",
@@ -45,7 +45,7 @@ export const TokenData: TokenModel[] = [
     description: "Azkal Meme Token"
   },
   {
-    id: 1,
+    id: 5,
     image_url: "IXONLogo",
     type: "Asset",
     network: "Xode",
@@ -54,7 +54,7 @@ export const TokenData: TokenModel[] = [
     description: "Private XON Token"
   },
   {
-    id: 1,
+    id: 6,
     image_url: "IXAVLogo",
     type: "Asset",
     network: "Xode",
