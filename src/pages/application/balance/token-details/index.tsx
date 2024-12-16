@@ -26,6 +26,8 @@ const IndexTokenDetails = ({ selectedBalance }) => {
     return isNaN(parsedBalance) ? "0.00" : parsedBalance.toFixed(2)
   }
 
+  const transferInProgress = () => {}
+
   return (
     <>
       <Label className="mt-4 tracking-[0.15em] font-semibold text-sm text-center">
@@ -72,7 +74,10 @@ const IndexTokenDetails = ({ selectedBalance }) => {
           <DrawerHeader>
             <DrawerTitle className="text-center text-purple">TRANSFER</DrawerTitle>
           </DrawerHeader>
-          <IndexTransfer selectedBalance={selectedBalance} />
+          <IndexTransfer
+            selectedBalance={selectedBalance}
+            handleCallbacks={transferInProgress}
+          />
         </DrawerContent>
       </Drawer>
     </>

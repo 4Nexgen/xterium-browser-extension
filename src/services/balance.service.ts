@@ -53,8 +53,9 @@ export class BalanceServices {
         }
 
         if (token.type === "Asset") {
-          const assetAccount = await this.api.query.assets.account(token.network_id, public_key);
-          const assetMetadata = await this.api.query.assets.metadata(token.network_id);
+          const queryAssets = this.api.query.assets
+          const assetAccount = await queryAssets.account(token.network_id, public_key);
+          const assetMetadata = await queryAssets.metadata(token.network_id);
 
           const metadata = assetMetadata?.toHuman() as { [key: string]: any };
           is_frozen = metadata?.is_frozen || false;
@@ -85,15 +86,29 @@ export class BalanceServices {
       try {
         await this.connect()
 
-        const info = await this.api.tx.balances['transfer'](recipient, value).paymentInfo(owner);
+        if (balance.token.type == "Native") {
+          const info = await this.api.tx.balances.transfer(recipient, value).paymentInfo(owner);
 
-        const substrateFee: SubstrateFeeModel = {
-          feeClass: info.class.toString(),
-          weight: info.weight.toString(),
-          partialFee: info.partialFee.toString(),
-        };
+          const substrateFee: SubstrateFeeModel = {
+            feeClass: info.class.toString(),
+            weight: info.weight.toString(),
+            partialFee: info.partialFee.toString(),
+          };
 
-        resolve(substrateFee);
+          resolve(substrateFee);
+        }
+
+        if (balance.token.type == "Asset") {
+          const info = await this.api.tx.assets.transfer(balance.token.network_id, recipient, value).paymentInfo(owner);
+
+          const substrateFee: SubstrateFeeModel = {
+            feeClass: info.class.toString(),
+            weight: info.weight.toString(),
+            partialFee: info.partialFee.toString(),
+          };
+
+          resolve(substrateFee);
+        }
       } catch (error) {
         reject(error);
       }
@@ -103,36 +118,41 @@ export class BalanceServices {
   async transfer(owner: string, value: number, recipient: string, password: string): Promise<any> {
     return new Promise(async (resolve, reject) => {
       try {
-        await this.connect()
+        await this.connect();
 
-        this.walletService.getWallets().then(async (data) => {
-          if (data.length > 0) {
-            for (let i = 0; i < data.length; i++) {
-              let wallet = data[i]
+        const wallets = await this.walletService.getWallets();
+        if (wallets.length === 0) {
+          return reject("No wallets available");
+        }
 
-              if (owner == wallet.public_key) {
-                const decryptedMnemonicPhrase = this.encryptionService.decrypt(password, wallet.mnemonic_phrase);
+        for (const wallet of wallets) {
+          if (owner === wallet.public_key) {
+            try {
+              const decryptedMnemonicPhrase = this.encryptionService.decrypt(password, wallet.mnemonic_phrase);
 
-                const keyring = new Keyring({ type: 'sr25519' });
-                const signature = keyring.addFromUri(decryptedMnemonicPhrase);
+              const keyring = new Keyring({ type: 'sr25519' });
+              const signature = keyring.addFromUri(decryptedMnemonicPhrase);
 
-                await this.api.tx.balances
-                  .transferAllowDeath(recipient, value)
-                  .signAndSend(signature, (result) => {
-                    if (result.status.isFinalized) {
-                      resolve(true);
-                    }
-                  })
+              await this.api.tx.balances
+                .transferAllowDeath(recipient, value)
+                .signAndSend(signature, (result) => {
+                  if (result.status.isFinalized) {
+                    resolve(true);
+                  } else if (result.isError) {
+                    reject("Transaction failed");
+                  }
+                });
 
-                break;
-              }
+              return;
+            } catch (error) {
+              return reject(`Error during transaction: ${error.message}`);
             }
           }
-        })
+        }
 
         reject("No valid wallet found");
       } catch (error) {
-        reject(error);
+        reject(`Unexpected error: ${error.message}`);
       }
     });
   }
@@ -140,36 +160,41 @@ export class BalanceServices {
   async transferAssets(owner: string, assetId: number, value: number, recipient: string, password: string): Promise<any> {
     return new Promise(async (resolve, reject) => {
       try {
-        await this.connect()
+        await this.connect();
 
-        this.walletService.getWallets().then(async (data) => {
-          if (data.length > 0) {
-            for (let i = 0; i < data.length; i++) {
-              let wallet = data[i]
+        const wallets = await this.walletService.getWallets();
+        if (wallets.length === 0) {
+          return reject("No wallets available");
+        }
 
-              if (owner == wallet.public_key) {
-                const decryptedMnemonicPhrase = this.encryptionService.decrypt(password, wallet.mnemonic_phrase);
+        for (const wallet of wallets) {
+          if (owner === wallet.public_key) {
+            try {
+              const decryptedMnemonicPhrase = this.encryptionService.decrypt(password, wallet.mnemonic_phrase);
 
-                const keyring = new Keyring({ type: 'sr25519' });
-                const signature = keyring.addFromUri(decryptedMnemonicPhrase);
+              const keyring = new Keyring({ type: 'sr25519' });
+              const signature = keyring.addFromUri(decryptedMnemonicPhrase);
 
-                await this.api.tx.assets
-                  .transfer(assetId, recipient, value)
-                  .signAndSend(signature, (transferResult) => {
-                    if (transferResult.status.isFinalized) {
-                      resolve("Transfer Successful!");
-                    }
-                  });
+              await this.api.tx.assets
+                .transfer(assetId, recipient, value)
+                .signAndSend(signature, (result) => {
+                  if (result.status.isFinalized) {
+                    resolve(true);
+                  } else if (result.isError) {
+                    reject("Transaction failed");
+                  }
+                });
 
-                break;
-              }
+              return;
+            } catch (error) {
+              return reject(`Error during transaction: ${error.message}`);
             }
           }
-        })
+        }
 
         reject("No valid wallet found");
       } catch (error) {
-        reject(error);
+        reject(`Unexpected error: ${error.message}`);
       }
     });
   }
