@@ -19,7 +19,7 @@ import React, { useEffect, useState } from "react"
 import IndexAddWallet from "./addWallet.tsx"
 import IndexDeleteWallet from "./deleteWallet"
 import IndexExportWallet from "./exportWallet"
-import IndexImportWallet from "./importWallet/index.jsx"
+import IndexImportWallet from "./importWallet"
 
 const IndexWallet = () => {
   const networkService = new NetworkService()
@@ -66,26 +66,9 @@ const IndexWallet = () => {
     setIsAddWalletDrawerOpen(true)
   }
 
-  const expandView = () => {
-    const extensionId = chrome.runtime.id
-    const url = `chrome-extension://${extensionId}/popup.html#import`
-    window.open(url, "_blank")
-  }
-
   const importWallet = () => {
     setIsImportWalletDrawerOpen(true)
   }
-
-  const handleButtonClick = () => {
-    expandView()
-    importWallet()
-  }
-
-  useEffect(() => {
-    if (window.location.hash === "#import") {
-      setIsImportWalletDrawerOpen(true)
-    }
-  }, [])
 
   const copyWallet = (value: string) => {
     navigator.clipboard
@@ -227,7 +210,7 @@ const IndexWallet = () => {
           <Button variant="jelly" className="my-auto" onClick={addWallet}>
             ADD WALLET
           </Button>
-          <Button variant="jelly" className="my-auto" onClick={handleButtonClick}>
+          <Button variant="jelly" className="my-auto" onClick={importWallet}>
             IMPORT WALLET
           </Button>
         </div>

@@ -9,8 +9,8 @@ import { u8aToHex } from "@polkadot/util"
 import {
   cryptoWaitReady,
   encodeAddress,
-  mnemonicValidate,
   mnemonicToMiniSecret,
+  mnemonicValidate,
   sr25519PairFromSeed
 } from "@polkadot/util-crypto"
 import { Check, X } from "lucide-react"
@@ -128,7 +128,7 @@ const IndexImportWallet = ({ handleCallbacks }) => {
       })
       return
     }
-    setIsInputPasswordDrawerOpen(true) 
+    setIsInputPasswordDrawerOpen(true)
   }
 
   const saveWithPassword = () => {

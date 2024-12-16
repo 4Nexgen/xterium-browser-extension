@@ -84,7 +84,8 @@ const IndexAddWallet = ({ handleCallbacks }) => {
       handleInputChange("mnemonic_phrase", mnemonicInput)
       createKeys(mnemonicInput)
     } else {
-      console.error("Invalid mnemonic input.")
+      handleInputChange("secret_key", "")
+      handleInputChange("public_key", "")
     }
   }
 
