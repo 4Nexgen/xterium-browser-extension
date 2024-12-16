@@ -251,6 +251,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
               </DropdownMenu>
             </SidebarMenuItem>
           </SidebarMenu>
+          <p className="text-xs opacity-50 text-right px-2">Xterium v.0.2.0 (Beta)</p>
         </SidebarFooter>
       </Sidebar>
 
