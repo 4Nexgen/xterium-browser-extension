@@ -13,7 +13,7 @@ import React, { useState } from "react"
 
 import IndexTransfer from "./transfer"
 
-const IndexTokenDetails = ({ selectedBalance }) => {
+const IndexTokenDetails = ({ selectedBalance, handleCallbacks }) => {
   const [balanceData, setBalanceData] = useState<BalanceModel>(selectedBalance)
   const [isTransferDrawerOpen, setIsTransferDrawerOpen] = useState(false)
 
@@ -26,7 +26,10 @@ const IndexTokenDetails = ({ selectedBalance }) => {
     return isNaN(parsedBalance) ? "0.00" : parsedBalance.toFixed(2)
   }
 
-  const transferInProgress = () => {}
+  const transferComplete = () => {
+    setIsTransferDrawerOpen(false)
+    handleCallbacks()
+  }
 
   return (
     <>
@@ -76,7 +79,7 @@ const IndexTokenDetails = ({ selectedBalance }) => {
           </DrawerHeader>
           <IndexTransfer
             selectedBalance={selectedBalance}
-            handleCallbacks={transferInProgress}
+            handleCallbacks={transferComplete}
           />
         </DrawerContent>
       </Drawer>

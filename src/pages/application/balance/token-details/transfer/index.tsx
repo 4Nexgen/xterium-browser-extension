@@ -226,22 +226,27 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
 
       <Drawer
         open={isInputPasswordDrawerOpen}
-        onOpenChange={setIsInputPasswordDrawerOpen}>
+        onOpenChange={setIsInputPasswordDrawerOpen}
+        dismissible={!isTransferInProgress}>
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>SEND {balanceData.token.symbol}</DrawerTitle>
           </DrawerHeader>
           <div className="p-6">
             <div className="mb-8">
-              <Label className="font-bold pb-2">Partial Fee:</Label>
-              <Input
-                value={partialFee.toString()}
-                className="text-lg"
-                readOnly
-              />
+              <Label className="pb-2">
+                Fees of
+                <span className="p-2 font-extrabold text-input-primary">
+                  {partialFee.toString()} XON
+                </span>
+                will be applied to the submission
+              </Label>
+              <hr className="mt-4" />
             </div>
             <div className="mb-8">
-              <Label className="font-bold pb-2">Enter your password:</Label>
+              <Label className="font-bold pb-2">
+                Please enter your password to confirm:
+              </Label>
               <Input
                 type="password"
                 placeholder="********"

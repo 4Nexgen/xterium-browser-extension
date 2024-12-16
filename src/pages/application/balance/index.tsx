@@ -237,10 +237,10 @@ const IndexBalance = () => {
   useEffect(() => {
     const matchingWallet = wallets.find(
       (wallet) => wallet.address_type === selectedNetwork?.name
-    );
+    )
 
-    setSelectedWallet(matchingWallet || null); 
-  }, [selectedNetwork, wallets]);
+    setSelectedWallet(matchingWallet || null)
+  }, [selectedNetwork, wallets])
 
   useEffect(() => {
     getBalances()
@@ -254,6 +254,11 @@ const IndexBalance = () => {
     }
 
     setSelectedBalance(data)
+  }
+
+  const transferComplete = () => {
+    setIsTokenDetailDrawerOpen(false)
+    getBalances()
   }
 
   return (
@@ -299,36 +304,37 @@ const IndexBalance = () => {
                             (selectedNetwork ? selectedNetwork.name : "")
                         )
                         .map((wallet) => (
-                        <CommandItem
-                          key={wallet.public_key}
-                          value={wallet.public_key}
-                          onSelect={(value) => {
-                            setSelectedWallet(wallet)
-                            setOpenWallets(false)
-                          }}
-                          className="cursor-pointer hover:bg-accent"
-                        >
-                          {wallet ? (
-                            <>
-                              {wallet.name} &nbsp;
-                              {"("}
-                              {wallet.public_key.slice(0, 6)}...
-                              {wallet.public_key.slice(-6)}
-                              {")"}
-                            </>
-                          ) : (
-                            "Select address"
-                          )}
-                        </CommandItem>
-                      ))}
+                          <CommandItem
+                            key={wallet.public_key}
+                            value={wallet.public_key}
+                            onSelect={(value) => {
+                              setSelectedWallet(wallet)
+                              setOpenWallets(false)
+                            }}
+                            className="cursor-pointer hover:bg-accent">
+                            {wallet ? (
+                              <>
+                                {wallet.name} &nbsp;
+                                {"("}
+                                {wallet.public_key.slice(0, 6)}...
+                                {wallet.public_key.slice(-6)}
+                                {")"}
+                              </>
+                            ) : (
+                              "Select address"
+                            )}
+                          </CommandItem>
+                        ))}
                     </CommandGroup>
                   </CommandList>
                 </Command>
               </PopoverContent>
             </Popover>
           </div>
-          {balances?.filter((item) => item.token.network == (selectedNetwork != null ? selectedNetwork.name : ""))
-            ?.length ? (
+          {balances?.filter(
+            (item) =>
+              item.token.network == (selectedNetwork != null ? selectedNetwork.name : "")
+          )?.length ? (
             <>
               <Card className="mb-3">
                 <Table>
@@ -409,7 +415,10 @@ const IndexBalance = () => {
                         </DrawerTitle>
                       </div>
                     </DrawerHeader>
-                    <IndexTokenDetails selectedBalance={selectedBalance} />
+                    <IndexTokenDetails
+                      selectedBalance={selectedBalance}
+                      handleCallbacks={transferComplete}
+                    />
                   </DrawerContent>
                 </Drawer>
               </Card>
