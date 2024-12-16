@@ -7,6 +7,7 @@ import { UserService } from "@/services/user.service"
 import { WalletService } from "@/services/wallet.service"
 import { Eye, EyeOff, X } from "lucide-react"
 import React, { useState } from "react"
+import CryptoJS from "crypto-js" 
 
 const IndexExportWallet = ({ selectedWallet, handleCallbacks }) => {
   const userService = new UserService()
@@ -21,22 +22,49 @@ const IndexExportWallet = ({ selectedWallet, handleCallbacks }) => {
     setShowPassword(!showPassword)
   }
 
+  const decryptData = (encryptedData, password) => {
+    try {
+      const decrypted = CryptoJS.AES.decrypt(encryptedData, password).toString(CryptoJS.enc.Utf8)
+      if (!decrypted) throw new Error("Decryption failed")
+      return decrypted
+    } catch (error) {
+      console.error("Decryption error:", error)
+      return null
+    }
+  }
+
   const exportWallet = () => {
     userService.login(inputedPassword).then((isValid) => {
-      if (isValid == true) {
+      if (isValid) {
         let walletService = new WalletService()
         walletService.getWalletById(walletData.id).then((result) => {
+          const decryptedMnemonic = decryptData(result.mnemonic_phrase, inputedPassword)
+          const decryptedSecretKey = decryptData(result.secret_key, inputedPassword)
+
+          if (!decryptedMnemonic || !decryptedSecretKey) {
+            toast({
+              description: (
+                <div className="flex items-center">
+                  <X className="mr-2 text-white-500" />
+                  Failed to decrypt wallet data. Please check your password.
+                </div>
+              ),
+              variant: "destructive",
+            })
+            return
+          }
+
           const exportedWalletData: WalletModel = {
             id: result.id,
             name: result.name,
             address_type: result.address_type,
-            mnemonic_phrase: result.mnemonic_phrase,
-            secret_key: result.secret_key,
-            public_key: result.public_key
+            mnemonic_phrase: decryptedMnemonic,
+            secret_key: decryptedSecretKey,
+            public_key: result.public_key,
           }
 
           const jsonBlob = new Blob([JSON.stringify(exportedWalletData)], {
-            type: "application/json"
+            type: "application/json",
           })
           const url = URL.createObjectURL(jsonBlob)
           const a = document.createElement("a")
@@ -57,7 +85,7 @@ const IndexExportWallet = ({ selectedWallet, handleCallbacks }) => {
               Invalid Password!
             </div>
           ),
-          variant: "destructive"
+          variant: "destructive",
         })
       }
     })
