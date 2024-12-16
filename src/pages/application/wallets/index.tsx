@@ -71,15 +71,18 @@ const IndexWallet = () => {
   }
 
   const expandView = () => {
-    const extensionId = chrome.runtime.id
-    const url = `chrome-extension://${extensionId}/popup.html#import`
-    window.open(url, "_blank")
-  }
-
+    const extensionId = chrome.runtime.id;
+    const url = `chrome-extension://${extensionId}/popup.html#import`;
+    
+    if (window.location.href !== url) {
+      window.open(url, "_blank");
+    }
+  };
+  
   const importWallet = () => {
-    expandView()
-    setIsImportWalletDrawerOpen(true)
-  }
+    expandView();
+    setIsImportWalletDrawerOpen(true);
+  };
 
   const copyWallet = (value: string) => {
     navigator.clipboard
