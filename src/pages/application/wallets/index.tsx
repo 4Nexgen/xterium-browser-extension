@@ -19,6 +19,7 @@ import React, { useEffect, useState } from "react"
 import IndexAddWallet from "./addWallet.tsx"
 import IndexDeleteWallet from "./deleteWallet"
 import IndexExportWallet from "./exportWallet"
+import IndexImportWallet from "./importWallet/index.jsx"
 
 const IndexWallet = () => {
   const networkService = new NetworkService()
@@ -37,6 +38,7 @@ const IndexWallet = () => {
   const [isAddWalletDrawerOpen, setIsAddWalletDrawerOpen] = useState(false)
   const [isExportWalletDrawerOpen, setIsExportWalletDrawerOpen] = useState(false)
   const [isDeleteWalletDrawerOpen, setIsDeleteWalletDrawerOpen] = useState(false)
+  const [isImportWalletDrawerOpen, setIsImportWalletDrawerOpen] = useState(false)
 
   const { toast } = useToast()
 
@@ -62,6 +64,10 @@ const IndexWallet = () => {
 
   const addWallet = () => {
     setIsAddWalletDrawerOpen(true)
+  }
+
+  const importWallet = () => {
+    setIsImportWalletDrawerOpen(true)
   }
 
   const copyWallet = (value: string) => {
@@ -100,6 +106,7 @@ const IndexWallet = () => {
     setIsAddWalletDrawerOpen(false)
     setIsExportWalletDrawerOpen(false)
     setIsDeleteWalletDrawerOpen(false)
+    setIsImportWalletDrawerOpen(false)
 
     setTimeout(() => {
       getWallets()
@@ -202,10 +209,15 @@ const IndexWallet = () => {
             </div>
           )}
         </div>
-
-        <Button variant="jelly" className="my-auto" onClick={addWallet}>
-          ADD WALLET
-        </Button>
+        
+        <div className="flex flex-row space-x-2">
+          <Button variant="jelly" className="my-auto" onClick={addWallet}>
+            ADD WALLET
+          </Button>
+          <Button variant="jelly" className="my-auto" onClick={importWallet}>
+            IMPORT WALLET
+          </Button>
+        </div>
 
         <Drawer open={isAddWalletDrawerOpen} onOpenChange={setIsAddWalletDrawerOpen}>
           <DrawerContent>
@@ -213,6 +225,15 @@ const IndexWallet = () => {
               <DrawerTitle>ADD NEW WALLET</DrawerTitle>
             </DrawerHeader>
             <IndexAddWallet handleCallbacks={callbackUpdates} />
+          </DrawerContent>
+        </Drawer>
+
+        <Drawer open={isImportWalletDrawerOpen} onOpenChange={setIsImportWalletDrawerOpen}>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>IMPORT WALLET</DrawerTitle>
+            </DrawerHeader>
+            <IndexImportWallet handleCallbacks={callbackUpdates} />
           </DrawerContent>
         </Drawer>
 
