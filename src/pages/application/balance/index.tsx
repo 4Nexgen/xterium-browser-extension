@@ -29,6 +29,7 @@ import { BalanceServices } from "@/services/balance.service"
 import { NetworkService } from "@/services/network.service.js"
 import { TokenService } from "@/services/token.service"
 import { WalletService } from "@/services/wallet.service"
+import { Coins } from "lucide-react"
 import Image from "next/image"
 import React, { useEffect, useState } from "react"
 
@@ -310,88 +311,101 @@ const IndexBalance = () => {
               </PopoverContent>
             </Popover>
           </div>
+          {balances?.filter((item) => item.token.network == selectedNetwork.name)
+            ?.length ? (
+            <>
+              <Card className="mb-3">
+                <Table>
+                  <TableBody>
+                    {balances
+                      .filter(
+                        (balance) =>
+                          balance.token.network ===
+                          (selectedNetwork ? selectedNetwork.name : "")
+                      )
+                      .sort((a, b) => {
+                        if (a.token.type === "Native" && b.token.type !== "Native")
+                          return -1
+                        if (a.token.type !== "Native" && b.token.type === "Native")
+                          return 1
+                        return 0
+                      })
+                      .map((balance) => (
+                        <TableRow
+                          key={balance.token.symbol}
+                          onClick={() => selectBalance(balance)}
+                          className="cursor-pointer hover-bg-custom">
+                          <TableCell className="w-[50px] justify-center">
+                            <Image
+                              src={getTokenImage(balance.token.image_url)}
+                              width={40}
+                              height={40}
+                              alt={balance.token.symbol}
+                              className="ml-1"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <div className="mb-[2px]">
+                              <span className="text-lg font-bold">
+                                {balance.token.symbol}
+                              </span>
+                            </div>
+                            <Badge>{balance.token.description}</Badge>
+                          </TableCell>
+                          <TableCell className="w-[50px] justify-end pr-2 text-right">
+                            <span className="text-lg font-bold text-purple">
+                              {loadingPerToken[balance.token.symbol] ? (
+                                <span className="text-sm font-normal">Loading...</span>
+                              ) : balancePerToken[balance.token.symbol] ? (
+                                fixBalance(
+                                  balancePerToken[balance.token.symbol].toString(),
+                                  12
+                                )
+                              ) : (
+                                0
+                              )}
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
 
-          <Card className="mb-3">
-            <Table>
-              <TableBody>
-                {balances
-                  .filter(
-                    (balance) =>
-                      balance.token.network ===
-                      (selectedNetwork ? selectedNetwork.name : "")
-                  )
-                  .sort((a, b) => {
-                    if (a.token.type === "Native" && b.token.type !== "Native") return -1
-                    if (a.token.type !== "Native" && b.token.type === "Native") return 1
-                    return 0
-                  })
-                  .map((balance) => (
-                    <TableRow
-                      key={balance.token.symbol}
-                      onClick={() => selectBalance(balance)}
-                      className="cursor-pointer hover-bg-custom">
-                      <TableCell className="w-[50px] justify-center">
-                        <Image
-                          src={getTokenImage(balance.token.image_url)}
-                          width={40}
-                          height={40}
-                          alt={balance.token.symbol}
-                          className="ml-1"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <div className="mb-[2px]">
-                          <span className="text-lg font-bold">
-                            {balance.token.symbol}
-                          </span>
-                        </div>
-                        <Badge>{balance.token.description}</Badge>
-                      </TableCell>
-                      <TableCell className="w-[50px] justify-end pr-2 text-right">
-                        <span className="text-lg font-bold text-purple">
-                          {loadingPerToken[balance.token.symbol] ? (
-                            <span className="text-sm font-normal">Loading...</span>
-                          ) : balancePerToken[balance.token.symbol] ? (
-                            fixBalance(
-                              balancePerToken[balance.token.symbol].toString(),
-                              12
-                            )
-                          ) : (
-                            0
-                          )}
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-
-            <Drawer
-              open={isTokenDetailDrawerOpen}
-              onOpenChange={setIsTokenDetailDrawerOpen}>
-              <DrawerContent>
-                <DrawerHeader>
-                  <div className="flex justify-center items-center w-full">
-                    {selectedBalance ? (
-                      <Image
-                        src={getTokenImage(selectedBalance.token.image_url)}
-                        alt={selectedBalance.token.symbol}
-                        width={32}
-                        height={32}
-                        className="mr-2"
-                      />
-                    ) : (
-                      <div>No Image</div>
-                    )}
-                    <DrawerTitle>
-                      {selectedBalance ? selectedBalance.token.symbol : ""}
-                    </DrawerTitle>
-                  </div>
-                </DrawerHeader>
-                <IndexTokenDetails selectedBalance={selectedBalance} />
-              </DrawerContent>
-            </Drawer>
-          </Card>
+                <Drawer
+                  open={isTokenDetailDrawerOpen}
+                  onOpenChange={setIsTokenDetailDrawerOpen}>
+                  <DrawerContent>
+                    <DrawerHeader>
+                      <div className="flex justify-center items-center w-full">
+                        {selectedBalance ? (
+                          <Image
+                            src={getTokenImage(selectedBalance.token.image_url)}
+                            alt={selectedBalance.token.symbol}
+                            width={32}
+                            height={32}
+                            className="mr-2"
+                          />
+                        ) : (
+                          <div>No Image</div>
+                        )}
+                        <DrawerTitle>
+                          {selectedBalance ? selectedBalance.token.symbol : ""}
+                        </DrawerTitle>
+                      </div>
+                    </DrawerHeader>
+                    <IndexTokenDetails selectedBalance={selectedBalance} />
+                  </DrawerContent>
+                </Drawer>
+              </Card>
+            </>
+          ) : (
+            <div className="flex flex-col gap-4 items-center py-[100px]">
+              <Coins className="size-20" />
+              <div className="text-center">
+                <h4 className="font-bold text-lg">No Token Found</h4>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>
