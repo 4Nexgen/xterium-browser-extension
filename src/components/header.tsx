@@ -108,7 +108,9 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
               </div>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="p-0 z-[1000]" align="start">
+          <PopoverContent
+            className="p-0 z-[1000] border border-accent rounded-lg"
+            align="start">
             <Command>
               <CommandInput placeholder="Choose network..." />
               <CommandList>
