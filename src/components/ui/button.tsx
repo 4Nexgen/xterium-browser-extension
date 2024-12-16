@@ -19,7 +19,7 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         jelly:
-          "relative w-full py-3 border-4 bg-gradient-to-b from-muted to-primary font-inter tracking-[0.15em] font-bold text-xs rounded-full transition-all duration-300 hover:from-muted hover:to-white dark:text-white",
+          "relative w-full py-3 border-4 bg-gradient-to-b from-muted to-primary font-inter tracking-[0.15em] font-bold text-xs rounded-full transition-all duration-300 hover:from-muted/50 hover:to-primary/50 dark:text-white",
         jellyDestructive:
           "relative w-full py-3 border-4 bg-gradient-to-b from-destructive/60 to-destructive tracking-[0.15em] font-inter font-bold text-xs rounded-full transition-all duration-300 hover:from-destructive hover:to-background",
         variant1: "bg-[var(--variant1-bg)] hover:bg-[var(--variant1-bg)]",
