@@ -79,6 +79,20 @@ const IndexAddWallet = ({ handleCallbacks }) => {
     })
   }
 
+  const inputMnemonic = (mnemonicInput) => {
+    if (mnemonicValidate(mnemonicInput)) {
+      handleInputChange("mnemonic_phrase", mnemonicInput)
+      createKeys(mnemonicInput)
+    } else {
+      console.error("Invalid mnemonic input.")
+    }
+  }
+
+  const onUserInput = (event) => {
+    const mnemonicInput = event.target.value
+    inputMnemonic(mnemonicInput)
+  }
+
   const saveWallet = () => {
     if (
       !walletData.name ||
@@ -175,7 +189,10 @@ const IndexAddWallet = ({ handleCallbacks }) => {
             <textarea
               placeholder="Mnemonic Phrase"
               value={walletData.mnemonic_phrase}
-              onChange={(e) => handleInputChange("mnemonic_phrase", e.target.value)}
+              onChange={(e) => {
+                handleInputChange("mnemonic_phrase", e.target.value)
+                onUserInput(e)
+              }}
               className="w-full p-2 rounded bg-input text-sm font-semibold"
               rows={2}></textarea>
             <Button
