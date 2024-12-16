@@ -137,11 +137,11 @@ const IndexWallet = () => {
                             <div className="mb-[2px]">
                               <span className="text-lg font-bold">{address.name}</span>
                             </div>
-                            <span style={{ color: "#657AA2" }}>
+                            <span>
                               {address.public_key.slice(0, 6)}
                             </span>
-                            <span className="text-gray-500">...</span>
-                            <span style={{ color: "#657AA2" }}>
+                            <span>...</span>
+                            <span>
                               {address.public_key.slice(-4)}
                             </span>
                           </TableCell>
@@ -151,7 +151,7 @@ const IndexWallet = () => {
                                 <TooltipTrigger>
                                   <button
                                     onClick={() => copyWallet(address.public_key)}
-                                    className="w-full h-full flex items-center justify-center text-white">
+                                    className="w-full h-full flex items-center justify-center">
                                     <Copy />
                                   </button>
                                 </TooltipTrigger>
@@ -167,7 +167,7 @@ const IndexWallet = () => {
                                 <TooltipTrigger>
                                   <button
                                     onClick={() => exportWallet(address)}
-                                    className="w-full h-full flex items-center justify-center text-white">
+                                    className="w-full h-full flex items-center justify-center">
                                     <Download />
                                   </button>
                                 </TooltipTrigger>
