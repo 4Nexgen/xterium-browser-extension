@@ -59,6 +59,10 @@ const IndexWallet = () => {
 
     setTimeout(() => {
       getWallets()
+
+      if (window.location.hash === "#import") {
+        setIsImportWalletDrawerOpen(true)
+      }
     }, 100)
   }, [])
 
@@ -66,7 +70,14 @@ const IndexWallet = () => {
     setIsAddWalletDrawerOpen(true)
   }
 
+  const expandView = () => {
+    const extensionId = chrome.runtime.id
+    const url = `chrome-extension://${extensionId}/popup.html#import`
+    window.open(url, "_blank")
+  }
+
   const importWallet = () => {
+    expandView()
     setIsImportWalletDrawerOpen(true)
   }
 
