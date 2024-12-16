@@ -235,6 +235,14 @@ const IndexBalance = () => {
   }
 
   useEffect(() => {
+    const matchingWallet = wallets.find(
+      (wallet) => wallet.address_type === selectedNetwork?.name
+    );
+
+    setSelectedWallet(matchingWallet || null); 
+  }, [selectedNetwork, wallets]);
+
+  useEffect(() => {
     getBalances()
   }, [selectedWallet])
 
@@ -284,7 +292,13 @@ const IndexBalance = () => {
                   <CommandList>
                     <CommandEmpty>No results found.</CommandEmpty>
                     <CommandGroup>
-                      {wallets.map((wallet) => (
+                      {wallets
+                        .filter(
+                          (wallet) =>
+                            wallet.address_type ===
+                            (selectedNetwork ? selectedNetwork.name : "")
+                        )
+                        .map((wallet) => (
                         <CommandItem
                           key={wallet.public_key}
                           value={wallet.public_key}
