@@ -1,7 +1,7 @@
 {
   "name": "xterium-browser-extension",
   "displayName": "Xterium browser extension",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "description": "Xterium Wallet",
   "author": "Xode",
   "scripts": {

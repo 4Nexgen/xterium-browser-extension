@@ -160,9 +160,9 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
             {balanceData.token.network || "N/A"}
           </span>
         </Label>
-        <Label className="pb-2">
+        <Label className="pb-2 flex items-center">
           Owner:
-          <span className="p-2 font-extrabold text-input-primary">
+          <span className="p-2 font-extrabold text-input-primary truncate max-w-full">
             {balanceData.owner || "N/A"}
           </span>
         </Label>
