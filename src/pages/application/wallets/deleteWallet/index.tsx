@@ -34,7 +34,7 @@ const IndexDeleteWallet = ({ selectedWallet, handleCallbacks }) => {
     <>
       <div className="p-6">
         <div className="mb-8">
-          <Label className="text-center tracking-[0.15em] font-semibold leading-2 font-Inter text-base text-white">
+          <Label className="text-center tracking-[0.15em] font-semibold leading-2 font-Inter text-base">
             Are you sure you want to delete <br />
             <span className="text-lg font-bold text-[#B375DC]">
               {walletData.name}
