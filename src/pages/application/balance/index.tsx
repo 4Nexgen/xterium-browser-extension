@@ -89,16 +89,22 @@ const IndexBalance = () => {
 
     tokenService.getTokens().then((data) => {
       if (data.length > 0) {
+        const uniqueTokens = new Set();
+
         for (let i = 0; i < data.length; i++) {
           let token = data[i]
 
-          emptyBalances.push({
-            owner: "",
-            token: token,
-            freeBalance: 0,
-            reservedBalance: 0,
-            is_frozen: false
-          })
+          if (!uniqueTokens.has(token.symbol)) {
+            uniqueTokens.add(token.symbol);
+
+            emptyBalances.push({
+              owner: "",
+              token: token,
+              freeBalance: 0,
+              reservedBalance: 0,
+              is_frozen: false
+            });
+          }
         }
       }
 
