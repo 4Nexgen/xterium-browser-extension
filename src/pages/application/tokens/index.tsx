@@ -110,6 +110,18 @@ const IndexTokens = () => {
   }
 
   const editToken = (data: TokenModel) => {
+    if (data.preloaded) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-red-500" />
+            This token is preloaded and cannot be edited!
+          </div>
+        ),
+        variant: "default"
+      })
+      return
+    }
     setIsEditTokenDrawerOpen(true)
     setSelectedToken(data)
   }
@@ -185,7 +197,11 @@ const IndexTokens = () => {
                                   <TooltipTrigger>
                                     <button
                                       onClick={() => editToken(token)}
-                                      className="w-full h-full flex items-center justify-center text-primary dark:text-white">
+                                      className={`w-full h-full flex items-center justify-center text-primary dark:text-white ${
+                                        token.preloaded
+                                          ? "opacity-50 cursor-not-allowed"
+                                          : ""
+                                      }`}>
                                       <Pencil />
                                     </button>
                                   </TooltipTrigger>
@@ -258,8 +274,11 @@ const IndexTokens = () => {
                                   <TooltipTrigger>
                                     <button
                                       onClick={() => editToken(token)}
-                                      className="w-full h-full flex items-center justify-center text-primary dark:text-white">
-                                      <Pencil />
+                                      className={`w-full h-full flex items-center justify-center text-primary dark:text-white ${
+                                        token.preloaded
+                                          ? "opacity-50 cursor-not-allowed"
+                                          : ""
+                                      }`}>                                      <Pencil />
                                     </button>
                                   </TooltipTrigger>
                                   <TooltipContent>
