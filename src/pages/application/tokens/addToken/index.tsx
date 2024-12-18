@@ -60,6 +60,10 @@ const IndexAddToken = ({ handleCallbacks }) => {
     }))
   }
 
+  const handleSymbolChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleInputChange("symbol", e.target.value.toUpperCase())
+  }
+
   const saveToken = () => {
     const { network_id, symbol, description } = tokenData
 
@@ -77,24 +81,59 @@ const IndexAddToken = ({ handleCallbacks }) => {
       return
     }
 
-    tokenData.network = selectedNetwork ? selectedNetwork.name : ""
-    tokenData.type = selectedTokenType
+    tokenService.getTokens().then((existingTokens) => {
+      const existingTokenWithNetwork = existingTokens.find(
+        (token) => token.network_id === network_id
+      )
+      const existingTokenWithSymbol = existingTokens.find(
+        (token) => token.symbol === symbol
+      )
 
-    tokenService.createToken(tokenData).then((result) => {
-      if (result != null) {
+      if (existingTokenWithNetwork) {
         toast({
           description: (
             <div className="flex items-center">
-              <Check className="mr-2 text-green-500" />
-              Token Saved Successfully!
+              <X className="mr-2 text-white-500" />
+              Network ID already exists!
             </div>
           ),
-          variant: "default"
+          variant: "destructive"
         })
+        return
       }
-    })
 
-    handleCallbacks()
+      if (existingTokenWithSymbol) {
+        toast({
+          description: (
+            <div className="flex items-center">
+              <X className="mr-2 text-white-500" />
+              Token symbol already exists!
+            </div>
+          ),
+          variant: "destructive"
+        })
+        return
+      }
+
+      tokenData.network = selectedNetwork ? selectedNetwork.name : ""
+      tokenData.type = selectedTokenType
+
+      tokenService.createToken(tokenData).then((result) => {
+        if (result != null) {
+          toast({
+            description: (
+              <div className="flex items-center">
+                <Check className="mr-2 text-green-500" />
+                Token Saved Successfully!
+              </div>
+            ),
+            variant: "default"
+          })
+        }
+      });
+
+      handleCallbacks();
+    });
   }
 
   return (
@@ -155,7 +194,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
             type="text"
             placeholder="Enter Symbol"
             value={tokenData.symbol}
-            onChange={(e) => handleInputChange("symbol", e.target.value)}
+            onChange={handleSymbolChange}          
           />
         </div>
         <div className="mb-8">
