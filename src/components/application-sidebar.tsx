@@ -56,7 +56,7 @@ const applicationItems = [
     icon: Network
   },
   {
-    title: "ImUrAi",
+    title: "Support",
     url: "#",
     icon: MessageCircle
   }
