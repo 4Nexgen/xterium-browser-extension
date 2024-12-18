@@ -14,7 +14,7 @@ import {
   mnemonicValidate,
   sr25519PairFromSeed
 } from "@polkadot/util-crypto"
-import { Check, X } from "lucide-react"
+import { Check, RefreshCcw, X } from "lucide-react"
 import React, { useEffect, useState } from "react"
 
 import "@polkadot/wasm-crypto/initOnlyAsm"
@@ -196,14 +196,18 @@ const IndexAddWallet = ({ handleCallbacks }) => {
               }}
               className="w-full p-2 rounded bg-input text-sm font-semibold"
               rows={2}></textarea>
-            <Button
-              type="button"
-              variant="variant1"
-              size="icon"
-              onClick={generateMnemonic}>
-              ↻
-            </Button>
           </div>
+        </div>
+        <div className="mb-2 flex items-center justify-center">
+          <Button
+            type="button"
+            className="w-[220px] border border-transparent dark:border-white"
+            variant="outline"
+            onClick={generateMnemonic}
+          >
+            <RefreshCcw />
+            Generate Mnemonic Phrase
+          </Button>
         </div>
         <div className="mb-3">
           <Label>Secret Key:</Label>
