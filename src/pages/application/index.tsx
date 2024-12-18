@@ -46,7 +46,7 @@ const IndexApplication = () => {
               {currentPage === "Tokens" && <IndexTokens />}
               {currentPage === "Network Status" && <IndexNetworkStatus />}
               {currentPage === "Wallets" && <IndexWallets />}
-              {currentPage === "ImUrAi" && <IndexImUrAi />}
+              {currentPage === "Support" && <IndexImUrAi />}
             </ScrollArea>
           </div>
         </div>
