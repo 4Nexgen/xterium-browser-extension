@@ -32,6 +32,45 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
   const { toast } = useToast()
 
   const sendTransfer = () => {
+    if (!quantity) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-red-500" />
+            Quantity cannot be empty!
+          </div>
+        ),
+        variant: "destructive",
+      });
+      return;
+    }
+  
+    if (quantity <= 0) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-red-500" />
+            Quantity must be greater than zero!
+          </div>
+        ),
+        variant: "destructive",
+      });
+      return;
+    }
+  
+    if (!transferTo.trim()) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-red-500" />
+            Recipient address cannot be empty!
+          </div>
+        ),
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSendInProgress(true)
     setSendLabel("CALCULATING FEES...")
 
