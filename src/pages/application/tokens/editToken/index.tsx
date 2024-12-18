@@ -13,7 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useToast } from "@/hooks/use-toast"
 import { TokenModel } from "@/models/token.model"
 import { TokenService } from "@/services/token.service"
-import { Check } from "lucide-react"
+import { Check, X } from "lucide-react"
 import React, { useEffect, useState } from "react"
 
 const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
@@ -39,24 +39,50 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
     }))
   }
 
+  const handleSymbolChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleInputChange("symbol", e.target.value.toUpperCase());
+  }
+
   const updateToken = () => {
     tokenData.type = selectedTokenType
+    tokenService.getTokens().then((existingTokens) => {
+      const duplicateSymbol = existingTokens.find(
+        (token) => token.symbol === tokenData.symbol && token.id !== tokenData.id
+      )
+      const duplicateNetworkId = existingTokens.find(
+        (token) => token.network_id === tokenData.network_id && token.id !== tokenData.id
+      )
 
-    tokenService.updateToken(tokenData.id, tokenData).then((result) => {
-      if (result != null) {
+      if (duplicateSymbol || duplicateNetworkId) {
+        const errorMsg = duplicateSymbol
+          ? "Token symbol already exists."
+          : "Network ID already exists.";
         toast({
           description: (
             <div className="flex items-center">
-              <Check className="mr-2 text-green-500" />
-              Token Updated Successfully!
+              <X className="mr-2 text-red-500" />
+              {errorMsg}
             </div>
           ),
-          variant: "default"
-        })
+          variant: "destructive",
+        });
+        return;
       }
+      tokenService.updateToken(tokenData.id, tokenData).then((result) => {
+        if (result != null) {
+          toast({
+            description: (
+              <div className="flex items-center">
+                <Check className="mr-2 text-green-500" />
+                Token Updated Successfully!
+              </div>
+            ),
+            variant: "default"
+          })
+        }
+      })
+      handleCallbacks()
     })
-
-    handleCallbacks()
   }
 
   return (
@@ -112,7 +138,7 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
             type="text"
             placeholder="Enter Symbol"
             value={tokenData.symbol}
-            onChange={(e) => handleInputChange("symbol", e.target.value)}
+            onChange={handleSymbolChange}
           />
         </div>
         <div className="mb-8">
