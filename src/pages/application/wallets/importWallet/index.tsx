@@ -15,6 +15,7 @@ import {
 } from "@polkadot/util-crypto"
 import { Check, X } from "lucide-react"
 import React, { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import "@polkadot/wasm-crypto/initOnlyAsm"
 
@@ -24,6 +25,7 @@ import { NetworkService } from "@/services/network.service"
 import { UserService } from "@/services/user.service"
 
 const IndexImportWallet = ({ handleCallbacks }) => {
+  const { t } = useTranslation()
   const networkService = new NetworkService()
   const userService = new UserService()
   const walletService = new WalletService()
@@ -131,17 +133,16 @@ const IndexImportWallet = ({ handleCallbacks }) => {
 
     userService.getWalletPassword().then((decryptedPassword) => {
       if (decryptedPassword) {
-    
-        const encryptionService = new EncryptionService();
-    
+        const encryptionService = new EncryptionService()
+
         const mnemonic_phrase = encryptionService.encrypt(
           decryptedPassword,
           walletData.mnemonic_phrase
-        );
+        )
         const secret_key = encryptionService.encrypt(
           decryptedPassword,
           walletData.secret_key
-        );
+        )
 
         walletData.mnemonic_phrase = mnemonic_phrase
         walletData.secret_key = secret_key
@@ -180,17 +181,17 @@ const IndexImportWallet = ({ handleCallbacks }) => {
     <>
       <div className="p-6">
         <div className="mb-3">
-          <Label>Enter a unique wallet name:</Label>
+          <Label>{t("Enter a unique wallet name")}:</Label>
           <Input
             type="text"
-            placeholder="Wallet Name"
+            placeholder={t("Wallet Name")}
             value={walletData.name}
             onChange={(e) => handleInputChange("name", e.target.value)}
           />
         </div>
 
         <div className="mb-3">
-          <Label>Upload Wallet JSON:</Label>
+          <Label>{t("Upload Wallet JSON")}:</Label>
           <input
             type="file"
             accept=".json"
@@ -201,7 +202,7 @@ const IndexImportWallet = ({ handleCallbacks }) => {
 
         <div className="mt-5 mb-3">
           <Button type="button" variant="jelly" onClick={saveWallet}>
-            SAVE
+            {t("SAVE")}
           </Button>
         </div>
       </div>
@@ -211,7 +212,7 @@ const IndexImportWallet = ({ handleCallbacks }) => {
         onOpenChange={setIsInputPasswordDrawerOpen}>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle>Import Wallet</DrawerTitle>
+            <DrawerTitle>{t("Import Wallet")}</DrawerTitle>
           </DrawerHeader>
           <div className="p-6">
             <div className="mb-8">

@@ -17,11 +17,13 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeOff, X } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
 import OutsideLayout from "../outsideLayout"
 
 const IndexLogin = ({ onSetCurrentPage }) => {
+  const { t } = useTranslation()
   const userService = new UserService()
 
   const [showPassword, setShowPassword] = useState<boolean>(false)
@@ -78,13 +80,13 @@ const IndexLogin = ({ onSetCurrentPage }) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-inter text-white font-extrabold text-[12px] leading-[15px] tracking-[0.15em] mb-2">
-                    Enter Password:
+                    {t("Enter Password")}:
                   </FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
                         type={showPassword ? "text" : "password"}
-                        placeholder="Enter password"
+                        placeholder={t("Enter password")}
                         {...field}
                       />
                       <button
@@ -100,7 +102,7 @@ const IndexLogin = ({ onSetCurrentPage }) => {
               )}
             />
             <Button type="submit" variant="jelly" className="w-full text-white">
-              UNLOCK
+              {t("UNLOCK")}
             </Button>
           </form>
         </Form>

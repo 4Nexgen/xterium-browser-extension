@@ -122,7 +122,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
             className="p-0 z-[1000] border border-accent rounded-lg"
             align="start">
             <Command>
-              <CommandInput placeholder="Choose network..." />
+              <CommandInput placeholder={t("Choose network...")} />
               <CommandList>
                 <CommandEmpty>No results found.</CommandEmpty>
                 <CommandGroup>
@@ -161,12 +161,12 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
       <Drawer open={isChangeNetwork} onOpenChange={setIsChangeNetwork}>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle>CHANGE NETWORK</DrawerTitle>
+            <DrawerTitle>{t("CHANGE NETWORK")}</DrawerTitle>
           </DrawerHeader>
           <div className="p-6">
             <div className="mb-8">
               <Label className="text-center tracking-[0.15em] font-semibold leading-2 font-Inter text-base">
-                Are you sure you want to change the network to
+                {t("Are you sure you want to change the network to")}
                 <br />
                 <br />
                 <div className="flex items-center justify-center space-x-2">
@@ -186,7 +186,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
             </div>
             <div className="flex flex-row space-x-3">
               <Button type="button" variant="jelly" onClick={confirmChangeNetwork}>
-                CONFIRM
+                {t("CONFIRM")}
               </Button>
             </div>
           </div>

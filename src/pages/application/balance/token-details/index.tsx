@@ -10,10 +10,12 @@ import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import type { BalanceModel } from "@/models/balance.model"
 import React, { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import IndexTransfer from "./transfer"
 
 const IndexTokenDetails = ({ selectedBalance, handleCallbacks }) => {
+  const { t } = useTranslation()
   const [balanceData, setBalanceData] = useState<BalanceModel>(selectedBalance)
   const [isTransferDrawerOpen, setIsTransferDrawerOpen] = useState(false)
 
@@ -34,7 +36,7 @@ const IndexTokenDetails = ({ selectedBalance, handleCallbacks }) => {
   return (
     <>
       <Label className="mt-4 tracking-[0.15em] font-semibold text-sm text-center">
-        Your Balance
+        {t("Your Balance")}
       </Label>
       <Table className="mt-6 w-full">
         <TableBody>
@@ -46,7 +48,7 @@ const IndexTokenDetails = ({ selectedBalance, handleCallbacks }) => {
                     (balanceData.freeBalance + balanceData.reservedBalance).toString()
                   )}
                 </p>
-                <Label className="text-sm font-semibold">Total</Label>
+                <Label className="text-sm font-semibold">{t("Total")}</Label>
               </div>
             </TableCell>
             <TableCell className="w-24 h-24 flex items-center justify-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
@@ -54,13 +56,13 @@ const IndexTokenDetails = ({ selectedBalance, handleCallbacks }) => {
                 <p className="text-2xl font-extrabold text-purple">
                   {formatBalance(balanceData.freeBalance.toString())}
                 </p>
-                <Label className="text-sm font-semibold">Transferable</Label>
+                <Label className="text-sm font-semibold">{t("Transferable")}</Label>
               </div>
             </TableCell>
             <TableCell className="w-24 h-24 flex items-center justify-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
               <div className="text-center">
                 <p className="text-2xl font-extrabold text-purple">0.00</p>
-                <Label className="text-sm font-semibold">Locked</Label>
+                <Label className="text-sm font-semibold">{t("Locked")}</Label>
               </div>
             </TableCell>
           </TableRow>
@@ -68,14 +70,14 @@ const IndexTokenDetails = ({ selectedBalance, handleCallbacks }) => {
       </Table>
       <div className="p-6">
         <Button variant="jelly" type="button" onClick={openTransferDrawer}>
-          TRANSFER
+          {t("TRANSFER")}
         </Button>
       </div>
 
       <Drawer open={isTransferDrawerOpen} onOpenChange={setIsTransferDrawerOpen}>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle className="text-center text-purple">TRANSFER</DrawerTitle>
+            <DrawerTitle className="text-center text-purple">{t("TRANSFER")}</DrawerTitle>
           </DrawerHeader>
           <IndexTransfer
             selectedBalance={selectedBalance}

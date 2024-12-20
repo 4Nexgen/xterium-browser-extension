@@ -293,7 +293,7 @@ const IndexBalance = () => {
                       {")"}
                     </>
                   ) : (
-                    "Select wallet"
+                    t("Select wallet")
                   )}
                 </Button>
               </PopoverTrigger>
@@ -302,9 +302,9 @@ const IndexBalance = () => {
                 align="start"
                 style={{ width: "var(--radix-popper-anchor-width)" }}>
                 <Command>
-                  <CommandInput placeholder="Choose wallet" />
+                  <CommandInput placeholder={t("Choose wallet")} />
                   <CommandList>
-                    <CommandEmpty>No results found.</CommandEmpty>
+                    <CommandEmpty>{t("No results found.")}</CommandEmpty>
                     <CommandGroup>
                       {wallets
                         .filter(
@@ -330,7 +330,7 @@ const IndexBalance = () => {
                                 {")"}
                               </>
                             ) : (
-                              "Select address"
+                              t("Select address")
                             )}
                           </CommandItem>
                         ))}
@@ -417,7 +417,7 @@ const IndexBalance = () => {
                             className="mr-2"
                           />
                         ) : (
-                          <div>No Image</div>
+                          <div>{t("No Image")}</div>
                         )}
                         <DrawerTitle>
                           {selectedBalance ? selectedBalance.token.symbol : ""}
@@ -436,7 +436,7 @@ const IndexBalance = () => {
             <div className="flex flex-col gap-4 items-center py-[100px]">
               <Coins className="size-20" />
               <div className="text-center">
-                <h4 className="font-bold text-lg">No Token Found</h4>
+                <h4 className="font-bold text-lg">{t("No Token Found")}</h4>
               </div>
             </div>
           )}

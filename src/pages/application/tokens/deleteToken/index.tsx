@@ -5,8 +5,10 @@ import { TokenModel } from "@/models/token.model"
 import { TokenService } from "@/services/token.service"
 import { Check } from "lucide-react"
 import React, { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 const IndexDeleteToken = ({ selectedToken, handleCallbacks }) => {
+  const { t } = useTranslation()
   const [tokenData, setTokenData] = useState<TokenModel>(selectedToken)
 
   const { toast } = useToast()
@@ -35,16 +37,16 @@ const IndexDeleteToken = ({ selectedToken, handleCallbacks }) => {
       <div className="p-6">
         <div className="mb-8">
           <Label className="text-center tracking-[0.15em] font-semibold leading-2 font-Inter text-base">
-            Are you sure you want to delete <br />
+            {t("Are you sure you want to delete")} <br />
             <span className="text-lg font-bold text-[#B375DC]">
               {tokenData.symbol}
             </span>{" "}
-            from your token list?
+            {t("from your token list?")}
           </Label>
         </div>
         <div className="flex flex-row space-x-3">
           <Button type="button" variant="jellyDestructive" onClick={deleteToken}>
-            DELETE
+            {t("DELETE")}
           </Button>
         </div>
       </div>
