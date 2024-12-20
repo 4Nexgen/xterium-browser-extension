@@ -17,8 +17,10 @@ import { NetworkService } from "@/services/network.service"
 import { TokenService } from "@/services/token.service"
 import { Check, X } from "lucide-react"
 import React, { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 const IndexAddToken = ({ handleCallbacks }) => {
+  const { t } = useTranslation()
   const networkService = new NetworkService()
   const tokenService = new TokenService()
 
@@ -152,17 +154,17 @@ const IndexAddToken = ({ handleCallbacks }) => {
             variant: "default"
           })
         }
-      });
+      })
 
-      handleCallbacks();
-    });
+      handleCallbacks()
+    })
   }
 
   return (
     <>
       <div className="p-6">
         <div className="mb-3">
-          <Label>Token Type</Label>
+          <Label>{t("Token Type")}</Label>
           <Popover open={openTokenType} onOpenChange={setOpenTokenType}>
             <PopoverTrigger asChild>
               <Button
@@ -174,11 +176,14 @@ const IndexAddToken = ({ handleCallbacks }) => {
                 {selectedTokenType ? selectedTokenType : "Select Token Type"}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="p-0" align="start" style={{ width: "var(--radix-popper-anchor-width)" }}>
+            <PopoverContent
+              className="p-0"
+              align="start"
+              style={{ width: "var(--radix-popper-anchor-width)" }}>
               <Command>
-                <CommandInput placeholder="Choose token type..." />
+                <CommandInput placeholder={t("Choose token type...")} />
                 <CommandList>
-                  <CommandEmpty>No results found.</CommandEmpty>
+                  <CommandEmpty>{t("No results found.")}</CommandEmpty>
                   <CommandGroup>
                     {tokenTypes.map((tokenType) => (
                       <CommandItem
@@ -188,8 +193,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
                           handleTokenTypeChange(value)
                           setOpenTokenType(false)
                         }}
-                        className="cursor-pointer hover:bg-accent"
-                      >
+                        className="cursor-pointer hover:bg-accent">
                         {tokenType}
                       </CommandItem>
                     ))}
@@ -200,36 +204,38 @@ const IndexAddToken = ({ handleCallbacks }) => {
           </Popover>
         </div>
         <div className="mb-3">
-          <Label>Network Id {"(0 if Native)"}:</Label>
+          <Label>
+            {t("Network Id")} {"(0 if Native)"}:
+          </Label>
           <Input
             type="number"
-            placeholder="Enter Network"
+            placeholder={t("Enter Network")}
             value={tokenData.network_id}
             onChange={(e) => handleInputChange("network_id", e.target.value)}
             readOnly={selectedTokenType === "Native"}
           />
         </div>
         <div className="mb-3">
-          <Label>Symbol:</Label>
+          <Label>{t("Symbol")}:</Label>
           <Input
             type="text"
-            placeholder="Enter Symbol"
+            placeholder={t("Enter Symbol")}
             value={tokenData.symbol}
-            onChange={handleSymbolChange}          
+            onChange={handleSymbolChange}
           />
         </div>
         <div className="mb-8">
-          <Label>Description:</Label>
+          <Label>{t("Description")}:</Label>
           <Input
             type="text"
-            placeholder="Enter Description"
+            placeholder={t("Enter Description")}
             value={tokenData.description}
             onChange={(e) => handleInputChange("description", e.target.value)}
           />
         </div>
         <div className="mt-3 mb-3">
           <Button type="button" variant="jelly" onClick={saveToken}>
-            SAVE
+            {t("SAVE")}
           </Button>
         </div>
       </div>

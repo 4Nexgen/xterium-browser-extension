@@ -15,6 +15,7 @@ import {
 } from "@polkadot/util-crypto"
 import { Check, RefreshCcw, X } from "lucide-react"
 import React, { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import "@polkadot/wasm-crypto/initOnlyAsm"
 
@@ -24,6 +25,7 @@ import { NetworkService } from "@/services/network.service"
 import { UserService } from "@/services/user.service"
 
 const IndexAddWallet = ({ handleCallbacks }) => {
+  const { t } = useTranslation()
   const networkService = new NetworkService()
   const userService = new UserService()
   const walletService = new WalletService()
@@ -110,22 +112,20 @@ const IndexAddWallet = ({ handleCallbacks }) => {
     }
     userService.getWalletPassword().then((decryptedPassword) => {
       if (decryptedPassword) {
-    
-        const encryptionService = new EncryptionService();
-    
+        const encryptionService = new EncryptionService()
+
         const mnemonic_phrase = encryptionService.encrypt(
           decryptedPassword,
           walletData.mnemonic_phrase
-        );
+        )
         const secret_key = encryptionService.encrypt(
           decryptedPassword,
           walletData.secret_key
-        );
-        
+        )
+
         walletData.mnemonic_phrase = mnemonic_phrase
         walletData.secret_key = secret_key
         walletData.address_type = selectedNetwork ? selectedNetwork.name : ""
-
 
         walletService.createWallet(walletData).then((result) => {
           if (result != null) {
@@ -160,19 +160,19 @@ const IndexAddWallet = ({ handleCallbacks }) => {
     <>
       <div className="p-6">
         <div className="mb-3">
-          <Label>Enter a unique wallet name:</Label>
+          <Label>{t("Enter a unique wallet name")}:</Label>
           <Input
             type="text"
-            placeholder="Wallet Name"
+            placeholder={t("Wallet Name")}
             value={walletData.name}
             onChange={(e) => handleInputChange("name", e.target.value)}
           />
         </div>
         <div className="mb-3">
-          <Label>Mnemonic Phrase:</Label>
+          <Label>{t("Mnemonic Phrase")}:</Label>
           <div className="flex items-center gap-2">
             <textarea
-              placeholder="Mnemonic Phrase"
+              placeholder={t("Mnemonic Phrase")}
               value={walletData.mnemonic_phrase}
               onChange={(e) => {
                 handleInputChange("mnemonic_phrase", e.target.value)
@@ -187,16 +187,15 @@ const IndexAddWallet = ({ handleCallbacks }) => {
             type="button"
             className="w-[220px] border border-transparent dark:border-white"
             variant="outline"
-            onClick={generateMnemonic}
-          >
+            onClick={generateMnemonic}>
             <RefreshCcw />
-            Generate Mnemonic Phrase
+            {t("Generate Mnemonic Phrase")}
           </Button>
         </div>
         <div className="mb-3">
-          <Label>Secret Key:</Label>
+          <Label>{t("Secret Key")}:</Label>
           <textarea
-            placeholder="Secret Key"
+            placeholder={t("Secret Key")}
             value={walletData.secret_key}
             onChange={(e) => handleInputChange("secret_key", e.target.value)}
             className="w-full p-2 bg-input rounded text-sm font-semibold"
@@ -204,10 +203,10 @@ const IndexAddWallet = ({ handleCallbacks }) => {
             readOnly></textarea>
         </div>
         <div className="mb-3">
-          <Label>Public Key:</Label>
+          <Label>{t("Public Key")}:</Label>
           <Input
             type="text"
-            placeholder="Public Key"
+            placeholder={t("Public Key")}
             value={walletData.public_key}
             onChange={(e) => handleInputChange("public_key", e.target.value)}
             readOnly
@@ -215,11 +214,10 @@ const IndexAddWallet = ({ handleCallbacks }) => {
         </div>
         <div className="mt-5 mb-3">
           <Button type="button" variant="jelly" onClick={saveWallet}>
-            SAVE
+            {t("SAVE")}
           </Button>
         </div>
       </div>
-
     </>
   )
 }

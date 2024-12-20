@@ -24,12 +24,14 @@ import { TokenService } from "@/services/token.service"
 import { Coins, Pencil, Trash, X } from "lucide-react"
 import Image from "next/image"
 import React, { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import IndexAddToken from "./addToken"
 import IndexDeleteToken from "./deleteToken"
 import IndexEditToken from "./editToken"
 
 const IndexTokens = () => {
+  const { t } = useTranslation()
   const networkService = new NetworkService()
   const tokenService = new TokenService()
 
@@ -162,7 +164,7 @@ const IndexTokens = () => {
               <Card className="mb-3 card-bg-image border-border">
                 <CardHeader>
                   <CardTitle>
-                    <b>NATIVE TOKEN</b>
+                    <b>{t("NATIVE TOKEN")}</b>
                   </CardTitle>
                 </CardHeader>
                 <Table>
@@ -206,7 +208,7 @@ const IndexTokens = () => {
                                     </button>
                                   </TooltipTrigger>
                                   <TooltipContent>
-                                    <p>Edit Token</p>
+                                    <p>{t("Edit Token")}</p>
                                   </TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
@@ -224,7 +226,7 @@ const IndexTokens = () => {
                                     </button>
                                   </TooltipTrigger>
                                   <TooltipContent>
-                                    <p>Delete Token</p>
+                                    <p>{t("Delete Token")}</p>
                                   </TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
@@ -239,7 +241,7 @@ const IndexTokens = () => {
               <Card className="mb-3 border-border">
                 <CardHeader>
                   <CardTitle>
-                    <b>ASSETS</b>
+                    <b>{t("ASSETS")}</b>
                   </CardTitle>
                 </CardHeader>
                 <Table>
@@ -278,11 +280,13 @@ const IndexTokens = () => {
                                         token.preloaded
                                           ? "opacity-50 cursor-not-allowed"
                                           : ""
-                                      }`}>                                      <Pencil />
+                                      }`}>
+                                      {" "}
+                                      <Pencil />
                                     </button>
                                   </TooltipTrigger>
                                   <TooltipContent>
-                                    <p>Edit Token</p>
+                                    <p>{t("Edit Token")}</p>
                                   </TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
@@ -300,7 +304,7 @@ const IndexTokens = () => {
                                     </button>
                                   </TooltipTrigger>
                                   <TooltipContent>
-                                    <p>Delete Token</p>
+                                    <p>{t("Delete Token")}</p>
                                   </TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
@@ -316,21 +320,23 @@ const IndexTokens = () => {
             <div className="flex flex-col gap-4 items-center py-[100px]">
               <Coins className="size-20" />
               <div className="text-center">
-                <h4 className="font-bold text-lg">No Token Found</h4>
-                <p className="opacity-50">Add new token by clicking the button below.</p>
+                <h4 className="font-bold text-lg">{t("No Token Found")}</h4>
+                <p className="opacity-50">
+                  {t("Add new token by clicking the button below.")}
+                </p>
               </div>
             </div>
           )}
         </div>
 
         <Button variant="jelly" className="my-auto" onClick={addToken}>
-          ADD NEW TOKEN
+          {t("ADD NEW TOKEN")}
         </Button>
 
         <Drawer open={isAddTokenDrawerOpen} onOpenChange={setIsAddTokenDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle>ADD NEW TOKEN</DrawerTitle>
+              <DrawerTitle>{t("ADD NEW TOKEN")}</DrawerTitle>
             </DrawerHeader>
             <IndexAddToken handleCallbacks={saveAndUpdateToken} />
           </DrawerContent>
@@ -341,7 +347,7 @@ const IndexTokens = () => {
           <DrawerContent>
             <DrawerHeader>
               <DrawerTitle className="flex items-center justify-center space-x-2">
-                <span>Edit</span>
+                <span>{t("Edit")}</span>
                 <Image
                   src={getTokenImage(selectedToken.image_url)}
                   alt={`${selectedToken.symbol} logo`}
@@ -350,7 +356,7 @@ const IndexTokens = () => {
                   className="rounded"
                 />
                 <span className="font-bold text-md">{selectedToken.symbol}</span>
-                <span>Token</span>
+                <span>{t("Token")}</span>
               </DrawerTitle>
             </DrawerHeader>
             <IndexEditToken
@@ -363,7 +369,7 @@ const IndexTokens = () => {
         <Drawer open={isDeleteTokenDrawerOpen} onOpenChange={setIsDeleteTokenDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle>DELETE TOKEN</DrawerTitle>
+              <DrawerTitle>{t("DELETE TOKEN")}</DrawerTitle>
             </DrawerHeader>
             <IndexDeleteToken
               selectedToken={selectedToken}

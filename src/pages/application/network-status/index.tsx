@@ -2,8 +2,10 @@ import { Label } from "@/components/ui/label"
 import { XodeService } from "@/services/xode.service"
 import { Blocks, HandCoins, Hourglass, Wallet } from "lucide-react"
 import React, { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 const IndexNetworkStatus = () => {
+  const { t } = useTranslation()
   const [networkStatus, setNetworkStatus] = useState({
     totalBlocks: 0,
     totalAddresses: 0,
@@ -54,7 +56,7 @@ const IndexNetworkStatus = () => {
             <p className="text-2xl font-extrabold mt-6 text-primary dark:text-white">
               {formatNumber(networkStatus.totalBlocks)}
             </p>
-            <Label className="text-sm opacity-50">Total Blocks</Label>
+            <Label className="text-sm opacity-50">{t("Total Blocks")}</Label>
           </div>
         </div>
         <div className="flex items-center justify-center h-full w-1/2 p-2">
@@ -63,7 +65,7 @@ const IndexNetworkStatus = () => {
             <p className="text-2xl font-extrabold mt-6 text-primary dark:text-white">
               {formatNumber(networkStatus.totalAddresses)}
             </p>
-            <Label className="text-sm opacity-50">Total Addresses</Label>
+            <Label className="text-sm opacity-50">{t("Total Addresses")}</Label>
           </div>
         </div>
         <div className="flex items-center justify-center h-full w-1/2 p-2">
@@ -72,7 +74,7 @@ const IndexNetworkStatus = () => {
             <p className="text-2xl font-extrabold mt-6 text-primary dark:text-white">
               {networkStatus.avgBlockInterval}
             </p>
-            <Label className="text-sm opacity-50">AVG Block Intervals</Label>
+            <Label className="text-sm opacity-50">{t("AVG Block Intervals")}</Label>
           </div>
         </div>
         <div className="flex items-center justify-center h-full w-1/2 p-2">
@@ -81,7 +83,7 @@ const IndexNetworkStatus = () => {
             <p className="text-2xl font-extrabold mt-6 text-primary dark:text-white">
               {networkStatus.lastGasFee}
             </p>
-            <Label className="text-sm opacity-50">Last Gas Fee</Label>
+            <Label className="text-sm opacity-50">{t("Last Gas Fee")}</Label>
           </div>
         </div>
       </div>

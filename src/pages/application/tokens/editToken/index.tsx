@@ -15,8 +15,10 @@ import { TokenModel } from "@/models/token.model"
 import { TokenService } from "@/services/token.service"
 import { Check, X } from "lucide-react"
 import React, { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
+  const { t } = useTranslation()
   const tokenService = new TokenService()
 
   const [tokenData, setTokenData] = useState<TokenModel>(selectedToken)
@@ -40,7 +42,7 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
   }
 
   const handleSymbolChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleInputChange("symbol", e.target.value.toUpperCase());
+    handleInputChange("symbol", e.target.value.toUpperCase())
   }
 
   const updateToken = () => {
@@ -56,7 +58,7 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
       if (duplicateSymbol || duplicateNetworkId) {
         const errorMsg = duplicateSymbol
           ? "Token symbol already exists."
-          : "Network ID already exists.";
+          : "Network ID already exists."
         toast({
           description: (
             <div className="flex items-center">
@@ -64,9 +66,9 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
               {errorMsg}
             </div>
           ),
-          variant: "destructive",
-        });
-        return;
+          variant: "destructive"
+        })
+        return
       }
       tokenService.updateToken(tokenData.id, tokenData).then((result) => {
         if (result != null) {
@@ -89,18 +91,21 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
     <>
       <div className="p-6">
         <div className="mb-3">
-          <Label>Token Type</Label>
+          <Label>{t("Token Type")}</Label>
           <Popover open={openTokenType} onOpenChange={setOpenTokenType}>
             <PopoverTrigger asChild>
               <Button variant="outline" className="w-full bg-input justify-between h-10">
                 {selectedTokenType ? <>{selectedTokenType}</> : <></>}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="p-0" align="start" style={{ width: "var(--radix-popper-anchor-width)"}}>
+            <PopoverContent
+              className="p-0"
+              align="start"
+              style={{ width: "var(--radix-popper-anchor-width)" }}>
               <Command>
-                <CommandInput placeholder="Choose token type..." />
+                <CommandInput placeholder={t("Choose token type...")} />
                 <CommandList>
-                  <CommandEmpty>No results found.</CommandEmpty>
+                  <CommandEmpty>{t("No results found.")}</CommandEmpty>
                   <CommandGroup>
                     {tokenTypes.map((tokenType) => (
                       <CommandItem
@@ -122,8 +127,7 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
                           }
                           setOpenTokenType(false)
                         }}
-                        className="cursor-pointer hover:bg-accent"
-                      >
+                        className="cursor-pointer hover:bg-accent">
                         {tokenType}
                       </CommandItem>
                     ))}
@@ -134,36 +138,38 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
           </Popover>
         </div>
         <div className="mb-3">
-          <Label>Network Id {"(0 if Native)"}:</Label>
+          <Label>
+            {t("Network Id")} {"(0 if Native)"}:
+          </Label>
           <Input
             type="text"
-            placeholder="Enter Network"
+            placeholder={t("Enter Network")}
             value={tokenData.network_id}
             disabled={selectedTokenType === "Native"}
             onChange={(e) => handleInputChange("network_id", e.target.value)}
           />
         </div>
         <div className="mb-3">
-          <Label>Symbol:</Label>
+          <Label>{t("Symbol")}:</Label>
           <Input
             type="text"
-            placeholder="Enter Symbol"
+            placeholder={t("Enter Symbol")}
             value={tokenData.symbol}
             onChange={handleSymbolChange}
           />
         </div>
         <div className="mb-8">
-          <Label>Description:</Label>
+          <Label>{t("Description")}:</Label>
           <Input
             type="text"
-            placeholder="Enter Description"
+            placeholder={t("Enter Description")}
             value={tokenData.description}
             onChange={(e) => handleInputChange("description", e.target.value)}
           />
         </div>
         <div className="mt-3 mb-3">
           <Button type="button" variant="jelly" onClick={updateToken}>
-            UPDATE
+            {t("UPDATE")}
           </Button>
         </div>
       </div>

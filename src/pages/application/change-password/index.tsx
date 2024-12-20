@@ -5,9 +5,11 @@ import { useToast } from "@/hooks/use-toast"
 import { UserService } from "@/services/user.service"
 import { Check, Eye, EyeOff } from "lucide-react"
 import React, { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
 const IndexChangePassword = ({ handleCallbacks }) => {
+  const { t } = useTranslation()
   const userService = new UserService()
 
   const [oldPassword, setOldPassword] = useState<string>("")
@@ -100,7 +102,7 @@ const IndexChangePassword = ({ handleCallbacks }) => {
     <>
       <div className="p-6">
         <div className="mb-3">
-          <Label className="font-bold">Enter old password:</Label>
+          <Label className="font-bold">{t("Enter old password")}:</Label>
           <div className="relative">
             <Input
               type={showOldPassword ? "text" : "password"}
@@ -117,7 +119,7 @@ const IndexChangePassword = ({ handleCallbacks }) => {
           </div>
         </div>
         <div className="mb-3">
-          <Label className="font-bold">Enter new password:</Label>
+          <Label className="font-bold">{t("Enter new password")}:</Label>
           <div className="relative">
             <Input
               type={showNewPassword ? "text" : "password"}
@@ -134,7 +136,7 @@ const IndexChangePassword = ({ handleCallbacks }) => {
           </div>
         </div>
         <div className="mb-3">
-          <Label className="font-bold">Confirm new password:</Label>
+          <Label className="font-bold">{t("Confirm new password")}:</Label>
           <div className="relative">
             <Input
               type={showConfirmPassword ? "text" : "password"}
@@ -153,7 +155,7 @@ const IndexChangePassword = ({ handleCallbacks }) => {
         {error && <div className="text-red-500 mb-4">{error}</div>}
         <div className="mt-3 mb-3">
           <Button type="button" variant="jelly" onClick={changePassword}>
-            CONFIRM
+            {t("CONFIRM")}
           </Button>
         </div>
       </div>

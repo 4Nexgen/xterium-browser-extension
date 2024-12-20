@@ -25,6 +25,7 @@ import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
 import { useTheme } from "next-themes"
 import Image from "next/image"
 import React, { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 interface HeaderProps {
   currentPage?: string
@@ -32,6 +33,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => {
+  const { t } = useTranslation()
   const networkService = new NetworkService()
 
   const [networks, setNetworks] = useState<NetworkModel[]>(NetworkData)
@@ -55,7 +57,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
         const defaultNetwork = networks.find((network) => network.name === "Xode")
         if (defaultNetwork) {
           setSelectedNetwork(defaultNetwork)
-          networkService.setNetwork(defaultNetwork)  
+          networkService.setNetwork(defaultNetwork)
         }
       }
     })
@@ -87,7 +89,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbPage>
-                  <b>{currentPage}</b>
+                  <b>{t(currentPage)}</b>
                 </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
@@ -120,7 +122,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
             className="p-0 z-[1000] border border-accent rounded-lg"
             align="start">
             <Command>
-              <CommandInput placeholder="Choose network..." />
+              <CommandInput placeholder={t("Choose network...")} />
               <CommandList>
                 <CommandEmpty>No results found.</CommandEmpty>
                 <CommandGroup>
@@ -135,8 +137,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
                         setOpenNetworks(false)
                         setIsChangeNetwork(true)
                       }}
-                      className="cursor-pointer hover:bg-accent"
-                      >
+                      className="cursor-pointer hover:bg-accent">
                       <div className="flex items-center">
                         <div className="w-5 h-5 mr-2 relative">
                           <Image
@@ -160,12 +161,12 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
       <Drawer open={isChangeNetwork} onOpenChange={setIsChangeNetwork}>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle>CHANGE NETWORK</DrawerTitle>
+            <DrawerTitle>{t("CHANGE NETWORK")}</DrawerTitle>
           </DrawerHeader>
           <div className="p-6">
             <div className="mb-8">
               <Label className="text-center tracking-[0.15em] font-semibold leading-2 font-Inter text-base">
-                Are you sure you want to change the network to
+                {t("Are you sure you want to change the network to")}
                 <br />
                 <br />
                 <div className="flex items-center justify-center space-x-2">
@@ -185,7 +186,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
             </div>
             <div className="flex flex-row space-x-3">
               <Button type="button" variant="jelly" onClick={confirmChangeNetwork}>
-                CONFIRM
+                {t("CONFIRM")}
               </Button>
             </div>
           </div>

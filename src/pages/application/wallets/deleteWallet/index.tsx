@@ -5,8 +5,10 @@ import type { WalletModel } from "@/models/wallet.model"
 import { WalletService } from "@/services/wallet.service"
 import { Check } from "lucide-react"
 import React, { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 const IndexDeleteWallet = ({ selectedWallet, handleCallbacks }) => {
+  const { t } = useTranslation()
   const [walletData, setWalletData] = useState<WalletModel>(selectedWallet)
 
   const { toast } = useToast()
@@ -35,16 +37,16 @@ const IndexDeleteWallet = ({ selectedWallet, handleCallbacks }) => {
       <div className="p-6">
         <div className="mb-8">
           <Label className="text-center tracking-[0.15em] font-semibold leading-2 font-Inter text-base">
-            Are you sure you want to delete <br />
+            {t("Are you sure you want to delete")} <br />
             <span className="text-lg font-bold text-[#B375DC]">
               {walletData.name}
             </span>{" "}
-            from your wallet list?
+            {t("from your wallet list?")}
           </Label>
         </div>
         <div className="flex flex-row space-x-3">
           <Button type="button" variant="jellyDestructive" onClick={deleteWallet}>
-            DELETE
+            {t("DELETE")}
           </Button>
         </div>
       </div>

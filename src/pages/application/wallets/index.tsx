@@ -15,6 +15,7 @@ import { NetworkService } from "@/services/network.service.js"
 import { WalletService } from "@/services/wallet.service.js"
 import { Check, Copy, Download, Trash, Wallet } from "lucide-react"
 import React, { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import IndexAddWallet from "./addWallet.tsx"
 import IndexDeleteWallet from "./deleteWallet"
@@ -22,6 +23,7 @@ import IndexExportWallet from "./exportWallet"
 import IndexImportWallet from "./importWallet"
 
 const IndexWallet = () => {
+  const { t } = useTranslation()
   const networkService = new NetworkService()
   const walletService = new WalletService()
 
@@ -71,18 +73,18 @@ const IndexWallet = () => {
   }
 
   const expandView = () => {
-    const extensionId = chrome.runtime.id;
-    const url = `chrome-extension://${extensionId}/popup.html#import`;
-    
+    const extensionId = chrome.runtime.id
+    const url = `chrome-extension://${extensionId}/popup.html#import`
+
     if (window.location.href !== url) {
-      window.open(url, "_blank");
+      window.open(url, "_blank")
     }
-  };
-  
+  }
+
   const importWallet = () => {
-    expandView();
-    setIsImportWalletDrawerOpen(true);
-  };
+    expandView()
+    setIsImportWalletDrawerOpen(true)
+  }
 
   const copyWallet = (value: string) => {
     navigator.clipboard
@@ -166,7 +168,7 @@ const IndexWallet = () => {
                                   </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p>Copy Address</p>
+                                  <p>{t("Copy Address")}</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -182,7 +184,7 @@ const IndexWallet = () => {
                                   </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p>Export Wallet</p>
+                                  <p>{t("Export Wallet")}</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -198,7 +200,7 @@ const IndexWallet = () => {
                                   </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p>Delete Wallet</p>
+                                  <p>{t("Delete Wallet")}</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -213,8 +215,10 @@ const IndexWallet = () => {
             <div className="flex flex-col gap-4 items-center py-[100px]">
               <Wallet className="size-20" />
               <div className="text-center">
-                <h4 className="font-bold text-lg">No Wallet Found</h4>
-                <p className="opacity-50">Add new wallet by clicking the button below.</p>
+                <h4 className="font-bold text-lg">{t("No Wallet Found")}</h4>
+                <p className="opacity-50">
+                  {t("Add new wallet by clicking the button below.")}
+                </p>
               </div>
             </div>
           )}
@@ -222,17 +226,17 @@ const IndexWallet = () => {
 
         <div className="flex flex-row space-x-2">
           <Button variant="jelly" className="my-auto" onClick={addWallet}>
-            ADD WALLET
+            {t("ADD WALLET")}
           </Button>
           <Button variant="jelly" className="my-auto" onClick={importWallet}>
-            IMPORT WALLET
+            {t("IMPORT WALLET")}
           </Button>
         </div>
 
         <Drawer open={isAddWalletDrawerOpen} onOpenChange={setIsAddWalletDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle>ADD NEW WALLET</DrawerTitle>
+              <DrawerTitle>{t("ADD NEW WALLET")}</DrawerTitle>
             </DrawerHeader>
             <IndexAddWallet handleCallbacks={callbackUpdates} />
           </DrawerContent>
@@ -243,7 +247,7 @@ const IndexWallet = () => {
           onOpenChange={setIsImportWalletDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle>IMPORT WALLET</DrawerTitle>
+              <DrawerTitle>{t("IMPORT WALLET")}</DrawerTitle>
             </DrawerHeader>
             <IndexImportWallet handleCallbacks={callbackUpdates} />
           </DrawerContent>
@@ -254,7 +258,7 @@ const IndexWallet = () => {
           onOpenChange={setIsExportWalletDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle>EXPORT WALLET</DrawerTitle>
+              <DrawerTitle>{t("EXPORT WALLET")}</DrawerTitle>
             </DrawerHeader>
             <IndexExportWallet
               selectedWallet={selectedWallet}
@@ -268,7 +272,7 @@ const IndexWallet = () => {
           onOpenChange={setIsDeleteWalletDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle>DELETE WALLET</DrawerTitle>
+              <DrawerTitle>{t("DELETE WALLET")}</DrawerTitle>
             </DrawerHeader>
             <IndexDeleteWallet
               selectedWallet={selectedWallet}

@@ -19,11 +19,13 @@ import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
 import { Eye, EyeOff, X } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
 import OutsideLayout from "../outsideLayout"
 
 const IndexCreatePassword = ({ onSetCurrentPage }) => {
+  const { t } = useTranslation()
   const userService = new UserService()
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
@@ -107,13 +109,13 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-inter font-extrabold text-[12px] leading-[15px] text-white tracking-[0.15em] mb-1">
-                    Enter Password:
+                    {t("Enter Password")}:
                   </FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
                         type={showPassword ? "text" : "password"}
-                        placeholder="Enter password"
+                        placeholder={t("Enter Password")}
                         {...field}
                         onChange={(e) => {
                           field.onChange(e)
@@ -145,13 +147,13 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-inter font-extrabold text-[12px] leading-[15px] text-white tracking-[0.15em] mb-2">
-                    Confirm Password:
+                    {t("Confirm Password")}:
                   </FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
                         type={showConfirmPassword ? "text" : "password"}
-                        placeholder="Enter password"
+                        placeholder={t("Enter password")}
                         {...field}
                         onChange={(e) => {
                           field.onChange(e)
@@ -178,12 +180,14 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
               )}
             />
             <p className="font-inter text-[11px] p-0 font-base text-justify text-white opacity-50">
-              Your password is used to unlock your wallet and is securely stored. We
-              recommend 8 characters with uppercase, lowercase, symbols, and numbers.
+              {t("Your password is used to unlock your wallet and is securely stored.")}
+              {t(
+                "We recommend 8 characters with uppercase, lowercase, symbols, and numbers."
+              )}
             </p>
             <br />
             <Button type="submit" variant="jelly" className="text-white">
-              SETUP PASSWORD
+              {t("SETUP PASSWORD")}
             </Button>
           </form>
         </Form>
