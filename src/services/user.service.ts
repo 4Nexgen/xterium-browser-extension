@@ -173,9 +173,5 @@ export class UserService {
             reject(error); 
           }
         });
-      }
-      
-      
-      
-      
+    } 
 }
