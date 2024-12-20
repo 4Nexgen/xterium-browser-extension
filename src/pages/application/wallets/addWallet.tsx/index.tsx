@@ -112,36 +112,25 @@ const IndexAddWallet = ({ handleCallbacks }) => {
       })
       return
     }
-    setIsInputPasswordDrawerOpen(true)
-  }
-
-  const saveWithPassword = () => {
-    if (!inputedPassword.trim()) {
-      toast({
-        description: (
-          <div className="flex items-center">
-            <X className="mr-2 text-red-500" />
-            Password cannot be empty!
-          </div>
-        ),
-        variant: "destructive"
-      })
-      return
-    }
-
-    userService.login(inputedPassword).then((isValid) => {
-      if (isValid == true) {
-        let encryptionService = new EncryptionService()
-
-        let mnemonic_phrase = encryptionService.encrypt(
-          inputedPassword,
+    userService.getWalletPassword().then((decryptedPassword) => {
+      if (decryptedPassword) {
+        console.log("Encrypted password retrieved:", decryptedPassword);
+    
+        const encryptionService = new EncryptionService();
+    
+        const mnemonic_phrase = encryptionService.encrypt(
+          decryptedPassword,
           walletData.mnemonic_phrase
-        )
-        let secret_key = encryptionService.encrypt(inputedPassword, walletData.secret_key)
-
+        );
+        const secret_key = encryptionService.encrypt(
+          decryptedPassword,
+          walletData.secret_key
+        );
+        
         walletData.mnemonic_phrase = mnemonic_phrase
         walletData.secret_key = secret_key
         walletData.address_type = selectedNetwork ? selectedNetwork.name : ""
+
 
         walletService.createWallet(walletData).then((result) => {
           if (result != null) {
@@ -236,31 +225,6 @@ const IndexAddWallet = ({ handleCallbacks }) => {
         </div>
       </div>
 
-      <Drawer
-        open={isInputPasswordDrawerOpen}
-        onOpenChange={setIsInputPasswordDrawerOpen}>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>SAVE WALLET</DrawerTitle>
-          </DrawerHeader>
-          <div className="p-6">
-            <div className="mb-8">
-              <Label className="font-bold pb-2">Enter your password:</Label>
-              <Input
-                type="password"
-                placeholder="********"
-                value={inputedPassword}
-                onChange={(e) => setInputedPassword(e.target.value)}
-              />
-            </div>
-            <div className="mt-3 mb-3">
-              <Button type="button" variant="jelly" onClick={saveWithPassword}>
-                SAVE
-              </Button>
-            </div>
-          </div>
-        </DrawerContent>
-      </Drawer>
     </>
   )
 }

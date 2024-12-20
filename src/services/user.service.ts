@@ -7,21 +7,28 @@ export class UserService {
         allCopied: true
     })
     private storageKey = "user"
+    private storageWalletKey = "userWallet"
+    private encryptionKey = "someDifferentKey"
     private lastAccessTimeKey = "user_last_access_time"
     private encryptionService = new EncryptionService()
 
     async createPassword(password: string): Promise<boolean | any> {
         return new Promise(async (resolve, reject) => {
-            try {
-                const encryptedPassword = this.encryptionService.encrypt(password, password);
-                await this.storage.setItem(this.storageKey, encryptedPassword);
-
-                resolve(true)
-            } catch (error) {
-                reject(error)
-            }
-        })
-    }
+          try {
+            const encryptedPasswordMethod1 = this.encryptionService.encrypt(password, password);
+      
+            const encryptedPasswordMethod2 = this.encryptionService.encrypt(this.encryptionKey, password);
+      
+            await this.storage.setItem(this.storageKey, encryptedPasswordMethod1); 
+            await this.storage.setItem(this.storageWalletKey, encryptedPasswordMethod2); 
+      
+            resolve(true);
+          } catch (error) {
+            console.error("Error during password creation:", error);
+            reject(error);
+          }
+        });
+      }
 
     async login(password: string): Promise<boolean | any> {
         return new Promise(async (resolve, reject) => {
@@ -33,6 +40,7 @@ export class UserService {
 
                 let isMatched = false
                 const decryptedPassword = this.encryptionService.decrypt(password, encryptedPassword);
+                console.log(decryptedPassword)
                 if (decryptedPassword === password) {
                     isMatched = true;
                 }
@@ -143,4 +151,32 @@ export class UserService {
             }
         })
     }
+
+    async getWalletPassword(): Promise<string | null> {
+        return new Promise(async (resolve, reject) => {
+          try {
+            
+            const encryptedPasswordMethod2 = await this.storage.getItem(this.storageWalletKey);
+      
+            if (!encryptedPasswordMethod2) {
+              return reject("No password found in storage.");
+            }
+      
+            const decryptedPassword = this.encryptionService.decrypt(this.encryptionKey, encryptedPasswordMethod2);
+      
+            if (decryptedPassword) {
+              return resolve(decryptedPassword);
+            }
+      
+            resolve(null);
+          } catch (error) {
+            console.error("Decryption error:", error);
+            reject(error); 
+          }
+        });
+      }
+      
+      
+      
+      
 }
