@@ -20,7 +20,8 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
+  useSidebar
 } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
 import IndexChangePassword from "@/pages/application/change-password"
@@ -70,10 +71,14 @@ const setupItems = [
   }
 ]
 
-const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
+const ApplicationSidebar = ({
+  onSetCurrentPage,
+  onSetIsLogout
+}) => {
   const [isChangePasswordDrawerOpen, setIsChangePasswordDrawerOpen] = useState(false) // State for drawer
   const { setTheme } = useTheme()
   const [activeItem, setActiveItem] = useState<string>("")
+  const { setOpenMobile } = useSidebar()
 
   const toggleDrawer = () => {
     setIsChangePasswordDrawerOpen(true)
@@ -91,6 +96,10 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
     const extensionId = chrome.runtime.id
     const url = `chrome-extension://${extensionId}/popup.html#`
     window.open(url, "_blank")
+  }
+
+  const retractSidebar = () => {
+    setOpenMobile(false)
   }
 
   return (
@@ -115,6 +124,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
                       onClick={() => {
                         setActiveItem(item.title)
                         onSetCurrentPage(item.title)
+                        retractSidebar()
                       }}>
                       <a
                         href={item.url}
