@@ -20,7 +20,8 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
+  useSidebar
 } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
 import IndexChangePassword from "@/pages/application/change-password"
@@ -81,6 +82,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
   const [isChangeLanguageDrawerOpen, setIsChangeLanguageDrawerOpen] = useState(false) // State for drawer
   const { setTheme } = useTheme()
   const [activeItem, setActiveItem] = useState<string>("")
+  const { setOpenMobile } = useSidebar()
   const [selectedLanguage, setSelectedLanguage] = useState("English")
   const [selectedLangToChange, setSelectedLangToChange] = useState("")
 
@@ -135,6 +137,10 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
     window.open(url, "_blank")
   }
 
+  const retractSidebar = () => {
+    setOpenMobile(false)
+  }
+
   return (
     <>
       <Sidebar>
@@ -157,6 +163,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
                       onClick={() => {
                         setActiveItem(item.title)
                         onSetCurrentPage(item.title)
+                        retractSidebar()
                       }}>
                       <a
                         href={item.url}
@@ -207,6 +214,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
                       onClick={() => {
                         setActiveItem(item.title)
                         onSetCurrentPage(item.title)
+                        retractSidebar()
                       }}>
                       <a
                         href={item.url}
@@ -328,7 +336,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
               </DropdownMenu>
             </SidebarMenuItem>
           </SidebarMenu>
-          <p className="text-xs opacity-50 text-right px-2">Xterium v.0.2.0 (Beta)</p>
+          <p className="text-xs opacity-50 text-right px-2">Xterium v.0.2.1 (Beta)</p>
         </SidebarFooter>
       </Sidebar>
 

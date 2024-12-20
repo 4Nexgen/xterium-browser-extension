@@ -107,9 +107,19 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
                         key={tokenType}
                         value={tokenType}
                         onSelect={(value) => {
-                          setSelectedTokenType(
-                            tokenTypes.find((priority) => priority === value) || null
-                          )
+                          const selectedType = tokenTypes.find((priority) => priority === value) || "Native";
+                          setSelectedTokenType(selectedType)
+                          if (selectedType === "Native") {
+                            setTokenData((prev) => ({
+                              ...prev,
+                              network_id: 0
+                            }))
+                          } else if (selectedType === "Asset") {
+                            setTokenData((prev) => ({
+                              ...prev,
+                              network_id: prev.network_id > 0 ? prev.network_id : 1
+                            }))
+                          }
                           setOpenTokenType(false)
                         }}
                         className="cursor-pointer hover:bg-accent"
@@ -129,6 +139,7 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
             type="text"
             placeholder="Enter Network"
             value={tokenData.network_id}
+            disabled={selectedTokenType === "Native"}
             onChange={(e) => handleInputChange("network_id", e.target.value)}
           />
         </div>

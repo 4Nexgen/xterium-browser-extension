@@ -64,6 +64,15 @@ const IndexAddToken = ({ handleCallbacks }) => {
     handleInputChange("symbol", e.target.value.toUpperCase())
   }
 
+  const handleTokenTypeChange = (type: string) => {
+    setSelectedTokenType(type)
+    if (type === "Native") {
+      setTokenData((prev) => ({ ...prev, network_id: 0 }))
+    } else if (type === "Asset") {
+      setTokenData((prev) => ({ ...prev, network_id: 1 }))
+    }
+  }
+
   const saveToken = () => {
     const { network_id, symbol, description } = tokenData
 
@@ -78,6 +87,19 @@ const IndexAddToken = ({ handleCallbacks }) => {
         variant: "destructive"
       })
 
+      return
+    }
+
+    if (network_id <= 0 && selectedTokenType === "Asset") {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-white-500" />
+            Network ID must be greater than 0!
+          </div>
+        ),
+        variant: "destructive"
+      })
       return
     }
 
@@ -163,9 +185,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
                         key={tokenType}
                         value={tokenType}
                         onSelect={(value) => {
-                          setSelectedTokenType(
-                            tokenTypes.find((priority) => priority === value) || null
-                          )
+                          handleTokenTypeChange(value)
                           setOpenTokenType(false)
                         }}
                         className="cursor-pointer hover:bg-accent"
@@ -186,6 +206,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
             placeholder="Enter Network"
             value={tokenData.network_id}
             onChange={(e) => handleInputChange("network_id", e.target.value)}
+            readOnly={selectedTokenType === "Native"}
           />
         </div>
         <div className="mb-3">

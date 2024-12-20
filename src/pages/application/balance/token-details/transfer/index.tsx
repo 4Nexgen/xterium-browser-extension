@@ -25,7 +25,6 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
 
   const [isInputPasswordDrawerOpen, setIsInputPasswordDrawerOpen] =
     useState<boolean>(false)
-  const [inputedPassword, setInputedPassword] = useState<string>("")
   const [isTransferInProgress, setIsTransferInProgress] = useState<boolean>(false)
   const [confirmTransferLabel, setConfirmTransferLabel] = useState<string>("CONFIRM")
 
@@ -41,8 +40,8 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
           </div>
         ),
         variant: "destructive",
-      });
-      return;
+      })
+      return
     }
   
     if (quantity <= 0) {
@@ -54,8 +53,8 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
           </div>
         ),
         variant: "destructive",
-      });
-      return;
+      })
+      return
     }
   
     if (!transferTo.trim()) {
@@ -67,8 +66,8 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
           </div>
         ),
         variant: "destructive",
-      });
-      return;
+      })
+      return
     }
 
     setIsSendInProgress(true)
@@ -102,91 +101,80 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
   }
 
   const sendTransferWithPassword = () => {
-    if (!inputedPassword.trim()) {
+    userService.getWalletPassword().then((storedPassword) => {
+      userService.login(storedPassword).then((isValid) => {
+        if (isValid) {
+          setIsTransferInProgress(true)
+          setConfirmTransferLabel("TRANSFER IN-PROGRESS...")
+  
+          if (balanceData.token.type == "Native") {
+            balanceService
+              .transfer(
+                balanceData.owner,
+                parseFloat(fixBalanceReverse(quantity.toString(), 12)),
+                transferTo,
+                storedPassword
+              )
+              .then((results) => {
+                console.log(results)
+                if (results) {
+                  setIsInputPasswordDrawerOpen(false)
+  
+                  toast({
+                    description: (
+                      <div className="flex items-center">
+                        <Check className="mr-2 text-green-500" />
+                        Transfer Successful!
+                      </div>
+                    ),
+                    variant: "default"
+                  })
+  
+                  handleCallbacks()
+                }
+              })
+          }
+  
+          if (balanceData.token.type == "Asset") {
+            balanceService
+              .transferAssets(
+                balanceData.owner,
+                balanceData.token.network_id,
+                parseFloat(fixBalanceReverse(quantity.toString(), 12)),
+                transferTo,
+                storedPassword
+              )
+              .then((results) => {
+                console.log(results)
+                if (results) {
+                  setIsInputPasswordDrawerOpen(false)
+  
+                  toast({
+                    description: (
+                      <div className="flex items-center">
+                        <Check className="mr-2 text-green-500" />
+                        Transfer Successful!
+                      </div>
+                    ),
+                    variant: "default"
+                  })
+  
+                  handleCallbacks()
+                }
+              })
+          }
+        }
+      })
+    }).catch((error) => {
       toast({
         description: (
           <div className="flex items-center">
             <X className="mr-2 text-red-500" />
-            Password cannot be empty!
+            Error retrieving password: {error}
           </div>
         ),
         variant: "destructive"
       })
-      return
-    }
-
-    userService.login(inputedPassword).then((isValid) => {
-      if (isValid == true) {
-        setIsTransferInProgress(true)
-        setConfirmTransferLabel("TRANSFER IN-PROGRESS...")
-
-        if (balanceData.token.type == "Native") {
-          balanceService
-            .transfer(
-              balanceData.owner,
-              parseFloat(fixBalanceReverse(quantity.toString(), 12)),
-              transferTo,
-              inputedPassword
-            )
-            .then((results) => {
-              console.log(results)
-              if (results == true) {
-                setIsInputPasswordDrawerOpen(false)
-
-                toast({
-                  description: (
-                    <div className="flex items-center">
-                      <Check className="mr-2 text-green-500" />
-                      Transfer Successful!
-                    </div>
-                  ),
-                  variant: "default"
-                })
-
-                handleCallbacks()
-              }
-            })
-        }
-
-        if (balanceData.token.type == "Asset") {
-          balanceService
-            .transferAssets(
-              balanceData.owner,
-              balanceData.token.network_id,
-              parseFloat(fixBalanceReverse(quantity.toString(), 12)),
-              transferTo,
-              inputedPassword
-            )
-            .then((results) => {
-              console.log(results)
-              if (results == true) {
-                setIsInputPasswordDrawerOpen(false)
-
-                toast({
-                  description: (
-                    <div className="flex items-center">
-                      <Check className="mr-2 text-green-500" />
-                      Transfer Successful!
-                    </div>
-                  ),
-                  variant: "default"
-                })
-
-                handleCallbacks()
-              }
-            })
-        }
-      } else {
-        toast({
-          description: (
-            <div className="flex items-center">
-              <X className="mr-2 text-red-500" />
-              Invalid Password! Please try again.
-            </div>
-          ),
-          variant: "destructive"
-        })
-      }
     })
   }
 
@@ -280,24 +268,11 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
                 </span>
                 will be applied to the submission
               </Label>
-              <hr className="mt-4" />
-            </div>
-            <div className="mb-8">
-              <Label className="font-bold pb-2">
-                Please enter your password to confirm:
-              </Label>
-              <Input
-                type="password"
-                placeholder="********"
-                value={inputedPassword}
-                onChange={(e) => setInputedPassword(e.target.value)}
-              />
-            </div>
-            <div className="mt-3 mb-3">
+              <hr className="mt-4 mb-4" />
               <Button
-                type="button"
                 variant="jelly"
                 onClick={sendTransferWithPassword}
+                className="w-full"
                 disabled={isTransferInProgress}>
                 {confirmTransferLabel}
               </Button>
