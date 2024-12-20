@@ -175,6 +175,7 @@ const ApplicationSidebar = ({
                       onClick={() => {
                         setActiveItem(item.title)
                         onSetCurrentPage(item.title)
+                        retractSidebar()
                       }}>
                       <a
                         href={item.url}
