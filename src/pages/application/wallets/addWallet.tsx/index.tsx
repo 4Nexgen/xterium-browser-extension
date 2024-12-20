@@ -114,7 +114,6 @@ const IndexAddWallet = ({ handleCallbacks }) => {
     }
     userService.getWalletPassword().then((decryptedPassword) => {
       if (decryptedPassword) {
-        console.log("Encrypted password retrieved:", decryptedPassword);
     
         const encryptionService = new EncryptionService();
     

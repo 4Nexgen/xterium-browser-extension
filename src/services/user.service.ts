@@ -40,7 +40,6 @@ export class UserService {
 
                 let isMatched = false
                 const decryptedPassword = this.encryptionService.decrypt(password, encryptedPassword);
-                console.log(decryptedPassword)
                 if (decryptedPassword === password) {
                     isMatched = true;
                 }
