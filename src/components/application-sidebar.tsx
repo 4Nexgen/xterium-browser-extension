@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
 import IndexChangePassword from "@/pages/application/change-password"
+import { Label } from "@radix-ui/react-dropdown-menu"
 import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
 import {
   ChevronUp,
@@ -36,47 +37,87 @@ import {
 } from "lucide-react"
 import { useTheme } from "next-themes"
 import React, { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 
+import i18n from "../i18n"
+import { Button } from "./ui/button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "./ui/drawer"
 
-const applicationItems = [
-  {
-    title: "Balance",
-    url: "#",
-    icon: DollarSign
-  },
-  {
-    title: "Tokens",
-    url: "#",
-    icon: Coins
-  },
-  {
-    title: "Network Status",
-    url: "#",
-    icon: Network
-  },
-  {
-    title: "Support",
-    url: "#",
-    icon: MessageCircle
-  }
-]
-
-const setupItems = [
-  {
-    title: "Wallets",
-    url: "#",
-    icon: Wallet
-  }
-]
-
 const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
+  const { t } = useTranslation()
+
+  const applicationItems = [
+    {
+      title: t("Balance"),
+      url: "#",
+      icon: DollarSign
+    },
+    {
+      title: t("Tokens"),
+      url: "#",
+      icon: Coins
+    },
+    {
+      title: t("Network Status"),
+      url: "#",
+      icon: Network
+    },
+    {
+      title: t("Support"),
+      url: "#",
+      icon: MessageCircle
+    }
+  ]
+
+  const setupItems = [
+    {
+      title: t("Wallets"),
+      url: "#",
+      icon: Wallet
+    }
+  ]
+
   const [isChangePasswordDrawerOpen, setIsChangePasswordDrawerOpen] = useState(false) // State for drawer
+  const [isChangeLanguageDrawerOpen, setIsChangeLanguageDrawerOpen] = useState(false) // State for drawer
   const { setTheme } = useTheme()
   const [activeItem, setActiveItem] = useState<string>("")
+  const [selectedLanguage, setSelectedLanguage] = useState("English")
+  const [selectedLangToChange, setSelectedLangToChange] = useState("")
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng)
+    switch (lng) {
+      case "en":
+        setSelectedLanguage("English")
+        break
+      case "ja":
+        setSelectedLanguage("Japanese")
+        break
+      case "ko":
+        setSelectedLanguage("Korean")
+        break
+      case "zh":
+        setSelectedLanguage("Chinese")
+        break
+      default:
+        setSelectedLanguage("English")
+    }
+  }
+
+  useEffect(() => {
+    const storedLang = localStorage.getItem("language")
+
+    if (storedLang) {
+      changeLanguage(storedLang)
+    }
+  }, [])
 
   const toggleDrawer = () => {
     setIsChangePasswordDrawerOpen(true)
+  }
+
+  const toggleChangeLanguageDrawer = () => {
+    setIsChangeLanguageDrawerOpen(true)
   }
 
   const handleSignOut = () => {
@@ -85,6 +126,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
 
   const callbackUpdates = () => {
     setIsChangePasswordDrawerOpen(false)
+    setIsChangeLanguageDrawerOpen(false)
   }
 
   const expandView = () => {
@@ -105,7 +147,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Application</SidebarGroupLabel>
+            <SidebarGroupLabel>{t("Application")}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {applicationItems.map((item) => (
@@ -155,7 +197,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
           </SidebarGroup>
 
           <SidebarGroup>
-            <SidebarGroupLabel>Setup</SidebarGroupLabel>
+            <SidebarGroupLabel>{t("Setup")}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {setupItems.map((item) => (
@@ -211,7 +253,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton>
-                    <Settings /> Settings
+                    <Settings /> {t("Settings")}
                     <ChevronUp className="ml-auto" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
@@ -220,7 +262,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
                   className="w-[--radix-popper-anchor-width]">
                   <DropdownMenuGroup>
                     <DropdownMenuSub>
-                      <DropdownMenuSubTrigger>Theme</DropdownMenuSubTrigger>
+                      <DropdownMenuSubTrigger>{t("Theme")}</DropdownMenuSubTrigger>
                       <DropdownMenuPortal>
                         <DropdownMenuSubContent>
                           <DropdownMenuItem onClick={() => setTheme("light")}>
@@ -237,15 +279,50 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
                       </DropdownMenuPortal>
                     </DropdownMenuSub>
                     <DropdownMenuItem onClick={expandView}>
-                      <span>Expand View</span>
+                      <span>{t("Expand View")}</span>
                     </DropdownMenuItem>
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger>{selectedLanguage}</DropdownMenuSubTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuSubContent>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedLangToChange("en")
+                              toggleChangeLanguageDrawer()
+                            }}>
+                            English
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedLangToChange("ja")
+                              toggleChangeLanguageDrawer()
+                            }}>
+                            Japanese
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedLangToChange("ko")
+                              toggleChangeLanguageDrawer()
+                            }}>
+                            Korean
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedLangToChange("zh")
+                              toggleChangeLanguageDrawer()
+                            }}>
+                            Chinese
+                          </DropdownMenuItem>
+                        </DropdownMenuSubContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenuSub>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={toggleDrawer}>
-                    <span>Change Password</span>
+                    <span>{t("Change Password")}</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSignOut}>
-                    <span>Sign out</span>
+                    <span>{t("Sign out")}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -263,6 +340,36 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
             <DrawerTitle>CHANGE PASSWORD</DrawerTitle>
           </DrawerHeader>
           <IndexChangePassword handleCallbacks={callbackUpdates} />
+        </DrawerContent>
+      </Drawer>
+
+      <Drawer
+        open={isChangeLanguageDrawerOpen}
+        onOpenChange={setIsChangeLanguageDrawerOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>CHANGE LANGUAGE</DrawerTitle>
+          </DrawerHeader>
+          <div className="p-6">
+            <div className="mb-8">
+              <Label className="text-center tracking-[0.15em] font-semibold leading-2 font-Inter text-base">
+                Are you sure you want to change the language?
+              </Label>
+            </div>
+            <div className="flex flex-row space-x-3">
+              <Button
+                type="button"
+                variant="jelly"
+                onClick={() => {
+                  localStorage.setItem("language", selectedLangToChange)
+                  changeLanguage(selectedLangToChange)
+                  setIsChangeLanguageDrawerOpen(false)
+                  window.location.reload()
+                }}>
+                CONFIRM
+              </Button>
+            </div>
+          </div>
         </DrawerContent>
       </Drawer>
     </>

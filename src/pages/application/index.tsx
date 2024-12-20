@@ -1,8 +1,8 @@
 import Header from "@/components/header"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { CurrentPageService } from "@/services/current-page.service"
-import { useTheme } from "next-themes"
 import React, { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import IndexBalance from "./balance"
 import IndexImUrAi from "./imurai"
@@ -12,16 +12,18 @@ import IndexTokens from "./tokens"
 import IndexWallets from "./wallets"
 
 const IndexApplication = () => {
+  const { t } = useTranslation()
+
   const currentPageService = new CurrentPageService()
 
-  const [currentPage, setCurrentPage] = useState<string>("Balance")
+  const [currentPage, setCurrentPage] = useState<string>(t("Balance"))
 
   const getCurrentPage = () => {
     currentPageService.getCurrentPage().then((data) => {
       if (data != null) {
         setCurrentPage(data)
       } else {
-        currentPageService.setCurrentPage("Balance")
+        currentPageService.setCurrentPage(t("Balance"))
       }
     })
   }
@@ -39,14 +41,14 @@ const IndexApplication = () => {
     <main className="max-h-screen">
       <Layout onSetCurrentPage={handleSetCurrentPage}>
         <div className="background-inside-theme">
-          <Header currentPage={currentPage} />
+          <Header currentPage={t(currentPage)} />
           <div className="h-[calc(100vh-60px)]">
             <ScrollArea className="px-4 h-full">
-              {currentPage === "Balance" && <IndexBalance />}
-              {currentPage === "Tokens" && <IndexTokens />}
-              {currentPage === "Network Status" && <IndexNetworkStatus />}
-              {currentPage === "Wallets" && <IndexWallets />}
-              {currentPage === "Support" && <IndexImUrAi />}
+              {currentPage === t("Balance") && <IndexBalance />}
+              {currentPage === t("Tokens") && <IndexTokens />}
+              {currentPage === t("Network Status") && <IndexNetworkStatus />}
+              {currentPage === t("Wallets") && <IndexWallets />}
+              {currentPage === t("Support") && <IndexImUrAi />}
             </ScrollArea>
           </div>
         </div>

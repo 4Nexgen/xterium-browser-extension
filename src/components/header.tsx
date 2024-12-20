@@ -25,6 +25,7 @@ import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
 import { useTheme } from "next-themes"
 import Image from "next/image"
 import React, { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 interface HeaderProps {
   currentPage?: string
@@ -32,6 +33,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => {
+  const { t } = useTranslation()
   const networkService = new NetworkService()
 
   const [networks, setNetworks] = useState<NetworkModel[]>(NetworkData)
@@ -55,7 +57,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
         const defaultNetwork = networks.find((network) => network.name === "Xode")
         if (defaultNetwork) {
           setSelectedNetwork(defaultNetwork)
-          networkService.setNetwork(defaultNetwork)  
+          networkService.setNetwork(defaultNetwork)
         }
       }
     })
@@ -87,7 +89,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbPage>
-                  <b>{currentPage}</b>
+                  <b>{t(currentPage)}</b>
                 </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
@@ -135,8 +137,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
                         setOpenNetworks(false)
                         setIsChangeNetwork(true)
                       }}
-                      className="cursor-pointer hover:bg-accent"
-                      >
+                      className="cursor-pointer hover:bg-accent">
                       <div className="flex items-center">
                         <div className="w-5 h-5 mr-2 relative">
                           <Image

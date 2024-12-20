@@ -32,10 +32,13 @@ import { WalletService } from "@/services/wallet.service"
 import { Coins } from "lucide-react"
 import Image from "next/image"
 import React, { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import IndexTokenDetails from "./token-details"
 
 const IndexBalance = () => {
+  const { t } = useTranslation()
+
   const networkService = new NetworkService()
   const walletService = new WalletService()
   const tokenService = new TokenService()
@@ -89,13 +92,13 @@ const IndexBalance = () => {
 
     tokenService.getTokens().then((data) => {
       if (data.length > 0) {
-        const uniqueTokens = new Set();
+        const uniqueTokens = new Set()
 
         for (let i = 0; i < data.length; i++) {
           let token = data[i]
 
           if (!uniqueTokens.has(token.symbol)) {
-            uniqueTokens.add(token.symbol);
+            uniqueTokens.add(token.symbol)
 
             emptyBalances.push({
               owner: "",
@@ -103,7 +106,7 @@ const IndexBalance = () => {
               freeBalance: 0,
               reservedBalance: 0,
               is_frozen: false
-            });
+            })
           }
         }
       }
@@ -272,7 +275,7 @@ const IndexBalance = () => {
       <div className="py-4 flex flex-col justify-between h-full">
         <div className="py-4">
           <div className="mb-3">
-            <Label>Address</Label>
+            <Label>{t("Address")}</Label>
             <Popover open={openWallets} onOpenChange={setOpenWallets}>
               <PopoverTrigger asChild>
                 <Button
