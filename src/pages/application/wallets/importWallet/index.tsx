@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button"
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
@@ -29,8 +28,6 @@ const IndexImportWallet = ({ handleCallbacks }) => {
   const walletService = new WalletService()
 
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
-  const [isInputPasswordDrawerOpen, setIsInputPasswordDrawerOpen] =
-    useState<boolean>(false)
   const [walletData, setWalletData] = useState<WalletModel>({
     id: 0,
     name: "",
@@ -39,7 +36,6 @@ const IndexImportWallet = ({ handleCallbacks }) => {
     secret_key: "",
     public_key: ""
   })
-  const [inputedPassword, setInputedPassword] = useState<string>("")
 
   const { toast } = useToast()
 
@@ -205,32 +201,6 @@ const IndexImportWallet = ({ handleCallbacks }) => {
           </Button>
         </div>
       </div>
-
-      <Drawer
-        open={isInputPasswordDrawerOpen}
-        onOpenChange={setIsInputPasswordDrawerOpen}>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>Import Wallet</DrawerTitle>
-          </DrawerHeader>
-          <div className="p-6">
-            <div className="mb-8">
-              <Label className="font-bold pb-2">Enter your password:</Label>
-              <Input
-                type="password"
-                placeholder="********"
-                value={inputedPassword}
-                onChange={(e) => setInputedPassword(e.target.value)}
-              />
-            </div>
-            <div className="mt-3 mb-3">
-              <Button type="button" variant="jelly" onClick={saveWallet}>
-                SAVE
-              </Button>
-            </div>
-          </div>
-        </DrawerContent>
-      </Drawer>
     </>
   )
 }

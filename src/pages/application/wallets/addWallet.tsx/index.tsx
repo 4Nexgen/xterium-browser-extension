@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button"
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
@@ -30,8 +29,6 @@ const IndexAddWallet = ({ handleCallbacks }) => {
   const walletService = new WalletService()
 
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
-  const [isInputPasswordDrawerOpen, setIsInputPasswordDrawerOpen] =
-    useState<boolean>(false)
   const [walletData, setWalletData] = useState<WalletModel>({
     id: 0,
     name: "",
@@ -40,7 +37,6 @@ const IndexAddWallet = ({ handleCallbacks }) => {
     secret_key: "",
     public_key: ""
   })
-  const [inputedPassword, setInputedPassword] = useState<string>("")
 
   const { toast } = useToast()
 
