@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
 import IndexChangePassword from "@/pages/application/change-password"
+import { CurrentPageService } from "@/services/current-page.service"
 import { LanguageTranslationService } from "@/services/language-translation.service"
 import { Label } from "@radix-ui/react-dropdown-menu"
 import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
@@ -44,7 +45,6 @@ import { useTranslation } from "react-i18next"
 import i18n from "../i18n"
 import { Button } from "./ui/button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "./ui/drawer"
-import { CurrentPageService } from "@/services/current-page.service"
 
 const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
   const { t } = useTranslation()
@@ -112,9 +112,9 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
     languageTranslationService
       .changeLanguage(lng)
       .then(() => {
-        const defaultPage = t("Balance"); // Set a default page or use a mapping based on language
-        currentPageService.setCurrentPage(defaultPage);
-        window.location.reload();
+        const defaultPage = t("Balance")
+        currentPageService.setCurrentPage(defaultPage)
+        window.location.reload()
       })
       .catch((error) => {
         console.error("Error changing language:", error)

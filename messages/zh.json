@@ -95,5 +95,14 @@
   "Add new wallet by clicking the button below.": "点击下面的按钮添加新钱包。",
   "ADD NEW WALLET": "添加新钱包",
   "Enter password": "输入密码",
-  "UNLOCK": "解锁"
+  "UNLOCK": "解锁",
+  "TRANSFER": "转账",
+  "Enter recipient address": "输入收款人地址",
+  "CONFIRM": "确认",
+  "Wallet Name": "钱包名称",
+  "CALCULATING FEES...": "正在计算费用...",
+  "Select Token Type": "选择代币类型",
+  "Copy Address": "复制地址",
+  "Export Wallet": "导出钱包",
+  "Delete Wallet": "删除钱包"
 }

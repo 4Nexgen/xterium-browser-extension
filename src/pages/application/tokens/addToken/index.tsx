@@ -173,7 +173,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
                 aria-expanded={openTokenType}
                 className="w-full bg-input justify-between text-input-primary p-3"
                 size="lg">
-                {selectedTokenType ? selectedTokenType : "Select Token Type"}
+                {selectedTokenType ? selectedTokenType : t("Select Token Type")}
               </Button>
             </PopoverTrigger>
             <PopoverContent

@@ -95,5 +95,14 @@
   "Add new wallet by clicking the button below.": "아래 버튼을 클릭하여 새 지갑을 추가하세요.",
   "ADD NEW WALLET": "새 지갑 추가",
   "Enter password": "비밀번호를 입력하세요",
-  "UNLOCK": "잠금 해제"
+  "UNLOCK": "잠금 해제",
+  "TRANSFER": "전송",
+  "Enter recipient address": "수신자 주소를 입력하세요",
+  "CONFIRM": "확인",
+  "Wallet Name": "지갑 이름",
+  "CALCULATING FEES...": "수수료 계산 중...",
+  "Select Token Type": "토큰 유형 선택",
+  "Copy Address": "주소 복사",
+  "Export Wallet": "지갑 내보내기",
+  "Delete Wallet": "지갑 삭제"
 }

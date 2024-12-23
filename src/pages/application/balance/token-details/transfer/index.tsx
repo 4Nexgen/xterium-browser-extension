@@ -7,7 +7,7 @@ import type { BalanceModel } from "@/models/balance.model"
 import { BalanceServices } from "@/services/balance.service"
 import { UserService } from "@/services/user.service"
 import { Check, X } from "lucide-react"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
@@ -38,7 +38,7 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
         description: (
           <div className="flex items-center">
             <X className="mr-2 text-red-500" />
-            Quantity cannot be empty!
+            {t("Quantity cannot be empty!")}
           </div>
         ),
         variant: "destructive"
@@ -73,7 +73,7 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
     }
 
     setIsSendInProgress(true)
-    setSendLabel("CALCULATING FEES...")
+    setSendLabel(t("CALCULATING FEES..."))
 
     balanceService
       .getEstimateFee(
@@ -86,11 +86,15 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
         setIsInputPasswordDrawerOpen(true)
 
         setIsSendInProgress(false)
-        setSendLabel("SEND")
+        setSendLabel(t("SEND"))
 
         setPartialFee(fixBalance(results.partialFee, 12))
       })
   }
+
+  useEffect(() => {
+    setSendLabel(t("SEND"))
+  }, [])
 
   const fixBalance = (value: string, decimal: number) => {
     const multiplier = 10 ** decimal
@@ -263,7 +267,8 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>
-              {t("SEND")} {balanceData.token.symbol}
+              {t("SEND")}
+              {balanceData.token.symbol}
             </DrawerTitle>
           </DrawerHeader>
           <div className="p-6">

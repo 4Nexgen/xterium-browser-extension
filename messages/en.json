@@ -93,5 +93,15 @@
   "IMPORT WALLET": "IMPORT WALLET",
   "No Wallet Found": "No Wallet Found",
   "Add new wallet by clicking the button below.": "Add new wallet by clicking the button below.",
-  "ADD NEW WALLET": "ADD NEW WALLET"
+  "ADD NEW WALLET": "ADD NEW WALLET",
+  "TRANSFER": "TRANSFER",
+  "Enter recipient address": "Enter recipient address",
+  "CONFIRM": "CONFIRM",
+  "Wallet Name": "Wallet Name",
+  "CALCULATING FEES...": "CALCULATING FEES...",
+  "Select Token Type": "Select Token Type",
+  "Copy Address": "Copy Address",
+  "Export Wallet": "Export Wallet",
+  "Delete Wallet": "Delete Wallet"
+  
 }

@@ -12,10 +12,12 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
+import i18n from "@/i18n"
+import { LanguageTranslationService } from "@/services/language-translation.service"
 import { UserService } from "@/services/user.service"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeOff, X } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
@@ -24,11 +26,31 @@ import OutsideLayout from "../outsideLayout"
 
 const IndexLogin = ({ onSetCurrentPage }) => {
   const { t } = useTranslation()
+  const languageTranslationService = new LanguageTranslationService()
+  const [selectedLanguage, setSelectedLanguage] = useState("English")
   const userService = new UserService()
 
   const [showPassword, setShowPassword] = useState<boolean>(false)
 
   const { toast } = useToast()
+
+  const getStoredLanguage = () => {
+    languageTranslationService
+      .getStoredLanguage()
+      .then((storedLanguage) => {
+        if (storedLanguage) {
+          setSelectedLanguage(languageTranslationService.getLanguageName(storedLanguage))
+          i18n.changeLanguage(storedLanguage)
+        }
+      })
+      .catch((error) => {
+        console.error("Error loading stored language:", error)
+      })
+  }
+
+  useEffect(() => {
+    getStoredLanguage()
+  }, [])
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword)

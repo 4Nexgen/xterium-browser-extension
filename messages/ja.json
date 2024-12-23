@@ -95,5 +95,14 @@
   "Add new wallet by clicking the button below.": "下のボタンをクリックして新しいウォレットを追加してください。",
   "ADD NEW WALLET": "新しいウォレットを追加",
   "Enter password": "パスワードを入力してください",
-  "UNLOCK": "アンロック"
+  "UNLOCK": "アンロック",
+  "TRANSFER": "転送",
+  "Enter recipient address": "受取人のアドレスを入力してください",
+  "CONFIRM": "確認",
+  "Wallet Name": "ウォレット名",
+  "CALCULATING FEES...": "手数料を計算中...",
+  "Select Token Type": "トークンタイプを選択",
+  "Copy Address": "アドレスをコピー",
+  "Export Wallet": "ウォレットをエクスポート",
+  "Delete Wallet": "ウォレットを削除"
 }
