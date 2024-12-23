@@ -44,10 +44,12 @@ import { useTranslation } from "react-i18next"
 import i18n from "../i18n"
 import { Button } from "./ui/button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "./ui/drawer"
+import { CurrentPageService } from "@/services/current-page.service"
 
 const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
   const { t } = useTranslation()
   const languageTranslationService = new LanguageTranslationService()
+  const currentPageService = new CurrentPageService()
 
   const applicationItems = [
     {
@@ -110,8 +112,9 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
     languageTranslationService
       .changeLanguage(lng)
       .then(() => {
-        setSelectedLanguage(languageTranslationService.getLanguageName(lng))
-        window.location.reload()
+        const defaultPage = t("Balance"); // Set a default page or use a mapping based on language
+        currentPageService.setCurrentPage(defaultPage);
+        window.location.reload();
       })
       .catch((error) => {
         console.error("Error changing language:", error)
