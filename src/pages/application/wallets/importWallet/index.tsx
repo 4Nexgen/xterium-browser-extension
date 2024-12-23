@@ -159,16 +159,6 @@ const IndexImportWallet = ({ handleCallbacks }) => {
         })
 
         handleCallbacks()
-      } else {
-        toast({
-          description: (
-            <div className="flex items-center">
-              <X className="mr-2 text-red-500" />
-              Invalid Password! Please try again.
-            </div>
-          ),
-          variant: "destructive"
-        })
       }
     })
   }

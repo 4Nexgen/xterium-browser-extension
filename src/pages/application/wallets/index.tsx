@@ -102,7 +102,7 @@ const IndexWallet = () => {
       })
       .catch(() => {
         toast({
-          description: "Failed to copy text.",
+          description: "Failed to copy address.",
           variant: "destructive"
         })
       })
