@@ -102,6 +102,8 @@
   "Select Token Type": "Select Token Type",
   "Copy Address": "Copy Address",
   "Export Wallet": "Export Wallet",
-  "Delete Wallet": "Delete Wallet"
+  "Delete Wallet": "Delete Wallet",
+  "Fees of": "Fees of",
+  "TRANSFER IN-PROGRESS...": "TRANSFER IN-PROGRESS..."
   
 }

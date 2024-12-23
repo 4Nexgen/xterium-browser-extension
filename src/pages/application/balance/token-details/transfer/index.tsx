@@ -94,6 +94,7 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
 
   useEffect(() => {
     setSendLabel(t("SEND"))
+    setConfirmTransferLabel(t("CONFIRM"))
   }, [])
 
   const fixBalance = (value: string, decimal: number) => {
@@ -113,7 +114,7 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
         userService.login(storedPassword).then((isValid) => {
           if (isValid) {
             setIsTransferInProgress(true)
-            setConfirmTransferLabel("TRANSFER IN-PROGRESS...")
+            setConfirmTransferLabel(t("TRANSFER IN-PROGRESS..."))
 
             if (balanceData.token.type == "Native") {
               balanceService
@@ -274,7 +275,7 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
           <div className="p-6">
             <div className="mb-8">
               <Label className="pb-2">
-                Fees of
+                {t("Fees of")}
                 <span className="p-2 font-extrabold text-input-primary">
                   {partialFee.toString()} XON
                 </span>

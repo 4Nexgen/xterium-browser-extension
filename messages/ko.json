@@ -104,5 +104,7 @@
   "Select Token Type": "토큰 유형 선택",
   "Copy Address": "주소 복사",
   "Export Wallet": "지갑 내보내기",
-  "Delete Wallet": "지갑 삭제"
+  "Delete Wallet": "지갑 삭제",
+  "Fees of": "수수료:",
+  "TRANSFER IN-PROGRESS...": "전송 진행 중..."
 }

@@ -104,5 +104,7 @@
   "Select Token Type": "选择代币类型",
   "Copy Address": "复制地址",
   "Export Wallet": "导出钱包",
-  "Delete Wallet": "删除钱包"
+  "Delete Wallet": "删除钱包",
+  "Fees of": "费用：",
+  "TRANSFER IN-PROGRESS...": "转账进行中..."
 }
