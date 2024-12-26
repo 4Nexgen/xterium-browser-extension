@@ -103,7 +103,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
         description: (
           <div className="flex items-center">
             <X className="mr-2 text-red-500" />
-            All fields must be filled out!
+            {t("All fields must be filled out!")}
           </div>
         ),
         variant: "destructive"
@@ -133,7 +133,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
               description: (
                 <div className="flex items-center">
                   <Check className="mr-2 text-green-500" />
-                  Wallet Saved Successfully!
+                  {t("Wallet Saved Successfully!")}
                 </div>
               ),
               variant: "default"
@@ -175,7 +175,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
         <div className="mb-2 flex items-center justify-center">
           <Button
             type="button"
-            className="w-[220px] border border-transparent dark:border-white"
+            className="w-[240px] border border-transparent dark:border-white"
             variant="outline"
             onClick={generateMnemonic}>
             <RefreshCcw />

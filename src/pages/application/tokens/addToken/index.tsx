@@ -83,7 +83,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
         description: (
           <div className="flex items-center">
             <X className="mr-2 text-white-500" />
-            All fields must be filled out!
+            {t("All fields must be filled out!")}
           </div>
         ),
         variant: "destructive"
@@ -97,7 +97,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
         description: (
           <div className="flex items-center">
             <X className="mr-2 text-white-500" />
-            Network ID must be greater than 0!
+            {t("Network ID must be greater than 0!")}
           </div>
         ),
         variant: "destructive"
@@ -118,7 +118,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
           description: (
             <div className="flex items-center">
               <X className="mr-2 text-white-500" />
-              Network ID already exists!
+              {t("Network ID already exists!")}
             </div>
           ),
           variant: "destructive"
@@ -131,7 +131,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
           description: (
             <div className="flex items-center">
               <X className="mr-2 text-white-500" />
-              Token symbol already exists!
+              {t("Token symbol already exists!")}
             </div>
           ),
           variant: "destructive"
@@ -148,7 +148,7 @@ const IndexAddToken = ({ handleCallbacks }) => {
             description: (
               <div className="flex items-center">
                 <Check className="mr-2 text-green-500" />
-                Token Saved Successfully!
+                {t("Token Saved Successfully!")}
               </div>
             ),
             variant: "default"

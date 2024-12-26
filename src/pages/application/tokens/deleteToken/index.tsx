@@ -21,7 +21,7 @@ const IndexDeleteToken = ({ selectedToken, handleCallbacks }) => {
           description: (
             <div className="flex items-center">
               <Check className="mr-2 text-green-500" />
-              Token Deleted Successfully!
+              {t("Token Deleted Successfully!")}
             </div>
           ),
           variant: "default"

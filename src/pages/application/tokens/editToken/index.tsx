@@ -57,8 +57,8 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
 
       if (duplicateSymbol || duplicateNetworkId) {
         const errorMsg = duplicateSymbol
-          ? "Token symbol already exists."
-          : "Network ID already exists."
+          ? t("Token symbol already exists.")
+          : t("Network ID already exists.")
         toast({
           description: (
             <div className="flex items-center">
@@ -76,7 +76,7 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
             description: (
               <div className="flex items-center">
                 <Check className="mr-2 text-green-500" />
-                Token Updated Successfully!
+                {t("Token Updated Successfully!")}
               </div>
             ),
             variant: "default"
@@ -112,7 +112,8 @@ const IndexEditToken = ({ selectedToken, handleCallbacks }) => {
                         key={tokenType}
                         value={tokenType}
                         onSelect={(value) => {
-                          const selectedType = tokenTypes.find((priority) => priority === value) || "Native";
+                          const selectedType =
+                            tokenTypes.find((priority) => priority === value) || "Native"
                           setSelectedTokenType(selectedType)
                           if (selectedType === "Native") {
                             setTokenData((prev) => ({

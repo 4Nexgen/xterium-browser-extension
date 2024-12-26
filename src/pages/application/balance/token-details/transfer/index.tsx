@@ -51,7 +51,7 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
         description: (
           <div className="flex items-center">
             <X className="mr-2 text-red-500" />
-            Quantity must be greater than zero!
+            {"Quantity must be greater than zero!"}
           </div>
         ),
         variant: "destructive"
@@ -64,7 +64,7 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
         description: (
           <div className="flex items-center">
             <X className="mr-2 text-red-500" />
-            Recipient address cannot be empty!
+            {t("Recipient address cannot be empty!")}
           </div>
         ),
         variant: "destructive"
@@ -133,7 +133,7 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
                       description: (
                         <div className="flex items-center">
                           <Check className="mr-2 text-green-500" />
-                          Transfer Successful!
+                          {t("Transfer Successful!")}
                         </div>
                       ),
                       variant: "default"
@@ -162,7 +162,7 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
                       description: (
                         <div className="flex items-center">
                           <Check className="mr-2 text-green-500" />
-                          Transfer Successful!
+                          {t("Transfer Successful!")}
                         </div>
                       ),
                       variant: "default"
@@ -180,7 +180,7 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
           description: (
             <div className="flex items-center">
               <X className="mr-2 text-red-500" />
-              Error retrieving password: {error}
+              {t("Error retrieving password")}: {error}
             </div>
           ),
           variant: "destructive"

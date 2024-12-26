@@ -117,7 +117,7 @@ const IndexTokens = () => {
         description: (
           <div className="flex items-center">
             <X className="mr-2 text-red-500" />
-            This token is preloaded and cannot be edited!
+            {t("This token is preloaded and cannot be edited!")}
           </div>
         ),
         variant: "default"
@@ -134,7 +134,7 @@ const IndexTokens = () => {
         description: (
           <div className="flex items-center">
             <X className="mr-2 text-red-500" />
-            This token is preloaded and cannot be deleted!
+            {t("This token is preloaded and cannot be deleted!")}
           </div>
         ),
         variant: "default"

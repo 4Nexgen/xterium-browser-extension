@@ -76,7 +76,7 @@ const IndexImportWallet = ({ handleCallbacks }) => {
               description: (
                 <div className="flex items-center">
                   <X className="mr-2 text-red-500" />
-                  Invalid mnemonic phrase in JSON!
+                  {t("Invalid mnemonic phrase in JSON!")}
                 </div>
               ),
               variant: "destructive"
@@ -87,7 +87,7 @@ const IndexImportWallet = ({ handleCallbacks }) => {
             description: (
               <div className="flex items-center">
                 <X className="mr-2 text-red-500" />
-                Failed to read the JSON file!
+                {t("Failed to read the JSON file!")}
               </div>
             ),
             variant: "destructive"
@@ -119,7 +119,7 @@ const IndexImportWallet = ({ handleCallbacks }) => {
         description: (
           <div className="flex items-center">
             <X className="mr-2 text-red-500" />
-            All fields must be filled out!
+            {t("All fields must be filled out!")}
           </div>
         ),
         variant: "destructive"
@@ -150,7 +150,7 @@ const IndexImportWallet = ({ handleCallbacks }) => {
               description: (
                 <div className="flex items-center">
                   <Check className="mr-2 text-green-500" />
-                  Wallet Imported Successfully!
+                  {t("Wallet Imported Successfully!")}
                 </div>
               ),
               variant: "default"

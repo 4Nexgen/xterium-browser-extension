@@ -94,7 +94,7 @@ const IndexWallet = () => {
           description: (
             <div className="flex items-center">
               <Check className="mr-2 text-green-500" />
-              Copied to clipboard!
+              {t("Copied to clipboard!")}
             </div>
           ),
           variant: "default"
@@ -102,7 +102,7 @@ const IndexWallet = () => {
       })
       .catch(() => {
         toast({
-          description: "Failed to copy address.",
+          description: t("Failed to copy address."),
           variant: "destructive"
         })
       })

@@ -38,7 +38,7 @@ const IndexExportWallet = ({ selectedWallet, handleCallbacks }) => {
           description: (
             <div className="flex items-center">
               <X className="mr-2 text-white-500" />
-              Unable to retrieve wallet password.
+              {t("Unable to retrieve wallet password.")}
             </div>
           ),
           variant: "destructive"
@@ -57,7 +57,7 @@ const IndexExportWallet = ({ selectedWallet, handleCallbacks }) => {
           description: (
             <div className="flex items-center">
               <X className="mr-2 text-white-500" />
-              Failed to decrypt wallet data.
+              {t("Failed to decrypt wallet data.")}
             </div>
           ),
           variant: "destructive"
@@ -93,7 +93,7 @@ const IndexExportWallet = ({ selectedWallet, handleCallbacks }) => {
         description: (
           <div className="flex items-center">
             <X className="mr-2 text-white-500" />
-            Something went wrong during export.
+            {t("Something went wrong during export.")}
           </div>
         ),
         variant: "destructive"

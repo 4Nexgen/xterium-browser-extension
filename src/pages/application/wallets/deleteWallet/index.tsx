@@ -21,7 +21,7 @@ const IndexDeleteWallet = ({ selectedWallet, handleCallbacks }) => {
           description: (
             <div className="flex items-center">
               <Check className="mr-2 text-green-500" />
-              Wallet Deleted Successfully!
+              {t("Wallet Deleted Successfully!")}
             </div>
           ),
           variant: "default"

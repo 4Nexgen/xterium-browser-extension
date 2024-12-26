@@ -82,7 +82,7 @@ const IndexLogin = ({ onSetCurrentPage }) => {
           description: (
             <div className="flex items-center">
               <X className="mr-2 text-white-500" />
-              Incorrect password!
+              {t("Incorrect password!")}
             </div>
           ),
           variant: "destructive"

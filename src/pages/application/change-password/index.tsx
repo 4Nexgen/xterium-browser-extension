@@ -40,14 +40,14 @@ const IndexChangePassword = ({ handleCallbacks }) => {
     .object({
       password: z
         .string()
-        .min(8, "Password must be at least 8 characters.")
-        .regex(/[A-Z]/, "Password must include at least one uppercase letter.")
-        .regex(/[a-z]/, "Password must include at least one lowercase letter.")
-        .regex(/[0-9]/, "Password must include at least one number."),
-      confirmPassword: z.string().min(8, "Please confirm your password.")
+        .min(8, t("Password must be at least 8 characters."))
+        .regex(/[A-Z]/, t("Password must include at least one uppercase letter."))
+        .regex(/[a-z]/, t("Password must include at least one lowercase letter."))
+        .regex(/[0-9]/, t("Password must include at least one number.")),
+      confirmPassword: z.string().min(8, t("Please confirm your password."))
     })
     .refine((data) => data.password === data.confirmPassword, {
-      message: "Passwords do not match.",
+      message: t("Passwords do not match."),
       path: ["confirmPassword"]
     })
 
@@ -62,7 +62,7 @@ const IndexChangePassword = ({ handleCallbacks }) => {
     }
 
     if (!oldPassword || !newPassword || !confirmPassword) {
-      setError("All fields are required.")
+      setError(t("All fields are required."))
       return
     }
 
@@ -71,7 +71,7 @@ const IndexChangePassword = ({ handleCallbacks }) => {
       .then((existingPassword) => {
         if (existingPassword != null) {
           if (existingPassword !== oldPassword) {
-            setError("Old password is incorrect.")
+            setError(t("Old password is incorrect."))
             console.log("Old password is incorrect.")
           } else {
             userService.updatePassword(newPassword).then((isUpdated) => {
@@ -80,7 +80,7 @@ const IndexChangePassword = ({ handleCallbacks }) => {
                   description: (
                     <div className="flex items-center">
                       <Check className="mr-2 text-green-500" />
-                      Password Changed Successful!
+                      {t("Password Changed Successful!")}
                     </div>
                   ),
                   variant: "default"
