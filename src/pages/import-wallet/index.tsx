@@ -1,34 +1,33 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
-import type { WalletModel } from "@/models/wallet.model"
-import { WalletService } from "@/services/wallet.service"
-import { u8aToHex } from "@polkadot/util"
-import {
-  cryptoWaitReady,
-  encodeAddress,
-  mnemonicToMiniSecret,
-  mnemonicValidate,
-  sr25519PairFromSeed
-} from "@polkadot/util-crypto"
-import { Check, X } from "lucide-react"
-import React, { useEffect, useState } from "react"
-import { useTranslation } from "react-i18next"
-
-import "@polkadot/wasm-crypto/initOnlyAsm"
-
-import type { NetworkModel } from "@/models/network.model"
-import { EncryptionService } from "@/services/encryption.service"
-import { NetworkService } from "@/services/network.service"
 import { UserService } from "@/services/user.service"
+import {
+    cryptoWaitReady,
+    encodeAddress,
+    mnemonicToMiniSecret,
+    mnemonicValidate,
+    sr25519PairFromSeed
+} from "@polkadot/util-crypto"
+import { u8aToHex } from "@polkadot/util"
+import { ArrowLeft, Check, X } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
+import { NetworkService } from "@/services/network.service"
+import { WalletService } from "@/services/wallet.service"
+import type { NetworkModel } from "@/models/network.model"
+import type { WalletModel } from "@/models/wallet.model"
+import { Label } from "@/components/ui/label"
+import { EncryptionService } from "@/services/encryption.service"
 
-const IndexImportWallet = ({ handleCallbacks }) => {
+const IndexImportWalletPage = ({ handleCallbacks }) => {
   const { t } = useTranslation()
   const networkService = new NetworkService()
   const userService = new UserService()
   const walletService = new WalletService()
-
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
   const [walletData, setWalletData] = useState<WalletModel>({
     id: 0,
@@ -76,7 +75,7 @@ const IndexImportWallet = ({ handleCallbacks }) => {
               description: (
                 <div className="flex items-center">
                   <X className="mr-2 text-red-500" />
-                  {t("Invalid mnemonic phrase in JSON!")}
+                  Invalid mnemonic phrase in JSON!
                 </div>
               ),
               variant: "destructive"
@@ -87,7 +86,7 @@ const IndexImportWallet = ({ handleCallbacks }) => {
             description: (
               <div className="flex items-center">
                 <X className="mr-2 text-red-500" />
-                {t("Failed to read the JSON file!")}
+                Failed to read the JSON file!
               </div>
             ),
             variant: "destructive"
@@ -119,7 +118,7 @@ const IndexImportWallet = ({ handleCallbacks }) => {
         description: (
           <div className="flex items-center">
             <X className="mr-2 text-red-500" />
-            {t("All fields must be filled out!")}
+            All fields must be filled out!
           </div>
         ),
         variant: "destructive"
@@ -150,7 +149,7 @@ const IndexImportWallet = ({ handleCallbacks }) => {
               description: (
                 <div className="flex items-center">
                   <Check className="mr-2 text-green-500" />
-                  {t("Wallet Imported Successfully!")}
+                  Wallet Imported Successfully!
                 </div>
               ),
               variant: "default"
@@ -158,15 +157,29 @@ const IndexImportWallet = ({ handleCallbacks }) => {
           }
         })
 
-        handleCallbacks()
+        handleCallbacks("application")      
       }
     })
   }
 
+  const handleBackClick = () => {
+    handleCallbacks("indexwallet") 
+  }
+
   return (
-    <>
-      <div className="p-6">
-        <div className="mb-3">
+    <div className="bg-background-sheet flex justify-center items-center">
+      <div className="bg-white background-inside-theme h-screen max-w-xl w-full">
+      <header className=" p-6 flex items-center border-b border-border-1">
+        <div 
+          onClick={handleBackClick} 
+          className="cursor-pointer flex items-center text-xl"
+        >
+          <ArrowLeft className="mr-2 ml-3" />
+          <span>{t("Import Wallet from JSON")}</span>
+        </div>
+      </header>
+      <div className="p-10">
+        <div className="mb-3 flex flex-col">
           <Label>{t("Enter a unique wallet name")}:</Label>
           <Input
             type="text"
@@ -187,13 +200,14 @@ const IndexImportWallet = ({ handleCallbacks }) => {
         </div>
 
         <div className="mt-5 mb-3">
-          <Button type="button" variant="jelly" onClick={saveWallet}>
+          <Button type="button" variant="jelly" className="my-auto" onClick={saveWallet}>
             {t("SAVE")}
           </Button>
         </div>
       </div>
-    </>
+      </div>
+    </div>
   )
 }
 
-export default IndexImportWallet
+export default IndexImportWalletPage

@@ -175,7 +175,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
         <div className="mb-2 flex items-center justify-center">
           <Button
             type="button"
-            className="w-[240px] border border-transparent dark:border-white"
+            className="w-[250px] border border-transparent dark:border-white"
             variant="outline"
             onClick={generateMnemonic}>
             <RefreshCcw />

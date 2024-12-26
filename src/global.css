@@ -11,6 +11,7 @@ body {
 @layer base {
   :root {
     --background: 0 0% 100%;
+    --background-sheet: 0 0% 96%;
     --foreground: 224 71.4% 4.1%;
     --card: 0 0% 100%;
     --card-foreground: 224 71.4% 4.1%;
@@ -27,6 +28,7 @@ body {
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 20% 98%;
     --border: 220 13% 91%;
+    --border-1: 0 0% 70%;
     --input: 220 13% 91%;
     --ring: 178 77% 70%;
     --radius: 0.5rem;
@@ -47,6 +49,7 @@ body {
 
   .dark {
     --background: 203 34% 13%;
+    --background-sheet: 203 39% 18%;
     --foreground: 210 20% 98%;
     --card: 181 69% 29%;
     --card-foreground: 210 20% 98%;
@@ -64,6 +67,7 @@ body {
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 20% 98%;
     --border: 178 77% 70%;
+    --border-1: 0 0% 100%;
     --input: 219 32% 10%;
     --ring: 178 77% 70%;
     --chart-1: 220 70% 50%;

@@ -20,7 +20,7 @@ import { useTranslation } from "react-i18next"
 import IndexAddWallet from "./addWallet.tsx"
 import IndexDeleteWallet from "./deleteWallet"
 import IndexExportWallet from "./exportWallet"
-import IndexImportWallet from "./importWallet"
+import IndexImportWalletPage from "@/pages/import-wallet/index.jsx"
 
 const IndexWallet = () => {
   const { t } = useTranslation()
@@ -40,7 +40,7 @@ const IndexWallet = () => {
   const [isAddWalletDrawerOpen, setIsAddWalletDrawerOpen] = useState(false)
   const [isExportWalletDrawerOpen, setIsExportWalletDrawerOpen] = useState(false)
   const [isDeleteWalletDrawerOpen, setIsDeleteWalletDrawerOpen] = useState(false)
-  const [isImportWalletDrawerOpen, setIsImportWalletDrawerOpen] = useState(false)
+  const [isImportWalletPageOpen, setIsImportWalletPageOpen] = useState(false)
 
   const { toast } = useToast()
 
@@ -63,7 +63,7 @@ const IndexWallet = () => {
       getWallets()
 
       if (window.location.hash === "#import") {
-        setIsImportWalletDrawerOpen(true)
+        setIsImportWalletPageOpen(true)
       }
     }, 100)
   }, [])
@@ -73,17 +73,20 @@ const IndexWallet = () => {
   }
 
   const expandView = () => {
+    setIsImportWalletPageOpen(true); 
     const extensionId = chrome.runtime.id
     const url = `chrome-extension://${extensionId}/popup.html#import`
-
+  
     if (window.location.href !== url) {
       window.open(url, "_blank")
     }
+    handleCallbacks("import-wallet")
   }
+  
 
   const importWallet = () => {
     expandView()
-    setIsImportWalletDrawerOpen(true)
+    setIsImportWalletPageOpen(true)
   }
 
   const copyWallet = (value: string) => {
@@ -122,15 +125,30 @@ const IndexWallet = () => {
     setIsAddWalletDrawerOpen(false)
     setIsExportWalletDrawerOpen(false)
     setIsDeleteWalletDrawerOpen(false)
-    setIsImportWalletDrawerOpen(false)
+    setIsImportWalletPageOpen(false)
 
     setTimeout(() => {
       getWallets()
     }, 100)
   }
 
+  const handleCallbacks = (action: string) => {
+    if (action === "import-wallet") {
+      setIsImportWalletPageOpen(false)
+    }
+
+    setTimeout(() => {
+      getWallets() 
+    }, 100)
+  }
+
   return (
     <>
+    {isImportWalletPageOpen ? (
+        <div className="w-full p-4">
+          <IndexImportWalletPage handleCallbacks={callbackUpdates} />
+        </div>
+      ) : (
       <div className="py-4 flex flex-col justify-between h-full">
         <div className="flex-1">
           {wallets.filter(
@@ -233,23 +251,18 @@ const IndexWallet = () => {
           </Button>
         </div>
 
+        {isImportWalletPageOpen && (
+          <div className="w-full p-4">
+            <IndexImportWalletPage handleCallbacks={callbackUpdates} />
+          </div>
+        )}
+
         <Drawer open={isAddWalletDrawerOpen} onOpenChange={setIsAddWalletDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
               <DrawerTitle>{t("ADD NEW WALLET")}</DrawerTitle>
             </DrawerHeader>
             <IndexAddWallet handleCallbacks={callbackUpdates} />
-          </DrawerContent>
-        </Drawer>
-
-        <Drawer
-          open={isImportWalletDrawerOpen}
-          onOpenChange={setIsImportWalletDrawerOpen}>
-          <DrawerContent>
-            <DrawerHeader>
-              <DrawerTitle>{t("IMPORT WALLET")}</DrawerTitle>
-            </DrawerHeader>
-            <IndexImportWallet handleCallbacks={callbackUpdates} />
           </DrawerContent>
         </Drawer>
 
@@ -281,6 +294,7 @@ const IndexWallet = () => {
           </DrawerContent>
         </Drawer>
       </div>
+      )}
     </>
   )
 }

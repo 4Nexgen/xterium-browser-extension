@@ -13,6 +13,7 @@ export default {
       },
       colors: {
         background: "hsl(var(--background))",
+        "background-sheet": "hsl(var(--background-sheet))",
         foreground: "hsl(var(--foreground))",
         card: {
           DEFAULT: "hsl(var(--card))",
@@ -43,6 +44,7 @@ export default {
           foreground: "hsl(var(--destructive-foreground))"
         },
         border: "hsl(var(--border))",
+        "border-1": "hsl(var(--border-1))",
         input: {
           DEFAULT: "hsl(var(--input))",
           primary: "hsl(var(--primary-input))"

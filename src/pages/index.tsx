@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import IndexApplication from "./application"
 import IndexCreatePassword from "./create-password"
 import IndexLogin from "./login"
+import IndexImportWalletPage from "./import-wallet"
 
 const IndexPages = () => {
   const userService = new UserService()
@@ -52,6 +53,10 @@ const IndexPages = () => {
       )}
       {currentPage === "login" && <IndexLogin onSetCurrentPage={handleSetCurrentPage} />}
       {currentPage === "application" && <IndexApplication />}
+      {currentPage === "import-wallet" && (
+        <IndexImportWalletPage handleCallbacks={handleSetCurrentPage} />
+      )}
+
     </>
   )
 }
