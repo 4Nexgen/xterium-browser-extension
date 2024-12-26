@@ -137,5 +137,6 @@
   "Something went wrong during export.": "내보내기 중에 문제가 발생했습니다.",
   "Copied to clipboard!": "클립보드에 복사되었습니다!",
   "Failed to copy address.": "주소 복사에 실패했습니다.",
-  "Incorrect password!": "비밀번호가 틀렸습니다!"
+  "Incorrect password!": "비밀번호가 틀렸습니다!",
+  "Import Wallet from JSON": "JSON에서 지갑 가져오기"
 }

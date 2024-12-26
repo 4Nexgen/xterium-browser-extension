@@ -137,5 +137,7 @@
   "Something went wrong during export.": "导出过程中出现问题。",
   "Copied to clipboard!": "已复制到剪贴板！",
   "Failed to copy address.": "复制地址失败。",
-  "Incorrect password!": "密码错误！"
+  "Incorrect password!": "密码错误！",
+  "Import Wallet from": "ウォレットをインポート from",
+  "Import Wallet from JSON": "从JSON导入钱包"
 }

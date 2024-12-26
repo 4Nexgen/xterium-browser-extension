@@ -22,9 +22,13 @@ import type { NetworkModel } from "@/models/network.model"
 import type { WalletModel } from "@/models/wallet.model"
 import { Label } from "@/components/ui/label"
 import { EncryptionService } from "@/services/encryption.service"
+import { LanguageTranslationService } from "@/services/language-translation.service"
+import i18n from "@/i18n"
 
 const IndexImportWalletPage = ({ handleCallbacks }) => {
   const { t } = useTranslation()
+  const languageTranslationService = new LanguageTranslationService()
+  const [selectedLanguage, setSelectedLanguage] = useState("English")
   const networkService = new NetworkService()
   const userService = new UserService()
   const walletService = new WalletService()
@@ -46,8 +50,23 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
     })
   }
 
+  const getStoredLanguage = () => {
+    languageTranslationService
+      .getStoredLanguage()
+      .then((storedLanguage) => {
+        if (storedLanguage) {
+          setSelectedLanguage(languageTranslationService.getLanguageName(storedLanguage))
+          i18n.changeLanguage(storedLanguage)
+        }
+      })
+      .catch((error) => {
+        console.error("Error loading stored language:", error)
+      })
+  }
+
   useEffect(() => {
     getNetwork()
+    getStoredLanguage()
   }, [])
 
   const handleInputChange = (field: keyof typeof walletData, value: string) => {
@@ -157,13 +176,13 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
           }
         })
 
-        handleCallbacks("application")      
+        handleCallbacks("Wallets")  
       }
     })
   }
 
   const handleBackClick = () => {
-    handleCallbacks("indexwallet") 
+    handleCallbacks("Wallets") 
   }
 
   return (

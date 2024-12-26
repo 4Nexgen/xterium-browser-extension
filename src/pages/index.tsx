@@ -53,9 +53,7 @@ const IndexPages = () => {
       )}
       {currentPage === "login" && <IndexLogin onSetCurrentPage={handleSetCurrentPage} />}
       {currentPage === "application" && <IndexApplication />}
-      {currentPage === "import-wallet" && (
-        <IndexImportWalletPage handleCallbacks={handleSetCurrentPage} />
-      )}
+
 
     </>
   )

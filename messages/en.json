@@ -137,5 +137,6 @@
   "Something went wrong during export.": "Something went wrong during export.",
   "Copied to clipboard!": "Copied to clipboard!",
   "Failed to copy address.": "Failed to copy address.",
-  "Incorrect password!": "Incorrect password!"
+  "Incorrect password!": "Incorrect password!",
+  "Import Wallet from JSON": "Import Wallet from JSON"
 }

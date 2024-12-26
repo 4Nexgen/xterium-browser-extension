@@ -137,5 +137,6 @@
   "Something went wrong during export.": "エクスポート中に問題が発生しました。",
   "Copied to clipboard!": "クリップボードにコピーしました！",
   "Failed to copy address.": "アドレスのコピーに失敗しました。",
-  "Incorrect password!": "パスワードが間違っています！"
+  "Incorrect password!": "パスワードが間違っています！",
+  "Import Wallet from JSON": "JSONからウォレットをインポート"
 }

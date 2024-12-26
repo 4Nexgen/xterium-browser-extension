@@ -20,9 +20,8 @@ import { useTranslation } from "react-i18next"
 import IndexAddWallet from "./addWallet.tsx"
 import IndexDeleteWallet from "./deleteWallet"
 import IndexExportWallet from "./exportWallet"
-import IndexImportWalletPage from "@/pages/import-wallet/index.jsx"
 
-const IndexWallet = () => {
+const IndexWallet = ({ handleSetCurrentPage }) => {
   const { t } = useTranslation()
   const networkService = new NetworkService()
   const walletService = new WalletService()
@@ -85,9 +84,13 @@ const IndexWallet = () => {
   
 
   const importWallet = () => {
-    expandView()
-    setIsImportWalletPageOpen(true)
-  }
+    if (!isImportWalletPageOpen) { 
+      expandView();
+      handleSetCurrentPage("import-wallet");
+    } else {
+      handleSetCurrentPage("import-wallet");
+    }
+  };
 
   const copyWallet = (value: string) => {
     navigator.clipboard
@@ -133,8 +136,9 @@ const IndexWallet = () => {
   }
 
   const handleCallbacks = (action: string) => {
-    if (action === "import-wallet") {
-      setIsImportWalletPageOpen(false)
+    if (action === "Wallets") {
+      handleSetCurrentPage("Wallets");
+      setIsImportWalletPageOpen(false);
     }
 
     setTimeout(() => {
@@ -144,11 +148,6 @@ const IndexWallet = () => {
 
   return (
     <>
-    {isImportWalletPageOpen ? (
-        <div className="w-full p-4">
-          <IndexImportWalletPage handleCallbacks={callbackUpdates} />
-        </div>
-      ) : (
       <div className="py-4 flex flex-col justify-between h-full">
         <div className="flex-1">
           {wallets.filter(
@@ -251,11 +250,6 @@ const IndexWallet = () => {
           </Button>
         </div>
 
-        {isImportWalletPageOpen && (
-          <div className="w-full p-4">
-            <IndexImportWalletPage handleCallbacks={callbackUpdates} />
-          </div>
-        )}
 
         <Drawer open={isAddWalletDrawerOpen} onOpenChange={setIsAddWalletDrawerOpen}>
           <DrawerContent>
@@ -294,7 +288,7 @@ const IndexWallet = () => {
           </DrawerContent>
         </Drawer>
       </div>
-      )}
+
     </>
   )
 }

@@ -10,6 +10,7 @@ import Layout from "./layout"
 import IndexNetworkStatus from "./network-status"
 import IndexTokens from "./tokens"
 import IndexWallets from "./wallets"
+import IndexImportWalletPage from "../import-wallet"
 
 const IndexApplication = () => {
   const { t } = useTranslation()
@@ -39,20 +40,24 @@ const IndexApplication = () => {
 
   return (
     <main className="max-h-screen">
-      <Layout onSetCurrentPage={handleSetCurrentPage}>
-        <div className="background-inside-theme">
-          <Header currentPage={currentPage} />
-          <div className="h-[calc(100vh-60px)]">
-            <ScrollArea className="px-4 h-full">
-              {currentPage === t("Balance") && <IndexBalance />}
-              {currentPage === t("Tokens") && <IndexTokens />}
-              {currentPage === t("Network Status") && <IndexNetworkStatus />}
-              {currentPage === t("Wallets") && <IndexWallets />}
-              {currentPage === t("Support") && <IndexImUrAi />}
-            </ScrollArea>
+      {currentPage === "import-wallet" ? (
+        <IndexImportWalletPage handleCallbacks={handleSetCurrentPage} />
+      ) : (
+        <Layout onSetCurrentPage={handleSetCurrentPage}>
+          <div className="background-inside-theme">
+            <Header currentPage={currentPage} />
+            <div className="h-[calc(100vh-60px)]">
+              <ScrollArea className="px-4 h-full">
+                {currentPage === t("Balance") && <IndexBalance />}
+                {currentPage === t("Tokens") && <IndexTokens />}
+                {currentPage === t("Network Status") && <IndexNetworkStatus />}
+                {currentPage === t("Wallets") && <IndexWallets handleSetCurrentPage={handleSetCurrentPage} />}
+                {currentPage === t("Support") && <IndexImUrAi />}
+              </ScrollArea>
+            </div>
           </div>
-        </div>
-      </Layout>
+        </Layout>
+      )}
     </main>
   )
 }
