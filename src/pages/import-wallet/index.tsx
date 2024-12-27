@@ -2,28 +2,28 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
+import i18n from "@/i18n"
+import type { NetworkModel } from "@/models/network.model"
+import type { WalletModel } from "@/models/wallet.model"
+import { EncryptionService } from "@/services/encryption.service"
+import { LanguageTranslationService } from "@/services/language-translation.service"
+import { NetworkService } from "@/services/network.service"
 import { UserService } from "@/services/user.service"
-import {
-    cryptoWaitReady,
-    encodeAddress,
-    mnemonicToMiniSecret,
-    mnemonicValidate,
-    sr25519PairFromSeed
-} from "@polkadot/util-crypto"
+import { WalletService } from "@/services/wallet.service"
 import { u8aToHex } from "@polkadot/util"
+import {
+  cryptoWaitReady,
+  encodeAddress,
+  mnemonicToMiniSecret,
+  mnemonicValidate,
+  sr25519PairFromSeed
+} from "@polkadot/util-crypto"
 import { ArrowLeft, Check, X } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { NetworkService } from "@/services/network.service"
-import { WalletService } from "@/services/wallet.service"
-import type { NetworkModel } from "@/models/network.model"
-import type { WalletModel } from "@/models/wallet.model"
-import { Label } from "@/components/ui/label"
-import { EncryptionService } from "@/services/encryption.service"
-import { LanguageTranslationService } from "@/services/language-translation.service"
-import i18n from "@/i18n"
 
 const IndexImportWalletPage = ({ handleCallbacks }) => {
   const { t } = useTranslation()
@@ -176,54 +176,57 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
           }
         })
 
-        handleCallbacks("Wallets")  
+        handleCallbacks(t("Wallets"))
       }
     })
   }
 
   const handleBackClick = () => {
-    handleCallbacks("Wallets") 
+    handleCallbacks(t("Wallets"))
   }
 
   return (
     <div className="bg-background-sheet flex justify-center items-center">
       <div className="bg-white background-inside-theme h-screen max-w-xl w-full">
-      <header className=" p-6 flex items-center border-b border-border-1">
-        <div 
-          onClick={handleBackClick} 
-          className="cursor-pointer flex items-center text-xl"
-        >
-          <ArrowLeft className="mr-2 ml-3" />
-          <span>{t("Import Wallet from JSON")}</span>
-        </div>
-      </header>
-      <div className="p-10">
-        <div className="mb-3 flex flex-col">
-          <Label>{t("Enter a unique wallet name")}:</Label>
-          <Input
-            type="text"
-            placeholder={t("Wallet Name")}
-            value={walletData.name}
-            onChange={(e) => handleInputChange("name", e.target.value)}
-          />
-        </div>
+        <header className=" p-6 flex items-center border-b border-border-1">
+          <div
+            onClick={handleBackClick}
+            className="cursor-pointer flex items-center text-xl">
+            <ArrowLeft className="mr-2 ml-3" />
+            <span>{t("Import Wallet from JSON")}</span>
+          </div>
+        </header>
+        <div className="p-10">
+          <div className="mb-3 flex flex-col">
+            <Label>{t("Enter a unique wallet name")}:</Label>
+            <Input
+              type="text"
+              placeholder={t("Wallet Name")}
+              value={walletData.name}
+              onChange={(e) => handleInputChange("name", e.target.value)}
+            />
+          </div>
 
-        <div className="mb-3">
-          <Label>{t("Upload Wallet JSON")}:</Label>
-          <input
-            type="file"
-            accept=".json"
-            onChange={handleFileUpload}
-            className="w-full p-2 rounded bg-input text-sm font-semibold"
-          />
-        </div>
+          <div className="mb-3">
+            <Label>{t("Upload Wallet JSON")}:</Label>
+            <input
+              type="file"
+              accept=".json"
+              onChange={handleFileUpload}
+              className="w-full p-2 rounded bg-input text-sm font-semibold"
+            />
+          </div>
 
-        <div className="mt-5 mb-3">
-          <Button type="button" variant="jelly" className="my-auto" onClick={saveWallet}>
-            {t("SAVE")}
-          </Button>
+          <div className="mt-5 mb-3">
+            <Button
+              type="button"
+              variant="jelly"
+              className="my-auto"
+              onClick={saveWallet}>
+              {t("SAVE")}
+            </Button>
+          </div>
         </div>
-      </div>
       </div>
     </div>
   )
