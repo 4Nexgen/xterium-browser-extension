@@ -139,5 +139,10 @@
   "Failed to copy address.": "复制地址失败。",
   "Incorrect password!": "密码错误！",
   "Import Wallet from": "ウォレットをインポート from",
-  "Import Wallet from JSON": "从JSON导入钱包"
+  "Import Wallet from JSON": "从JSON导入钱包",
+  "from your token list?": "从你的代币列表中？",
+  "DELETE WALLET": "删除钱包",
+  "EXPORT WALLET": "导出钱包",
+  "Are you sure you want to export": "你确定要导出吗",
+  "from your wallet list?": "从你的钱包清单中？"
 }

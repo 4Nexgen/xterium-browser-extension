@@ -138,5 +138,9 @@
   "Copied to clipboard!": "Copied to clipboard!",
   "Failed to copy address.": "Failed to copy address.",
   "Incorrect password!": "Incorrect password!",
-  "Import Wallet from JSON": "Import Wallet from JSON"
+  "Import Wallet from JSON": "Import Wallet from JSON",
+  "from your token list?": "from your token list?",
+  "DELETE WALLET": "",
+  "Are you sure you want to export": "",
+  "from your wallet list?": ""
 }

@@ -138,5 +138,10 @@
   "Copied to clipboard!": "クリップボードにコピーしました！",
   "Failed to copy address.": "アドレスのコピーに失敗しました。",
   "Incorrect password!": "パスワードが間違っています！",
-  "Import Wallet from JSON": "JSONからウォレットをインポート"
+  "Import Wallet from JSON": "JSONからウォレットをインポート",
+  "from your token list?": "トークンリストから？",
+  "DELETE WALLET": "ウォレット削除",
+  "EXPORT WALLET": "エクスポートウォレット",
+  "Are you sure you want to export": "エクスポートしてもよろしいですか",
+  "from your wallet list?": "ウォレットリストから?"
 }
