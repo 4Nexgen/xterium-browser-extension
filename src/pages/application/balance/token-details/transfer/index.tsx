@@ -125,7 +125,6 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
                   storedPassword
                 )
                 .then((results) => {
-                  console.log(results)
                   if (results) {
                     setIsInputPasswordDrawerOpen(false)
 
@@ -154,7 +153,6 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
                   storedPassword
                 )
                 .then((results) => {
-                  console.log(results)
                   if (results) {
                     setIsInputPasswordDrawerOpen(false)
 
@@ -268,7 +266,7 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>
-              {t("SEND")}
+              {t("SEND ")}
               {balanceData.token.symbol}
             </DrawerTitle>
           </DrawerHeader>

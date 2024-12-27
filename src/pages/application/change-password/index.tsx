@@ -72,7 +72,6 @@ const IndexChangePassword = ({ handleCallbacks }) => {
         if (existingPassword != null) {
           if (existingPassword !== oldPassword) {
             setError(t("Old password is incorrect."))
-            console.log("Old password is incorrect.")
           } else {
             userService.updatePassword(newPassword).then((isUpdated) => {
               if (isUpdated == true) {
