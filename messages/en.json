@@ -147,11 +147,12 @@
   "Created by:": "Created by:",
   "Market Cap:": "Market Cap:",
   "Loading...": "Loading...",
-  "Contract:": "Contract:",
+  "Contract: ": "Contract: ",
   "Price" : "Price",
   "Market Cap": "Market Cap",
   "Virtual Liquidity": "Virtual Liquidity",
   "24H Volume": "24H Volume",
   "Token Created": "Token Created",
-  "BUY": "BUY"
+  "BUY": "BUY",
+  "Pump": "Pump"
 }

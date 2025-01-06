@@ -152,11 +152,12 @@
   "Created by:": "创建者：",
   "Market Cap:": "市值：",
   "Loading...": "加载中...",
-  "Contract:": "合约：",
+  "Contract: ": "合约：",
   "Price" : "价格",
   "Market Cap": "市值",
   "Virtual Liquidity": "虚拟流动性",
   "24H Volume": "24小时交易量",
   "Token Created": "代币创建时间",
-  "BUY": "购买"
+  "BUY": "购买",
+  "Pump": "泵"
 }

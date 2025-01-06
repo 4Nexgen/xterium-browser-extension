@@ -1,6 +1,4 @@
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { TableCell, TableRow } from "@/components/ui/table"
 import React from "react"
 import { useTranslation } from "react-i18next"
 
@@ -32,7 +30,7 @@ const IndexPumpTokenDetails = ({ selectedMockTokens, handleCallbacks }) => {
 
         <div className="ml-6 w-3/4">
           <div className="flex items-center gap-x-2">
-            <p className="font-semibold">{t("Created by: ")}</p>
+            <p className="font-semibold">{t("Created by:")}</p>
             <p className="opacity-70 text-muted underline">{creator}</p>
           </div>
           <div className="mt-2 flex items-center gap-x-2">
