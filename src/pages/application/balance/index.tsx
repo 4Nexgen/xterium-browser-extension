@@ -407,7 +407,7 @@ const IndexBalance = () => {
                   onOpenChange={setIsTokenDetailDrawerOpen}>
                   <DrawerContent>
                     <DrawerHeader>
-                      <div className="flex justify-center items-center w-full">
+                      <div className="flex justify-center items-center w-full border-b border-border-1/20 pb-4">
                         {selectedBalance ? (
                           <Image
                             src={getTokenImage(selectedBalance.token.image_url)}
