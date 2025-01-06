@@ -11,6 +11,7 @@ import IndexNetworkStatus from "./network-status"
 import IndexTokens from "./tokens"
 import IndexWallets from "./wallets"
 import IndexImportWalletPage from "../import-wallet"
+import IndexPumpToken from "./pump-token"
 
 const IndexApplication = () => {
   const { t } = useTranslation()
@@ -51,6 +52,7 @@ const IndexApplication = () => {
                 {currentPage === t("Balance") && <IndexBalance />}
                 {currentPage === t("Tokens") && <IndexTokens />}
                 {currentPage === t("Network Status") && <IndexNetworkStatus />}
+                {currentPage === t("Pump") && <IndexPumpToken />}
                 {currentPage === t("Wallets") && <IndexWallets handleSetCurrentPage={handleSetCurrentPage} />}
                 {currentPage === t("Support") && <IndexImUrAi />}
               </ScrollArea>

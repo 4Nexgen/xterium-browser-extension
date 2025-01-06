@@ -143,5 +143,19 @@
   "DELETE WALLET": "ウォレット削除",
   "EXPORT WALLET": "エクスポートウォレット",
   "Are you sure you want to export": "エクスポートしてもよろしいですか",
-  "from your wallet list?": "ウォレットリストから?"
+  "from your wallet list?": "ウォレットリストから?",
+  "Search": "検索",
+  "Search for Tokens": "トークンを検索",
+  "Enter Token Name": "トークン名を入力",
+  "No results found": "結果が見つかりません",
+  "Created by:": "作成者：",
+  "Market Cap:": "時価総額：",
+  "Loading...": "ローディング中...",
+  "Contract:": "契約：",
+  "Price" : "価格",
+  "Market Cap": "時価総額",
+  "Virtual Liquidity": "仮想流動性",
+  "24H Volume": " 24時間の取引量",
+  "Token Created": "トークン作成日",
+  "BUY": "買う"
 }
