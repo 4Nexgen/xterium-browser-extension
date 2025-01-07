@@ -20,6 +20,7 @@ export const PumpTokenData: PumpTokenModel[] = [
       tokenCreated: "12H 41M",
       percentage: "(2%)",
       image_url: Xtronx,
+      network: "Xode"
   },
   {
     id: 2,
@@ -35,6 +36,7 @@ export const PumpTokenData: PumpTokenModel[] = [
       tokenCreated: "12H 41M",
       percentage: "(2%)",
       image_url: Bandan,
+      network: "Xode"
   },
   {
     id: 3,
@@ -50,6 +52,7 @@ export const PumpTokenData: PumpTokenModel[] = [
       tokenCreated: "12H 41M",
       percentage: "(2%)",
       image_url: BananaMan,
+      network: "Xode"
   },
   {
     id: 4,
@@ -65,6 +68,7 @@ export const PumpTokenData: PumpTokenModel[] = [
       tokenCreated: "12H 41M",
       percentage: "(2%)",
       image_url: PupperHero,
+      network: "Xode"
   }
 ]
 

@@ -12,5 +12,6 @@ export class PumpTokenModel {
     tokenCreated: string
     percentage: string
     image_url?: string
+    network: string
   }
   

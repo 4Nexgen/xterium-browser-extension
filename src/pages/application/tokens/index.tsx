@@ -336,7 +336,7 @@ const IndexTokens = () => {
         <Drawer open={isAddTokenDrawerOpen} onOpenChange={setIsAddTokenDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle className="border-b border-border-1/20 pb-4">{t("ADD NEW TOKEN")}</DrawerTitle>
+              <DrawerTitle className="border-b border-border-1/20 pb-4 text-muted">{t("ADD NEW TOKEN")}</DrawerTitle>
             </DrawerHeader>
             <IndexAddToken handleCallbacks={saveAndUpdateToken} />
           </DrawerContent>
@@ -346,7 +346,7 @@ const IndexTokens = () => {
           <DrawerTrigger asChild></DrawerTrigger>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle className="flex items-center justify-center space-x-2 border-b border-border-1/20 pb-4">
+              <DrawerTitle className="flex items-center justify-center space-x-2 border-b border-border-1/20 pb-4 text-muted">
                 <span>{t("Edit")}</span>
                 <Image
                   src={getTokenImage(selectedToken.image_url)}
@@ -369,7 +369,7 @@ const IndexTokens = () => {
         <Drawer open={isDeleteTokenDrawerOpen} onOpenChange={setIsDeleteTokenDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle className="border-b border-border-1/20 pb-4">{t("DELETE TOKEN")}</DrawerTitle>
+              <DrawerTitle className="border-b border-border-1/20 pb-4 text-muted">{t("DELETE TOKEN")}</DrawerTitle>
             </DrawerHeader>
             <IndexDeleteToken
               selectedToken={selectedToken}

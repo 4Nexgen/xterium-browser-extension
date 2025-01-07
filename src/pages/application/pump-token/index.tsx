@@ -3,12 +3,13 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Search } from "lucide-react"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { PumpTokenData } from "@/data/pump-token.data"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import IndexPumpTokenDetails from "./pump-token-details"
 import type { PumpTokenModel } from "@/models/pump-token.model"
+import { NetworkService } from "@/services/network.service";
 
 const truncateText = (text, limit) => {
   return text.length > limit ? `${text.slice(0, limit)}...` : text;
@@ -34,49 +35,65 @@ const IndexPumpToken = () => {
     tokenCreated: "",
     percentage: "",
     image_url: "Default",
+    network: ""
   })  
+  const [currentNetwork, setCurrentNetwork] = useState<string>("");
+  const networkService = new NetworkService();
+
+  useEffect(() => {
+    const fetchNetwork = async () => {
+      try {
+        const network = await networkService.getNetwork();
+        setCurrentNetwork(network?.name || ""); 
+      } catch (error) {
+        console.error("Failed to fetch network:", error);
+      }
+    };
+
+    fetchNetwork();
+  }, []);
 
   const handleTokenClick = (token: PumpTokenModel) => {
     setSelectedMockTokens(token)
     setIsMockTokenDrawerOpen(true)
   }
 
-  const filteredTokens = searchQuery 
-  ? PumpTokenData.filter((token) =>
-      token.name.toLowerCase().includes(searchQuery.toLowerCase())
-    ) 
-  : PumpTokenData;
+  const filteredTokens = PumpTokenData.filter(
+    (token) =>
+      (!searchQuery || token.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
+      (currentNetwork ? token.network === currentNetwork : true) 
+  );
 
   return (
     <>
       <div className="py-4 flex flex-col justify-between h-full">
         <div className="py-4">
           <div className="mb-3">
-              <Label className="font-bold text-muted">{t("Search")}</Label>
-              <Popover open={openSearchToken} onOpenChange={setOpenSearchTokens}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="roundedOutline"
-                    role="combobox"
-                    aria-expanded={openSearchToken}
-                    className="w-full justify-between text-input-primary p-3 font-bold hover:bg-accent"
-                    size="lg"
-                  >
-                    {selectedInSearchToken ? (
-                      <>
-                        <span className="text-muted">
-                          {selectedInSearchToken.name} &nbsp;
-                          {"("}
-                          {selectedInSearchToken.symbol}
-                          {")"}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-muted opacity-70">{t("Search for Tokens")}</span>
-                    )}
-                    <Search/>
-                  </Button>
-                </PopoverTrigger>
+            <Label className="font-bold text-muted">{t("Search")}</Label>
+            <Popover open={openSearchToken} onOpenChange={setOpenSearchTokens}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="roundedOutline"
+                  role="combobox"
+                  aria-expanded={openSearchToken}
+                  className="w-full justify-between text-input-primary p-3 font-bold hover:bg-accent"
+                  size="lg"
+                >
+                  {selectedInSearchToken ? (
+                    <>
+                      <span className="text-muted">
+                        {selectedInSearchToken.name} &nbsp;
+                        {"("}
+                        {selectedInSearchToken.symbol}
+                        {")"}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-muted opacity-70">{t("Search for Tokens")}</span>
+                  )}
+                  <Search/>
+                </Button>
+              </PopoverTrigger>
               <PopoverContent
                 className="p-0"
                 align="start"
