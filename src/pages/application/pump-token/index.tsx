@@ -16,8 +16,10 @@ const truncateText = (text, limit) => {
 
 const IndexPumpToken = () => {
   const { t } = useTranslation()
-  const [openSearch, setOpenSearch] = useState<boolean>(false)
+  const [openSearchToken, setOpenSearchTokens] = useState<boolean>(false)
+  const [searchQuery, setSearchQuery] = useState("");
   const [isMockTokenDrawerOpen, setIsMockTokenDrawerOpen] = useState(false)
+  const [selectedInSearchToken, setSelectedInSearchToken] = useState<PumpTokenModel | null>(null);
   const [selectedMockTokens, setSelectedMockTokens] = useState<PumpTokenModel>({
     id: 0,
     name: "",
@@ -34,10 +36,16 @@ const IndexPumpToken = () => {
     image_url: "Default",
   })  
 
-  const handleTokenClick = (token) => {
+  const handleTokenClick = (token: PumpTokenModel) => {
     setSelectedMockTokens(token)
     setIsMockTokenDrawerOpen(true)
   }
+
+  const filteredTokens = searchQuery 
+  ? PumpTokenData.filter((token) =>
+      token.name.toLowerCase().includes(searchQuery.toLowerCase())
+    ) 
+  : PumpTokenData;
 
   return (
     <>
@@ -45,18 +53,29 @@ const IndexPumpToken = () => {
         <div className="py-4">
           <div className="mb-3">
               <Label className="font-bold text-muted">{t("Search")}</Label>
-              <Popover open={openSearch} onOpenChange={setOpenSearch}>
+              <Popover open={openSearchToken} onOpenChange={setOpenSearchTokens}>
                 <PopoverTrigger asChild>
-                <Button
+                  <Button
                     variant="roundedOutline"
                     role="combobox"
-                    aria-expanded={openSearch}
+                    aria-expanded={openSearchToken}
                     className="w-full justify-between text-input-primary p-3 font-bold hover:bg-accent"
                     size="lg"
-                >
-                    <span className="text-muted opacity-70">{t("Search for Tokens")}</span>
+                  >
+                    {selectedInSearchToken ? (
+                      <>
+                        <span className="text-muted">
+                          {selectedInSearchToken.name} &nbsp;
+                          {"("}
+                          {selectedInSearchToken.symbol}
+                          {")"}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-muted opacity-70">{t("Search for Tokens")}</span>
+                    )}
                     <Search/>
-                </Button>
+                  </Button>
                 </PopoverTrigger>
               <PopoverContent
                 className="p-0"
@@ -64,50 +83,90 @@ const IndexPumpToken = () => {
                 style={{ width: "var(--radix-popper-anchor-width)" }}
               >
                 <Command>
-                    <CommandInput placeholder={t("Enter Token Name")} />
-                    <CommandList>
-                      <CommandEmpty>{t("No results found.")}</CommandEmpty>
-                      <CommandGroup>
-                        {PumpTokenData.map((token) => (
-                          <CommandItem 
-                            key={token.id} 
-                            className="cursor-pointer hover:bg-accent"
-                          >
-                            {token.name}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
+                  <CommandInput
+                    placeholder={t("Enter Token Name")}
+                    value={selectedInSearchToken ? `${selectedInSearchToken.name}` : searchQuery}
+                    onValueChange={(value) => {
+                      setSearchQuery(value);
+                      if (value === "") {
+                        setSelectedInSearchToken(null);
+                      }                  
+                    }}
+                  />                  
+                  <CommandList>
+                    <CommandEmpty>{t("No results found.")}</CommandEmpty>
+                    <CommandGroup>
+                      {filteredTokens.map((token) => (
+                        <CommandItem 
+                          key={token.id}
+                          value={token.name}
+                          onSelect={() => {
+                            setSelectedInSearchToken(token);
+                            setOpenSearchTokens(false);
+                          }} 
+                          className="cursor-pointer hover:bg-accent"
+                        >
+                          {token.name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
                 </Command>
               </PopoverContent>
             </Popover>
           </div>
           <div className="flex grid grid-cols-2 sm:grid-cols-2 gap-4">
-            {PumpTokenData.map((token) => (
+            {selectedInSearchToken ? (
               <div
-                key={token.id}
+                key={selectedInSearchToken.id}
                 className="flex flex-col items-start justify-between border-2 border-primary dark:border-border dark:bg-muted/50 rounded-xl h-full"
-                onClick={() => handleTokenClick(token)}
+                onClick={() => handleTokenClick(selectedInSearchToken)}
               >
-              <div className="w-full flex justify-center mb-4">
-                <img
-                  src={token.image_url}
-                  alt={token.name}
-                  className="h-36 w-full object-cover object-center rounded-lg"
-                />
+                <div className="w-full flex justify-center mb-4">
+                  <img
+                    src={selectedInSearchToken.image_url}
+                    alt={selectedInSearchToken.name}
+                    className="h-36 w-full object-cover object-center rounded-lg"
+                  />
+                </div>
+                <h3 className="font-bold text-sm pl-2">
+                  {selectedInSearchToken.name} ({selectedInSearchToken.symbol})
+                </h3>
+                <p className="pl-2 mt-1">Created by: <span className="text-muted p-4 underline">{selectedInSearchToken.creator}</span></p>
+                <p className="pl-2 pr-2 opacity-50 leading-snug mt-1 mb-1">{truncateText(selectedInSearchToken.description, 50)}</p>
+                <p>
+                  <span className="opacity-50 pl-2">Market Cap:</span> 
+                  <span className="font-bold p-4">{selectedInSearchToken.marketCap}</span>
+                  <span className="opacity-50">{selectedInSearchToken.percentage}</span>
+                </p>
               </div>
-              <h3 className="font-bold text-sm pl-2">
-                {token.name} ({token.symbol})
-              </h3>
-              <p className="pl-2 mt-1">Created by: <span className="text-muted p-4 underline">{token.creator}</span></p>
-              <p className="pl-2 pr-2 opacity-50 leading-snug mt-1 mb-1">{truncateText(token.description, 50)}</p>
-              <p>
-                <span className="opacity-50 pl-2">Market Cap:</span> 
-                <span className="font-bold p-4">{token.marketCap}</span>
-                <span className="opacity-50">{token.percentage}</span>
-              </p>
-          </div>
-          ))}
+            ): (
+              filteredTokens.map((token) => (
+                <div
+                  key={token.id}
+                  className="flex flex-col items-start justify-between border-2 border-primary dark:border-border dark:bg-muted/50 rounded-xl h-full"
+                  onClick={() => handleTokenClick(token)}
+                >
+                  <div className="w-full flex justify-center mb-4">
+                    <img
+                      src={token.image_url}
+                      alt={token.name}
+                      className="h-36 w-full object-cover object-center rounded-lg"
+                    />
+                  </div>
+                  <h3 className="font-bold text-sm pl-2">
+                    {token.name} ({token.symbol})
+                  </h3>
+                  <p className="pl-2 mt-1">Created by: <span className="text-muted p-4 underline">{token.creator}</span></p>
+                  <p className="pl-2 pr-2 opacity-50 leading-snug mt-1 mb-1">{truncateText(token.description, 50)}</p>
+                  <p>
+                    <span className="opacity-50 pl-2">Market Cap:</span> 
+                    <span className="font-bold p-4">{token.marketCap}</span>
+                    <span className="opacity-50">{token.percentage}</span>
+                  </p>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

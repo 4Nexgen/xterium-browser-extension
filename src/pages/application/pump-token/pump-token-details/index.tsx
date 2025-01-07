@@ -24,8 +24,8 @@ const IndexPumpTokenDetails = ({ selectedMockTokens, handleCallbacks }) => {
   return (
     <div className="p-6">
       <div className="flex">
-        <div className="w-1/4 flex">
-          <img src={image_url} alt={selectedMockTokens.name} className="rounded-lg w-full object-contain" />
+        <div className="w-full flex">
+          <img src={image_url} alt={selectedMockTokens.name} className="rounded-lg object-cover" />
         </div>
 
         <div className="ml-6 w-3/4">
