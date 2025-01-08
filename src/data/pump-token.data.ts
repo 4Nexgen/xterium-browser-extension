@@ -1,8 +1,8 @@
 import { PumpTokenModel } from "@/models/pump-token.model"
-import Xtronx from "data-base64:/assets/app-logo/xtronx.png"
+import Xtronx from "data-base64:/assets/app-logo/xtronx.jpg"
 import Bandan from "data-base64:/assets/app-logo/bandan.png"
-import BananaMan from "data-base64:/assets/app-logo/bananaMan.png"
-import PupperHero from "data-base64:/assets/app-logo/pupperHero.png"
+import TrumpLoves from "data-base64:/assets/app-logo/trumpLoves.jpg"
+import Bob_Super_Pomeranian from "data-base64:/assets/app-logo/bobSuper.jpeg"
 import DefaultLogo from "data-base64:/assets/tokens/default.png"
 
 export const PumpTokenData: PumpTokenModel[] = [
@@ -27,7 +27,7 @@ export const PumpTokenData: PumpTokenModel[] = [
       name: "Bandan",
       symbol: "$ Bandan",
       creator: "TGdh...giuU",
-      description: "Bandan tokens are here to revolutionize the game with unique offerings and possibilities. Whether you're an investor or enthusiast, Bandan empowers you to explore the crypto space with confidence and creativity. Join the Bandan revolution today.",
+      description: "Bandan: Peeling his way to $120,000, one tape at a time!",
       contract: "TK6qbhdzrEqXFNd7Q...giuU",
       marketCap: "$9.62k",
       price: "0.000036 TRX",
@@ -40,10 +40,10 @@ export const PumpTokenData: PumpTokenModel[] = [
   },
   {
     id: 3,
-      name: "Banana Man",
-      symbol: "$ Banana",
+      name: "Trump Loves baNana",
+      symbol: "$ TLN",
       creator: "TGdh...giuU",
-      description: "Banana Man tokens are as fun as they are valuable, paving the way for new adventures in the crypto world. With every token, you're unlocking opportunities for entertainment and financial growth. Dive into the Banana Man ecosystem and reap the rewards!",
+      description: "As Justin Sun said: \"T for Trump, N for Banana,\" TLN therefore means Trump Loves baNana. TLN will be the first MEME token listed on Max-Pump.Fun, a brand-new pump-and-swap platform.",
       contract: "TK6qbhdzrEqXFNd7Q...giuU",
       marketCap: "$9.62k",
       price: "0.000036 TRX",
@@ -51,23 +51,23 @@ export const PumpTokenData: PumpTokenModel[] = [
       volume24h: "2,581.64 TRX",
       tokenCreated: "12H 41M",
       percentage: "(2%)",
-      image_url: BananaMan,
+      image_url: TrumpLoves,
       network: "Xode"
   },
   {
     id: 4,
-      name: "Pupper Hero",
-      symbol: "$ PUPP",
+      name: "Bob Super Pomeranian",
+      symbol: "$ BSP",
       creator: "TGdh...giuU",
       contract: "TK6qbhdzrEqXFNd7Q...giuU",
-      description: "Pupper Hero tokens are here to save the day with loyalty and strength in the crypto market. Join the Pupper Hero community to experience a token that combines stability, trust, and heroic potential. Be part of the journey and make a difference!",
+      description: "Bob super hero Pomeranian. His strength is his beauty and friendliness",
       marketCap: "$9.62k",
       price: "0.000036 TRX",
       virtualLiquidity: "$19.6k",
       volume24h: "2,581.64 TRX",
       tokenCreated: "12H 41M",
       percentage: "(2%)",
-      image_url: PupperHero,
+      image_url: Bob_Super_Pomeranian,
       network: "Xode"
   }
 ]
@@ -77,8 +77,8 @@ export class PumpTokenImages {
       switch (imageName) {
         case "Xtronx": return Xtronx
         case "Bandan": return Bandan
-        case "BananaMan": return BananaMan
-        case "PupperHero": return PupperHero
+        case "TrumpLoves": return TrumpLoves
+        case "Bob_Super_Pomeranian": return Bob_Super_Pomeranian
         default: return DefaultLogo
       }
     }

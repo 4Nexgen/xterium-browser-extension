@@ -168,7 +168,7 @@ const IndexPumpToken = () => {
                     <img
                       src={token.image_url}
                       alt={token.name}
-                      className="h-36 w-full object-cover object-center rounded-lg"
+                      className="h-40 w-full object-cover object-center rounded-lg"
                     />
                   </div>
                   <h3 className="font-bold text-sm pl-2">
