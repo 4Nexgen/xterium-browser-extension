@@ -1,4 +1,3 @@
-import { setTimeout } from "timers"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -48,7 +47,6 @@ const IndexBalance = () => {
   const [openWallets, setOpenWallets] = useState<boolean>(false)
   const [wallets, setWallets] = useState<WalletModel[]>([])
   const [selectedWallet, setSelectedWallet] = useState<WalletModel>(null)
-  const [searchQuery, setSearchQuery] = useState("");
   const [balances, setBalances] = useState<BalanceModel[]>([])
   const [balancePerToken, setBalancePerToken] = useState({})
   const [loadingPerToken, setLoadingPerToken] = useState({})
@@ -70,11 +68,6 @@ const IndexBalance = () => {
       setWallets(data)
     })
   }
-
-  const filteredWallets = wallets.filter(
-    (wallet) =>
-      (!searchQuery || wallet.name.toLowerCase().includes(searchQuery.toLowerCase()))
-  ); 
 
   const preloadTokens = () => {
     tokenService.getTokens().then(async (data) => {
@@ -189,7 +182,6 @@ const IndexBalance = () => {
           )
         )
       })
-
       await Promise.all(balancePromises)
     }
   }
