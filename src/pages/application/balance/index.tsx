@@ -48,10 +48,10 @@ const IndexBalance = () => {
   const [openWallets, setOpenWallets] = useState<boolean>(false)
   const [wallets, setWallets] = useState<WalletModel[]>([])
   const [selectedWallet, setSelectedWallet] = useState<WalletModel>(null)
+  const [searchQuery, setSearchQuery] = useState("");
   const [balances, setBalances] = useState<BalanceModel[]>([])
   const [balancePerToken, setBalancePerToken] = useState({})
   const [loadingPerToken, setLoadingPerToken] = useState({})
-
   const [isTokenDetailDrawerOpen, setIsTokenDetailDrawerOpen] = useState(false)
   const [selectedBalance, setSelectedBalance] = useState<BalanceModel>(null)
 
@@ -70,6 +70,11 @@ const IndexBalance = () => {
       setWallets(data)
     })
   }
+
+  const filteredWallets = wallets.filter(
+    (wallet) =>
+      (!searchQuery || wallet.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  ); 
 
   const preloadTokens = () => {
     tokenService.getTokens().then(async (data) => {
@@ -275,7 +280,7 @@ const IndexBalance = () => {
       <div className="py-4 flex flex-col justify-between h-full">
         <div className="py-4">
           <div className="mb-3">
-            <Label>{t("Address")}</Label>
+            <Label className="text-muted font-bold">{t("Address")}</Label>
             <Popover open={openWallets} onOpenChange={setOpenWallets}>
               <PopoverTrigger asChild>
                 <Button
@@ -286,14 +291,16 @@ const IndexBalance = () => {
                   size="lg">
                   {selectedWallet ? (
                     <>
-                      {selectedWallet.name} &nbsp;
-                      {"("}
-                      {selectedWallet.public_key.slice(0, 6)}...
-                      {selectedWallet.public_key.slice(-6)}
-                      {")"}
+                      <span className="text-muted">
+                        {selectedWallet.name} &nbsp;
+                        {"("}
+                        {selectedWallet.public_key.slice(0, 6)}...
+                        {selectedWallet.public_key.slice(-6)}
+                        {")"}
+                      </span>
                     </>
                   ) : (
-                    t("Select wallet")
+                    <span className="text-muted opacity-70">{t("Select wallet")}</span>
                   )}
                 </Button>
               </PopoverTrigger>
@@ -314,9 +321,9 @@ const IndexBalance = () => {
                         )
                         .map((wallet) => (
                           <CommandItem
-                            key={wallet.public_key}
-                            value={wallet.public_key}
-                            onSelect={(value) => {
+                            key={wallet.id}
+                            value={wallet.name}
+                            onSelect={() => {
                               setSelectedWallet(wallet)
                               setOpenWallets(false)
                             }}
@@ -407,7 +414,7 @@ const IndexBalance = () => {
                   onOpenChange={setIsTokenDetailDrawerOpen}>
                   <DrawerContent>
                     <DrawerHeader>
-                      <div className="flex justify-center items-center w-full border-b border-border-1/20 pb-4">
+                      <div className="flex justify-center items-center w-full border-b border-border-1/20 pb-4 text-muted">
                         {selectedBalance ? (
                           <Image
                             src={getTokenImage(selectedBalance.token.image_url)}
