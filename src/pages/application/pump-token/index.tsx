@@ -5,11 +5,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Search } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { PumpTokenData } from "@/data/pump-token.data"
+import PumpTokenData from "src/data/pump-tokens.json";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import IndexPumpTokenDetails from "./pump-token-details"
 import type { PumpTokenModel } from "@/models/pump-token.model"
 import { NetworkService } from "@/services/network.service";
+import { PumpTokenService } from "@/services/pump-token.service"
 
 const truncateText = (text, limit) => {
   return text.length > limit ? `${text.slice(0, limit)}...` : text;
@@ -21,7 +22,7 @@ const IndexPumpToken = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMockTokenDrawerOpen, setIsMockTokenDrawerOpen] = useState(false)
   const [selectedInSearchToken, setSelectedInSearchToken] = useState<PumpTokenModel | null>(null);
-  const [selectedMockTokens, setSelectedMockTokens] = useState<PumpTokenModel>({
+  const [pumpTokenData, setPumpTokenData] = useState<PumpTokenModel>({
     id: 0,
     name: "",
     symbol: "",
@@ -34,11 +35,12 @@ const IndexPumpToken = () => {
     volume24h: "",
     tokenCreated: "",
     percentage: "",
-    image_url: "Default",
+    image_url: undefined,
     network: ""
   })  
   const [currentNetwork, setCurrentNetwork] = useState<string>("");
   const networkService = new NetworkService();
+  const pumpTokenService = new PumpTokenService();
 
   useEffect(() => {
     const fetchNetwork = async () => {
@@ -54,15 +56,15 @@ const IndexPumpToken = () => {
   }, []);
 
   const handleTokenClick = (token: PumpTokenModel) => {
-    setSelectedMockTokens(token)
+    setPumpTokenData(token)
     setIsMockTokenDrawerOpen(true)
   }
 
   const filteredTokens = PumpTokenData.filter(
-    (token) =>
+    (token: PumpTokenModel) =>
       (!searchQuery || token.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
-      (currentNetwork ? token.network === currentNetwork : true) 
-  );
+      (currentNetwork ? token.network === currentNetwork : true)
+  );  
 
   return (
     <>
@@ -194,12 +196,12 @@ const IndexPumpToken = () => {
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle className="border-b border-border-1/20 pb-4 text-muted">
-              {selectedMockTokens ? `${selectedMockTokens.name} (${selectedMockTokens.symbol})` : "Loading..."}
+              {pumpTokenData ? `${pumpTokenData.name} (${pumpTokenData.symbol})` : "Loading..."}
             </DrawerTitle>
           </DrawerHeader>
-          {selectedMockTokens ? (
+          {pumpTokenData ? (
             <IndexPumpTokenDetails
-              selectedMockTokens={selectedMockTokens}
+              selectedMockTokens={pumpTokenData}
               handleCallbacks={() => {}}
             />
           ) : (
