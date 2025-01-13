@@ -13,7 +13,8 @@
         "tokenCreated": "12H 41M",
         "percentage": "(2%)",
         "image_url": "assets/app-logo/Xtronx.png",
-        "network": "Xode"
+        "network": "Xode",
+        "network_id": "0"
     },
     {
         "id": 2,
@@ -29,7 +30,8 @@
         "tokenCreated": "12H 41M",
         "percentage": "(2%)",
         "image_url": "assets/app-logo/Bandan.png",
-        "network": "Xode"
+        "network": "Xode",
+        "network_id": "1"
     },
     {
         "id": 3,
@@ -45,7 +47,8 @@
         "tokenCreated": "12H 41M",
         "percentage": "(2%)",
         "image_url": "assets/app-logo/trumpLoves.png",
-        "network": "Xode"
+        "network": "Xode",
+        "network_id": "2"
     },
     {
         "id": 4,
@@ -61,6 +64,7 @@
         "tokenCreated": "12H 41M",
         "percentage": "(2%)",
         "image_url": "assets/app-logo/bobSuper.png",
-        "network": "Xode"
+        "network": "Xode",
+        "network_id": "3"
     }
 ]
