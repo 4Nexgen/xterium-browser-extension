@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next"
 import PumpTokenData from "src/data/pump-tokens.json";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import IndexPumpTokenDetails from "./pump-token-details"
+import IndexAddPumpToken from "./addPumpToken"
 import type { PumpTokenModel } from "@/models/pump-token.model"
 import { NetworkService } from "@/services/network.service";
 import { PumpTokenService } from "@/services/pump-token.service"
@@ -20,7 +21,8 @@ const IndexPumpToken = () => {
   const { t } = useTranslation()
   const [openSearchToken, setOpenSearchTokens] = useState<boolean>(false)
   const [searchQuery, setSearchQuery] = useState("");
-  const [isMockTokenDrawerOpen, setIsMockTokenDrawerOpen] = useState(false)
+  const [isPumpTokenDetailsDrawerOpen, setIsPumpTokenDetailsDrawerOpen] = useState(false)
+  const [isAddPumpTokenDrawerOpen, setIsAddPumpTokenDrawerOpen] = useState<boolean>(false)
   const [selectedInSearchToken, setSelectedInSearchToken] = useState<PumpTokenModel | null>(null);
   const [pumpTokenData, setPumpTokenData] = useState<PumpTokenModel>({
     id: 0,
@@ -36,7 +38,8 @@ const IndexPumpToken = () => {
     tokenCreated: "",
     percentage: "",
     image_url: undefined,
-    network: ""
+    network: "",
+    network_id: ""
   })  
   const [currentNetwork, setCurrentNetwork] = useState<string>("");
   const networkService = new NetworkService();
@@ -57,7 +60,19 @@ const IndexPumpToken = () => {
 
   const handleTokenClick = (token: PumpTokenModel) => {
     setPumpTokenData(token)
-    setIsMockTokenDrawerOpen(true)
+    setIsPumpTokenDetailsDrawerOpen(true)
+  }
+
+  const addPumpToken = () => {
+    setIsAddPumpTokenDrawerOpen(true)
+  }
+
+  const saveAndUpdatePumpToken = () => {
+    setIsAddPumpTokenDrawerOpen(false)
+    // setIsEditPumpTokenDrawerOpen(false)
+    // setIsDeleteTokenDrawerOpen(false)
+
+    setTimeout(() => {}, 100)
   }
 
   const filteredTokens = PumpTokenData.filter(
@@ -188,10 +203,13 @@ const IndexPumpToken = () => {
             )}
           </div>
         </div>
+        <Button variant="jelly" className="my-auto" onClick={addPumpToken}>
+          {t("ADD NEW TOKEN")}
+        </Button>
       </div>
       <Drawer
-        open={isMockTokenDrawerOpen}
-        onOpenChange={setIsMockTokenDrawerOpen}
+        open={isPumpTokenDetailsDrawerOpen}
+        onOpenChange={setIsPumpTokenDetailsDrawerOpen}
       >
         <DrawerContent>
           <DrawerHeader>
@@ -209,6 +227,14 @@ const IndexPumpToken = () => {
           )}
         </DrawerContent>
       </Drawer>
+      <Drawer open={isAddPumpTokenDrawerOpen} onOpenChange={setIsAddPumpTokenDrawerOpen}>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle className="border-b border-border-1/20 pb-4 text-muted">{t("ADD NEW TOKEN")}</DrawerTitle>
+            </DrawerHeader>
+            <IndexAddPumpToken handleCallbacks={saveAndUpdatePumpToken} />
+          </DrawerContent>
+        </Drawer>
     </>
   )
 }
