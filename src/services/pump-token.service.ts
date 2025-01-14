@@ -27,10 +27,10 @@ export class PumpTokenService {
         const jsonData = JSON.stringify(pumpTokens, null, 2)
 
         const blob = new Blob([jsonData], { type: "application/json" })
-
+        const fileName = "pumptoken.json"
         const link = document.createElement("a")
         link.href = URL.createObjectURL(blob)
-        link.download = "pumpTokens.json"
+        link.download = fileName
 
         document.body.appendChild(link)
         link.click()
