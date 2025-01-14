@@ -2,16 +2,16 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
+import type { NetworkModel } from "@/models/network.model"
 import type { PumpTokenModel } from "@/models/pump-token.model"
+import { NetworkService } from "@/services/network.service"
 import { PumpTokenService } from "@/services/pump-token.service"
 import { Check, X } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import type { NetworkModel } from "@/models/network.model"
-import { NetworkService } from "@/services/network.service"
 
 const IndexAddPumpToken = ({ handleCallbacks }) => {
-  console.log("IndexAddPumpToken component mounted");
+  console.log("IndexAddPumpToken component mounted")
 
   const { t } = useTranslation()
   const networkService = new NetworkService()
@@ -31,9 +31,9 @@ const IndexAddPumpToken = ({ handleCallbacks }) => {
     tokenCreated: "",
     percentage: "",
     image_url: undefined,
-    network: "wss://rpcnodea01.xode.net/n7yoxCmcIrCF6VziCcDmYTwL8R03a/rpc",
+    network: "Xode",
     network_id: ""
-  })  
+  })
 
   const { toast } = useToast()
 
@@ -61,29 +61,45 @@ const IndexAddPumpToken = ({ handleCallbacks }) => {
       reader.onloadend = () => {
         setPumpTokenData((prev) => ({
           ...prev,
-          image_url: reader.result as string 
+          image_url: reader.result as string
         }))
       }
-      reader.readAsDataURL(file) 
+      reader.readAsDataURL(file)
     }
   }
 
   const savePumpToken = async () => {
-    alert("Save button clicked!");
+    const {
+      name,
+      symbol,
+      creator,
+      contract,
+      description,
+      marketCap,
+      price,
+      virtualLiquidity,
+      volume24h,
+      tokenCreated,
+      percentage,
+      image_url,
+      network_id
+    } = pumpTokenData
+
+    alert("Save button clicked!")
     if (
-      !pumpTokenData.name ||
-      !pumpTokenData.symbol ||
-      !pumpTokenData.creator ||
-      !pumpTokenData.contract ||
-      !pumpTokenData.description ||
-      !pumpTokenData.marketCap ||
-      !pumpTokenData.price ||
-      !pumpTokenData.virtualLiquidity ||
-      !pumpTokenData.volume24h ||
-      !pumpTokenData.tokenCreated ||
-      !pumpTokenData.percentage ||
-      !pumpTokenData.image_url ||
-      !pumpTokenData.network_id
+      !name ||
+      !symbol ||
+      !creator ||
+      !contract ||
+      !description ||
+      !marketCap ||
+      !price ||
+      !virtualLiquidity ||
+      !volume24h ||
+      !tokenCreated ||
+      !percentage ||
+      // !pumpTokenData.image_url ||
+      !network_id
     ) {
       toast({
         description: (
@@ -96,47 +112,43 @@ const IndexAddPumpToken = ({ handleCallbacks }) => {
       })
       return
     }
-  
-    try {
-      const existingPumpTokens = await pumpTokenService.getAllPumpTokens();
-      const updatedTokens = [...existingPumpTokens, { ...pumpTokenData, id: existingPumpTokens.length + 1 }];
-  
-      const blob = new Blob([JSON.stringify(updatedTokens, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
+    pumpTokenService.getPumpTokens().then((existingPumpTokens) => {
+      const existingPumpToken = existingPumpTokens.find(
+        (token) => token.network_id === network_id
+      )
 
-      const fileName = `${pumpTokenData.name.replace(/\s+/g, "_").toLowerCase()}.json`;
-  
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${fileName}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a); 
-  
-      toast({
-        description: (
-          <div className="flex items-center">
-            <Check className="mr-2 text-green-500" />
-            {t("Pump Token Saved Successfully!")}
-          </div>
-        ),
-        variant: "default"
-      });
-  
-      handleCallbacks();
-    } catch (error) {
-      toast({
-        description: (
-          <div className="flex items-center">
-            <X className="mr-2 text-red-500" />
-            {error}
-          </div>
-        ),
-        variant: "destructive"
+      if (existingPumpToken) {
+        toast({
+          description: (
+            <div className="flex items-center">
+              <X className="mr-2 text-white-500" />
+              {t("Network ID already exists!")}
+            </div>
+          ),
+          variant: "destructive"
+        })
+        return
+      }
+
+      pumpTokenData.network = selectedNetwork ? selectedNetwork.name : ""
+
+      pumpTokenService.createPumpToken(pumpTokenData).then((result) => {
+        if (result != null) {
+          toast({
+            description: (
+              <div className="flex items-center">
+                <Check className="mr-2 text-green-500" />
+                {t("Pump Token Saved Successfully!")}
+              </div>
+            ),
+            variant: "default"
+          })
+        }
       })
-    }
-  };
-  
+
+      handleCallbacks()
+    })
+  }
 
   return (
     <>
@@ -163,10 +175,10 @@ const IndexAddPumpToken = ({ handleCallbacks }) => {
           <div className="mb-3">
             <Label>{t("Symbol")}:</Label>
             <Input
-            type="text"
-            placeholder={t("Enter Symbol")}
-            value={pumpTokenData.symbol}
-            onChange={(e) => handleInputChange("symbol", e.target.value)}
+              type="text"
+              placeholder={t("Enter Symbol")}
+              value={pumpTokenData.symbol}
+              onChange={(e) => handleInputChange("symbol", e.target.value)}
             />
           </div>
           <div className="mb-3">
