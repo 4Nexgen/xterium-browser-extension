@@ -98,7 +98,7 @@ const IndexAddPumpToken = ({ handleCallbacks }) => {
     }
   
     try {
-      const existingPumpTokens = await pumpTokenService.getPumpTokens();
+      const existingPumpTokens = await pumpTokenService.getAllPumpTokens();
       const updatedTokens = [...existingPumpTokens, { ...pumpTokenData, id: existingPumpTokens.length + 1 }];
   
       const blob = new Blob([JSON.stringify(updatedTokens, null, 2)], { type: "application/json" });
