@@ -24,17 +24,8 @@ export class PumpTokenService {
 
         await this.storage.set(this.key, JSON.stringify(pumpTokens))
 
-        const jsonData = JSON.stringify(pumpTokens, null, 2)
+        await this.savePumpTokenToFileSystem(data)
 
-        const blob = new Blob([jsonData], { type: "application/json" })
-        const fileName = "pumptoken.json"
-        const link = document.createElement("a")
-        link.href = URL.createObjectURL(blob)
-        link.download = fileName
-
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
         resolve("Pupm token created successfully")
       } catch (error) {
         reject(error)
@@ -57,5 +48,29 @@ export class PumpTokenService {
         reject(error)
       }
     })
+  }
+
+  async savePumpTokenToFileSystem(data: PumpTokenModel): Promise<void> {
+    try {
+      if ("showDirectoryPicker" in window) {
+        const directoryHandle = await (window as any).showDirectoryPicker()
+
+        const fileHandle = await directoryHandle.getFileHandle(`${data.name}.json`, {
+          create: true
+        })
+
+        const writable = await fileHandle.createWritable()
+
+        await writable.write(JSON.stringify(data, null, 2))
+
+        await writable.close()
+
+        console.log("Pump token saved to file system")
+      } else {
+        console.warn("File System Access API is not supported in this browser")
+      }
+    } catch (error) {
+      console.error("Error saving pump token to file system", error)
+    }
   }
 }
