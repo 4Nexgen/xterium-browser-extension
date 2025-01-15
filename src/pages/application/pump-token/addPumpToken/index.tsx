@@ -24,15 +24,15 @@ const IndexAddPumpToken = ({ handleCallbacks }) => {
     creator: "",
     contract: "",
     description: "",
-    marketCap: "",
-    price: "",
-    virtualLiquidity: "",
-    volume24h: "",
-    tokenCreated: "",
-    percentage: "",
+    marketCap: 0,
+    price: 0,
+    virtualLiquidity: 0,
+    volume24h: 0,
+    tokenCreated: new Date(),
+    percentage: 0,
     image_url: undefined,
     network: "Xode",
-    network_id: ""
+    network_id: 0
   })
 
   const { toast } = useToast()
@@ -84,20 +84,17 @@ const IndexAddPumpToken = ({ handleCallbacks }) => {
       image_url,
       network_id
     } = pumpTokenData
-
-    alert("Save button clicked!")
     if (
       !name ||
-      !symbol ||
-      !creator ||
-      !contract ||
-      !description ||
-      !marketCap ||
-      !price ||
-      !virtualLiquidity ||
-      !volume24h ||
-      !tokenCreated ||
-      !percentage ||
+      // !symbol ||
+      // !creator ||
+      // !contract ||
+      // !description ||
+      // !marketCap ||
+      // !price ||
+      // !virtualLiquidity ||
+      // !volume24h ||
+      // !percentage ||
       // !pumpTokenData.image_url ||
       !network_id
     ) {
@@ -131,7 +128,7 @@ const IndexAddPumpToken = ({ handleCallbacks }) => {
       }
 
       pumpTokenData.network = selectedNetwork ? selectedNetwork.name : ""
-
+      pumpTokenData.tokenCreated = new Date();
       pumpTokenService.createPumpToken(pumpTokenData).then((result) => {
         if (result != null) {
           toast({
@@ -154,15 +151,6 @@ const IndexAddPumpToken = ({ handleCallbacks }) => {
     <>
       <div className="p-6">
         <div className="grid grid-cols-2 gap-6 p-2">
-          <div className="mb-3">
-            <Label>{t("Enter Pump Token ID")}:</Label>
-            <Input
-              type="text"
-              placeholder={t("Pump Token ID")}
-              value={pumpTokenData.id}
-              onChange={(e) => handleInputChange("id", e.target.value)}
-            />
-          </div>
           <div className="mb-3">
             <Label>{t("Enter Pump Token Name")}:</Label>
             <Input
@@ -242,15 +230,6 @@ const IndexAddPumpToken = ({ handleCallbacks }) => {
               placeholder={t("Volume24h")}
               value={pumpTokenData.volume24h}
               onChange={(e) => handleInputChange("volume24h", e.target.value)}
-            />
-          </div>
-          <div className="mb-3">
-            <Label>{t("Token Created")}:</Label>
-            <Input
-              type="text"
-              placeholder={t("Token Created")}
-              value={pumpTokenData.tokenCreated}
-              onChange={(e) => handleInputChange("tokenCreated", e.target.value)}
             />
           </div>
           <div className="mb-3">

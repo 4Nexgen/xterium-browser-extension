@@ -5,14 +5,14 @@ export class PumpTokenModel {
     creator: string
     contract: string
     description: string
-    marketCap: string
-    price: string
-    virtualLiquidity: string
-    volume24h: string
-    tokenCreated: string
-    percentage: string
+    marketCap: number
+    price: number
+    virtualLiquidity: number
+    volume24h: number
+    tokenCreated: Date
+    percentage: number
     image_url?: string
     network: string
-    network_id: string
+    network_id: number
   }
   

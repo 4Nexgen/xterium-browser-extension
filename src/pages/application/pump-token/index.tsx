@@ -44,15 +44,15 @@ const IndexPumpToken = () => {
     creator: "",
     contract: "",
     description: "",
-    marketCap: "",
-    price: "",
-    virtualLiquidity: "",
-    volume24h: "",
-    tokenCreated: "",
-    percentage: "",
+    marketCap: 0,
+    price: 0,
+    virtualLiquidity: 0,
+    volume24h: 0,
+    tokenCreated: new Date(),
+    percentage: 0,
     image_url: undefined,
-    network: "",
-    network_id: ""
+    network: "Xode",
+    network_id: 0
   })
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
 
@@ -95,6 +95,17 @@ const IndexPumpToken = () => {
       (!searchQuery || token.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
       (selectedNetwork ? token.network === selectedNetwork.name : true)
   )
+
+  const formatCurrency = (amount) => {
+    if (!amount) return "$0.0"; 
+    const num = parseFloat(amount.replace(/,/g, '')); 
+    if (isNaN(num)) return "$0.0"; 
+  
+    if (num >= 1000) {
+      return `$${(num / 1000).toFixed(1)}k`; 
+    }
+    return `$${num.toFixed(1)}`; 
+  };
 
   return (
     <>
@@ -181,7 +192,7 @@ const IndexPumpToken = () => {
                   />
                 </div>
                 <h3 className="font-bold text-sm pl-2">
-                  {selectedInSearchToken.name} ({selectedInSearchToken.symbol})
+                  {selectedInSearchToken.name} ($ {selectedInSearchToken.symbol})
                 </h3>
                 <p className="pl-2 mt-1">
                   Created by:{" "}
@@ -195,8 +206,7 @@ const IndexPumpToken = () => {
                 <p>
                   <span className="opacity-50 pl-2">Market Cap:</span>
                   <span className="font-bold p-4">{selectedInSearchToken.marketCap}</span>
-                  <span className="opacity-50">{selectedInSearchToken.percentage}</span>
-                </p>
+                  <span className="font-bold p-4">{formatCurrency(selectedInSearchToken.marketCap)}</span>                </p>
               </div>
             ) : (
               filteredTokens.map((token) => (
@@ -212,7 +222,7 @@ const IndexPumpToken = () => {
                     />
                   </div>
                   <h3 className="font-bold text-sm pl-2">
-                    {token.name} ({token.symbol})
+                    {token.name} ($ {token.symbol})
                   </h3>
                   <p className="pl-2 mt-1">
                     Created by:{" "}
@@ -223,8 +233,8 @@ const IndexPumpToken = () => {
                   </p>
                   <p>
                     <span className="opacity-50 pl-2">Market Cap:</span>
-                    <span className="font-bold p-4">{token.marketCap}</span>
-                    <span className="opacity-50">{token.percentage}</span>
+                    <span className="font-bold p-4">{formatCurrency(token.marketCap)}</span>
+                    <span className="opacity-50">({token.percentage}%)</span>
                   </p>
                 </div>
               ))
@@ -260,7 +270,7 @@ const IndexPumpToken = () => {
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle className="border-b border-border-1/20 pb-4 text-muted">
-              {t("ADD NEW TOKEN")}
+              {t("ADD NEW PUMP TOKEN")}
             </DrawerTitle>
           </DrawerHeader>
           <IndexAddPumpToken handleCallbacks={saveAndUpdatePumpToken} />

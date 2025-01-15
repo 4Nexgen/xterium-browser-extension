@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 const IndexPumpTokenDetails = ({ selectedMockTokens, handleCallbacks }) => {
@@ -20,6 +20,59 @@ const IndexPumpTokenDetails = ({ selectedMockTokens, handleCallbacks }) => {
     volume24h,
     tokenCreated
   } = selectedMockTokens
+
+  const formatCurrency = (amount) => {
+    if (!amount) return "$0.0";
+    const num = parseFloat(amount.replace(/,/g, '')); 
+    if (isNaN(num)) return "$0.0"; 
+  
+    if (num >= 1000) {
+      return `$${(num / 1000).toFixed(1)}k`; 
+    }
+    return `$${num.toFixed(1)}`; 
+  };
+
+  const [timeElapsed, setTimeElapsed] = useState('');
+
+  const calculateTimeElapsed = () => {
+    const now = new Date();
+    const createdTime = new Date(tokenCreated);
+
+    if (isNaN(createdTime.getTime())) {
+      console.error("Invalid tokenCreated date:", tokenCreated);
+      return;
+    }
+
+    const elapsed = Math.floor((now.getTime() - createdTime.getTime()) / 1000);
+
+    const days = Math.floor(elapsed / 86400); 
+    const hours = Math.floor((elapsed % 86400) / 3600);
+    const minutes = Math.floor((elapsed % 3600) / 60);
+    const seconds = elapsed % 60; 
+
+    let timeString = '';
+
+    if (days > 0) {
+      timeString += `${days}D `;
+      timeString += `${hours}H `;
+      timeString += `${minutes}M`;
+    } else if (hours > 0) {
+      timeString += `${hours}H `;
+      timeString += `${minutes}M`;
+    } else {
+      timeString += `${minutes}M`;
+    }
+
+    setTimeElapsed(timeString.trim() || "0M");
+  };
+
+  useEffect(() => {
+    calculateTimeElapsed();
+
+    const intervalId = setInterval(calculateTimeElapsed, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [tokenCreated]);  
 
   return (
     <div className="p-6">
@@ -52,31 +105,31 @@ const IndexPumpTokenDetails = ({ selectedMockTokens, handleCallbacks }) => {
           <p className="font-semibold text-sm opacity-70 mr-2">{t("Price")}</p>
           <p className="text-muted">+12.29%</p>
         </div>
-          <p className="font-bold text-sm">{price}</p>
+          <p className="font-bold text-sm">{price} XON</p>
         </div>
         <div className="border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg p-2">
           <p className="opacity-70 text-sm">{t("Market Cap")}</p>
-          <p className="font-bold text-sm">{marketCap}</p>
+          <p className="font-bold text-sm">{formatCurrency(marketCap)}</p>
         </div>
       </div>
       <div className="mt-6 grid grid-cols-3 gap-4">
         <div className="border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg p-2">
           <p className="opacity-70 text-sm">{t("Virtual Liquidity")}</p>
-          <p className="font-bold text-sm">{virtualLiquidity}</p>
+          <p className="font-bold text-sm">{formatCurrency(virtualLiquidity)}</p>
         </div>
         <div className="border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg p-2">
           <p className="opacity-70 text-sm">{t("24H Volume")}</p>
-          <p className="font-bold text-sm">{volume24h}</p>
+          <p className="font-bold text-sm">{volume24h} XON</p>
         </div>
         <div className="border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg p-2">
           <p className="opacity-70 text-sm">{t("Token Created")}</p>
-          <p className="font-bold text-sm">{tokenCreated}</p>
+          <p className="font-bold text-sm">{timeElapsed}</p>
         </div>
       </div>
 
       <div className="mt-6">
         <Button variant="jelly" type="button">
-          {t("BUY")}
+          {t("SWAP")}
         </Button>
       </div>
     </div>
