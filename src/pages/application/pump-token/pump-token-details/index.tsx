@@ -1,11 +1,18 @@
 import { Button } from "@/components/ui/button"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
+import type { PumpTokenModel } from "@/models/pump-token.model"
+import { PumpTokenService } from "@/services/pump-token.service"
+import IndexSwapPumpToken from "./swapPumpToken"
 
-const IndexPumpTokenDetails = ({ selectedMockTokens, handleCallbacks }) => {
+const IndexPumpTokenDetails = ({ selectedPumpTokens, handleCallbacks, selectedWallet }) => {
   const { t } = useTranslation()
+  const pumpTokenService = new PumpTokenService()
+  const [isSwapPumpDrawerOpen, setIsSwapPumpDrawerOpen] = useState(false)
+  const [pumpTokens, setPumpTokens] = useState<PumpTokenModel[]>([])
 
-  if (!selectedMockTokens) {
+  if (!selectedPumpTokens) {
     return <div>{t("Loading...")}</div>
   }
 
@@ -19,7 +26,7 @@ const IndexPumpTokenDetails = ({ selectedMockTokens, handleCallbacks }) => {
     virtualLiquidity,
     volume24h,
     tokenCreated
-  } = selectedMockTokens
+  } = selectedPumpTokens
 
   const formatCurrency = (amount) => {
     if (!amount) return "$0.0";
@@ -74,13 +81,17 @@ const IndexPumpTokenDetails = ({ selectedMockTokens, handleCallbacks }) => {
     return () => clearInterval(intervalId);
   }, [tokenCreated]);  
 
+  const swapPumpToken = () => {
+    setIsSwapPumpDrawerOpen(true)
+  }
+
   return (
     <div className="p-6">
       <div className="flex">
           <div>
             <img
               src={image_url}
-              alt={selectedMockTokens.name}
+              alt={selectedPumpTokens.name}
               className="rounded-lg object-cover h-40 w-40"
             />
           </div>
@@ -128,10 +139,22 @@ const IndexPumpTokenDetails = ({ selectedMockTokens, handleCallbacks }) => {
       </div>
 
       <div className="mt-6">
-        <Button variant="jelly" type="button">
-          {t("SWAP")}
+        <Button variant="jelly" onClick={swapPumpToken}>
+          {t("SWAP TO XON")}
         </Button>
       </div>
+      <Drawer
+        open={isSwapPumpDrawerOpen}
+        onOpenChange={setIsSwapPumpDrawerOpen}>
+        <DrawerContent>
+          {/* <DrawerHeader>
+            <DrawerTitle className="border-b border-border-1/20 pb-4 text-muted">
+              {t("SWAP PUMP TOKEN")}
+            </DrawerTitle>
+          </DrawerHeader> */}
+          <IndexSwapPumpToken handleCallbacks={handleCallbacks} selectedWallet={selectedWallet} />
+          </DrawerContent>
+      </Drawer>
     </div>
   )
 }

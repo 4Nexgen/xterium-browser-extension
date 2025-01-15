@@ -25,7 +25,7 @@ const truncateText = (text, limit) => {
   return text.length > limit ? `${text.slice(0, limit)}...` : text
 }
 
-const IndexPumpToken = () => {
+const IndexPumpToken = ({selectedWallet}) => {
   const { t } = useTranslation()
   const networkService = new NetworkService()
   const pumpTokenService = new PumpTokenService()
@@ -226,7 +226,7 @@ const IndexPumpToken = () => {
                   </h3>
                   <p className="pl-2 mt-1">
                     Created by:{" "}
-                    <span className="text-muted p-4 underline">{token.creator}</span>
+                    <span className="text-muted p-4 underline font-semibold">{token.creator}</span>
                   </p>
                   <p className="pl-2 pr-2 opacity-50 leading-snug mt-1 mb-1">
                     {truncateText(token.description, 50)}
@@ -258,8 +258,9 @@ const IndexPumpToken = () => {
           </DrawerHeader>
           {pumpTokenData ? (
             <IndexPumpTokenDetails
-              selectedMockTokens={pumpTokenData}
+              selectedPumpTokens={pumpTokenData}
               handleCallbacks={() => {}}
+              selectedWallet={selectedWallet}
             />
           ) : (
             <p>{t("Loading...")}</p>
