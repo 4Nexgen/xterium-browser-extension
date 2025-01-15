@@ -5,12 +5,18 @@ import { TokenService } from './token.service';
 import { WalletService } from './wallet.service';
 import { EncryptionService } from './encryption.service';
 import type { TokenModel } from '@/models/token.model';
+import { Storage } from "@plasmohq/storage";
 
 export class BalanceServices {
   private networkService = new NetworkService()
   private walletService = new WalletService()
   private tokenService = new TokenService()
   private encryptionService = new EncryptionService()
+  private storage = new Storage({
+    area: "local",
+    allCopied: true
+  })
+  private balanceStorageKey = "wallet_balances";
 
   private api: ApiPromise = null
 
@@ -195,6 +201,21 @@ export class BalanceServices {
         reject("No valid wallet found");
       } catch (error) {
         reject(`Unexpected error: ${error.message}`);
+      }
+    });
+  }
+
+  async saveBalance(publicKey: string, balances: { tokenName: string; freeBalance: number }[]): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const walletBalances = {
+          [publicKey]: balances 
+        };
+  
+        await this.storage.set(this.balanceStorageKey, JSON.stringify(walletBalances));
+        resolve();
+      } catch (error) {
+        reject(error);
       }
     });
   }
