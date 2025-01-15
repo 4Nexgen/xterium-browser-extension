@@ -1,30 +1,15 @@
 import { PumpTokenModel } from "@/models/pump-token.model"
 
-import { Storage } from "@plasmohq/storage"
+import pumpTokens from "../data/pump-token/pump-tokens.json"
 
 export class PumpTokenService {
-  private storage = new Storage({
-    area: "local",
-    allCopied: true
-  })
-  private key = "pump-tokens"
-
   async createPumpToken(data: PumpTokenModel): Promise<string> {
     return new Promise(async (resolve, reject) => {
       try {
-        const existingPumpTokens = await this.storage.get<string>(this.key)
-        const pumpTokens: PumpTokenModel[] = existingPumpTokens
-          ? JSON.parse(existingPumpTokens)
-          : []
-
         const lastId = pumpTokens.length > 0 ? pumpTokens[pumpTokens.length - 1].id : 0
         data.id = lastId + 1
 
-        pumpTokens.push(data)
-
-        await this.storage.set(this.key, JSON.stringify(pumpTokens))
-
-        await this.savePumpTokenToFileSystem(data)
+        await this.jsonFileSave(data)
 
         resolve("Pupm token created successfully")
       } catch (error) {
@@ -34,38 +19,39 @@ export class PumpTokenService {
   }
 
   async getPumpTokens(): Promise<PumpTokenModel[]> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       try {
-        const storedData = await this.storage.get<string>(this.key)
-
-        if (!storedData) {
-          return resolve([])
-        }
-
-        const pumpTokens: PumpTokenModel[] = JSON.parse(storedData)
-        resolve(pumpTokens)
+        resolve(pumpTokens as unknown as PumpTokenModel[])
       } catch (error) {
-        reject(error)
+        reject(new Error(`Error reading JSON file: ${error.message}`))
       }
     })
   }
 
-  async savePumpTokenToFileSystem(data: PumpTokenModel): Promise<void> {
+  async jsonFileSave(data: PumpTokenModel): Promise<void> {
     try {
       if ("showDirectoryPicker" in window) {
         const directoryHandle = await (window as any).showDirectoryPicker()
 
-        const fileHandle = await directoryHandle.getFileHandle(`${data.name}.json`, {
-          create: true
+        const fileHandle = await directoryHandle.getFileHandle("pump-tokens.json", {
+          create: false
         })
 
+        const file = await fileHandle.getFile()
+        const text = await file.text()
+        let existingData = []
+
+        if (text) {
+          existingData = JSON.parse(text)
+        }
+
+        existingData.push(data)
+
+        const jsonData = JSON.stringify(existingData, null, 2)
+
         const writable = await fileHandle.createWritable()
-
-        await writable.write(JSON.stringify(data, null, 2))
-
+        await writable.write(jsonData)
         await writable.close()
-
-        console.log("Pump token saved to file system")
       } else {
         console.warn("File System Access API is not supported in this browser")
       }
