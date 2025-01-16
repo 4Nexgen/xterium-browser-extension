@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button"
-import React, { useEffect, useState } from "react"
-import { useTranslation } from "react-i18next"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import type { PumpTokenModel } from "@/models/pump-token.model"
 import { PumpTokenService } from "@/services/pump-token.service"
+import React, { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
+
 import IndexSwapPumpToken from "./swapPumpToken"
 
 const IndexPumpTokenDetails = ({ selectedPumpTokens, handleCallbacks }) => {
@@ -29,76 +30,84 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, handleCallbacks }) => {
   } = selectedPumpTokens
 
   const formatCurrency = (amount) => {
-    if (!amount) return "$0.0";
-    const num = parseFloat(amount.replace(/,/g, '')); 
-    if (isNaN(num)) return "$0.0"; 
-  
-    if (num >= 1000) {
-      return `$${(num / 1000).toFixed(1)}k`; 
-    }
-    return `$${num.toFixed(1)}`; 
-  };
+    if (!amount) return "$0.0"
+    const num = parseFloat(amount.replace(/,/g, ""))
+    if (isNaN(num)) return "$0.0"
 
-  const [timeElapsed, setTimeElapsed] = useState('');
+    if (num >= 1000) {
+      return `$${(num / 1000).toFixed(1)}k`
+    }
+    return `$${num.toFixed(1)}`
+  }
+
+  const [timeElapsed, setTimeElapsed] = useState("")
 
   const calculateTimeElapsed = () => {
-    const now = new Date();
-    const createdTime = new Date(tokenCreated);
+    const now = new Date()
+    const createdTime = new Date(tokenCreated)
 
     if (isNaN(createdTime.getTime())) {
-      console.error("Invalid tokenCreated date:", tokenCreated);
-      return;
+      console.error("Invalid tokenCreated date:", tokenCreated)
+      return
     }
 
-    const elapsed = Math.floor((now.getTime() - createdTime.getTime()) / 1000);
+    const elapsed = Math.floor((now.getTime() - createdTime.getTime()) / 1000)
 
-    const days = Math.floor(elapsed / 86400); 
-    const hours = Math.floor((elapsed % 86400) / 3600);
-    const minutes = Math.floor((elapsed % 3600) / 60);
-    const seconds = elapsed % 60; 
+    const days = Math.floor(elapsed / 86400)
+    const hours = Math.floor((elapsed % 86400) / 3600)
+    const minutes = Math.floor((elapsed % 3600) / 60)
+    const seconds = elapsed % 60
 
-    let timeString = '';
+    let timeString = ""
 
     if (days > 0) {
-      timeString += `${days}D `;
-      timeString += `${hours}H `;
-      timeString += `${minutes}M`;
+      timeString += `${days}D `
+      timeString += `${hours}H `
+      timeString += `${minutes}M`
     } else if (hours > 0) {
-      timeString += `${hours}H `;
-      timeString += `${minutes}M`;
+      timeString += `${hours}H `
+      timeString += `${minutes}M`
     } else {
-      timeString += `${minutes}M`;
+      timeString += `${minutes}M`
     }
 
-    setTimeElapsed(timeString.trim() || "0M");
-  };
+    setTimeElapsed(timeString.trim() || "0M")
+  }
 
   useEffect(() => {
-    calculateTimeElapsed();
+    calculateTimeElapsed()
 
-    const intervalId = setInterval(calculateTimeElapsed, 1000);
+    const intervalId = setInterval(calculateTimeElapsed, 1000)
 
-    return () => clearInterval(intervalId);
-  }, [tokenCreated]);  
+    return () => clearInterval(intervalId)
+  }, [tokenCreated])
 
   const swapPumpToken = () => {
     setIsSwapPumpDrawerOpen(true)
   }
 
   return (
-    <div className="p-6">
+    <div className="p-4">
+      <div className="w-full flex justify-center mb-4">
+        <img
+          src={image_url}
+          className="h-20 w-full object-cover object-center rounded-lg"
+        />
+      </div>
       <div className="flex">
-          <div>
-            <img
-              src={image_url}
-              alt={selectedPumpTokens.name}
-              className="rounded-lg object-cover h-40 w-40"
-            />
-          </div>
+        <div>
+          <img
+            src={image_url}
+            alt={selectedPumpTokens.name}
+            className="rounded-full object-cover h-20 w-20"
+          />
+        </div>
         <div className="ml-6 w-3/4">
           <div className="flex items-center gap-x-2">
             <p className="font-semibold">{t("Created by:")}</p>
-            <p className="opacity-70 text-muted underline">{creator}</p>
+            <p className="opacity-70 text-muted underline">
+              {creator.slice(0, 4)}...{creator.slice(-4)}
+            </p>
           </div>
           <div className="mt-2 flex items-center gap-x-2">
             <p className="font-semibold">{t("Contract: ")}</p>
@@ -112,10 +121,10 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, handleCallbacks }) => {
 
       <div className="mt-3 grid grid-cols-2 gap-4">
         <div className="border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg p-2">
-        <div className="flex items-center">
-          <p className="font-semibold text-sm opacity-70 mr-2">{t("Price")}</p>
-          <p className="text-muted">+12.29%</p>
-        </div>
+          <div className="flex items-center">
+            <p className="font-semibold text-sm opacity-70 mr-2">{t("Price")}</p>
+            <p className="text-muted">+12.29%</p>
+          </div>
           <p className="font-bold text-sm">{price} XON</p>
         </div>
         <div className="border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg p-2">
@@ -143,9 +152,7 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, handleCallbacks }) => {
           {t("SWAP TO XON")}
         </Button>
       </div>
-      <Drawer
-        open={isSwapPumpDrawerOpen}
-        onOpenChange={setIsSwapPumpDrawerOpen}>
+      <Drawer open={isSwapPumpDrawerOpen} onOpenChange={setIsSwapPumpDrawerOpen}>
         <DrawerContent>
           {/* <DrawerHeader>
             <DrawerTitle className="border-b border-border-1/20 pb-4 text-muted">
@@ -153,7 +160,7 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, handleCallbacks }) => {
             </DrawerTitle>
           </DrawerHeader> */}
           <IndexSwapPumpToken handleCallbacks={handleCallbacks} />
-          </DrawerContent>
+        </DrawerContent>
       </Drawer>
     </div>
   )

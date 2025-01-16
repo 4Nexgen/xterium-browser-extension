@@ -1,10 +1,11 @@
 import { PumpTokenModel } from "@/models/pump-token.model"
+
 import pumpTokens from "../data/pump-token/pump-tokens.json"
-import { BalanceServices } from './balance.service';
+import { BalanceServices } from "./balance.service"
 
 export class PumpTokenService {
-  private balanceService = new BalanceServices();
-  
+  private balanceService = new BalanceServices()
+
   async createPumpToken(data: PumpTokenModel): Promise<string> {
     return new Promise(async (resolve, reject) => {
       try {
@@ -62,19 +63,26 @@ export class PumpTokenService {
     }
   }
 
-  async getWalletBalances(): Promise<Record<string, { publicKey: string; tokenName: string; freeBalance: number }[]>> {
+  async getWalletBalances(): Promise<
+    Record<string, { publicKey: string; tokenName: string; freeBalance: number }[]>
+  > {
     return new Promise(async (resolve, reject) => {
       try {
-        const rawBalances = await this.balanceService.storage.get(this.balanceService.balanceStorageKey);
+        const rawBalances = await this.balanceService.storage.get(
+          this.balanceService.balanceStorageKey
+        )
         if (!rawBalances) {
-          return resolve({});
+          return resolve({})
         }
 
-        const balances = JSON.parse(rawBalances) as Record<string, { publicKey: string; tokenName: string; freeBalance: number }[]>;
-        resolve(balances);
+        const balances = JSON.parse(rawBalances) as Record<
+          string,
+          { publicKey: string; tokenName: string; freeBalance: number }[]
+        >
+        resolve(balances)
       } catch (error) {
-        reject(`Error fetching wallet balances: ${error.message}`);
+        reject(`Error fetching wallet balances: ${error.message}`)
       }
-    });
+    })
   }
 }
