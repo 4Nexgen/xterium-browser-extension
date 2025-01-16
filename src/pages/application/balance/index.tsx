@@ -154,9 +154,9 @@ const IndexBalance = () => {
   }
 
   const getBalances = async () => {
-    zeroOutBalances();
+    zeroOutBalances(); 
   
-    if (selectedWallet != null) {
+    if (selectedWallet) {
       const sortedBalances = balances.sort((a, b) => {
         if (a.token.id < b.token.id) return -1;
         if (a.token.id > b.token.id) return 1;
@@ -165,32 +165,26 @@ const IndexBalance = () => {
   
       const balancePromises = sortedBalances.map(async (balance) => {
         const updatedBalance = await getBalancePerToken(balance.token);
-  
-        setBalances((prevBalances) =>
-          prevBalances.map((prevBalance) =>
-            prevBalance.token.id === updatedBalance.token.id
-              ? {
-                  ...prevBalance,
-                  freeBalance: fixBalance(updatedBalance.freeBalance.toString(), 12),
-                  reservedBalance: fixBalance(updatedBalance.reservedBalance.toString(), 12),
-                }
-              : prevBalance
-          )
-        );
+        return {
+          ...balance,
+          freeBalance: fixBalance(updatedBalance.freeBalance.toString(), 12),
+          reservedBalance: fixBalance(updatedBalance.reservedBalance.toString(), 12),
+        };
       });
   
-      await Promise.all(balancePromises);
+      const updatedBalances = await Promise.all(balancePromises);
+      setBalances(updatedBalances);
   
-      const filteredBalances = balances
+      const filteredBalances = updatedBalances
         .filter((balance) => {
           return (
             balance.token.symbol === "XON" || 
-            ["XGM", "XAV", "AZK", "IXON", "IXAV"].includes(balance.token.symbol) // Asset tokens
+            ["XGM", "XAV", "AZK", "IXON", "IXAV"].includes(balance.token.symbol)
           );
         })
         .map((balance) => ({
-          tokenName: balance.token.symbol,   
-          freeBalance: balance.freeBalance,    
+          tokenName: balance.token.symbol,
+          freeBalance: balance.freeBalance,
         }));
   
       await balanceService.saveBalance(selectedWallet.public_key, filteredBalances);
@@ -260,8 +254,10 @@ const IndexBalance = () => {
   }, [selectedNetwork, wallets])
 
   useEffect(() => {
-    getBalances()
-  }, [selectedWallet])
+    if (selectedWallet) {
+      getBalances(); 
+    }
+  }, [selectedWallet]);
 
   const selectBalance = (data: BalanceModel) => {
     setIsTokenDetailDrawerOpen(true)
