@@ -34,8 +34,7 @@ const IndexPumpToken = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [isPumpTokenDetailsDrawerOpen, setIsPumpTokenDetailsDrawerOpen] = useState(false)
   const [isAddPumpTokenDrawerOpen, setIsAddPumpTokenDrawerOpen] = useState<boolean>(false)
-  const [selectedInSearchToken, setSelectedInSearchToken] =
-    useState<PumpTokenModel | null>(null)
+  const [selectedInSearchToken, setSelectedInSearchToken] = useState<PumpTokenModel | null>(null)
   const [pumpTokens, setPumpTokens] = useState<PumpTokenModel[]>([])
   const [pumpTokenData, setPumpTokenData] = useState<PumpTokenModel>({
     id: 0,
@@ -197,7 +196,7 @@ const IndexPumpToken = () => {
                 <p className="pl-2 mt-1">
                   Created by:{" "}
                   <span className="text-muted p-4 underline">
-                    {selectedInSearchToken.creator}
+                    {selectedInSearchToken.creator.slice(0, 4)}...{selectedInSearchToken.creator.slice(-4)}
                   </span>
                 </p>
                 <p className="pl-2 pr-2 opacity-50 leading-snug mt-1 mb-1">
@@ -226,7 +225,7 @@ const IndexPumpToken = () => {
                   </h3>
                   <p className="pl-2 mt-1">
                     Created by:{" "}
-                    <span className="text-muted p-4 underline font-semibold">{token.creator}</span>
+                    <span className="text-muted p-4 underline font-semibold">{token.creator.slice(0, 4)}...{token.creator.slice(-4)}</span>
                   </p>
                   <p className="pl-2 pr-2 opacity-50 leading-snug mt-1 mb-1">
                     {truncateText(token.description, 50)}
