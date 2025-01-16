@@ -6,7 +6,7 @@ import type { PumpTokenModel } from "@/models/pump-token.model"
 import { PumpTokenService } from "@/services/pump-token.service"
 import IndexSwapPumpToken from "./swapPumpToken"
 
-const IndexPumpTokenDetails = ({ selectedPumpTokens, handleCallbacks, selectedWallet }) => {
+const IndexPumpTokenDetails = ({ selectedPumpTokens, handleCallbacks }) => {
   const { t } = useTranslation()
   const pumpTokenService = new PumpTokenService()
   const [isSwapPumpDrawerOpen, setIsSwapPumpDrawerOpen] = useState(false)
@@ -152,7 +152,7 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, handleCallbacks, selectedWa
               {t("SWAP PUMP TOKEN")}
             </DrawerTitle>
           </DrawerHeader> */}
-          <IndexSwapPumpToken handleCallbacks={handleCallbacks} selectedWallet={selectedWallet} />
+          <IndexSwapPumpToken handleCallbacks={handleCallbacks} />
           </DrawerContent>
       </Drawer>
     </div>

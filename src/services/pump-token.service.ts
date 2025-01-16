@@ -1,16 +1,10 @@
 import { PumpTokenModel } from "@/models/pump-token.model"
-
 import pumpTokens from "../data/pump-token/pump-tokens.json"
-import { Storage } from "@plasmohq/storage"
+import { BalanceServices } from './balance.service';
 
 export class PumpTokenService {
-  private storage = new Storage({
-    area: "local",
-    allCopied: true
-  })
-
-  private key = "wallet_balances";
-
+  private balanceService = new BalanceServices();
+  
   async createPumpToken(data: PumpTokenModel): Promise<string> {
     return new Promise(async (resolve, reject) => {
       try {
@@ -68,28 +62,18 @@ export class PumpTokenService {
     }
   }
 
-  async getTokenBalances(publicKey: string): Promise<{ XON: number; AZK: number }> {
+  async getWalletBalances(): Promise<Record<string, { publicKey: string; tokenName: string; freeBalance: number }[]>> {
     return new Promise(async (resolve, reject) => {
       try {
-        const storedData = await this.storage.get<string>(this.key);
-        console.log("Stored Data:", storedData);
-        if (!storedData) {
-          return resolve({ XON: 0, AZK: 0 });
+        const rawBalances = await this.balanceService.storage.get(this.balanceService.balanceStorageKey);
+        if (!rawBalances) {
+          return resolve({});
         }
-  
-        const walletBalances = JSON.parse(storedData);
-        const balances = walletBalances[publicKey] || [];
-  
-        const xonBalance = balances.find(balance => balance.tokenName === "XON");
-        const azkBalance = balances.find(balance => balance.tokenName === "AZK");
-  
-        resolve({
-          XON: xonBalance ? xonBalance.freeBalance : 0,
-          AZK: azkBalance ? azkBalance.freeBalance : 0,
-        });
+
+        const balances = JSON.parse(rawBalances) as Record<string, { publicKey: string; tokenName: string; freeBalance: number }[]>;
+        resolve(balances);
       } catch (error) {
-        console.error("Error fetching token balances:", error);
-        reject(error);
+        reject(`Error fetching wallet balances: ${error.message}`);
       }
     });
   }

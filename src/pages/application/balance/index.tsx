@@ -183,6 +183,7 @@ const IndexBalance = () => {
           );
         })
         .map((balance) => ({
+          publicKey: selectedWallet.public_key,
           tokenName: balance.token.symbol,
           freeBalance: balance.freeBalance,
         }));

@@ -25,7 +25,7 @@ const truncateText = (text, limit) => {
   return text.length > limit ? `${text.slice(0, limit)}...` : text
 }
 
-const IndexPumpToken = ({selectedWallet}) => {
+const IndexPumpToken = () => {
   const { t } = useTranslation()
   const networkService = new NetworkService()
   const pumpTokenService = new PumpTokenService()
@@ -260,7 +260,6 @@ const IndexPumpToken = ({selectedWallet}) => {
             <IndexPumpTokenDetails
               selectedPumpTokens={pumpTokenData}
               handleCallbacks={() => {}}
-              selectedWallet={selectedWallet}
             />
           ) : (
             <p>{t("Loading...")}</p>

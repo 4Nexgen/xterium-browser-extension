@@ -19,7 +19,8 @@ const IndexApplication = () => {
   const currentPageService = new CurrentPageService()
 
   const [currentPage, setCurrentPage] = useState<string>(t("Balance"))
-
+  const [selectedWallet, setSelectedWallet] = useState<any>(null)
+  
   const getCurrentPage = () => {
     currentPageService.getCurrentPage().then((data) => {
       if (data != null) {

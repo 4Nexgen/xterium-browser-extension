@@ -12,11 +12,11 @@ export class BalanceServices {
   private walletService = new WalletService()
   private tokenService = new TokenService()
   private encryptionService = new EncryptionService()
-  private storage = new Storage({
+  public storage = new Storage({
     area: "local",
     allCopied: true
   })
-  private balanceStorageKey = "wallet_balances";
+  public balanceStorageKey = "wallet_balances";
 
   private api: ApiPromise = null
 
@@ -205,7 +205,7 @@ export class BalanceServices {
     });
   }
 
-  async saveBalance(publicKey: string, balances: { tokenName: string; freeBalance: number }[]): Promise<void> {
+  async saveBalance(publicKey: string, balances: { publicKey: string, tokenName: string; freeBalance: number }[]): Promise<void> {
     return new Promise(async (resolve, reject) => {
       try {
         const walletBalances = {
