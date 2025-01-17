@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import type { PumpTokenModel } from "@/models/pump-token.model"
+import { BalanceServices } from "@/services/balance.service"
 import { PumpTokenService } from "@/services/pump-token.service"
+import { XodeService } from "@/services/xode.service"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -10,8 +12,15 @@ import IndexSwapPumpToken from "./swapPumpToken"
 const IndexPumpTokenDetails = ({ selectedPumpTokens, handleCallbacks }) => {
   const { t } = useTranslation()
   const pumpTokenService = new PumpTokenService()
+  const xodeService = new XodeService()
   const [isSwapPumpDrawerOpen, setIsSwapPumpDrawerOpen] = useState(false)
   const [pumpTokens, setPumpTokens] = useState<PumpTokenModel[]>([])
+  const [assetDetails, setAssetDetails] = useState<{
+    owner: string
+    supply: string
+  } | null>(null)
+
+  const [error, setError] = useState<string | null>(null)
 
   if (!selectedPumpTokens) {
     return <div>{t("Loading...")}</div>
@@ -76,11 +85,34 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, handleCallbacks }) => {
 
   useEffect(() => {
     calculateTimeElapsed()
+    fetchAssetDetails()
 
     const intervalId = setInterval(calculateTimeElapsed, 1000)
 
     return () => clearInterval(intervalId)
-  }, [tokenCreated])
+  }, [tokenCreated, selectedPumpTokens])
+
+  const fetchAssetDetails = async () => {
+    try {
+      const networkId = selectedPumpTokens?.network_id
+      let assetId = selectedPumpTokens?.network_id
+
+      if (!networkId || !assetId) {
+        throw new Error("network_id or assetId is not defined or is invalid.")
+      }
+
+      if (networkId !== assetId) {
+        throw new Error("network_id and assetId must be the same.")
+      }
+
+      const details = await xodeService.getAssetDetails(assetId)
+      console.log(details)
+      setAssetDetails(details)
+    } catch (err) {
+      console.error("Error fetching asset details:", err)
+      setError(err.message || "Failed to fetch asset details")
+    }
+  }
 
   const swapPumpToken = () => {
     setIsSwapPumpDrawerOpen(true)
@@ -88,6 +120,17 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, handleCallbacks }) => {
 
   return (
     <div className="p-4">
+      {/* Asset details section */}
+      {assetDetails ? (
+        <div className="mt-4">
+          <p className="font-semibold">Owner: {assetDetails.owner}</p>
+          <p className="font-semibold">Supply: {assetDetails.supply}</p>
+        </div>
+      ) : error ? (
+        <div className="mt-4 text-red-500">{error}</div>
+      ) : (
+        <div className="mt-4 text-muted">{t("Fetching asset details...")}</div>
+      )}
       <div className="w-full flex justify-center mb-4">
         <img
           src={image_url}
