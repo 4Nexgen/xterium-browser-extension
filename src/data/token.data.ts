@@ -61,6 +61,15 @@ export const TokenData: TokenModel[] = [
     network_id: 5,
     symbol: "IXAV",
     description: "Private XAV Token"
+  },
+  {
+    id: 7,
+    image_url: "DefaultLogo",
+    type: "Asset",
+    network: "Xode",
+    network_id: 6,
+    symbol: "IDON",
+    description: "Private DON Token"
   }
 ]
 
