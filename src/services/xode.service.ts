@@ -1,20 +1,10 @@
 import { ApiPromise, WsProvider } from "@polkadot/api"
-import { Option } from "@polkadot/types"
-import { hexToU8a, u8aToHex } from "@polkadot/util" // Import utilities for converting to hex (if needed)
-import { blake2AsU8a } from "@polkadot/util-crypto"
-
-import { Storage } from "@plasmohq/storage"
 
 import { NetworkService } from "./network.service"
 
 export class XodeService {
   private networkService = new NetworkService()
   private api: ApiPromise | null = null
-  private storage = new Storage({
-    area: "local",
-    allCopied: true
-  })
-  private key = "assets"
 
   async connect(): Promise<ApiPromise | any> {
     return new Promise(async (resolve, reject) => {
