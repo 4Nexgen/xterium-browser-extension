@@ -18,7 +18,6 @@ import { Search } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
-import IndexAddPumpToken from "./addPumpToken"
 import IndexPumpTokenDetails from "./pump-token-details"
 
 const truncateText = (text, limit) => {
@@ -54,7 +53,7 @@ const IndexPumpToken = () => {
     network_id: 0
   })
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
-
+  const [owner, setOwner] = useState<string | null>(null);
   const getNetwork = () => {
     networkService.getNetwork().then((data) => {
       setSelectedNetwork(data)
@@ -259,20 +258,11 @@ const IndexPumpToken = () => {
             <IndexPumpTokenDetails
               selectedPumpTokens={pumpTokenData}
               handleCallbacks={() => {}}
+              owner={owner}
             />
           ) : (
             <p>{t("Loading...")}</p>
           )}
-        </DrawerContent>
-      </Drawer>
-      <Drawer open={isAddPumpTokenDrawerOpen} onOpenChange={setIsAddPumpTokenDrawerOpen}>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle className="border-b border-border-1/20 pb-4 text-muted">
-              {t("ADD NEW PUMP TOKEN")}
-            </DrawerTitle>
-          </DrawerHeader>
-          <IndexAddPumpToken handleCallbacks={saveAndUpdatePumpToken} />
         </DrawerContent>
       </Drawer>
     </>
