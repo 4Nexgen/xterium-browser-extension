@@ -5,6 +5,10 @@ import IXONLogo from "data-base64:/assets/tokens/ixon.png"
 import XAVLogo from "data-base64:/assets/tokens/xav.png"
 import XGMLogo from "data-base64:/assets/tokens/xgm.png"
 import XONLogo from "data-base64:/assets/tokens/xon.png"
+import IDONLogo from "data-base64:/assets/tokens/idon.png"
+import MPCLogo from "data-base64:/assets/tokens/mpc.png"
+import IMPCLogo from "data-base64:/assets/tokens/impc.png"
+
 import DefaultLogo from "data-base64:/assets/tokens/default.png"
 
 export const TokenData: TokenModel[] = [
@@ -61,6 +65,33 @@ export const TokenData: TokenModel[] = [
     network_id: 5,
     symbol: "IXAV",
     description: "Private XAV Token"
+  },
+  {
+    id: 7,
+    image_url: "IDONLogo",
+    type: "Asset",
+    network: "Xode",
+    network_id: 6,
+    symbol: "IDON",
+    description: "Private DON Token"
+  },
+  {
+    id: 8,
+    image_url: "MPCLogo",
+    type: "Asset",
+    network: "Xode",
+    network_id: 7,
+    symbol: "MPC",
+    description: "Manny Pacquiao Coin"
+  },
+  {
+    id: 9,
+    image_url: "IMPCLogo",
+    type: "Asset",
+    network: "Xode",
+    network_id: 8,
+    symbol: "IMPC",
+    description: "Private MPC Token"
   }
 ]
 
@@ -73,6 +104,9 @@ export class TokenImages {
       case "AZKLogo": return AZKLogo
       case "IXONLogo": return IXONLogo
       case "IXAVLogo": return IXAVLogo
+      case "IDONLogo": return IDONLogo
+      case "MPCLogo": return MPCLogo
+      case "IMPCLogo": return IMPCLogo
       default: return DefaultLogo
     }
   }
