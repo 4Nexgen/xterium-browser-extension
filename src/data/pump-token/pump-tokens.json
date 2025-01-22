@@ -1,28 +1,24 @@
 [
   {
     "id": 1,
-    "description": "Bandan: Peeling his way to $120,000, one tape at a time!",
-    "marketCap": "9620",
+    "description": "Inspired by the unwavering spirit of the Filipino street dog, Azkal (AZK) rises above the chaos of the crypto world. This meme token embodies resilience and determination, offering a unique presence in a market of fleeting trends.",
+    "marketCap": "1",
     "price": "0.000036",
-    "virtualLiquidity": "19600",
-    "volume24h": "2581.64",
     "tokenCreated": "2025-01-15T03:08:06.028Z",
-    "percentage": "2",
-    "image_url": "assets/app-logo/Bandan.png",
+    "image_url": "assets/app-logo/azkal.png",
+    "image_url_cover": "assets/app-logo/AZKAL_LOGO.png",
     "network": "Xode",
-    "network_id": "2"
+    "network_id": "3"
   },
   {
     "id": 2,
-    "description": "test",
+    "description": "This meme token pays tribute to the legendary Manny Pacquiao, embodying his strength, resilience, and iconic Filipino pride. With a bold design inspired by the \"Pacman\" himself, it combines cultural heritage and innovation, making it a standout in the world of cryptocurrency.",
     "marketCap": "1",
-    "price": "1",
-    "virtualLiquidity": "1",
-    "volume24h": "1",
+    "price": "0.000035",
     "tokenCreated": "2025-01-17T07:15:22.772Z",
-    "percentage": "1",
-    "image_url": "assets/app-logo/Bandan.png",
+    "image_url": "assets/tokens/mpc.png",
+    "image_url_cover": "assets/app-logo/Flag.png",
     "network": "Xode",
-    "network_id": "3"
+    "network_id": "7"
   }
 ]
