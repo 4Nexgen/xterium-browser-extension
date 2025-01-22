@@ -143,5 +143,20 @@
   "DELETE WALLET": "지갑 삭제",
   "EXPORT WALLET": "지갑 내보내기",
   "Are you sure you want to export": "내보내시겠습니까",
-  "from your wallet list?": "지갑 목록에서?"
+  "from your wallet list?": "지갑 목록에서?",
+  "Search": "검색",
+  "Search for Tokens": "토큰 검색",
+  "Enter Token Name": "토큰 이름 입력",
+  "No results found": "결과가 없습니다",
+  "Created by:": "작성자:",
+  "Market Cap:": "시가 총액:",
+  "Loading...": "로딩 중...",
+  "Contract: ": "계약:",
+  "Price": "가격",
+  "Market Cap": "시가 총액",
+  "Virtual Liquidity": "가상 유동성",
+  "24H Volume": "24시간 거래량",
+  "Token Created": "토큰 생성일",
+  "BUY": "구입하다",
+  "Pump": "펌프 "
 }

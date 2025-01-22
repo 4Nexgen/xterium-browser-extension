@@ -254,7 +254,7 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
         <Drawer open={isAddWalletDrawerOpen} onOpenChange={setIsAddWalletDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle>{t("ADD NEW WALLET")}</DrawerTitle>
+              <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">{t("ADD NEW WALLET")}</DrawerTitle>
             </DrawerHeader>
             <IndexAddWallet handleCallbacks={callbackUpdates} />
           </DrawerContent>
@@ -265,7 +265,7 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
           onOpenChange={setIsExportWalletDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle>{t("EXPORT WALLET")}</DrawerTitle>
+              <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">{t("EXPORT WALLET")}</DrawerTitle>
             </DrawerHeader>
             <IndexExportWallet
               selectedWallet={selectedWallet}
@@ -279,7 +279,7 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
           onOpenChange={setIsDeleteWalletDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle>{t("DELETE WALLET")}</DrawerTitle>
+              <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">{t("DELETE WALLET")}</DrawerTitle>
             </DrawerHeader>
             <IndexDeleteWallet
               selectedWallet={selectedWallet}

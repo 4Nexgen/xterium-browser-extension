@@ -1,4 +1,5 @@
 import { ApiPromise, WsProvider } from "@polkadot/api"
+
 import { NetworkService } from "./network.service"
 
 export class XodeService {
@@ -8,20 +9,23 @@ export class XodeService {
   async connect(): Promise<ApiPromise | any> {
     return new Promise(async (resolve, reject) => {
       try {
-        this.networkService.getNetwork().then(async data => {
-          let wsUrl = data.rpc
+        this.networkService
+          .getNetwork()
+          .then(async (data) => {
+            let wsUrl = data.rpc
 
-          if (!this.api) {
-            const wsProvider = new WsProvider(wsUrl)
-            const api = await ApiPromise.create({ provider: wsProvider })
+            if (!this.api) {
+              const wsProvider = new WsProvider(wsUrl)
+              const api = await ApiPromise.create({ provider: wsProvider })
 
-            this.api = api
+              this.api = api
 
-            resolve(this.api)
-          }
-        }).catch(error => {
-          reject(error)
-        })
+              resolve(this.api)
+            }
+          })
+          .catch((error) => {
+            reject(error)
+          })
       } catch (error) {
         reject("Failed to connect to RPC")
       }

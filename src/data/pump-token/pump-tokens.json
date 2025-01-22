@@ -1,0 +1,28 @@
+[
+  {
+    "id": 1,
+    "description": "Bandan: Peeling his way to $120,000, one tape at a time!",
+    "marketCap": "9620",
+    "price": "0.000036",
+    "virtualLiquidity": "19600",
+    "volume24h": "2581.64",
+    "tokenCreated": "2025-01-15T03:08:06.028Z",
+    "percentage": "2",
+    "image_url": "assets/app-logo/Bandan.png",
+    "network": "Xode",
+    "network_id": "2"
+  },
+  {
+    "id": 2,
+    "description": "test",
+    "marketCap": "1",
+    "price": "1",
+    "virtualLiquidity": "1",
+    "volume24h": "1",
+    "tokenCreated": "2025-01-17T07:15:22.772Z",
+    "percentage": "1",
+    "image_url": "assets/app-logo/Bandan.png",
+    "network": "Xode",
+    "network_id": "3"
+  }
+]

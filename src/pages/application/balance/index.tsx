@@ -1,4 +1,3 @@
-import { setTimeout } from "timers"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -51,7 +50,6 @@ const IndexBalance = () => {
   const [balances, setBalances] = useState<BalanceModel[]>([])
   const [balancePerToken, setBalancePerToken] = useState({})
   const [loadingPerToken, setLoadingPerToken] = useState({})
-
   const [isTokenDetailDrawerOpen, setIsTokenDetailDrawerOpen] = useState(false)
   const [selectedBalance, setSelectedBalance] = useState<BalanceModel>(null)
 
@@ -156,38 +154,43 @@ const IndexBalance = () => {
   }
 
   const getBalances = async () => {
-    zeroOutBalances()
-
-    if (selectedWallet != null) {
+    zeroOutBalances(); 
+  
+    if (selectedWallet) {
       const sortedBalances = balances.sort((a, b) => {
-        if (a.token.id < b.token.id) return -1
-        if (a.token.id > b.token.id) return 1
-        return 0
-      })
-
+        if (a.token.id < b.token.id) return -1;
+        if (a.token.id > b.token.id) return 1;
+        return 0;
+      });
+  
       const balancePromises = sortedBalances.map(async (balance) => {
-        const updatedBalance = await getBalancePerToken(balance.token)
-
-        getBalancePerToken(balance.token)
-        setBalances((prevBalances) =>
-          prevBalances.map((prevBalance) =>
-            prevBalance.token.id === updatedBalance.token.id
-              ? {
-                  ...prevBalance,
-                  freeBalance: fixBalance(updatedBalance.freeBalance.toString(), 12),
-                  reservedBalance: fixBalance(
-                    updatedBalance.reservedBalance.toString(),
-                    12
-                  )
-                }
-              : prevBalance
-          )
-        )
-      })
-
-      await Promise.all(balancePromises)
+        const updatedBalance = await getBalancePerToken(balance.token);
+        return {
+          ...balance,
+          freeBalance: fixBalance(updatedBalance.freeBalance.toString(), 12),
+          reservedBalance: fixBalance(updatedBalance.reservedBalance.toString(), 12),
+        };
+      });
+  
+      const updatedBalances = await Promise.all(balancePromises);
+      setBalances(updatedBalances);
+  
+      const filteredBalances = updatedBalances
+        .filter((balance) => {
+          return (
+            balance.token.symbol === "XON" || 
+            ["XGM", "XAV", "AZK", "IXON", "IXAV"].includes(balance.token.symbol)
+          );
+        })
+        .map((balance) => ({
+          publicKey: selectedWallet.public_key,
+          tokenName: balance.token.symbol,
+          freeBalance: balance.freeBalance,
+        }));
+  
+      await balanceService.saveBalance(selectedWallet.public_key, filteredBalances);
     }
-  }
+  };
 
   const getBalancePerToken = async (token: TokenModel): Promise<BalanceModel> => {
     setLoadingPerToken((prevLoadingPerToken) => ({
@@ -252,8 +255,10 @@ const IndexBalance = () => {
   }, [selectedNetwork, wallets])
 
   useEffect(() => {
-    getBalances()
-  }, [selectedWallet])
+    if (selectedWallet) {
+      getBalances(); 
+    }
+  }, [selectedWallet]);
 
   const selectBalance = (data: BalanceModel) => {
     setIsTokenDetailDrawerOpen(true)
@@ -275,7 +280,7 @@ const IndexBalance = () => {
       <div className="py-4 flex flex-col justify-between h-full">
         <div className="py-4">
           <div className="mb-3">
-            <Label>{t("Address")}</Label>
+            <Label className="text-muted font-bold">{t("Address")}</Label>
             <Popover open={openWallets} onOpenChange={setOpenWallets}>
               <PopoverTrigger asChild>
                 <Button
@@ -409,7 +414,7 @@ const IndexBalance = () => {
                   onOpenChange={setIsTokenDetailDrawerOpen}>
                   <DrawerContent>
                     <DrawerHeader>
-                      <div className="flex justify-center items-center w-full">
+                      <div className="flex justify-center items-center w-full border-b border-border-1/20 pb-4 text-muted">
                         {selectedBalance ? (
                           <Image
                             src={getTokenImage(selectedBalance.token.image_url)}

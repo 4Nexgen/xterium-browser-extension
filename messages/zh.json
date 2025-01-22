@@ -144,5 +144,20 @@
   "DELETE WALLET": "删除钱包",
   "EXPORT WALLET": "导出钱包",
   "Are you sure you want to export": "你确定要导出吗",
-  "from your wallet list?": "从你的钱包清单中？"
+  "from your wallet list?": "从你的钱包清单中？",
+  "Search": "搜索",
+  "Search for Tokens": "搜索代币",
+  "Enter Token Name": "输入代币名称",
+  "No results found": "未找到结果",
+  "Created by:": "创建者：",
+  "Market Cap:": "市值：",
+  "Loading...": "加载中...",
+  "Contract: ": "合约：",
+  "Price" : "价格",
+  "Market Cap": "市值",
+  "Virtual Liquidity": "虚拟流动性",
+  "24H Volume": "24小时交易量",
+  "Token Created": "代币创建时间",
+  "BUY": "购买",
+  "Pump": "泵"
 }

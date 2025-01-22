@@ -71,6 +71,11 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
       title: t("Support"),
       url: "#",
       icon: MessageCircle
+    },
+    {
+      title: t("Pump"),
+      url: "#",
+      icon: Coins
     }
   ]
 
