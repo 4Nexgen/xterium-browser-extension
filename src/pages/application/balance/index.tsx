@@ -286,14 +286,16 @@ const IndexBalance = () => {
                   size="lg">
                   {selectedWallet ? (
                     <>
-                      {selectedWallet.name} &nbsp;
-                      {"("}
-                      {selectedWallet.public_key.slice(0, 6)}...
-                      {selectedWallet.public_key.slice(-6)}
-                      {")"}
+                      <span className="text-muted">
+                        {selectedWallet.name} &nbsp;
+                        {"("}
+                        {selectedWallet.public_key.slice(0, 6)}...
+                        {selectedWallet.public_key.slice(-6)}
+                        {")"}
+                      </span>
                     </>
                   ) : (
-                    t("Select wallet")
+                    <span className="text-muted opacity-70">{t("Select wallet")}</span>
                   )}
                 </Button>
               </PopoverTrigger>
@@ -314,9 +316,9 @@ const IndexBalance = () => {
                         )
                         .map((wallet) => (
                           <CommandItem
-                            key={wallet.public_key}
-                            value={wallet.public_key}
-                            onSelect={(value) => {
+                            key={wallet.id}
+                            value={wallet.name}
+                            onSelect={() => {
                               setSelectedWallet(wallet)
                               setOpenWallets(false)
                             }}
