@@ -135,6 +135,7 @@ const IndexBalance = () => {
     const multiplier = 10 ** decimal
     return parseFloat(value) / multiplier
   }
+  
 
   const zeroOutBalances = () => {
     if (balances.length > 0) {
@@ -154,7 +155,7 @@ const IndexBalance = () => {
   }
 
   const getBalances = async () => {
-    zeroOutBalances(); 
+    // Removed zeroOutBalances to prevent resetting to zero before fetching actual balances
   
     if (selectedWallet) {
       const sortedBalances = balances.sort((a, b) => {
@@ -371,8 +372,14 @@ const IndexBalance = () => {
                       .map((balance) => (
                         <TableRow
                           key={balance.token.symbol}
-                          onClick={() => selectBalance(balance)}
-                          className="cursor-pointer hover-bg-custom">
+                          onClick={() => {
+                            if (!loadingPerToken[balance.token.symbol]) {
+                              selectBalance(balance);
+                            }
+                          }}
+                          className={`cursor-pointer hover-bg-custom ${
+                            loadingPerToken[balance.token.symbol] ? "pointer-events-none opacity-50" : ""
+                          }`}>
                           <TableCell className="w-[50px] justify-center">
                             <Image
                               src={getTokenImage(balance.token.image_url)}
