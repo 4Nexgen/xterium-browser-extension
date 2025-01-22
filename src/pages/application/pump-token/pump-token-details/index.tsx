@@ -3,11 +3,8 @@ import { Drawer, DrawerContent } from "@/components/ui/drawer"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
-import IndexSwapPumpToken from "./swapPumpToken"
-
-const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, handleCallbacks }) => {
+const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, handleCallbacks, minBalance, supply }) => {
   const { t } = useTranslation()
-  const [isSwapPumpDrawerOpen, setIsSwapPumpDrawerOpen] = useState(false)
 
   if (!selectedPumpTokens) {
     return <div>{t("Loading...")}</div>
@@ -21,10 +18,18 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, handleCallbacks }) =
     const num = parseFloat(amount.replace(/,/g, ""))
     if (isNaN(num)) return "$0.0"
 
-    if (num >= 1000) {
-      return `$${(num / 1000).toFixed(1)}k`
+    if (num >= 1e15) {
+      return `${(num / 1e15).toFixed(1)}Q`
+    } else if (num >= 1e12) {
+      return `${(num / 1e12).toFixed(1)}T`
+    } else if (num >= 1e9) {
+      return `${(num / 1e9).toFixed(1)}B`
+    } else if (num >= 1e6) {
+      return `${(num / 1e6).toFixed(1)}M`
+    } else if (num >= 1e3) {
+      return `${(num / 1e3).toFixed(1)}k`
     }
-    return `$${num.toFixed(1)}`
+    return `${num.toFixed(1)}`
   }
 
   const [timeElapsed, setTimeElapsed] = useState("")
@@ -68,16 +73,12 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, handleCallbacks }) =
     return () => clearInterval(intervalId)
   }, [tokenCreated])
 
-  const swapPumpToken = () => {
-    setIsSwapPumpDrawerOpen(true)
-  }
-
   return (
     <div className="p-4">
       <div className="w-full flex justify-center mb-4">
         <img
-          src={selectedPumpTokens.image_url}
-          className="h-20 w-full object-cover object-center rounded-lg"
+          src={selectedPumpTokens.image_url_cover}
+          className="h-24 w-full object-cover object-center rounded-lg"
         />
       </div>
       <div className="flex">
@@ -101,7 +102,7 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, handleCallbacks }) =
           </div>
           <div className="mt-2 flex items-center gap-x-2">
             <p className="font-semibold">{t("Contract: ")}</p>
-            <p className="opacity-70 text-muted">{selectedPumpTokens.assetId}</p>
+            <p className="opacity-70 text-muted">{selectedPumpTokens.assetDetail?.assetId ?? "N/A"}</p>
           </div>
           <div className="mt-2">
             <p className="opacity-70">{description}</p>
@@ -113,7 +114,6 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, handleCallbacks }) =
         <div className="border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg p-2">
           <div className="flex items-center">
             <p className="font-semibold text-sm opacity-70 mr-2">{t("Price")}</p>
-            <p className="text-muted">+12.29%</p>
           </div>
           <p className="font-bold text-sm">{price} XON</p>
         </div>
@@ -122,36 +122,20 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, handleCallbacks }) =
           <p className="font-bold text-sm">{formatCurrency(marketCap)}</p>
         </div>
       </div>
-      <div className="mt-6 grid grid-cols-3 gap-4">
+      <div className="mt-6 grid grid-cols-3 gap-2">
         <div className="border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg p-2">
-          <p className="opacity-70 text-sm">{t("Virtual Liquidity")}</p>
-          <p className="font-bold text-sm">{formatCurrency(virtualLiquidity)}</p>
+          <p className="opacity-70 text-sm">{t("Min Balance")}</p>
+          <p className="font-bold text-sm">{formatCurrency(minBalance)}</p>
         </div>
         <div className="border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg p-2">
-          <p className="opacity-70 text-sm">{t("24H Volume")}</p>
-          <p className="font-bold text-sm">{volume24h} XON</p>
+          <p className="opacity-70 text-sm">{t("Total Token Supply")}</p>
+          <p className="font-bold text-sm">{formatCurrency(supply)}</p>
         </div>
         <div className="border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg p-2">
           <p className="opacity-70 text-sm">{t("Token Created")}</p>
           <p className="font-bold text-sm">{timeElapsed}</p>
         </div>
       </div>
-
-      <div className="mt-6">
-        <Button variant="jelly" onClick={swapPumpToken}>
-          {t("SWAP TO XON")}
-        </Button>
-      </div>
-      <Drawer open={isSwapPumpDrawerOpen} onOpenChange={setIsSwapPumpDrawerOpen}>
-        <DrawerContent>
-          {/* <DrawerHeader>
-            <DrawerTitle className="border-b border-border-1/20 pb-4 text-muted">
-              {t("SWAP PUMP TOKEN")}
-            </DrawerTitle>
-          </DrawerHeader> */}
-          <IndexSwapPumpToken handleCallbacks={handleCallbacks} />
-        </DrawerContent>
-      </Drawer>
     </div>
   )
 }

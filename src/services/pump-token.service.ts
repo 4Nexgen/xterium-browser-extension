@@ -154,9 +154,11 @@ export class PumpTokenService {
 
         resolve({
           assetId: assetIdNumber,
-          name: metadataDetails.name || "Unknown",
+          name: metadataDetails.name || "N/A",
           symbol: metadataDetails.symbol || "N/A",
-          owner: assetDetails.owner || "Unknown",
+          owner: assetDetails.owner || "N/A",
+          minBalance: assetDetails.minBalance || "N/A",
+          supply: assetDetails.supply || "N/A",
           assetDetails: assetDetails,
           metadataDetails
         })
