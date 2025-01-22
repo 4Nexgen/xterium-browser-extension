@@ -1,5 +1,5 @@
 import { TokenModel } from "@/models/token.model"
-import AZKLogo from "data-base64:/assets/tokens/azk.png"
+import AZKLogo from "data-base64:/assets/tokens/azkal.png"
 import IXAVLogo from "data-base64:/assets/tokens/ixav.png"
 import IXONLogo from "data-base64:/assets/tokens/ixon.png"
 import XAVLogo from "data-base64:/assets/tokens/xav.png"
