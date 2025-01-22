@@ -8,6 +8,7 @@ import XONLogo from "data-base64:/assets/tokens/xon.png"
 import IDONLogo from "data-base64:/assets/tokens/idon.png"
 import MPCLogo from "data-base64:/assets/tokens/mpc.png"
 import IMPCLogo from "data-base64:/assets/tokens/impc.png"
+import DONLogo from "data-base64:/assets/tokens/don.png"
 
 import DefaultLogo from "data-base64:/assets/tokens/default.png"
 
@@ -92,6 +93,15 @@ export const TokenData: TokenModel[] = [
     network_id: 8,
     symbol: "IMPC",
     description: "Private MPC Token"
+  },
+  {
+    id: 9,
+    image_url: "DONLogo",
+    type: "Asset",
+    network: "Xode",
+    network_id: 8,
+    symbol: "DON",
+    description: "Dondon Utility Token"
   }
 ]
 
@@ -107,6 +117,7 @@ export class TokenImages {
       case "IDONLogo": return IDONLogo
       case "MPCLogo": return MPCLogo
       case "IMPCLogo": return IMPCLogo
+      case "DONLogo": return DONLogo
       default: return DefaultLogo
     }
   }
