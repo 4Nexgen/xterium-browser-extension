@@ -1,7 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
-import type { PumpTokenModel } from "@/models/pump-token.model"
-import { PumpTokenService } from "@/services/pump-token.service"
+import { Drawer, DrawerContent } from "@/components/ui/drawer"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -9,25 +7,14 @@ import IndexSwapPumpToken from "./swapPumpToken"
 
 const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, handleCallbacks }) => {
   const { t } = useTranslation()
-  const pumpTokenService = new PumpTokenService()
   const [isSwapPumpDrawerOpen, setIsSwapPumpDrawerOpen] = useState(false)
-  const [pumpTokens, setPumpTokens] = useState<PumpTokenModel[]>([])
 
   if (!selectedPumpTokens) {
     return <div>{t("Loading...")}</div>
   }
 
-  const {
-    image_url,
-    creator,
-    contract,
-    description,
-    price,
-    marketCap,
-    virtualLiquidity,
-    volume24h,
-    tokenCreated
-  } = selectedPumpTokens
+  const { description, price, marketCap, virtualLiquidity, volume24h, tokenCreated } =
+    selectedPumpTokens
 
   const formatCurrency = (amount) => {
     if (!amount) return "$0.0"
@@ -56,7 +43,6 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, handleCallbacks }) =
     const days = Math.floor(elapsed / 86400)
     const hours = Math.floor((elapsed % 86400) / 3600)
     const minutes = Math.floor((elapsed % 3600) / 60)
-    const seconds = elapsed % 60
 
     let timeString = ""
 
@@ -90,14 +76,14 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, handleCallbacks }) =
     <div className="p-4">
       <div className="w-full flex justify-center mb-4">
         <img
-          src={image_url}
+          src={selectedPumpTokens.image_url}
           className="h-20 w-full object-cover object-center rounded-lg"
         />
       </div>
       <div className="flex">
         <div>
           <img
-            src={image_url}
+            src={selectedPumpTokens.image_url}
             alt={selectedPumpTokens.name}
             className="rounded-full object-cover h-20 w-20"
           />
@@ -106,13 +92,16 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, handleCallbacks }) =
           <div className="flex items-center gap-x-2">
             <div className="flex items-center gap-x-2">
               <p>
-                Created by: <span className="font-semibold">{owner ? `${owner.slice(0, 4)}...${owner.slice(-4)}` : "N/A"}</span>
+                Created by:{" "}
+                <span className="font-semibold">
+                  {owner ? `${owner.slice(0, 4)}...${owner.slice(-4)}` : "N/A"}
+                </span>
               </p>
             </div>
           </div>
           <div className="mt-2 flex items-center gap-x-2">
             <p className="font-semibold">{t("Contract: ")}</p>
-            <p className="opacity-70 text-muted">{contract}</p>
+            <p className="opacity-70 text-muted">{selectedPumpTokens.assetId}</p>
           </div>
           <div className="mt-2">
             <p className="opacity-70">{description}</p>

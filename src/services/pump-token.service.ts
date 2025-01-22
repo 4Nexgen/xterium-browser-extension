@@ -36,20 +36,21 @@ export class PumpTokenService {
     })
   }
 
-  async createPumpToken(data: PumpTokenModel): Promise<string> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const lastId = pumpTokens.length > 0 ? pumpTokens[pumpTokens.length - 1].id : 0
-        data.id = lastId + 1
+  // async getPumpTokenByNetworkId(): Promise<PumpTokenModel[]> {
+  //   return new Promise((resolve, reject) => {
+  //     try {
+  //       const data = pumpTokens as unknown as PumpTokenModel[]
 
-        await this.jsonFileSave(data)
+  //       const networkIds = data.map((token) => token.network_id)
 
-        resolve("Pupm token created successfully")
-      } catch (error) {
-        reject(error)
-      }
-    })
-  }
+  //       console.log(networkIds)
+
+  //       resolve(data)
+  //     } catch (error) {
+  //       reject(new Error(`Error reading JSON file: ${error.message}`))
+  //     }
+  //   })
+  // }
 
   async getPumpTokens(): Promise<PumpTokenModel[]> {
     return new Promise((resolve, reject) => {
@@ -61,37 +62,38 @@ export class PumpTokenService {
     })
   }
 
-  async jsonFileSave(data: PumpTokenModel): Promise<void> {
-    try {
-      if ("showDirectoryPicker" in window) {
-        const directoryHandle = await (window as any).showDirectoryPicker()
+  // async getPumpTokens(): Promise<PumpTokenModel[]> {
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       const tokens = pumpTokens as unknown as PumpTokenModel[]
+  //       const results = []
 
-        const fileHandle = await directoryHandle.getFileHandle("pump-tokens.json", {
-          create: false
-        })
+  //       for (const token of tokens) {
+  //         const networkId = token.network_id
 
-        const file = await fileHandle.getFile()
-        const text = await file.text()
-        let existingData = []
+  //         const assetDetails = await this.getAssetDetails(networkId.toString())
 
-        if (text) {
-          existingData = JSON.parse(text)
-        }
+  //         console.log("details", assetDetails)
+  //         console.log("assetId:", assetDetails.assetId)
 
-        existingData.push(data)
+  //         if (String(assetDetails.assetId) === String(networkId)) {
+  //           results.push({ token, assetDetails })
+  //         }
+  //       }
 
-        const jsonData = JSON.stringify(existingData, null, 2)
+  //       console.log("Results:", results)
 
-        const writable = await fileHandle.createWritable()
-        await writable.write(jsonData)
-        await writable.close()
-      } else {
-        console.warn("File System Access API is not supported in this browser")
-      }
-    } catch (error) {
-      console.error("Error saving pump token to file system", error)
-    }
-  }
+  //       if (results.length > 0) {
+  //         resolve(results)
+  //       } else {
+  //         reject(new Error("No matching assets found."))
+  //       }
+  //     } catch (error) {
+  //       console.error("Error processing pump tokens:", error)
+  //       reject(new Error(`Error processing pump tokens: ${error.message}`))
+  //     }
+  //   })
+  // }
 
   async getWalletBalances(): Promise<
     Record<string, { publicKey: string; tokenName: string; freeBalance: number }[]>
@@ -150,16 +152,6 @@ export class PumpTokenService {
           return
         }
 
-        console.log("Asset Details:", {
-          assetId: assetIdNumber,
-          details: assetDetails
-        })
-
-        console.log("Asset Details:", {
-          assetId: assetIdNumber,
-          details: metadataDetails
-        })
-
         resolve({
           assetId: assetIdNumber,
           name: metadataDetails.name || "Unknown",
@@ -174,4 +166,34 @@ export class PumpTokenService {
       }
     })
   }
+
+  // async getPumpTokensWithAssetDetails(): Promise<any[]> {
+  //   try {
+  //     const pumpTokens = await this.getPumpTokens()
+
+  //     const assetDetailsList: any[] = []
+
+  //     for (const token of pumpTokens) {
+  //       const networkId = token?.network_id
+  //       console.log(networkId)
+
+  //       if (!networkId) {
+  //         console.warn("Network ID not found for pump token:", token)
+  //         continue
+  //       }
+
+  //       try {
+  //         const assetDetails = await this.getAssetDetails(networkId.toString())
+  //         assetDetailsList.push(assetDetails) // Store the result
+  //       } catch (error) {
+  //         console.error(`Error fetching asset details for networkId ${networkId}:`, error)
+  //       }
+  //     }
+
+  //     return assetDetailsList
+  //   } catch (error) {
+  //     console.error("Error fetching pump tokens or asset details:", error)
+  //     throw error
+  //   }
+  // }
 }

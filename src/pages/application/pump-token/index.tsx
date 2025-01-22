@@ -33,14 +33,11 @@ const IndexPumpToken = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [isPumpTokenDetailsDrawerOpen, setIsPumpTokenDetailsDrawerOpen] = useState(false)
   const [isAddPumpTokenDrawerOpen, setIsAddPumpTokenDrawerOpen] = useState<boolean>(false)
-  const [selectedInSearchToken, setSelectedInSearchToken] = useState<PumpTokenModel | null>(null)
+  const [selectedInSearchToken, setSelectedInSearchToken] =
+    useState<PumpTokenModel | null>(null)
   const [pumpTokens, setPumpTokens] = useState<PumpTokenModel[]>([])
   const [pumpTokenData, setPumpTokenData] = useState<PumpTokenModel>({
     id: 0,
-    name: "",
-    symbol: "",
-    creator: "",
-    contract: "",
     description: "",
     marketCap: 0,
     price: 0,
@@ -53,7 +50,8 @@ const IndexPumpToken = () => {
     network_id: 0
   })
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
-  const [owner, setOwner] = useState<string | null>(null);
+  const [assetDetails, setAssetDetails] = useState<any>(null)
+
   const getNetwork = () => {
     networkService.getNetwork().then((data) => {
       setSelectedNetwork(data)
@@ -63,7 +61,23 @@ const IndexPumpToken = () => {
   const getPumpTokens = () => {
     pumpTokenService.getPumpTokens().then((data) => {
       setPumpTokens(data)
+
+      data.forEach((token) => {
+        if (token.network_id) {
+          fetchAssetDetails(token.network_id)
+        }
+      })
     })
+  }
+
+  const fetchAssetDetails = async (assetId) => {
+    try {
+      const details = await pumpTokenService.getAssetDetails(assetId)
+      console.log(details)
+      setAssetDetails(details)
+    } catch (error) {
+      console.error("Failed to fetch asset details:", error)
+    }
   }
 
   useEffect(() => {
@@ -76,34 +90,23 @@ const IndexPumpToken = () => {
     setIsPumpTokenDetailsDrawerOpen(true)
   }
 
-  const addPumpToken = () => {
-    setIsAddPumpTokenDrawerOpen(true)
-  }
-
-  const saveAndUpdatePumpToken = () => {
-    setIsAddPumpTokenDrawerOpen(false)
-
-    setTimeout(() => {
-      getPumpTokens()
-    }, 100)
-  }
-
   const filteredTokens = pumpTokens.filter(
     (token: PumpTokenModel) =>
-      (!searchQuery || token.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
+      (!searchQuery ||
+        assetDetails?.name?.toLowerCase().includes(searchQuery.toLowerCase())) &&
       (selectedNetwork ? token.network === selectedNetwork.name : true)
   )
 
   const formatCurrency = (amount) => {
-    if (!amount) return "$0.0"; 
-    const num = parseFloat(amount.replace(/,/g, '')); 
-    if (isNaN(num)) return "$0.0"; 
-  
+    if (!amount) return "$0.0"
+    const num = parseFloat(amount.replace(/,/g, ""))
+    if (isNaN(num)) return "$0.0"
+
     if (num >= 1000) {
-      return `$${(num / 1000).toFixed(1)}k`; 
+      return `$${(num / 1000).toFixed(1)}k`
     }
-    return `$${num.toFixed(1)}`; 
-  };
+    return `$${num.toFixed(1)}`
+  }
 
   return (
     <>
@@ -119,12 +122,12 @@ const IndexPumpToken = () => {
                   aria-expanded={openSearchToken}
                   className="w-full justify-between text-input-primary p-3 font-bold hover:bg-accent"
                   size="lg">
-                  {selectedInSearchToken ? (
+                  {assetDetails ? (
                     <>
                       <span className="text-muted">
-                        {selectedInSearchToken.name} &nbsp;
+                        {assetDetails.name} &nbsp;
                         {"("}
-                        {selectedInSearchToken.symbol}
+                        {assetDetails.symbol}
                         {")"}
                       </span>
                     </>
@@ -143,11 +146,7 @@ const IndexPumpToken = () => {
                 <Command>
                   <CommandInput
                     placeholder={t("Enter Token Name")}
-                    value={
-                      selectedInSearchToken
-                        ? `${selectedInSearchToken.name}`
-                        : searchQuery
-                    }
+                    value={assetDetails ? `${assetDetails.name}` : searchQuery}
                     onValueChange={(value) => {
                       setSearchQuery(value)
                       if (value === "") {
@@ -161,13 +160,13 @@ const IndexPumpToken = () => {
                       {filteredTokens.map((token) => (
                         <CommandItem
                           key={token.id}
-                          value={token.name}
+                          value={assetDetails?.name || ""} // Guard with optional chaining or fallback to empty string
                           onSelect={() => {
                             setSelectedInSearchToken(token)
                             setOpenSearchTokens(false)
                           }}
                           className="cursor-pointer hover:bg-accent">
-                          {token.name}
+                          {assetDetails?.name || t("No Name Available")}
                         </CommandItem>
                       ))}
                     </CommandGroup>
@@ -185,17 +184,18 @@ const IndexPumpToken = () => {
                 <div className="w-full flex justify-center mb-4">
                   <img
                     src={selectedInSearchToken.image_url}
-                    alt={selectedInSearchToken.name}
+                    alt={assetDetails.name}
                     className="h-36 w-full object-cover object-center rounded-lg"
                   />
                 </div>
                 <h3 className="font-bold text-sm pl-2">
-                  {selectedInSearchToken.name} ($ {selectedInSearchToken.symbol})
+                  {assetDetails.name} ({assetDetails.symbol})
                 </h3>
                 <p className="pl-2 mt-1">
                   Created by:{" "}
                   <span className="text-muted p-4 underline">
-                    {selectedInSearchToken.creator.slice(0, 4)}...{selectedInSearchToken.creator.slice(-4)}
+                    {assetDetails.owner.slice(0, 4)}...
+                    {assetDetails.owner.slice(-4)}
                   </span>
                 </p>
                 <p className="pl-2 pr-2 opacity-50 leading-snug mt-1 mb-1">
@@ -204,7 +204,10 @@ const IndexPumpToken = () => {
                 <p>
                   <span className="opacity-50 pl-2">Market Cap:</span>
                   <span className="font-bold p-4">{selectedInSearchToken.marketCap}</span>
-                  <span className="font-bold p-4">{formatCurrency(selectedInSearchToken.marketCap)}</span>                </p>
+                  <span className="font-bold p-4">
+                    {formatCurrency(selectedInSearchToken.marketCap)}
+                  </span>{" "}
+                </p>
               </div>
             ) : (
               filteredTokens.map((token) => (
@@ -215,23 +218,30 @@ const IndexPumpToken = () => {
                   <div className="w-full flex justify-center mb-4">
                     <img
                       src={token.image_url}
-                      alt={token.name}
-                      className="h-40 w-full object-cover object-center rounded-lg"
+                      alt={assetDetails?.name || "Token Image"}
+                      className="h-36 w-full object-cover object-center rounded-lg"
                     />
                   </div>
                   <h3 className="font-bold text-sm pl-2">
-                    {token.name} ($ {token.symbol})
+                    {assetDetails?.name || "No Name Available"} (
+                    {assetDetails?.symbol || "N/A"})
                   </h3>
                   <p className="pl-2 mt-1">
                     Created by:{" "}
-                    <span className="text-muted p-4 underline font-semibold">{token.creator.slice(0, 4)}...{token.creator.slice(-4)}</span>
+                    <span className="text-muted p-4 underline">
+                      {assetDetails?.owner
+                        ? `${assetDetails.owner.slice(0, 4)}...${assetDetails.owner.slice(-4)}`
+                        : "Unknown"}
+                    </span>
                   </p>
                   <p className="pl-2 pr-2 opacity-50 leading-snug mt-1 mb-1">
                     {truncateText(token.description, 50)}
                   </p>
                   <p>
                     <span className="opacity-50 pl-2">Market Cap:</span>
-                    <span className="font-bold p-4">{formatCurrency(token.marketCap)}</span>
+                    <span className="font-bold p-4">
+                      {formatCurrency(token.marketCap)}
+                    </span>
                     <span className="opacity-50">({token.percentage}%)</span>
                   </p>
                 </div>
@@ -239,9 +249,6 @@ const IndexPumpToken = () => {
             )}
           </div>
         </div>
-        <Button variant="jelly" className="my-auto" onClick={addPumpToken}>
-          {t("ADD NEW TOKEN")}
-        </Button>
       </div>
       <Drawer
         open={isPumpTokenDetailsDrawerOpen}
@@ -249,16 +256,16 @@ const IndexPumpToken = () => {
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle className="border-b border-border-1/20 pb-4 text-muted">
-              {pumpTokenData
-                ? `${pumpTokenData.name} (${pumpTokenData.symbol})`
+              {assetDetails
+                ? `${assetDetails.name} (${assetDetails.symbol})`
                 : "Loading..."}
             </DrawerTitle>
           </DrawerHeader>
-          {pumpTokenData ? (
+          {assetDetails ? (
             <IndexPumpTokenDetails
               selectedPumpTokens={pumpTokenData}
               handleCallbacks={() => {}}
-              owner={owner}
+              owner={assetDetails.owner}
             />
           ) : (
             <p>{t("Loading...")}</p>
