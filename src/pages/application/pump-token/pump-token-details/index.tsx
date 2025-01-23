@@ -44,8 +44,6 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, minBalance, supply }
     if (!amount) return "0.0000"; 
     const num = parseFloat(amount.replace(/,/g, ""));
     if (isNaN(num)) return "0.0000";
-
-    console.log("Full:", num.toString())
   
     const formattedValue = (num / 1e12).toFixed(4); 
     return formattedValue;
