@@ -66,17 +66,19 @@ const IndexPumpToken = () => {
         console.error("Failed to fetch pump tokens:", error)
       })
       .finally(() => {
-        setLoading(false) // End spinner for tokens
+        setLoading(false)
       })
   }
 
   const fetchAssetDetails = async (assetId) => {
-    try {
-      const details = await pumpTokenService.getAssetDetails(assetId)
-      setAssetDetails((prevDetails) => [...prevDetails, details])
-    } catch (error) {
-      console.error("Failed to fetch asset details:", error)
-    }
+    await pumpTokenService
+      .getAssetDetails(assetId)
+      .then((details) => {
+        setAssetDetails((prevDetails) => [...prevDetails, details])
+      })
+      .catch((error) => {
+        console.error("Failed to fetch asset details:", error)
+      })
   }
 
   useEffect(() => {
