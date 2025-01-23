@@ -217,7 +217,7 @@ const IndexPumpToken = () => {
                 </div>
               ))
             ) : (
-              <div className="flex flex-col gap-4 items-center justify-center py-[100px]">
+              <div className="flex absolute justify-center items-center w-full py-[100px] gap-4 flex-col">
                 <Coins className="size-20" />
                 <h4 className="font-bold text-lg">{t("No Pump Token Found")}</h4>
               </div>
