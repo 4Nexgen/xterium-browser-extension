@@ -149,7 +149,7 @@
   "Search for Tokens": "搜索代币",
   "Enter Token Name": "输入代币名称",
   "No results found": "未找到结果",
-  "Created by:": "创建者：",
+  "Created by": "创建者",
   "Market Cap:": "市值：",
   "Loading...": "加载中...",
   "Contract: ": "合约：",
@@ -159,5 +159,8 @@
   "24H Volume": "24小时交易量",
   "Token Created": "代币创建时间",
   "BUY": "购买",
-  "Pump": "泵"
+  "Pump": "泵",
+  "Total Supply": "总供应量",
+  "Min Balance": "最小余额",
+  "Pump token loading...": "正在加载泵代币..."
 }

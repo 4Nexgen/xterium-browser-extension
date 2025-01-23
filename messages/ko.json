@@ -148,7 +148,7 @@
   "Search for Tokens": "토큰 검색",
   "Enter Token Name": "토큰 이름 입력",
   "No results found": "결과가 없습니다",
-  "Created by:": "작성자:",
+  "Created by": "작성자",
   "Market Cap:": "시가 총액:",
   "Loading...": "로딩 중...",
   "Contract: ": "계약:",
@@ -158,5 +158,8 @@
   "24H Volume": "24시간 거래량",
   "Token Created": "토큰 생성일",
   "BUY": "구입하다",
-  "Pump": "펌프 "
+  "Pump": "펌프 ",
+  "Total Supply": "총 공급량",
+  "Min Balance": "최소 잔액",
+  "Pump token loading...": "펌프 토큰 로딩 중..."
 }

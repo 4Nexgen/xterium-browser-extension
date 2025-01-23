@@ -148,7 +148,7 @@
   "Search for Tokens": "トークンを検索",
   "Enter Token Name": "トークン名を入力",
   "No results found": "結果が見つかりません",
-  "Created by:": "作成者：",
+  "Created by": "作成者",
   "Market Cap:": "時価総額：",
   "Loading...": "ローディング中...",
   "Contract: ": "契約：",
@@ -158,5 +158,8 @@
   "24H Volume": " 24時間の取引量",
   "Token Created": "トークン作成日",
   "BUY": "買う",
-  "Pump": "ポンプ"
+  "Pump": "ポンプ",
+  "Total Supply": "総供給量",
+  "Min Balance": "最小残高",
+  "Pump token loading...": "ポンプトークンの読み込み中..."
 }

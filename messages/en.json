@@ -144,7 +144,7 @@
   "Search for Tokens": "Search for Tokens",
   "Enter Token Name": "Enter Token Name",
   "No results found": "No results found",
-  "Created by:": "Created by:",
+  "Created by": "Created by",
   "Market Cap:": "Market Cap:",
   "Loading...": "Loading...",
   "Contract: ": "Contract: ",
@@ -154,5 +154,8 @@
   "24H Volume": "24H Volume",
   "Token Created": "Token Created",
   "BUY": "BUY",
-  "Pump": "Pump"
+  "Pump": "Pump",
+  "Total Supply": "Total Supply",
+  "Min Balance": "Min Balance",
+  "Pump token loading...": "Pump token loading..."
 }
