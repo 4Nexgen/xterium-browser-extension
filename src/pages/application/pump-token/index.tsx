@@ -11,10 +11,10 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/u
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import type { NetworkModel } from "@/models/network.model"
-import type { PumpTokenWithAssetDetails } from "@/models/pump-token.model" // Use the new interface
+import type { PumpTokenWithAssetDetails } from "@/models/pump-token.model"
 import { NetworkService } from "@/services/network.service"
 import { PumpTokenService } from "@/services/pump-token.service"
-import { LoaderCircle, Search } from "lucide-react"
+import { LoaderCircle, Search, Coins } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -71,15 +71,13 @@ const IndexPumpToken = () => {
   }
 
   const fetchAssetDetails = async (assetId) => {
-    await pumpTokenService
-      .getAssetDetails(assetId)
-      .then((details) => {
-        setAssetDetails((prevDetails) => [...prevDetails, details])
-      })
-      .catch((error) => {
-        console.error("Failed to fetch asset details:", error)
-      })
-  }
+    try {
+      const details = await pumpTokenService.getAssetDetails(assetId);
+      setAssetDetails((prevDetails) => [...prevDetails, details]);
+    } catch (error) {
+      console.error("Failed to fetch asset details:", error);
+    }
+  };
 
   useEffect(() => {
     getNetwork()
@@ -177,7 +175,7 @@ const IndexPumpToken = () => {
                     </CommandGroup>
                   </CommandList>
                 </Command>
-              </PopoverContent>
+              </ PopoverContent>
             </Popover>
           </div>
           <div className="flex grid grid-cols-2 sm:grid-cols-2 gap-4">
@@ -188,7 +186,7 @@ const IndexPumpToken = () => {
                   {loading ? t("Loading tokens...") : t("Pump token loading...")}
                 </p>
               </div>
-            ) : (
+            ) : filteredTokens.length > 0 ? (
               filteredTokens.map((token) => (
                 <div
                   key={token.id}
@@ -206,7 +204,7 @@ const IndexPumpToken = () => {
                     {token.assetDetail?.symbol || "N/A"})
                   </h3>
                   <p className="pl-2 mt-1">
-                    Created by:{" "}
+                    {t("Created by")}:
                     <span className="text-muted p-4 underline">
                       {token.assetDetail?.owner
                         ? `${token.assetDetail.owner.slice(0, 4)}...${token.assetDetail.owner.slice(-4)}`
@@ -216,14 +214,13 @@ const IndexPumpToken = () => {
                   <p className="pl-2 pr-2 opacity-50 leading-snug mt-1 mb-1">
                     {truncateText(token.description, 50)}
                   </p>
-                  <p>
-                    <span className="opacity-50 pl-2">Market Cap:</span>
-                    <span className="font-bold p-4">
-                      {formatCurrency(token.marketCap)}
-                    </span>
-                  </p>
                 </div>
               ))
+            ) : (
+              <div className="flex flex-col gap-4 items-center justify-center py-[100px]">
+                <Coins className="size-20" />
+                <h4 className="font-bold text-lg">{t("No Pump Token Found")}</h4>
+              </div>
             )}
           </div>
         </div>
