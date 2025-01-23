@@ -180,7 +180,7 @@ const IndexPumpToken = () => {
           </div>
           <div className="flex grid grid-cols-2 sm:grid-cols-2 gap-4">
             {loading || loadingAssets ? (
-              <div className="flex absolute justify-center items-center w-full h-36">
+              <div className="flex flex-col absolute justify-center items-center w-full h-36 gap-4">
                 <LoaderCircle className="animate-spin h-12 w-12 text-muted" />
                 <p className="text-muted ml-2 text-lg">
                   {loading ? t("Loading tokens...") : t("Pump token loading...")}
