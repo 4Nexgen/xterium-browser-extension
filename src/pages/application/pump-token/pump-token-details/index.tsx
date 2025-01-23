@@ -1,35 +1,42 @@
-import { Button } from "@/components/ui/button"
-import { Drawer, DrawerContent } from "@/components/ui/drawer"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
-const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, handleCallbacks, minBalance, supply }) => {
+const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, minBalance, supply }) => {
   const { t } = useTranslation()
 
   if (!selectedPumpTokens) {
     return <div>{t("Loading...")}</div>
   }
 
-  const { description, price, marketCap, virtualLiquidity, volume24h, tokenCreated } =
-    selectedPumpTokens
+  const { description, price, marketCap, tokenCreated } = selectedPumpTokens
 
   const formatCurrency = (amount) => {
-    if (!amount) return "$0.0"
+    if (!amount) return "0.0"
     const num = parseFloat(amount.replace(/,/g, ""))
-    if (isNaN(num)) return "$0.0"
+    if (isNaN(num)) return "0.0"
 
-    if (num >= 1e15) {
-      return `${(num / 1e15).toFixed(1)}Q`
+    if (num >= 1e24) {
+      return `${(num / 1e24).toFixed(4)} T`
+    } else if (num >= 1e21) {
+      return `${(num / 1e21).toFixed(4)} B`
+    } else if (num >= 1e18) {
+      return `${(num / 1e18).toFixed(4)} Q`
+    } else if (num >= 1e15) {
+      return `${(num / 1e15).toFixed(4)} P`
     } else if (num >= 1e12) {
-      return `${(num / 1e12).toFixed(1)}T`
+      return `${(num / 1e12).toFixed(4)} T`
     } else if (num >= 1e9) {
-      return `${(num / 1e9).toFixed(1)}B`
+      return `${(num / 1e9).toFixed(4)} B`
     } else if (num >= 1e6) {
-      return `${(num / 1e6).toFixed(1)}M`
+      return `${(num / 1e6).toFixed(4)} M`
     } else if (num >= 1e3) {
-      return `${(num / 1e3).toFixed(1)}k`
+      return `${(num / 1e3).toFixed(4)} k`
     }
-    return `${num.toFixed(1)}`
+
+    if (Number.isInteger(num)) {
+      return `${num}`
+    }
+    return `${num.toFixed(4)}`
   }
 
   const [timeElapsed, setTimeElapsed] = useState("")
@@ -102,7 +109,9 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, handleCallbacks, min
           </div>
           <div className="mt-2 flex items-center gap-x-2">
             <p className="font-semibold">{t("Contract: ")}</p>
-            <p className="opacity-70 text-muted">{selectedPumpTokens.assetDetail?.assetId ?? "N/A"}</p>
+            <p className="opacity-70 text-muted">
+              {selectedPumpTokens.assetDetail?.assetId ?? "N/A"}
+            </p>
           </div>
           <div className="mt-2">
             <p className="opacity-70">{description}</p>
@@ -125,11 +134,17 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, handleCallbacks, min
       <div className="mt-6 grid grid-cols-3 gap-2">
         <div className="border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg p-2">
           <p className="opacity-70 text-sm">{t("Min Balance")}</p>
-          <p className="font-bold text-sm">{formatCurrency(minBalance)}</p>
+          <p className="font-bold text-sm">
+            {formatCurrency(minBalance)}
+            {selectedPumpTokens.assetDetail?.symbol ?? "N/A"}
+          </p>
         </div>
         <div className="border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg p-2">
           <p className="opacity-70 text-sm">{t("Total Token Supply")}</p>
-          <p className="font-bold text-sm">{formatCurrency(supply)}</p>
+          <p className="font-bold text-sm">
+            {formatCurrency(supply)}
+            {selectedPumpTokens.assetDetail?.symbol ?? "N/A"}
+          </p>
         </div>
         <div className="border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg p-2">
           <p className="opacity-70 text-sm">{t("Token Created")}</p>
