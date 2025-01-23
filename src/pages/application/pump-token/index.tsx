@@ -14,10 +14,9 @@ import type { NetworkModel } from "@/models/network.model";
 import type { PumpTokenWithAssetDetails } from "@/models/pump-token.model"; // Use the new interface
 import { NetworkService } from "@/services/network.service";
 import { PumpTokenService } from "@/services/pump-token.service";
-import { Search } from "lucide-react";
+import { Search, Loader } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Loader } from "lucide-react";
 import IndexPumpTokenDetails from "./pump-token-details";
 
 const truncateText = (text, limit) => {
@@ -60,7 +59,6 @@ const IndexPumpToken = () => {
   const fetchAssetDetails = async (assetId) => {
     try {
       const details = await pumpTokenService.getAssetDetails(assetId);
-      console.log("Asset Details:", details);
       setAssetDetails((prevDetails) => [...prevDetails, details]); 
     } catch (error) {
       console.error("Failed to fetch asset details:", error);
@@ -73,18 +71,26 @@ const IndexPumpToken = () => {
   }, []);
 
   const handleTokenClick = (token: PumpTokenWithAssetDetails) => {
-    console.log("Token clicked:", token);
     setSelectedInSearchToken(token);
     setIsPumpTokenDetailsDrawerOpen(true);
   };
 
-  const filteredTokens = pumpTokens.map((token) => {
-    const assetDetail = assetDetails.find(detail => detail.assetId.toString() === token.network_id);
+  const filteredTokens = pumpTokens
+  .map((token) => {
+    const assetDetail = assetDetails.find(
+      (detail) => detail.assetId.toString() === token.network_id
+    );
     return {
       ...token,
-      assetDetail: assetDetail || null 
+      assetDetail: assetDetail || null,
     };
-  }).filter(token => token.assetDetail && (searchQuery === "" || token.assetDetail.name.toLowerCase().includes(searchQuery.toLowerCase()))); // Only keep tokens with matching asset details and search query
+  })
+  .filter(
+    (token) =>
+      token.assetDetail &&
+      (searchQuery === "" ||
+        token.assetDetail.name.toLowerCase().startsWith(searchQuery.toLowerCase())) 
+  );
 
   const formatCurrency = (amount) => {
     if (!amount) return "$0.0";
@@ -142,7 +148,8 @@ const IndexPumpToken = () => {
                           key={token.id}
                           value={token.assetDetail?.name || ""}
                           onSelect={() => {
-                            setSelectedInSearchToken(token);
+                            setSearchQuery(token.assetDetail?.name || ""); 
+                            setSelectedInSearchToken(token); 
                             setOpenSearchTokens(false);
                           }}
                           className="cursor-pointer hover:bg-accent">
