@@ -164,33 +164,28 @@ const IndexBalance = () => {
       });
   
       const balancePromises = sortedBalances.map(async (balance) => {
-        const updatedBalance = await getBalancePerToken(balance.token);
-        return {
-          ...balance,
-          freeBalance: fixBalance(updatedBalance.freeBalance.toString(), 12),
-          reservedBalance: fixBalance(updatedBalance.reservedBalance.toString(), 12),
-        };
-      });
-  
-      const updatedBalances = await Promise.all(balancePromises);
-      setBalances(updatedBalances);
-  
-      const filteredBalances = updatedBalances
-        .filter((balance) => {
-          return (
-            balance.token.symbol === "XON" || 
-            ["XGM", "XAV", "AZK", "IXON", "IXAV"].includes(balance.token.symbol)
-          );
-        })
-        .map((balance) => ({
-          publicKey: selectedWallet.public_key,
-          tokenName: balance.token.symbol,
-          freeBalance: balance.freeBalance,
-        }));
-  
-      await balanceService.saveBalance(selectedWallet.public_key, filteredBalances);
+        const updatedBalance = await getBalancePerToken(balance.token)
+
+        getBalancePerToken(balance.token)
+        setBalances((prevBalances) =>
+          prevBalances.map((prevBalance) =>
+            prevBalance.token.id === updatedBalance.token.id
+              ? {
+                  ...prevBalance,
+                  freeBalance: fixBalance(updatedBalance.freeBalance.toString(), 12),
+                  reservedBalance: fixBalance(
+                    updatedBalance.reservedBalance.toString(),
+                    12
+                  )
+                }
+              : prevBalance
+          )
+        )
+      })
+
+      await Promise.all(balancePromises)
     }
-  };
+  }
 
   const getBalancePerToken = async (token: TokenModel): Promise<BalanceModel> => {
     setLoadingPerToken((prevLoadingPerToken) => ({
