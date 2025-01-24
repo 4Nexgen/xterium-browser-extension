@@ -2,143 +2,144 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
-  min-width: 450px; 
+html,
+body {
+  min-width: 450px;
   min-height: 600px;
 }
 
 @layer base {
   :root {
-    /* Root or body background */
     --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-
-    /* Card */
+    --background-sheet: 0 0% 96%;
+    --foreground: 224 71.4% 4.1%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-
-    /* Popover */
+    --card-foreground: 224 71.4% 4.1%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-
-    /* Colors */
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
+    --popover-foreground: 224 71.4% 4.1%;
+    --primary: 178 85% 39%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 220.9 39.3% 11%;
+    --muted: 178 77% 70%;
+    --muted-foreground: 220 8.9% 46.1%;
+    --accent: 220 14.3% 95.9%;
+    --accent-foreground: 220.9 39.3% 11%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-
-    /* Border and inputs */
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 10% 3.9%;
-
-    /* Charts */
+    --destructive-foreground: 210 20% 98%;
+    --border: 220 13% 91%;
+    --border-1: 0 0% 70%;
+    --input: 220 13% 91%;
+    --ring: 178 77% 70%;
+    --radius: 0.5rem;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-
-    /* Radius */
-    --radius: 1.5rem;
-
-    /* Sidebar */
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-background: 203 39% 18%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 231 73% 30%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 178 85% 39%;
+    --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
   .dark {
-    /* Root or body background */
-    --background: 213, 36%, 11%;
-    --foreground: 0 0% 98%;
-
-    /* Card */
-    --card: 222, 30%, 15%;
-    --card-foreground: 0 0% 98%;
-
-    /* Popover */
-    --popover: 213, 36%, 11%;
-    --popover-foreground: 0 0% 98%;
-
-    /* Colors */
-    --primary: 219, 25%, 52%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 222, 30%, 10%;
-    --accent-foreground: 0 0% 98%;
+    --background: 203 34% 13%;
+    --background-sheet: 203 39% 18%;
+    --foreground: 210 20% 98%;
+    --card: 181 69% 29%;
+    --card-foreground: 210 20% 98%;
+    --card-border: 210 20% 98%;
+    --popover: 224 71.4% 4.1%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 212 88% 54%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 178 77% 70%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+    --accent: 215 27.9% 16.9%;
+    --accent-foreground: 210 20% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-
-    /* Border and inputs */
-    --border: 213, 36%, 11%;
-    --input: 213, 36%, 11%;
-    --ring: 213, 36%, 11%;
-
-    /* Charts */
+    --destructive-foreground: 210 20% 98%;
+    --border: 178 77% 70%;
+    --border-1: 0 0% 100%;
+    --input: 219 32% 10%;
+    --ring: 178 77% 70%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-
-    /* Radius */
-    --radius: 1.5rem;
-
-    /* Sidebar */
-    --sidebar-background: 222, 30%, 15%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-background: 203 39% 18%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 231 73% 30%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 213, 36%, 11%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 222, 30%, 15%;
-    --sidebar-ring: 222, 30%, 15%;
-
-    /* custom */
-    --background-gradient: linear-gradient(180deg, #2e266d 0%, #121B26 100%);
+    --sidebar-accent: 178 85% 39%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
+.dev-bg-image {
+  background: url("../assets/covers/xon-cover.png") no-repeat;
+  background-size: cover;
+  background-position: center 15%;
+}
+
+.background-theme {
+  background: url("../assets/covers/bg.png") no-repeat;
+  background-size: cover;
+  background-position: center 15%;
+}
+
+.dark .background-inside-theme {
+  background: url("../assets/covers/bg-inside.png") no-repeat;
+  background-size: cover;
+  background-position: top center;
+}
+
+.background-box {
+  background: url("../assets/covers/awesomebox.png") no-repeat;
+  background-size: cover;
+  background-position: top center;
+}
+
+/* HTML: <div class="loader"></div> */
+.loader {
+  margin-left: 14px;
+  width: 30px;
+  aspect-ratio: 4;
+  --_g: no-repeat radial-gradient(circle closest-side, #fff 90%, #0000);
+  background:
+    var(--_g) 0% 50%,
+    var(--_g) 50% 50%,
+    var(--_g) 100% 50%;
+  background-size: calc(100% / 4) 100%;
+  animation: l7 1s infinite linear;
+}
+@keyframes l7 {
+  33% {
+    background-size:
+      calc(100% / 3) 0%,
+      calc(100% / 3) 100%,
+      calc(100% / 3) 100%;
   }
-  body {
-    @apply bg-background text-foreground;
+  50% {
+    background-size:
+      calc(100% / 3) 100%,
+      calc(100% / 3) 0%,
+      calc(100% / 3) 100%;
   }
-  .dark main {
-    background-image: var(--background-gradient);
-    /* background: url("../assets/covers/cover.png");
-    background-size: cover;
-    background-repeat: no-repeat; */
-  }
-  .light .card-bg-image {
-    background: url("../assets/covers/xon-cover.png") no-repeat;
-    background-size: cover;
-    background-position: center -20px;
-    border-radius: 20px; 
-    overflow: hidden;
-  }
-  .dark .card-bg-image {
-    background: url("../assets/covers/xon-cover.png") no-repeat;
-    background-size: cover;
-    background-position: center -20px;
-    border-radius: 20px; 
-    overflow: hidden;
-    border: 0;
+  66% {
+    background-size:
+      calc(100% / 3) 100%,
+      calc(100% / 3) 100%,
+      calc(100% / 3) 0%;
   }
 }
