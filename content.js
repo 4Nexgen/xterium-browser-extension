@@ -1,6 +1,8 @@
-javascriptCopyEdit
+const script = document.createElement('script');
 script.src = chrome.runtime.getURL('injected.js');
+
 script.onload = function () {
-  this.remove(); 
+  this.remove();
+};
+
 (document.head || document.documentElement).appendChild(script);
-}
