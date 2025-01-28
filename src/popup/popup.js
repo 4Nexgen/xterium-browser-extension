@@ -8,7 +8,7 @@ document.getElementById("connect").addEventListener("click", async () => {
   
     try {
       const response = await chrome.runtime.sendMessage({
-        type: "XTREIUM_REQUEST",
+        type: "XTERIUM_REQUEST",
         method: "getWalletAddress",
         username: username
       });

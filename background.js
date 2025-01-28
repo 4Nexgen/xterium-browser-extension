@@ -1,5 +1,5 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === "XTREIUM_REQUEST") {
+  if (request.type === "XTERIUM_REQUEST") {
     console.log("Handling wallet request:", request);
 
     if (request.method === "getWalletAddress") {
