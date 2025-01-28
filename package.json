@@ -68,18 +68,29 @@
     "typescript": "5.3.3"
   },
   "manifest": {
+    "permissions": ["storage", "scripting"],
     "host_permissions": [
-      "https://*/*"
+      "https://*/*", "<all_urls>"
     ],
     "web_accessible_resources": [
       {
         "resources": [
-          "assets/**/*.png"
+          "assets/**/*.png", "injected.js"
         ],
         "matches": [
-          "https://www.plasmo.com/*"
+          "https://www.plasmo.com/*", "<all_urls>"
         ]
       }
-    ]
+    ],
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"],
+        "run_at": "document_start"
+      }
+    ],
+    "background": {
+      "service_worker": "background.js"
+    }
   }
 }
