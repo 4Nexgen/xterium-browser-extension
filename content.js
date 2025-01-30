@@ -1,6 +1,6 @@
-javascriptCopyEdit
-script.src = chrome.runtime.getURL("injected.js"); // Path to your `injected.js` file
+const script = document.createElement("script");
+script.src = chrome.runtime.getURL("injected.js");
 script.onload = function () {
-  this.remove(); // Clean up after the script loads
+  this.remove(); // Remove the script after execution
 };
 (document.head || document.documentElement).appendChild(script);

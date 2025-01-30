@@ -6,7 +6,8 @@ window.xterium = {
         { type: "XTERIUM_REQUEST", method, params },
         "*"
       );
-      window.addEventListener("message", function handler(event) {
+
+      function handler(event) {
         if (event.data.type === "XTERIUM_RESPONSE") {
           window.removeEventListener("message", handler);
           if (event.data.error) {
@@ -15,9 +16,14 @@ window.xterium = {
             resolve(event.data.result);
           }
         }
-      });
+      }
+
+      window.addEventListener("message", handler);
     });
   }
 };
+
+// Make `window.xterium` globally accessible
+globalThis.xterium = window.xterium;
 
 console.log("xterium injected:", window.xterium);
