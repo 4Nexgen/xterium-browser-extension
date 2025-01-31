@@ -35,15 +35,15 @@ const IndexTokenDetails = ({ selectedBalance, handleCallbacks }) => {
 
   return (
     <>
-      <Label className="mt-4 tracking-[0.15em] font-semibold text-sm text-center">
+      <Label className="tracking-[0.15em] font-semibold text-sm text-center">
         {t("Your Balance")}
       </Label>
-      <Table className="mt-6 w-full">
+      <Table className="w-full">
         <TableBody>
           <TableRow className="flex flex-col gap-4 hover:bg-transparent hover:cursor-default p-6">
             <TableCell className="w-full h-12 flex items-center justify-center text-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
               <div className="text-center">
-                <p className="text-lg font-semibold text-purple"> {/* Changed to font-semibold */}
+                <p className="text-lg font-bold text-purple"> 
                   {formatBalance(
                     (balanceData.freeBalance + balanceData.reservedBalance).toString()
                   )}
@@ -53,7 +53,7 @@ const IndexTokenDetails = ({ selectedBalance, handleCallbacks }) => {
             </TableCell>
             <TableCell className="w-full h-12 flex items-center justify-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
               <div className="text-center">
-                <p className="text-lg font-semibold text-purple"> {/* Changed to font-semibold */}
+                <p className="text-lg font-bold text-purple"> 
                   {formatBalance(balanceData.freeBalance.toString())}
                 </p>
                 <Label className="text-xs font-semibold">{t("Transferable")}</Label>
@@ -61,7 +61,7 @@ const IndexTokenDetails = ({ selectedBalance, handleCallbacks }) => {
             </TableCell>
             <TableCell className="w-full h-12 flex items-center justify-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
               <div className="text-center">
-                <p className="text-lg font-semibold text-purple"> {/* Changed to font-semibold */}
+                <p className="text-lg font-bold text-purple"> 
                   0.00
                 </p>
                 <Label className="text-xs font-semibold">{t("Locked")}</Label>
@@ -70,7 +70,7 @@ const IndexTokenDetails = ({ selectedBalance, handleCallbacks }) => {
           </TableRow>
         </TableBody>
       </Table>
-      <div className="p-6">
+      <div className="p-6 pt-0">
         <Button variant="jelly" type="button" onClick={openTransferDrawer}>
           {t("TRANSFER")}
         </Button>
