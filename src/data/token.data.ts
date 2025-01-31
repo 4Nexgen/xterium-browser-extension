@@ -95,11 +95,11 @@ export const TokenData: TokenModel[] = [
     description: "Private MPC Token"
   },
   {
-    id: 9,
+    id: 10,
     image_url: "DONLogo",
     type: "Asset",
     network: "Xode",
-    network_id: 8,
+    network_id: 9,
     symbol: "DON",
     description: "Dondon Utility Token"
   }

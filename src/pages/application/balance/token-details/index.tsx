@@ -40,29 +40,31 @@ const IndexTokenDetails = ({ selectedBalance, handleCallbacks }) => {
       </Label>
       <Table className="mt-6 w-full">
         <TableBody>
-          <TableRow className="flex justify-center gap-4 hover:bg-transparent hover:cursor-default">
-            <TableCell className="w-24 h-24 flex items-center justify-center text-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
+          <TableRow className="flex flex-col gap-4 hover:bg-transparent hover:cursor-default p-6">
+            <TableCell className="w-full h-12 flex items-center justify-center text-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
               <div className="text-center">
-                <p className="text-2xl font-extrabold text-purple">
+                <p className="text-lg font-semibold text-purple"> {/* Changed to font-semibold */}
                   {formatBalance(
                     (balanceData.freeBalance + balanceData.reservedBalance).toString()
                   )}
                 </p>
-                <Label className="text-sm font-semibold">{t("Total")}</Label>
+                <Label className="text-xs font-semibold">{t("Total")}</Label>
               </div>
             </TableCell>
-            <TableCell className="w-24 h-24 flex items-center justify-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
+            <TableCell className="w-full h-12 flex items-center justify-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
               <div className="text-center">
-                <p className="text-2xl font-extrabold text-purple">
+                <p className="text-lg font-semibold text-purple"> {/* Changed to font-semibold */}
                   {formatBalance(balanceData.freeBalance.toString())}
                 </p>
-                <Label className="text-sm font-semibold">{t("Transferable")}</Label>
+                <Label className="text-xs font-semibold">{t("Transferable")}</Label>
               </div>
             </TableCell>
-            <TableCell className="w-24 h-24 flex items-center justify-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
+            <TableCell className="w-full h-12 flex items-center justify-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
               <div className="text-center">
-                <p className="text-2xl font-extrabold text-purple">0.00</p>
-                <Label className="text-sm font-semibold">{t("Locked")}</Label>
+                <p className="text-lg font-semibold text-purple"> {/* Changed to font-semibold */}
+                  0.00
+                </p>
+                <Label className="text-xs font-semibold">{t("Locked")}</Label>
               </div>
             </TableCell>
           </TableRow>
