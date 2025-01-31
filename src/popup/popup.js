@@ -1,25 +1,17 @@
-document.getElementById("connect").addEventListener("click", async () => {
-    const username = document.getElementById("username").value;
-  
-    if (!username) {
-      alert("Please enter a username.");
-      return;
-    }
-  
-    try {
-      const response = await chrome.runtime.sendMessage({
-        type: "XTERIUM_REQUEST",
-        method: "getWalletAddress",
-        username: username
-      });
-  
-      if (response && response.result) {
-        document.getElementById("status").textContent = `Connected: ${response.result}`;
+document.addEventListener("DOMContentLoaded", async () => {
+  const walletDisplay = document.getElementById("walletAddress");
+
+  // Fetch wallet address from storage
+  chrome.runtime.sendMessage({ action: "getWalletAddress" }, (response) => {
+      if (response && response.public_key) {
+          walletDisplay.textContent = `Wallet Address: ${response.public_key}`;
       } else {
-        document.getElementById("status").textContent = "Connection failed";
+          walletDisplay.textContent = "No wallet found.";
       }
-    } catch (error) {
-      console.error("Error:", error);
-      document.getElementById("status").textContent = "Error connecting";
-    }
   });
+
+  // Close popup button
+  document.getElementById("closePopup").addEventListener("click", () => {
+      window.close();
+  });
+});

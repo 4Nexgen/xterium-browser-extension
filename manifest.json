@@ -3,7 +3,7 @@
     "name": "Xterium Browser Extension",
     "version": "1.0",
     "description": "A browser extension for Xterium.",
-    "permissions": ["storage", "scripting"],
+    "permissions": ["activeTab", "scripting", "storage"],
     "host_permissions": ["<all_urls>"],
     "background": {
       "service_worker": "background.js"
@@ -17,12 +17,12 @@
     ],
     "web_accessible_resources": [
       {
-        "resources": ["injected.js"],
+        "resources": ["popup.html"],
         "matches": ["<all_urls>"]
       }
     ],
     "content_security_policy": {
-      "extension_pages": "script-src 'self'; object-src 'self'"
+    "extension_pages": "script-src 'self'; object-src 'self'" 
     },
     "action": {
       "default_popup": "src/popup/index.html",

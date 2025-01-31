@@ -1,12 +1,19 @@
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === "XTERIUM_REQUEST") {
-    console.log("Handling wallet request:", request);
+import { WalletService } from "@/services/wallet.service";
+const walletService = new WalletService();
 
-    if (request.method === "getWalletAddress") {
-      sendResponse({ result: "5CGDeeDXj9ZbYqdFK4dDQcYdTPxMAHk9mcjitbkfaF1NRd6x" });
-    } else {
-      sendResponse({ error: "Method not supported" });
+function displayWalletInfo(wallets) {
+    console.log('Wallets:', wallets);  // This will help confirm if data is being passed
+    wallets.forEach(wallet => {
+        console.log(`Wallet ID: ${wallet.id}, Type: ${wallet.type}, Address: ${wallet.public_key}`);
+    });
+}
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "getWalletAddress") {
+        chrome.storage.local.get("walletAddress", (result) => {
+            console.log("[Xterium] Retrieved wallet address:", result.walletAddress);
+            sendResponse({ public_key: result.walletAddress || null });
+        });
+        return true; // Required to handle async response
     }
-  }
-  return true;
 });
