@@ -1,19 +1,26 @@
-import { WalletService } from "@/services/wallet.service";
-const walletService = new WalletService();
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  switch (msg.action) {
+    case "OPEN_POPUP":
+      chrome.windows.create({
+        url: chrome.runtime.getURL("popup.html"),
+        type: "popup",
+        width: 400,
+        height: 600,
+        left: Math.round(screen.width / 2 - 200),
+        top: Math.round(screen.height / 2 - 300)
+      });
+      break;
 
-function displayWalletInfo(wallets) {
-    console.log('Wallets:', wallets);  // This will help confirm if data is being passed
-    wallets.forEach(wallet => {
-        console.log(`Wallet ID: ${wallet.id}, Type: ${wallet.type}, Address: ${wallet.public_key}`);
-    });
-}
-
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "getWalletAddress") {
-        chrome.storage.local.get("walletAddress", (result) => {
-            console.log("[Xterium] Retrieved wallet address:", result.walletAddress);
-            sendResponse({ public_key: result.walletAddress || null });
+    case "GET_WALLET_ADDRESS":
+      chrome.storage.local.get(["wallet"], (result) => {
+        sendResponse({
+          public_key: result.wallet?.publicKey || null,
+          error: result.wallet ? null : "No wallet found"
         });
-        return true; // Required to handle async response
-    }
+      });
+      return true;
+
+    default:
+      console.warn("[Xterium] Unrecognized action:", msg.action);
+  }
 });
