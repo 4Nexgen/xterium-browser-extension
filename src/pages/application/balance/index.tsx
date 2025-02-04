@@ -357,17 +357,21 @@ const IndexBalance = () => {
                           (selectedNetwork ? selectedNetwork.name : "")
                       )
                       .sort((a, b) => {
-                        if (a.token.type === "Native" && b.token.type !== "Native")
-                          return -1
-                        if (a.token.type !== "Native" && b.token.type === "Native")
-                          return 1
+                        if (a.token.type === "Native" && b.token.type !== "Native") return -1
+                        if (a.token.type !== "Native" && b.token.type === "Native") return 1
                         return 0
                       })
                       .map((balance) => (
                         <TableRow
                           key={balance.token.symbol}
-                          onClick={() => selectBalance(balance)}
-                          className="cursor-pointer hover-bg-custom">
+                          onClick={() => {
+                            if (!loadingPerToken[balance.token.symbol]) {
+                              selectBalance(balance);
+                            }
+                          }}
+                          className={`cursor-pointer hover-bg-custom ${
+                            loadingPerToken[balance.token.symbol] ? "cursor-not-allowed" : ""
+                          }`}>
                           <TableCell className="w-[50px] justify-center">
                             <Image
                               src={getTokenImage(balance.token.image_url)}
@@ -388,7 +392,7 @@ const IndexBalance = () => {
                           <TableCell className="w-[50px] justify-end pr-2 text-right">
                             <span className="text-lg font-bold text-purple">
                               {loadingPerToken[balance.token.symbol] ? (
-                                <span className="text-sm font-normal">Loading...</span>
+                                <span className="text-sm font-normal opacity-50">Loading...</span>
                               ) : balancePerToken[balance.token.symbol] ? (
                                 fixBalance(
                                   balancePerToken[balance.token.symbol].toString(),
