@@ -68,14 +68,14 @@
     "typescript": "5.3.3"
   },
   "manifest": {
-    "permissions": ["storage", "scripting", "windows" ],
+    "permissions": ["storage", "scripting", "activeTab"],
     "host_permissions": [
       "https://*/*", "<all_urls>"
     ],
     "web_accessible_resources": [
       {
         "resources": [
-          "assets/**/*.png", "injected.js"
+          "assets/**/*.png", "injected.js", "popup.html"
         ],
         "matches": [
           "https://www.plasmo.com/*", "<all_urls>"
