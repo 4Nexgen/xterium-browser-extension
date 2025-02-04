@@ -58,7 +58,7 @@ const IndexTokens = () => {
       if (preloadedTokenData.length > 0) {
         for (let i = 0; i < preloadedTokenData.length; i++) {
           let existingToken = data.filter(
-            (d) => d.symbol == preloadedTokenData[i].symbol
+            (d) => d.network_id === preloadedTokenData[i].network_id // Match by network_id
           )[0]
 
           if (existingToken != null) {
@@ -72,15 +72,15 @@ const IndexTokens = () => {
 
       if (data.length > 0) {
         for (let i = 0; i < data.length; i++) {
-          let existingToken = tokenList.filter((d) => d.symbol == data[i].symbol)[0]
+          let existingToken = tokenList.filter((d) => d.network_id === data[i].network_id)[0];
 
           if (existingToken == null) {
             tokenList.push(data[i])
           }
         }
       }
-
-      setTokens(tokenList)
+      const updatedTokens = await tokenService.fetchAssetDetailsForTokens(tokenList);
+      setTokens(updatedTokens)
     })
   }
 
@@ -176,7 +176,7 @@ const IndexTokens = () => {
                           token.network === (selectedNetwork ? selectedNetwork.name : "")
                       )
                       .map((token) => (
-                        <TableRow key={token.symbol}>
+                        <TableRow key={token.id}>
                           <TableCell className="w-[50px] justify-center">
                             <Image
                               src={getTokenImage(token.image_url)}
@@ -253,7 +253,7 @@ const IndexTokens = () => {
                           token.network === (selectedNetwork ? selectedNetwork.name : "")
                       )
                       .map((token) => (
-                        <TableRow key={token.symbol} className="cursor-pointer">
+                        <TableRow key={token.id} className="cursor-pointer">
                           <TableCell className="w-[50px] justify-center">
                             <Image
                               src={getTokenImage(token.image_url)}
