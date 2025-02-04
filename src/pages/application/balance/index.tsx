@@ -363,7 +363,7 @@ const IndexBalance = () => {
                       })
                       .map((balance) => (
                         <TableRow
-                          key={balance.token.symbol}
+                          key={balance.token.id}
                           onClick={() => {
                             if (!loadingPerToken[balance.token.symbol]) {
                               selectBalance(balance);

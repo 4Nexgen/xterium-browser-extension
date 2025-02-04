@@ -23,6 +23,8 @@ import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
 import OutsideLayout from "../outsideLayout"
+import { TokenService } from "@/services/token.service"
+import { TokenData } from "@/data/token.data"
 
 const IndexCreatePassword = ({ onSetCurrentPage }) => {
   const { t } = useTranslation()
@@ -81,7 +83,9 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
   const createPassword = (data: z.infer<typeof FormSchema>) => {
     userService.createPassword(data.password).then((isValid) => {
       if (isValid == true) {
-        onSetCurrentPage("application")
+        preloadTokens().then(() => {
+          onSetCurrentPage("application")
+        })
       } else {
         toast({
           description: (
@@ -94,6 +98,32 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
         })
       }
     })
+  }
+  
+  const preloadTokens = async () => {
+    const tokenService = new TokenService()
+    let tokenList = []
+  
+    try {
+      const data = await tokenService.getTokens()
+      let preloadedTokenData = TokenData 
+  
+      for (let i = 0; i < preloadedTokenData.length; i++) {
+        let existingToken = data.find(d => d.network_id === preloadedTokenData[i].network_id)
+  
+        if (existingToken) {
+          tokenList.push({ ...existingToken, preloaded: true })
+        } else {
+          await tokenService.createToken(preloadedTokenData[i])
+          tokenList.push({ ...preloadedTokenData[i], preloaded: true })
+        }
+      }
+  
+      const updatedTokens = await tokenService.fetchAssetDetailsForTokens(tokenList)
+      console.log("Tokens preloaded and updated:", updatedTokens)
+    } catch (error) {
+      console.error("Error preloading tokens:", error)
+    }
   }
 
   return (
