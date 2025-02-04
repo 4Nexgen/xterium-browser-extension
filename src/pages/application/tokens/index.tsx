@@ -21,7 +21,7 @@ import type { NetworkModel } from "@/models/network.model"
 import { TokenModel } from "@/models/token.model"
 import { NetworkService } from "@/services/network.service"
 import { TokenService } from "@/services/token.service"
-import { Coins, Pencil, Trash, X } from "lucide-react"
+import { Coins, Pencil, Trash, X, LoaderCircle } from "lucide-react"
 import Image from "next/image"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -49,11 +49,14 @@ const IndexTokens = () => {
   const [isAddTokenDrawerOpen, setIsAddTokenDrawerOpen] = useState<boolean>(false)
   const [isEditTokenDrawerOpen, setIsEditTokenDrawerOpen] = useState<boolean>(false)
   const [isDeleteTokenDrawerOpen, setIsDeleteTokenDrawerOpen] = useState(false)
+  const [loading, setLoading] = useState<boolean>(false)
 
-  const preloadTokens = () => {
+  const preloadTokens = async () => {
+    setLoading(true)
     let tokenList: any[] = []
 
-    tokenService.getTokens().then(async (data) => {
+    try{
+      const data = await tokenService.getTokens()
       let preloadedTokenData = TokenData
       if (preloadedTokenData.length > 0) {
         for (let i = 0; i < preloadedTokenData.length; i++) {
@@ -81,7 +84,11 @@ const IndexTokens = () => {
       }
       const updatedTokens = await tokenService.fetchAssetDetailsForTokens(tokenList);
       setTokens(updatedTokens)
-    })
+    } catch (error) {
+      console.error("Error loading tokens:", error)
+    } finally {
+      setLoading(false) 
+    }
   }
 
   const getNetwork = () => {
@@ -159,7 +166,14 @@ const IndexTokens = () => {
     <>
       <div className="py-4 flex flex-col justify-between h-full">
         <div className="py-4">
-          {tokens?.filter((item) => item.network == selectedNetwork.name)?.length ? (
+          {loading ? (
+            <div className="flex flex-col items-center w-full h-30 gap-4 mt-10">
+              <LoaderCircle className="animate-spin h-12 w-12 text-muted" />
+              <p className="text-muted ml-2 text-lg">
+                {loading ? t("Loading tokens...") : t("Loading tokens...")}
+              </p>
+            </div>
+          ) : tokens?.filter((item) => item.network == selectedNetwork.name)?.length ? (
             <>
               <Card className="mb-3 card-bg-image border-border">
                 <CardHeader>
