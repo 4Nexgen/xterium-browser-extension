@@ -162,5 +162,7 @@
   "Pump": "泵",
   "Total Supply": "总供应量",
   "Min Balance": "最小余额",
-  "Pump token loading...": "正在加载泵代币..."
+  "Pump token loading...": "正在加载泵代币...",
+  "Loading tokens...": "正在加载令牌...",
+  "No Pump Token Found": "未找到泵令牌"
 }

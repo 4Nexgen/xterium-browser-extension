@@ -161,5 +161,7 @@
   "Pump": "ポンプ",
   "Total Supply": "総供給量",
   "Min Balance": "最小残高",
-  "Pump token loading...": "ポンプトークンの読み込み中..."
+  "Pump token loading...": "ポンプトークンの読み込み中...",
+  "Loading tokens...": "トークンをロード中...",
+  "No Pump Token Found": "ポンプトークンが見つかりません"
 }

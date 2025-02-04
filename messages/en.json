@@ -157,5 +157,7 @@
   "Pump": "Pump",
   "Total Supply": "Total Supply",
   "Min Balance": "Min Balance",
-  "Pump token loading...": "Pump token loading..."
+  "Pump token loading...": "Pump token loading...",
+  "Loading tokens...": "Loading tokens...",
+  "No Pump Token Found": "No Pump Token Found"
 }
