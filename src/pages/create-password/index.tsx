@@ -23,6 +23,8 @@ import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
 import OutsideLayout from "../outsideLayout"
+import { TokenService } from "@/services/token.service"
+import { TokenData } from "@/data/token.data"
 
 const IndexCreatePassword = ({ onSetCurrentPage }) => {
   const { t } = useTranslation()
@@ -30,6 +32,7 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
   const [passwordStrength, setPasswordStrength] = useState<string>("")
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const { toast } = useToast()
 
@@ -78,9 +81,12 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
     createPassword(data)
   }
 
-  const createPassword = (data: z.infer<typeof FormSchema>) => {
-    userService.createPassword(data.password).then((isValid) => {
-      if (isValid == true) {
+  const createPassword = async (data: z.infer<typeof FormSchema>) => {
+    setIsLoading(true) 
+    try {
+      const isValid = await userService.createPassword(data.password)
+      if (isValid) {
+        await preloadTokens()
         onSetCurrentPage("application")
       } else {
         toast({
@@ -93,7 +99,41 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
           variant: "destructive"
         })
       }
-    })
+    } catch (error) {
+      console.error("Error creating password:", error)
+      toast({
+        description: t("An error occurred while creating the password."),
+        variant: "destructive"
+      })
+    } finally {
+      setIsLoading(false) 
+    }
+  }
+  
+  const preloadTokens = async () => {
+    const tokenService = new TokenService()
+    let tokenList = []
+  
+    try {
+      const data = await tokenService.getTokens()
+      let preloadedTokenData = TokenData 
+  
+      for (let i = 0; i < preloadedTokenData.length; i++) {
+        let existingToken = data.find(d => d.network_id === preloadedTokenData[i].network_id)
+  
+        if (existingToken) {
+          tokenList.push({ ...existingToken, preloaded: true })
+        } else {
+          await tokenService.createToken(preloadedTokenData[i])
+          tokenList.push({ ...preloadedTokenData[i], preloaded: true })
+        }
+      }
+  
+      const updatedTokens = await tokenService.fetchAssetDetailsForTokens(tokenList)
+      console.log("Tokens preloaded and updated:", updatedTokens)
+    } catch (error) {
+      console.error("Error preloading tokens:", error)
+    }
   }
 
   return (
@@ -186,8 +226,8 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
               )}
             </p>
             <br />
-            <Button type="submit" variant="jelly" className="text-white">
-              {t("SETUP PASSWORD")}
+            <Button type="submit" variant="jelly" className="text-white" disabled={isLoading}>
+              {isLoading ? t("Processing...") : t("SETUP PASSWORD")}
             </Button>
           </form>
         </Form>

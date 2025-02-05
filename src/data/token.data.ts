@@ -27,81 +27,63 @@ export const TokenData: TokenModel[] = [
     image_url: "XGMLogo",
     type: "Asset",
     network: "Xode",
-    network_id: 1,
-    symbol: "XGM",
-    description: "XGame Utility Token"
+    network_id: 1
   },
   {
     id: 3,
     image_url: "XAVLogo",
     type: "Asset",
     network: "Xode",
-    network_id: 2,
-    symbol: "XAV",
-    description: "Xaver Utility Token"
+    network_id: 2
   },
   {
     id: 4,
     image_url: "AZKLogo",
     type: "Asset",
     network: "Xode",
-    network_id: 3,
-    symbol: "AZK",
-    description: "Azkal Meme Token"
+    network_id: 3
   },
   {
     id: 5,
     image_url: "IXONLogo",
     type: "Asset",
     network: "Xode",
-    network_id: 4,
-    symbol: "IXON",
-    description: "Private XON Token"
+    network_id: 4
   },
   {
     id: 6,
     image_url: "IXAVLogo",
     type: "Asset",
     network: "Xode",
-    network_id: 5,
-    symbol: "IXAV",
-    description: "Private XAV Token"
+    network_id: 5
   },
   {
     id: 7,
     image_url: "IDONLogo",
     type: "Asset",
     network: "Xode",
-    network_id: 6,
-    symbol: "IDON",
-    description: "Private DON Token"
+    network_id: 6
   },
   {
     id: 8,
     image_url: "MPCLogo",
     type: "Asset",
     network: "Xode",
-    network_id: 7,
-    symbol: "MPC",
-    description: "Manny Pacquiao Coin"
+    network_id: 7
   },
   {
     id: 9,
     image_url: "IMPCLogo",
     type: "Asset",
     network: "Xode",
-    network_id: 8,
-    symbol: "IMPC",
-    description: "Private MPC Token"
+    network_id: 8
   },
   {
-    id: 9,
+    id: 10,
     image_url: "DONLogo",
     type: "Asset",
     network: "Xode",
-    network_id: 8,
-    symbol: "DON",
-    description: "Dondon Utility Token"
+    network_id: 9
   }
 ]
 

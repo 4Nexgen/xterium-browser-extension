@@ -14,19 +14,13 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
   const { t } = useTranslation()
   const userService = new UserService()
   const balanceService = new BalanceServices()
-
   const [balanceData, setBalanceData] = useState<BalanceModel>(selectedBalance)
-
   const [quantity, setQuantity] = useState<number>(0)
   const [transferTo, setTransferTo] = useState<string>("")
-
   const [isSendInProgress, setIsSendInProgress] = useState<boolean>(false)
   const [sendLabel, setSendLabel] = useState<string>("SEND")
-
   const [partialFee, setPartialFee] = useState<number>(0)
-
-  const [isInputPasswordDrawerOpen, setIsInputPasswordDrawerOpen] =
-    useState<boolean>(false)
+  const [isInputPasswordDrawerOpen, setIsInputPasswordDrawerOpen] = useState<boolean>(false)
   const [isTransferInProgress, setIsTransferInProgress] = useState<boolean>(false)
   const [confirmTransferLabel, setConfirmTransferLabel] = useState<string>("CONFIRM")
 
@@ -87,8 +81,11 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
 
         setIsSendInProgress(false)
         setSendLabel(t("SEND"))
+        console.log("Raw fee:", results.partialFee.toString());
+        const rawFee = BigInt(results.partialFee);
+        const formattedFee = Number(rawFee) / Math.pow(10, 12); 
 
-        setPartialFee(fixBalance(results.partialFee, 12))
+        setPartialFee(formattedFee);
       })
   }
 
@@ -98,14 +95,14 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
   }, [])
 
   const fixBalance = (value: string, decimal: number) => {
-    const multiplier = 10 ** decimal
-    return parseFloat(value) / multiplier
+    const multiplier = BigInt(10 ** decimal)
+    return (BigInt(value) / multiplier).toString()
   }
-
+  
   const fixBalanceReverse = (value: string, decimal: number): string => {
-    const multiplier = 10 ** decimal
-    return (parseFloat(value) * multiplier).toString()
-  }
+    const multiplier = BigInt(10 ** decimal)
+    return (BigInt(parseFloat(value)) * multiplier).toString()
+  }  
 
   const sendTransferWithPassword = () => {
     userService
@@ -120,7 +117,7 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
               balanceService
                 .transfer(
                   balanceData.owner,
-                  parseFloat(fixBalanceReverse(quantity.toString(), 12)),
+                  Number(fixBalanceReverse(quantity.toString(), 12)),
                   transferTo,
                   storedPassword
                 )
@@ -148,7 +145,7 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
                 .transferAssets(
                   balanceData.owner,
                   balanceData.token.network_id,
-                  parseFloat(fixBalanceReverse(quantity.toString(), 12)),
+                  Number(fixBalanceReverse(quantity.toString(), 12)),
                   transferTo,
                   storedPassword
                 )
@@ -275,7 +272,7 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
               <Label className="pb-2">
                 {t("Fees of")}
                 <span className="p-2 font-extrabold text-input-primary">
-                  {partialFee.toString()} XON
+                  {partialFee.toFixed(12)} XON
                 </span>
                 {t("will be applied to the submission")}
               </Label>

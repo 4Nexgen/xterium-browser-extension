@@ -91,9 +91,10 @@ export class BalanceServices {
     return new Promise(async (resolve, reject) => {
       try {
         await this.connect()
+        const amount = BigInt(value);
 
         if (balance.token.type == "Native") {
-          const info = await this.api.tx.balances.transfer(recipient, value).paymentInfo(owner);
+          const info = await this.api.tx.balances.transfer(recipient, amount).paymentInfo(owner);
 
           const substrateFee: SubstrateFeeModel = {
             feeClass: info.class.toString(),
@@ -105,7 +106,7 @@ export class BalanceServices {
         }
 
         if (balance.token.type == "Asset") {
-          const info = await this.api.tx.assets.transfer(balance.token.network_id, recipient, value).paymentInfo(owner);
+          const info = await this.api.tx.assets.transfer(balance.token.network_id, recipient, amount).paymentInfo(owner);
 
           const substrateFee: SubstrateFeeModel = {
             feeClass: info.class.toString(),
@@ -125,6 +126,7 @@ export class BalanceServices {
     return new Promise(async (resolve, reject) => {
       try {
         await this.connect();
+        const amount = BigInt(value);
 
         const wallets = await this.walletService.getWallets();
         if (wallets.length === 0) {
@@ -135,12 +137,11 @@ export class BalanceServices {
           if (owner === wallet.public_key) {
             try {
               const decryptedMnemonicPhrase = this.encryptionService.decrypt(password, wallet.mnemonic_phrase);
-
               const keyring = new Keyring({ type: 'sr25519' });
               const signature = keyring.addFromUri(decryptedMnemonicPhrase);
 
               await this.api.tx.balances
-                .transferAllowDeath(recipient, value)
+                .transferAllowDeath(recipient, amount)
                 .signAndSend(signature, (result) => {
                   if (result.status.isFinalized) {
                     resolve(true);
@@ -167,6 +168,7 @@ export class BalanceServices {
     return new Promise(async (resolve, reject) => {
       try {
         await this.connect();
+        const amount = BigInt(value);
 
         const wallets = await this.walletService.getWallets();
         if (wallets.length === 0) {
@@ -180,9 +182,10 @@ export class BalanceServices {
 
               const keyring = new Keyring({ type: 'sr25519' });
               const signature = keyring.addFromUri(decryptedMnemonicPhrase);
+              const formattedAmount = this.api.createType("Compact<u128>", amount);
 
               await this.api.tx.assets
-                .transfer(assetId, recipient, value)
+                .transfer(assetId, recipient, formattedAmount)
                 .signAndSend(signature, (result) => {
                   if (result.status.isFinalized) {
                     resolve(true);
