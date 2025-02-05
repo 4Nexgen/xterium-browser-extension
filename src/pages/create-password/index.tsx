@@ -32,6 +32,7 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
   const [passwordStrength, setPasswordStrength] = useState<string>("")
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const { toast } = useToast()
 
@@ -80,12 +81,13 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
     createPassword(data)
   }
 
-  const createPassword = (data: z.infer<typeof FormSchema>) => {
-    userService.createPassword(data.password).then((isValid) => {
-      if (isValid == true) {
-        preloadTokens().then(() => {
-          onSetCurrentPage("application")
-        })
+  const createPassword = async (data: z.infer<typeof FormSchema>) => {
+    setIsLoading(true) 
+    try {
+      const isValid = await userService.createPassword(data.password)
+      if (isValid) {
+        await preloadTokens()
+        onSetCurrentPage("application")
       } else {
         toast({
           description: (
@@ -97,7 +99,15 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
           variant: "destructive"
         })
       }
-    })
+    } catch (error) {
+      console.error("Error creating password:", error)
+      toast({
+        description: t("An error occurred while creating the password."),
+        variant: "destructive"
+      })
+    } finally {
+      setIsLoading(false) 
+    }
   }
   
   const preloadTokens = async () => {
@@ -216,8 +226,8 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
               )}
             </p>
             <br />
-            <Button type="submit" variant="jelly" className="text-white">
-              {t("SETUP PASSWORD")}
+            <Button type="submit" variant="jelly" className="text-white" disabled={isLoading}>
+              {isLoading ? t("Processing...") : t("SETUP PASSWORD")}
             </Button>
           </form>
         </Form>
