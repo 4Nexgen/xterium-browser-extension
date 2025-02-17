@@ -6,10 +6,16 @@ export class PumpTokenModel {
   marketCap: number;
   price: number;
   tokenCreated: Date;
-  image_url?: string; 
-  image_url_cover?: string;
+  image_url: string; 
+  image_url_cover: string;
   network: string;
   network_id: number;
+  decimals: number;
+  symbol: string;
+  type: string; 
+
+
+  
 }
 
 export interface PumpTokenWithAssetDetails extends PumpTokenModel {
@@ -21,5 +27,6 @@ export interface PumpTokenWithAssetDetails extends PumpTokenModel {
     marketCap: number;
     minBalance: number;
     supply: number;
+    
   };
 }

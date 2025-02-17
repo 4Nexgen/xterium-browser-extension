@@ -1,77 +1,80 @@
-import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
-import { BalanceModel, SubstrateFeeModel } from '@/models/balance.model';
-import { NetworkService } from './network.service';
-import { TokenService } from './token.service';
-import { WalletService } from './wallet.service';
-import { EncryptionService } from './encryption.service';
-import type { TokenModel } from '@/models/token.model';
+import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
+import { BalanceModel, SubstrateFeeModel } from "@/models/balance.model";
+import { NetworkService } from "./network.service";
+import { TokenService } from "./token.service";
+import { WalletService } from "./wallet.service";
+import { EncryptionService } from "./encryption.service";
+import type { TokenModel } from "@/models/token.model";
 import { Storage } from "@plasmohq/storage";
 
 export class BalanceServices {
-  private networkService = new NetworkService()
-  private walletService = new WalletService()
-  private tokenService = new TokenService()
-  private encryptionService = new EncryptionService()
+  private networkService = new NetworkService();
+
+  private tokenService = new TokenService();
+  private encryptionService = new EncryptionService();
   public storage = new Storage({
     area: "local",
-    allCopied: true
-  })
+    allCopied: true,
+  });
   public balanceStorageKey = "wallet_balances";
+  private walletService: WalletService;
 
-  private api: ApiPromise = null
+  constructor(walletService: WalletService) {
+    this.walletService = walletService;
+  }
 
-  async connect(): Promise<ApiPromise | any> {
-    return new Promise(async (resolve, reject) => {
-      this.networkService.getNetwork().then(async data => {
-        let wsUrl = data.rpc
+  private api: ApiPromise = null;
 
-        if (!this.api) {
-          const wsProvider = new WsProvider(wsUrl)
-          const api = await ApiPromise.create({ provider: wsProvider })
-
-          this.api = api
-        }
-
-        resolve(this.api)
-      }).catch(error => {
-        reject(error)
-      })
-    })
+  async connect(): Promise<ApiPromise | null> {
+    if (this.api && this.api.isConnected) {
+      return this.api; // Return existing connection if available
+    }
+  
+    try {
+      const data = await this.networkService.getNetwork();
+      const wsUrl = data.rpc;
+      const wsProvider = new WsProvider(wsUrl);
+      this.api = await ApiPromise.create({ provider: wsProvider });
+      return this.api;
+    } catch (error) {
+      console.error("Failed to connect to RPC:", error);
+      throw new Error("RPC connection failed.");
+    }
   }
 
   async getBalancePerToken(public_key: string, token: TokenModel): Promise<BalanceModel> {
     return new Promise(async (resolve, reject) => {
       try {
-        await this.connect()
-
+        await this.connect();
+  
         let balance: BalanceModel = new BalanceModel();
-
         let freeBalance = 0;
         let reservedBalance = 0;
         let is_frozen = false;
-
+  
         if (token.type === "Native") {
           const accountInfo = await this.api.query.system.account(public_key);
           const { free, reserved } = (accountInfo.toJSON() as any).data;
-
+  
           freeBalance = free;
           reservedBalance = reserved;
         }
-
+  
         if (token.type === "Asset") {
-          const queryAssets = this.api.query.assets
+          const queryAssets = this.api.query.assets;
           const assetAccount = await queryAssets.account(token.network_id, public_key);
           const assetMetadata = await queryAssets.metadata(token.network_id);
-
+  
           const metadata = assetMetadata?.toHuman() as { [key: string]: any };
           is_frozen = metadata?.is_frozen || false;
-
+  
           if (assetAccount && !assetAccount.isEmpty) {
             const humanData = (assetAccount.toHuman() as { [key: string]: any })?.balance;
-            freeBalance = humanData ? parseInt(humanData.split(',').join('')) : 0;
+            freeBalance = humanData ? parseInt(humanData.split(",").join("")) : 0;
+  
           }
         }
-
+  
         balance = {
           owner: public_key,
           token,
@@ -79,14 +82,25 @@ export class BalanceServices {
           reservedBalance: reservedBalance,
           is_frozen,
         };
-
-        resolve(balance)
+  
+        console.log("[BalanceService] Retrieved balance:", balance);
+  
+        // Save the balance to storage
+        await this.saveBalance(public_key, [
+          {
+            tokenName: token.symbol,
+            freeBalance: freeBalance,
+            reservedBalance: reservedBalance,
+            is_frozen: is_frozen,
+          },
+        ]);
+  
+        resolve(balance);
       } catch (error) {
         reject(error);
       }
     });
   }
-
   async getEstimateFee(owner: string, value: number, recipient: string, balance: BalanceModel): Promise<SubstrateFeeModel> {
     return new Promise(async (resolve, reject) => {
       try {
@@ -208,18 +222,53 @@ export class BalanceServices {
     });
   }
 
-  async saveBalance(publicKey: string, balances: { publicKey: string, tokenName: string; freeBalance: number }[]): Promise<void> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const walletBalances = {
-          [publicKey]: balances 
-        };
+  async saveBalance(
+    publicKey: string,
+    balances: { tokenName: string; freeBalance: number; reservedBalance: number; is_frozen: boolean }[]
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get("wallet_balances", (data) => {
+        try {
+          const storedBalances = data.wallet_balances || {};
+          const existingBalances = storedBalances[publicKey] || [];
   
-        await this.storage.set(this.balanceStorageKey, JSON.stringify(walletBalances));
-        resolve();
-      } catch (error) {
-        reject(error);
-      }
+          // Format each balance so that freeBalance and reservedBalance are fixed to 8 decimals.
+          const formattedBalances = balances.map((b) => {
+            let free = b.freeBalance;
+            let reserved = b.reservedBalance;
+            if (isNaN(free)) free = 0;
+            if (isNaN(reserved)) reserved = 0;
+            return {
+              tokenName: b.tokenName,
+              freeBalance: parseFloat(free.toFixed(8)),
+              reservedBalance: parseFloat(reserved.toFixed(8)),
+              is_frozen: b.is_frozen,
+            };
+          });
+  
+          // Merge new balances with existing ones
+          for (const newBalance of formattedBalances) {
+            const tokenIndex = existingBalances.findIndex(
+              (b: any) => b.tokenName === newBalance.tokenName
+            );
+            if (tokenIndex > -1) {
+              existingBalances[tokenIndex] = newBalance;
+            } else {
+              existingBalances.push(newBalance);
+            }
+          }
+  
+          storedBalances[publicKey] = existingBalances;
+  
+          chrome.storage.local.set({ wallet_balances: storedBalances }, () => {
+            console.log("[BalanceService] Balances saved (formatted):", storedBalances);
+            resolve();
+          });
+        } catch (error) {
+          reject(error);
+        }
+      });
     });
+    
   }
 }

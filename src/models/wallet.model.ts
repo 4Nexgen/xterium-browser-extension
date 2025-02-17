@@ -6,6 +6,7 @@ export class WalletModel {
   mnemonic_phrase: string
   secret_key: string
   public_key: string  
-  balances: BalanceModel; 
+  balances: BalanceModel[];
+  type: string;
 }
 
