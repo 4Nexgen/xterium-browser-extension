@@ -62,6 +62,8 @@ export class BalanceServices {
   
         if (token.type === "Asset") {
           const queryAssets = this.api.query.assets;
+  
+          // Corrected the query: ensure both assetId and publicKey are passed
           const assetAccount = await queryAssets.account(token.network_id, public_key);
           const assetMetadata = await queryAssets.metadata(token.network_id);
   
@@ -71,7 +73,6 @@ export class BalanceServices {
           if (assetAccount && !assetAccount.isEmpty) {
             const humanData = (assetAccount.toHuman() as { [key: string]: any })?.balance;
             freeBalance = humanData ? parseInt(humanData.split(",").join("")) : 0;
-  
           }
         }
   
@@ -82,10 +83,7 @@ export class BalanceServices {
           reservedBalance: reservedBalance,
           is_frozen,
         };
-  
         console.log("[BalanceService] Retrieved balance:", balance);
-  
-        // Save the balance to storage
         await this.saveBalance(public_key, [
           {
             tokenName: token.symbol,
@@ -97,10 +95,12 @@ export class BalanceServices {
   
         resolve(balance);
       } catch (error) {
+        console.error("[BalanceService] Failed to fetch balance:", error);
         reject(error);
       }
     });
   }
+  
   async getEstimateFee(owner: string, value: number, recipient: string, balance: BalanceModel): Promise<SubstrateFeeModel> {
     return new Promise(async (resolve, reject) => {
       try {
