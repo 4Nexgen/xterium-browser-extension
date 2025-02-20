@@ -619,9 +619,62 @@ if (!window.xterium) {
       });
     },
     showPopup: function () {
-      console.log("[Xterium] showPopup called.");
+      if (document.getElementById("xterium-popup-overlay")) return;
+      document.body.style.overflow = "auto";
+      const overlay = document.createElement("div");
+      overlay.id = "xterium-popup-overlay";
+      overlay.style.position = "fixed";
+      overlay.style.top = "0";
+      overlay.style.left = "0";
+      overlay.style.width = "100%";
+      overlay.style.height = "100%";
+      overlay.style.backgroundColor = "rgba(0,0,0,0.0)";
+      overlay.style.zIndex = "10000";
+      overlay.style.pointerEvents = "none";
+
+      const container = document.createElement("div");
+      container.style.position = "fixed";
+      container.style.width = "450px";
+      container.style.height = "600px";
+      container.style.bottom = "20px";
+      container.style.right = "20px";
+      container.style.backgroundColor = "#fff";
+      container.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)";
+      container.style.borderRadius = "8px";
+      container.style.pointerEvents = "auto";
+      container.style.overflow = "hidden";
+
+      const closeBtn = document.createElement("button");
+      closeBtn.innerText = "X";
+      closeBtn.style.position = "absolute";
+      closeBtn.style.top = "10px";
+      closeBtn.style.right = "10px";
+      closeBtn.style.cursor = "pointer";
+      closeBtn.style.border = "none";
+      closeBtn.style.background = "transparent";
+      closeBtn.style.fontSize = "18px";
+      closeBtn.style.color = "#333";
+      closeBtn.addEventListener("click", () => {
+        document.body.removeChild(overlay);
+        document.body.style.overflow = "";
+      });
+
+      const iframe = document.createElement("iframe");
+      iframe.src = `chrome-extension://${window.xterium.extensionId}/popup.html`;
+      iframe.style.width = "100%";
+      iframe.style.height = "100%";
+      iframe.style.border = "none";
+      iframe.style.overflow = "hidden";
+
+      container.appendChild(closeBtn);
+      container.appendChild(iframe);
+      overlay.appendChild(container);
+      document.body.appendChild(overlay);
+      console.log("[Xterium] Popup overlay opened.");
     }
-  };
+
+   
+    };
 
   window.xterium.loadConnectionState();
   console.log("[Xterium] Injected Successfully!", window.xterium);
