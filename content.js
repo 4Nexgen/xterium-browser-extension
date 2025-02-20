@@ -1,19 +1,11 @@
 import { Storage } from "@plasmohq/storage";
-import { WalletService } from "./wallet.service";
-import { BalanceServices } from "./balance.service";
 
 const storage = new Storage({
   area: "local",
   allCopied: true
 });
 
-// Create instances of WalletService and BalanceServices.
-// BalanceServices requires a WalletService instance.
-const walletService = new WalletService();
-const balanceService = new BalanceServices(walletService);
-
-console.log("[Xterium] Content script loaded.");
-
+// Save balances from Plasmo Storage to Chrome Storage (unchanged logic).
 async function saveBalanceToChromeStorage() {
   try {
     const walletBalances = await storage.get("wallet_balances");
@@ -22,7 +14,6 @@ async function saveBalanceToChromeStorage() {
       console.log("[Content.js] No balances found in Plasmo Storage.");
       return;
     }
-
     let parsedBalances =
       typeof walletBalances === "string"
         ? JSON.parse(walletBalances)
@@ -38,10 +29,38 @@ async function saveBalanceToChromeStorage() {
   }
 }
 
-// Save balance when the page loads.
-saveBalanceToChromeStorage();
+// NEW: Fetch the token list from extension storage and inject it into the page's localStorage
+async function syncTokenListToPage() {
+  try {
+    const tokenList = await storage.get("token_list");
+    if (!tokenList) {
+      console.log("[Content.js] No token list found in extension storage.");
+      return;
+    }
+    console.log("[Content.js] Found token_list in extension storage:", tokenList);
 
-// Listen for window messages (e.g. for balance or wallet requests).
+    // Inject a script into the page context that writes to window.localStorage
+    const scriptContent = `
+      (function() {
+        // Write the token list into the page's localStorage
+        window.localStorage.setItem("token_list", JSON.stringify(${tokenList}));
+        console.log("[Content.js -> Injected Script] token_list stored in page localStorage.");
+      })();
+    `;
+    const scriptElement = document.createElement("script");
+    scriptElement.textContent = scriptContent;
+    (document.head || document.documentElement).appendChild(scriptElement);
+    scriptElement.remove();
+  } catch (err) {
+    console.error("[Content.js] Failed to sync token list:", err);
+  }
+}
+
+// Call our two setup functions on load
+saveBalanceToChromeStorage();
+syncTokenListToPage();
+
+// Listen for window messages (balance requests, wallet requests, transfers, etc.)
 window.addEventListener("message", async (event) => {
   if (!event.data || event.source !== window) return;
 
@@ -92,50 +111,30 @@ window.addEventListener("message", async (event) => {
       });
       break;
     }
+
+    // Listen for transfer requests from injected.js.
+    case "XTERIUM_TRANSFER_REQUEST": {
+      console.log("[Content.js] Transfer request received from injected.js:", event.data.payload);
+      // Forward the transfer request to background.js.
+      chrome.runtime.sendMessage(
+        { action: "XTERIUM_TRANSFER", payload: event.data.payload },
+        (response) => {
+          console.log("[Content.js] Transfer response from background:", response);
+          window.postMessage(
+            { type: "XTERIUM_TRANSFER_RESPONSE", ...response },
+            "*"
+          );
+        }
+      );
+      break;
+    }
   }
 });
 
-// Listen for transfer requests coming from injected.js via the runtime messaging API.
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "XTERIUM_TRANSFER") {
-    const { token, owner, recipient, value, password } = message.payload;
-    // Basic payload validation.
-    if (!token || !owner || !recipient || !value || !password) {
-      sendResponse({ error: "Invalid payload for transfer." });
-      return;
-    }
-
-    console.log(
-      `[Content.js] Received transfer request: ${value} of ${token.symbol} from ${owner} to ${recipient}`
-    );
-
-    // Call the appropriate transfer method based on token type.
-    if (token.type === "Native") {
-      balanceService
-        .transfer(owner, value, recipient, password)
-        .then((result) => {
-          console.log("[Content.js] Native transfer successful:", result);
-          sendResponse({ success: true, result: result });
-        })
-        .catch((error) => {
-          console.error("[Content.js] Native transfer failed:", error);
-          sendResponse({ error: error });
-        });
-    } else if (token.type === "Asset") {
-      balanceService
-        .transferAssets(owner, token.network_id, value, recipient, password)
-        .then((result) => {
-          console.log("[Content.js] Asset transfer successful:", result);
-          sendResponse({ success: true, result: result });
-        })
-        .catch((error) => {
-          console.error("[Content.js] Asset transfer failed:", error);
-          sendResponse({ error: error });
-        });
-    } else {
-      sendResponse({ error: "Unknown token type." });
-    }
-    // Return true to indicate we will respond asynchronously.
+    console.log("[Content.js] Transfer request received; this is now handled in background.js.");
+    sendResponse({ error: "Transfer is handled in background.js." });
     return true;
   }
 });

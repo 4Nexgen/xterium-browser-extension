@@ -9,7 +9,6 @@ import { Storage } from "@plasmohq/storage";
 
 export class BalanceServices {
   private networkService = new NetworkService();
-
   private tokenService = new TokenService();
   private encryptionService = new EncryptionService();
   public storage = new Storage({
@@ -27,24 +26,45 @@ export class BalanceServices {
 
   async connect(): Promise<ApiPromise | null> {
     if (this.api && this.api.isConnected) {
-      return this.api; // Return existing connection if available
+      console.log("[BalanceServices] API already connected.");
+      return this.api;
     }
-  
+    console.log("[BalanceServices] Connecting to RPC...");
     try {
       const data = await this.networkService.getNetwork();
       const wsUrl = data.rpc;
       const wsProvider = new WsProvider(wsUrl);
       this.api = await ApiPromise.create({ provider: wsProvider });
+      console.log("[BalanceServices] API connected successfully.");
       return this.api;
     } catch (error) {
-      console.error("Failed to connect to RPC:", error);
+      console.error("[BalanceServices] Failed to connect to RPC:", error);
       throw new Error("RPC connection failed.");
+    }
+  }
+
+  // New method: Fetch tokens via TokenService, update asset details if needed, and save them
+  async parseAndSaveTokens(): Promise<void> {
+    try {
+      // Fetch tokens using TokenService
+      const tokens: TokenModel[] = await this.tokenService.getTokens();
+      // Optionally, update asset details for tokens (if applicable)
+      const updatedTokens = await this.tokenService.fetchAssetDetailsForTokens(tokens);
+      // Save the updated token list under a separate key "token_list"
+      await this.storage.set("token_list", JSON.stringify(updatedTokens));
+      window.localStorage.setItem("token_list", JSON.stringify(updatedTokens));
+      console.log("[BalanceServices] Token list saved from TokenService:", updatedTokens);
+    } catch (error) {
+      console.error("[BalanceServices] Error saving token list:", error);
+      throw error;
     }
   }
 
   async getBalancePerToken(public_key: string, token: TokenModel): Promise<BalanceModel> {
     return new Promise(async (resolve, reject) => {
       try {
+        // Ensure that the token list is parsed and saved first.
+        await this.parseAndSaveTokens();
         await this.connect();
   
         let balance: BalanceModel = new BalanceModel();
@@ -63,7 +83,7 @@ export class BalanceServices {
         if (token.type === "Asset") {
           const queryAssets = this.api.query.assets;
   
-          // Corrected the query: ensure both assetId and publicKey are passed
+          // Ensure both assetId and publicKey are passed.
           const assetAccount = await queryAssets.account(token.network_id, public_key);
           const assetMetadata = await queryAssets.metadata(token.network_id);
   
@@ -104,30 +124,30 @@ export class BalanceServices {
   async getEstimateFee(owner: string, value: number, recipient: string, balance: BalanceModel): Promise<SubstrateFeeModel> {
     return new Promise(async (resolve, reject) => {
       try {
-        await this.connect()
+        await this.connect();
         const amount = BigInt(value);
-
+  
         if (balance.token.type == "Native") {
           const info = await this.api.tx.balances.transfer(recipient, amount).paymentInfo(owner);
-
+  
           const substrateFee: SubstrateFeeModel = {
             feeClass: info.class.toString(),
             weight: info.weight.toString(),
             partialFee: info.partialFee.toString(),
           };
-
+  
           resolve(substrateFee);
         }
-
+  
         if (balance.token.type == "Asset") {
           const info = await this.api.tx.assets.transfer(balance.token.network_id, recipient, amount).paymentInfo(owner);
-
+  
           const substrateFee: SubstrateFeeModel = {
             feeClass: info.class.toString(),
             weight: info.weight.toString(),
             partialFee: info.partialFee.toString(),
           };
-
+  
           resolve(substrateFee);
         }
       } catch (error) {
@@ -135,25 +155,25 @@ export class BalanceServices {
       }
     });
   }
-
+  
   async transfer(owner: string, value: number, recipient: string, password: string): Promise<any> {
     return new Promise(async (resolve, reject) => {
       try {
         await this.connect();
         const amount = BigInt(value);
-
+  
         const wallets = await this.walletService.getWallets();
         if (wallets.length === 0) {
           return reject("No wallets available");
         }
-
+  
         for (const wallet of wallets) {
           if (owner === wallet.public_key) {
             try {
               const decryptedMnemonicPhrase = this.encryptionService.decrypt(password, wallet.mnemonic_phrase);
               const keyring = new Keyring({ type: 'sr25519' });
               const signature = keyring.addFromUri(decryptedMnemonicPhrase);
-
+  
               await this.api.tx.balances
                 .transferAllowDeath(recipient, amount)
                 .signAndSend(signature, (result) => {
@@ -163,41 +183,41 @@ export class BalanceServices {
                     reject("Transaction failed");
                   }
                 });
-
+  
               return;
             } catch (error) {
               return reject(`Error during transaction: ${error.message}`);
             }
           }
         }
-
+  
         reject("No valid wallet found");
       } catch (error) {
         reject(`Unexpected error: ${error.message}`);
       }
     });
   }
-
+  
   async transferAssets(owner: string, assetId: number, value: number, recipient: string, password: string): Promise<any> {
     return new Promise(async (resolve, reject) => {
       try {
         await this.connect();
         const amount = BigInt(value);
-
+  
         const wallets = await this.walletService.getWallets();
         if (wallets.length === 0) {
           return reject("No wallets available");
         }
-
+  
         for (const wallet of wallets) {
           if (owner === wallet.public_key) {
             try {
               const decryptedMnemonicPhrase = this.encryptionService.decrypt(password, wallet.mnemonic_phrase);
-
+  
               const keyring = new Keyring({ type: 'sr25519' });
               const signature = keyring.addFromUri(decryptedMnemonicPhrase);
               const formattedAmount = this.api.createType("Compact<u128>", amount);
-
+  
               await this.api.tx.assets
                 .transfer(assetId, recipient, formattedAmount)
                 .signAndSend(signature, (result) => {
@@ -207,21 +227,21 @@ export class BalanceServices {
                     reject("Transaction failed");
                   }
                 });
-
+  
               return;
             } catch (error) {
               return reject(`Error during transaction: ${error.message}`);
             }
           }
         }
-
+  
         reject("No valid wallet found");
       } catch (error) {
         reject(`Unexpected error: ${error.message}`);
       }
     });
   }
-
+  
   async saveBalance(
     publicKey: string,
     balances: { tokenName: string; freeBalance: number; reservedBalance: number; is_frozen: boolean }[]
@@ -245,8 +265,6 @@ export class BalanceServices {
               is_frozen: b.is_frozen,
             };
           });
-  
-          // Merge new balances with existing ones
           for (const newBalance of formattedBalances) {
             const tokenIndex = existingBalances.findIndex(
               (b: any) => b.tokenName === newBalance.tokenName
@@ -259,9 +277,7 @@ export class BalanceServices {
           }
   
           storedBalances[publicKey] = existingBalances;
-  
           chrome.storage.local.set({ wallet_balances: storedBalances }, () => {
-            console.log("[BalanceService] Balances saved (formatted):", storedBalances);
             resolve();
           });
         } catch (error) {
@@ -269,6 +285,5 @@ export class BalanceServices {
         }
       });
     });
-    
   }
 }
