@@ -1,289 +1,312 @@
-import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
-import { BalanceModel, SubstrateFeeModel } from "@/models/balance.model";
-import { NetworkService } from "./network.service";
-import { TokenService } from "./token.service";
-import { WalletService } from "./wallet.service";
-import { EncryptionService } from "./encryption.service";
-import type { TokenModel } from "@/models/token.model";
-import { Storage } from "@plasmohq/storage";
+import { BalanceModel, SubstrateFeeModel } from "@/models/balance.model"
+import type { TokenModel } from "@/models/token.model"
+import { ApiPromise, Keyring, WsProvider } from "@polkadot/api"
+import { Storage } from "@plasmohq/storage"
+import { EncryptionService } from "./encryption.service"
+import { NetworkService } from "./network.service"
+import { TokenService } from "./token.service"
+import { WalletService } from "./wallet.service"
 
 export class BalanceServices {
-  private networkService = new NetworkService();
-  private tokenService = new TokenService();
-  private encryptionService = new EncryptionService();
+  private networkService = new NetworkService()
+  private tokenService = new TokenService()
+  private encryptionService = new EncryptionService()
   public storage = new Storage({
     area: "local",
-    allCopied: true,
-  });
-  public balanceStorageKey = "wallet_balances";
-  private walletService: WalletService;
+    allCopied: true
+  })
+  public balanceStorageKey = "wallet_balances"
+  private walletService: WalletService
 
   constructor(walletService: WalletService) {
-    this.walletService = walletService;
+    this.walletService = walletService
   }
 
-  private api: ApiPromise = null;
+  private api: ApiPromise = null
 
   async connect(): Promise<ApiPromise | null> {
     if (this.api && this.api.isConnected) {
-      console.log("[BalanceServices] API already connected.");
-      return this.api;
+      console.log("[BalanceServices] API already connected.")
+      return this.api
     }
-    console.log("[BalanceServices] Connecting to RPC...");
+    console.log("[BalanceServices] Connecting to RPC...")
     try {
-      const data = await this.networkService.getNetwork();
-      const wsUrl = data.rpc;
-      const wsProvider = new WsProvider(wsUrl);
-      this.api = await ApiPromise.create({ provider: wsProvider });
-      console.log("[BalanceServices] API connected successfully.");
-      return this.api;
+      const data = await this.networkService.getNetwork()
+      const wsUrl = data.rpc
+      const wsProvider = new WsProvider(wsUrl)
+      this.api = await ApiPromise.create({ provider: wsProvider })
+      console.log("[BalanceServices] API connected successfully.")
+      return this.api
     } catch (error) {
-      console.error("[BalanceServices] Failed to connect to RPC:", error);
-      throw new Error("RPC connection failed.");
+      console.error("[BalanceServices] Failed to connect to RPC:", error)
+      throw new Error("RPC connection failed.")
     }
   }
-
-  // New method: Fetch tokens via TokenService, update asset details if needed, and save them
   async parseAndSaveTokens(): Promise<void> {
     try {
-      // Fetch tokens using TokenService
-      const tokens: TokenModel[] = await this.tokenService.getTokens();
-      // Optionally, update asset details for tokens (if applicable)
-      const updatedTokens = await this.tokenService.fetchAssetDetailsForTokens(tokens);
-      // Save the updated token list under a separate key "token_list"
-      await this.storage.set("token_list", JSON.stringify(updatedTokens));
-      window.localStorage.setItem("token_list", JSON.stringify(updatedTokens));
-      console.log("[BalanceServices] Token list saved from TokenService:", updatedTokens);
+      const tokens: TokenModel[] = await this.tokenService.getTokens()
+      const updatedTokens = await this.tokenService.fetchAssetDetailsForTokens(tokens)
+      await this.storage.set("token_list", JSON.stringify(updatedTokens))
+      window.localStorage.setItem("token_list", JSON.stringify(updatedTokens))
+      console.log("[BalanceServices] Token list saved from TokenService:", updatedTokens)
     } catch (error) {
-      console.error("[BalanceServices] Error saving token list:", error);
-      throw error;
+      console.error("[BalanceServices] Error saving token list:", error)
+      throw error
     }
   }
 
   async getBalancePerToken(public_key: string, token: TokenModel): Promise<BalanceModel> {
     return new Promise(async (resolve, reject) => {
       try {
-        // Ensure that the token list is parsed and saved first.
-        await this.parseAndSaveTokens();
-        await this.connect();
-  
-        let balance: BalanceModel = new BalanceModel();
-        let freeBalance = 0;
-        let reservedBalance = 0;
-        let is_frozen = false;
-  
+// token list is parsed and saved first.
+        await this.parseAndSaveTokens()
+        await this.connect()
+
+        let balance: BalanceModel = new BalanceModel()
+        let freeBalance = 0
+        let reservedBalance = 0
+        let is_frozen = false
+
         if (token.type === "Native") {
-          const accountInfo = await this.api.query.system.account(public_key);
-          const { free, reserved } = (accountInfo.toJSON() as any).data;
-  
-          freeBalance = free;
-          reservedBalance = reserved;
+          const accountInfo = await this.api.query.system.account(public_key)
+          const { free, reserved } = (accountInfo.toJSON() as any).data
+
+          freeBalance = free
+          reservedBalance = reserved
         }
-  
+
         if (token.type === "Asset") {
-          const queryAssets = this.api.query.assets;
-  
-          // Ensure both assetId and publicKey are passed.
-          const assetAccount = await queryAssets.account(token.network_id, public_key);
-          const assetMetadata = await queryAssets.metadata(token.network_id);
-  
-          const metadata = assetMetadata?.toHuman() as { [key: string]: any };
-          is_frozen = metadata?.is_frozen || false;
-  
+          const queryAssets = this.api.query.assets
+
+          const assetAccount = await queryAssets.account(token.network_id, public_key)
+          const assetMetadata = await queryAssets.metadata(token.network_id)
+
+          const metadata = assetMetadata?.toHuman() as { [key: string]: any }
+          is_frozen = metadata?.is_frozen || false
+
           if (assetAccount && !assetAccount.isEmpty) {
-            const humanData = (assetAccount.toHuman() as { [key: string]: any })?.balance;
-            freeBalance = humanData ? parseInt(humanData.split(",").join("")) : 0;
+            const humanData = (assetAccount.toHuman() as { [key: string]: any })?.balance
+            freeBalance = humanData ? parseInt(humanData.split(",").join("")) : 0
           }
         }
-  
+
         balance = {
           owner: public_key,
           token,
           freeBalance: freeBalance,
           reservedBalance: reservedBalance,
-          is_frozen,
-        };
-        console.log("[BalanceService] Retrieved balance:", balance);
+          is_frozen
+        }
+        console.log("[BalanceService] Retrieved balance:", balance)
         await this.saveBalance(public_key, [
           {
             tokenName: token.symbol,
             freeBalance: freeBalance,
             reservedBalance: reservedBalance,
-            is_frozen: is_frozen,
-          },
-        ]);
-  
-        resolve(balance);
+            is_frozen: is_frozen
+          }
+        ])
+
+        resolve(balance)
       } catch (error) {
-        console.error("[BalanceService] Failed to fetch balance:", error);
-        reject(error);
+        console.error("[BalanceService] Failed to fetch balance:", error)
+        reject(error)
       }
-    });
+    })
   }
-  
-  async getEstimateFee(owner: string, value: number, recipient: string, balance: BalanceModel): Promise<SubstrateFeeModel> {
+
+  async getEstimateFee(
+    owner: string,
+    value: number,
+    recipient: string,
+    balance: BalanceModel
+  ): Promise<SubstrateFeeModel> {
     return new Promise(async (resolve, reject) => {
       try {
-        await this.connect();
-        const amount = BigInt(value);
-  
+        await this.connect()
+        const amount = BigInt(value)
+
         if (balance.token.type == "Native") {
-          const info = await this.api.tx.balances.transfer(recipient, amount).paymentInfo(owner);
-  
+          const info = await this.api.tx.balances
+            .transfer(recipient, amount)
+            .paymentInfo(owner)
+
           const substrateFee: SubstrateFeeModel = {
             feeClass: info.class.toString(),
             weight: info.weight.toString(),
-            partialFee: info.partialFee.toString(),
-          };
-  
-          resolve(substrateFee);
+            partialFee: info.partialFee.toString()
+          }
+
+          resolve(substrateFee)
         }
-  
+
         if (balance.token.type == "Asset") {
-          const info = await this.api.tx.assets.transfer(balance.token.network_id, recipient, amount).paymentInfo(owner);
-  
+          const info = await this.api.tx.assets
+            .transfer(balance.token.network_id, recipient, amount)
+            .paymentInfo(owner)
+
           const substrateFee: SubstrateFeeModel = {
             feeClass: info.class.toString(),
             weight: info.weight.toString(),
-            partialFee: info.partialFee.toString(),
-          };
-  
-          resolve(substrateFee);
+            partialFee: info.partialFee.toString()
+          }
+
+          resolve(substrateFee)
         }
       } catch (error) {
-        reject(error);
+        reject(error)
       }
-    });
+    })
   }
-  
-  async transfer(owner: string, value: number, recipient: string, password: string): Promise<any> {
+
+  async transfer(
+    owner: string,
+    value: number,
+    recipient: string,
+    password: string
+  ): Promise<any> {
     return new Promise(async (resolve, reject) => {
       try {
-        await this.connect();
-        const amount = BigInt(value);
-  
-        const wallets = await this.walletService.getWallets();
+        await this.connect()
+        const amount = BigInt(value)
+
+        const wallets = await this.walletService.getWallets()
         if (wallets.length === 0) {
-          return reject("No wallets available");
+          return reject("No wallets available")
         }
-  
+
         for (const wallet of wallets) {
           if (owner === wallet.public_key) {
             try {
-              const decryptedMnemonicPhrase = this.encryptionService.decrypt(password, wallet.mnemonic_phrase);
-              const keyring = new Keyring({ type: 'sr25519' });
-              const signature = keyring.addFromUri(decryptedMnemonicPhrase);
-  
+              const decryptedMnemonicPhrase = this.encryptionService.decrypt(
+                password,
+                wallet.mnemonic_phrase
+              )
+              const keyring = new Keyring({ type: "sr25519" })
+              const signature = keyring.addFromUri(decryptedMnemonicPhrase)
+
               await this.api.tx.balances
                 .transferAllowDeath(recipient, amount)
                 .signAndSend(signature, (result) => {
                   if (result.status.isFinalized) {
-                    resolve(true);
+                    resolve(true)
                   } else if (result.isError) {
-                    reject("Transaction failed");
+                    reject("Transaction failed")
                   }
-                });
-  
-              return;
+                })
+
+              return
             } catch (error) {
-              return reject(`Error during transaction: ${error.message}`);
+              return reject(`Error during transaction: ${error.message}`)
             }
           }
         }
-  
-        reject("No valid wallet found");
+
+        reject("No valid wallet found")
       } catch (error) {
-        reject(`Unexpected error: ${error.message}`);
+        reject(`Unexpected error: ${error.message}`)
       }
-    });
+    })
   }
-  
-  async transferAssets(owner: string, assetId: number, value: number, recipient: string, password: string): Promise<any> {
+
+  async transferAssets(
+    owner: string,
+    assetId: number,
+    value: number,
+    recipient: string,
+    password: string
+  ): Promise<any> {
     return new Promise(async (resolve, reject) => {
       try {
-        await this.connect();
-        const amount = BigInt(value);
-  
-        const wallets = await this.walletService.getWallets();
+        await this.connect()
+        const amount = BigInt(value)
+
+        const wallets = await this.walletService.getWallets()
         if (wallets.length === 0) {
-          return reject("No wallets available");
+          return reject("No wallets available")
         }
-  
+
         for (const wallet of wallets) {
           if (owner === wallet.public_key) {
             try {
-              const decryptedMnemonicPhrase = this.encryptionService.decrypt(password, wallet.mnemonic_phrase);
-  
-              const keyring = new Keyring({ type: 'sr25519' });
-              const signature = keyring.addFromUri(decryptedMnemonicPhrase);
-              const formattedAmount = this.api.createType("Compact<u128>", amount);
-  
+              const decryptedMnemonicPhrase = this.encryptionService.decrypt(
+                password,
+                wallet.mnemonic_phrase
+              )
+
+              const keyring = new Keyring({ type: "sr25519" })
+              const signature = keyring.addFromUri(decryptedMnemonicPhrase)
+              const formattedAmount = this.api.createType("Compact<u128>", amount)
+
               await this.api.tx.assets
                 .transfer(assetId, recipient, formattedAmount)
                 .signAndSend(signature, (result) => {
                   if (result.status.isFinalized) {
-                    resolve(true);
+                    resolve(true)
                   } else if (result.isError) {
-                    reject("Transaction failed");
+                    reject("Transaction failed")
                   }
-                });
-  
-              return;
+                })
+
+              return
             } catch (error) {
-              return reject(`Error during transaction: ${error.message}`);
+              return reject(`Error during transaction: ${error.message}`)
             }
           }
         }
-  
-        reject("No valid wallet found");
+
+        reject("No valid wallet found")
       } catch (error) {
-        reject(`Unexpected error: ${error.message}`);
+        reject(`Unexpected error: ${error.message}`)
       }
-    });
+    })
   }
-  
+
   async saveBalance(
     publicKey: string,
-    balances: { tokenName: string; freeBalance: number; reservedBalance: number; is_frozen: boolean }[]
+    balances: {
+      tokenName: string
+      freeBalance: number
+      reservedBalance: number
+      is_frozen: boolean
+    }[]
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       chrome.storage.local.get("wallet_balances", (data) => {
         try {
-          const storedBalances = data.wallet_balances || {};
-          const existingBalances = storedBalances[publicKey] || [];
-  
-          // Format each balance so that freeBalance and reservedBalance are fixed to 8 decimals.
+          const storedBalances = data.wallet_balances || {}
+          const existingBalances = storedBalances[publicKey] || []
           const formattedBalances = balances.map((b) => {
-            let free = b.freeBalance;
-            let reserved = b.reservedBalance;
-            if (isNaN(free)) free = 0;
-            if (isNaN(reserved)) reserved = 0;
+            let free = b.freeBalance
+            let reserved = b.reservedBalance
+            if (isNaN(free)) free = 0
+            if (isNaN(reserved)) reserved = 0
             return {
               tokenName: b.tokenName,
               freeBalance: parseFloat(free.toFixed(8)),
               reservedBalance: parseFloat(reserved.toFixed(8)),
-              is_frozen: b.is_frozen,
-            };
-          });
+              is_frozen: b.is_frozen
+            }
+          })
           for (const newBalance of formattedBalances) {
             const tokenIndex = existingBalances.findIndex(
               (b: any) => b.tokenName === newBalance.tokenName
-            );
+            )
             if (tokenIndex > -1) {
-              existingBalances[tokenIndex] = newBalance;
+              existingBalances[tokenIndex] = newBalance
             } else {
-              existingBalances.push(newBalance);
+              existingBalances.push(newBalance)
             }
           }
-  
-          storedBalances[publicKey] = existingBalances;
+
+          storedBalances[publicKey] = existingBalances
           chrome.storage.local.set({ wallet_balances: storedBalances }, () => {
-            resolve();
-          });
+            resolve()
+          })
         } catch (error) {
-          reject(error);
+          reject(error)
         }
-      });
-    });
+      })
+    })
   }
 }

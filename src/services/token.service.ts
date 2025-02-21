@@ -1,11 +1,10 @@
 import { TokenModel } from "@/models/token.model"
-import { Storage } from "@plasmohq/storage"
 import { ApiPromise, WsProvider } from "@polkadot/api"
+import { Storage } from "@plasmohq/storage"
 import { NetworkService } from "./network.service"
-
 export class TokenService {
   private storage = new Storage({
-    area: 'local',
+    area: "local",
     allCopied: true
   })
   private storageKey = "tokens"
@@ -44,7 +43,7 @@ export class TokenService {
         const existingTokens = await this.storage.get<string>(this.storageKey)
         const tokens: TokenModel[] = existingTokens ? JSON.parse(existingTokens) : []
 
-        const lastId = tokens.length > 0 ? tokens[tokens.length - 1].id : 0;
+        const lastId = tokens.length > 0 ? tokens[tokens.length - 1].id : 0
         data.id = lastId + 1
 
         tokens.push(data)
@@ -99,44 +98,47 @@ export class TokenService {
 
   async getAssetDetails(assetId: string): Promise<any> {
     if (!this.api) {
-      await this.connect();
+      await this.connect()
     }
 
-    const assetIdNumber = Number(assetId);
+    const assetIdNumber = Number(assetId)
     if (isNaN(assetIdNumber) || assetIdNumber < 0 || assetIdNumber > 2 ** 32 - 1) {
-      throw new Error("Invalid assetId. Must be a valid u32.");
+      throw new Error("Invalid assetId. Must be a valid u32.")
     }
 
-    const metadata = await this.api.query.assets.metadata(assetIdNumber);
-    const metadataDetails = metadata.toHuman() as { [key: string]: any };
+    const metadata = await this.api.query.assets.metadata(assetIdNumber)
+    const metadataDetails = metadata.toHuman() as { [key: string]: any }
 
     return {
       assetId: assetIdNumber,
       name: metadataDetails.name || "N/A",
       symbol: metadataDetails.symbol || "N/A",
       metadataDetails
-    };
+    }
   }
 
   async fetchAssetDetailsForTokens(tokens: TokenModel[]): Promise<TokenModel[]> {
-    const updatedTokens = [...tokens];
-  
+    const updatedTokens = [...tokens]
+
     for (let token of updatedTokens) {
-      if (token.network_id >= 1 && token.network_id <= 9) { 
+      if (token.network_id >= 1 && token.network_id <= 9) {
         try {
-          const assetDetails = await this.getAssetDetails(token.network_id.toString());
-          token.description = assetDetails.name;
-          token.symbol = assetDetails.symbol;
-          token.assetId = assetDetails.assetId; 
+          const assetDetails = await this.getAssetDetails(token.network_id.toString())
+          token.description = assetDetails.name
+          token.symbol = assetDetails.symbol
+          token.assetId = assetDetails.assetId
         } catch (error) {
-          console.error(`Failed to fetch details for token with network_id ${token.network_id}:`, error);
+          console.error(
+            `Failed to fetch details for token with network_id ${token.network_id}:`,
+            error
+          )
         }
       }
     }
 
-    await this.storage.set(this.storageKey, JSON.stringify(updatedTokens));
-  
-    return updatedTokens;
+    await this.storage.set(this.storageKey, JSON.stringify(updatedTokens))
+
+    return updatedTokens
   }
 
   async updateToken(id: number, data: TokenModel): Promise<string> {

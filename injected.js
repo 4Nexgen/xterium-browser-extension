@@ -272,7 +272,6 @@ if (!window.xterium) {
           window.removeEventListener("message", handleTokenListResponse);
           const tokenData = event.data.tokenList || [];
           console.log("[Injected.js] Token list from extension storage:", tokenData);
-          // Store token data globally for token detection
           window._xteriumTokenData = tokenData;
           createTransferUI(tokenData);
         };
@@ -471,7 +470,7 @@ if (!window.xterium) {
                   recipientVal,
                   { token: tokenObj }
                 );
-                // Format the fee using fixBalance and display only the total fee.
+               
                 const fixedFee = window.xterium.fixBalance(fee.partialFee, 12);
                 feeDisplay.innerText = `Estimated Fee: ${fixedFee}`;
               } catch (error) {
@@ -492,7 +491,7 @@ if (!window.xterium) {
               token: tokenValue,
               recipient: recipientValue,
               value: valueValue,
-              password: "****", // Do not log the actual password
+              password: "****", 
               detected: detectedInfo.innerText
             });
             let foundToken = window._xteriumTokenData.find(
@@ -672,7 +671,7 @@ if (!window.xterium) {
       document.body.appendChild(overlay);
       console.log("[Xterium] Popup overlay opened.");
     }
-
+   
    
     };
 
