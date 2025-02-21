@@ -13,13 +13,14 @@
       {
         "matches": ["<all_urls>"],
         "js": ["content.js"],
-        "run_at": "document_start"
+        "run_at": "document_start",
+        "css": ["assets/covers/bg-inside.png"]
       
       }
     ],
     "web_accessible_resources": [
       {
-        "resources": ["injected.js", "popup.html"],
+        "resources": ["injected.js", "popup.html", "assets/covers/bg-inside.png"],
         "matches": ["<all_urls>"]
       }
     ],
