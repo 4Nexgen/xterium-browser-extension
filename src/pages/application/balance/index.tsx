@@ -41,7 +41,7 @@ const IndexBalance = () => {
   const networkService = new NetworkService()
   const walletService = new WalletService()
   const tokenService = new TokenService()
-  const balanceService = new BalanceServices()
+  const balanceService = new BalanceServices(walletService)
 
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
   const [openWallets, setOpenWallets] = useState<boolean>(false)

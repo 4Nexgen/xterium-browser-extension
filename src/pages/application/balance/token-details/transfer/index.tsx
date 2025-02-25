@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast"
 import type { BalanceModel } from "@/models/balance.model"
 import { BalanceServices } from "@/services/balance.service"
 import { UserService } from "@/services/user.service"
+import { WalletService } from "@/services/wallet.service"
 import { Check, X } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -13,7 +14,8 @@ import { useTranslation } from "react-i18next"
 const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
   const { t } = useTranslation()
   const userService = new UserService()
-  const balanceService = new BalanceServices()
+  const walletService = new WalletService()
+  const balanceService = new BalanceServices(walletService)
   const [balanceData, setBalanceData] = useState<BalanceModel>(selectedBalance)
   const [quantity, setQuantity] = useState<number>(0)
   const [transferTo, setTransferTo] = useState<string>("")

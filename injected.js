@@ -1,6 +1,6 @@
 function formatWalletAddress(address) {
-  if (address.length <= 10) return address; // If address is too short, no need to truncate
-  return address.slice(0, 6) + "........" + address.slice(-6);
+  if (address.length <= 10) return address // If address is too short, no need to truncate
+  return address.slice(0, 6) + "........" + address.slice(-6)
 }
 
 if (!window.xterium) {
@@ -97,56 +97,55 @@ if (!window.xterium) {
         }
       })
     },
-    
+
     showConnectPrompt: function (wallets) {
       return new Promise((resolve, reject) => {
-        const overlay = document.createElement("div");
-        overlay.id = "wallet-connect-overlay";
-        overlay.classList.add("wallet-overlay");
-    
-        const container = document.createElement("div");
-        container.classList.add("wallet-container");
-    
-        const header = document.createElement("div");
-        header.classList.add("wallet-header");
-        header.innerText = "Connect Your Wallet";
-    
-        const description = document.createElement("p");
-        description.classList.add("wallet-description");
-        description.innerText = "Choose a wallet to proceed:";
-    
-        const walletList = document.createElement("div");
-        walletList.classList.add("wallet-list");
-    
+        const overlay = document.createElement("div")
+        overlay.id = "wallet-connect-overlay"
+        overlay.classList.add("wallet-overlay")
+
+        const container = document.createElement("div")
+        container.classList.add("wallet-container")
+
+        const header = document.createElement("div")
+        header.classList.add("wallet-header")
+        header.innerText = "Connect Your Wallet"
+
+        const description = document.createElement("p")
+        description.classList.add("wallet-description")
+        description.innerText = "Choose a wallet to proceed:"
+
+        const walletList = document.createElement("div")
+        walletList.classList.add("wallet-list")
+
         wallets.forEach((wallet) => {
-          const walletButton = document.createElement("button");
-          walletButton.classList.add("wallet-button");
-          walletButton.innerText = formatWalletAddress(wallet.public_key);
+          const walletButton = document.createElement("button")
+          walletButton.classList.add("wallet-button")
+          walletButton.innerText = formatWalletAddress(wallet.public_key)
           walletButton.addEventListener("click", () => {
-            document.body.removeChild(overlay);
-            window.xterium.showSuccessMessage(wallet);
-            resolve(wallet);
-          });
-          walletList.appendChild(walletButton);
-        });
-    
-        const cancelButton = document.createElement("button");
-        cancelButton.classList.add("wallet-cancel-button");
-        cancelButton.innerText = "Cancel";
+            document.body.removeChild(overlay)
+            window.xterium.showSuccessMessage(wallet)
+            resolve(wallet)
+          })
+          walletList.appendChild(walletButton)
+        })
+
+        const cancelButton = document.createElement("button")
+        cancelButton.classList.add("wallet-cancel-button")
+        cancelButton.innerText = "Cancel"
         cancelButton.addEventListener("click", () => {
-          document.body.removeChild(overlay);
-          reject("User cancelled wallet connection.");
-        });
-    
-        container.appendChild(header);
-        container.appendChild(description);
-        container.appendChild(walletList);
-        container.appendChild(cancelButton);
-        overlay.appendChild(container);
-        document.body.appendChild(overlay);
-      });
+          document.body.removeChild(overlay)
+          reject("User cancelled wallet connection.")
+        })
+
+        container.appendChild(header)
+        container.appendChild(description)
+        container.appendChild(walletList)
+        container.appendChild(cancelButton)
+        overlay.appendChild(container)
+        document.body.appendChild(overlay)
+      })
     },
-    
     getBalance: function (publicKey) {
       return new Promise((resolve, reject) => {
         if (!window.xterium.isConnected || !window.xterium.connectedWallet) {
@@ -174,8 +173,12 @@ if (!window.xterium) {
           if (event.data.balance !== null) {
             try {
               let balanceData = event.data.balance
-              if (typeof balanceData === "string") balanceData = JSON.parse(balanceData)
+              // Parse the balance if it is a string
+              if (typeof balanceData === "string") {
+                balanceData = JSON.parse(balanceData)
+              }
               let fixedBalance
+              // If the balance is an array, map through each token balance
               if (Array.isArray(balanceData)) {
                 fixedBalance = balanceData.map((item) => ({
                   tokenName: item.tokenName,
@@ -183,7 +186,23 @@ if (!window.xterium) {
                   reservedBalance: window.xterium.fixBalance(item.reservedBalance, 12),
                   is_frozen: item.is_frozen
                 }))
+              }
+              // If the balance is an object, convert it to an array of balance objects
+              else if (typeof balanceData === "object") {
+                fixedBalance = Object.keys(balanceData).map((token) => ({
+                  tokenName: token,
+                  freeBalance: window.xterium.fixBalance(
+                    balanceData[token].freeBalance,
+                    12
+                  ),
+                  reservedBalance: window.xterium.fixBalance(
+                    balanceData[token].reservedBalance,
+                    12
+                  ),
+                  is_frozen: balanceData[token].is_frozen
+                }))
               } else {
+                // If it's just a numeric value, apply fixBalance directly
                 fixedBalance = window.xterium.fixBalance(balanceData, 12)
               }
               console.log(`[Injected.js] Balance for ${publicKey} (fixed):`, fixedBalance)
@@ -202,9 +221,13 @@ if (!window.xterium) {
         window.postMessage({ type: "XTERIUM_GET_BALANCE", publicKey }, "*")
       })
     },
-
     transferInternal: function (token, recipient, value, password) {
       return new Promise((resolve, reject) => {
+        if (!window.xterium.isConnected || !window.xterium.connectedWallet) {
+          reject("No wallet connected. Please connect your wallet first.")
+          return
+        }
+
         if (!token) {
           reject("Token parameter is required.")
           return
@@ -221,59 +244,174 @@ if (!window.xterium) {
           reject("Password is required.")
           return
         }
-        if (!window.xterium.isConnected || !window.xterium.connectedWallet) {
-          reject("No wallet connected.")
-          return
-        }
+
         const owner = window.xterium.connectedWallet.public_key
-        console.log(
-          `[Injected.js] Initiating transfer of ${value} for token ${token.symbol} from ${owner} to ${recipient}`
-        )
 
-        function handleTransferResponse(event) {
-          if (event.source !== window || !event.data) return
-          if (event.data.type === "XTERIUM_TRANSFER_RESPONSE") {
-            window.removeEventListener("message", handleTransferResponse)
-            if (event.data.error) {
-              reject(event.data.error)
-            } else {
-              resolve(event.data.response)
+        // Check balance before proceeding with the transfer
+        window.xterium
+          .getBalance(owner)
+          .then((balances) => {
+            const userBalance = balances.find((b) => b.tokenName === token.symbol)
+            if (!userBalance || userBalance.freeBalance < Number(value)) {
+              reject(
+                `Insufficient balance. Your available balance is ${userBalance ? userBalance.freeBalance : 0} ${token.symbol}.`
+              )
+              return
             }
-          }
-        }
 
-        window.addEventListener("message", handleTransferResponse)
-        window.postMessage(
-          {
-            type: "XTERIUM_TRANSFER_REQUEST",
-            payload: { token, owner, recipient, value, password }
-          },
-          "*"
-        )
+            console.log(
+              `[Injected.js] Initiating transfer of ${value} ${token.symbol} from ${owner} to ${recipient}`
+            )
+
+            function handleTransferResponse(event) {
+              if (event.source !== window || !event.data) return
+              if (event.data.type === "XTERIUM_TRANSFER_RESPONSE") {
+                window.removeEventListener("message", handleTransferResponse)
+                if (event.data.error) {
+                  reject(event.data.error)
+                } else {
+                  console.log(
+                    "[Injected.js] Transfer successful. Fetching updated balance..."
+                  )
+                  window.xterium
+                    .getBalance(owner)
+                    .then((updatedBalance) => {
+                      console.log("[Injected.js] Updated balance:", updatedBalance)
+                      window.postMessage(
+                        { type: "XTERIUM_REFRESH_BALANCE", publicKey: owner },
+                        "*"
+                      )
+                      resolve(event.data.response)
+                    })
+                    .catch((balanceErr) => {
+                      console.error(
+                        "[Injected.js] Error fetching updated balance:",
+                        balanceErr
+                      )
+                      reject(balanceErr)
+                    })
+                }
+              }
+            }
+
+            window.addEventListener("message", handleTransferResponse)
+            window.postMessage(
+              {
+                type: "XTERIUM_TRANSFER_REQUEST",
+                payload: { token, owner, recipient, value, password }
+              },
+              "*"
+            )
+          })
+          .catch((err) => {
+            reject(`Failed to fetch balance: ${err}`)
+          })
       })
     },
-
     transfer: function (token, recipient, value, password) {
       if (arguments.length === 0) {
         return window.xterium.showTransferUI()
       } else {
-        return window.xterium.transferInternal(token, recipient, value, password)
+        let tokenSymbol = typeof token === "string" ? token.trim() : token.symbol
+        let tokenObj = { symbol: tokenSymbol, type: "Native" }
+        let detectedInfo = "Detected as: Native (default)"
+
+        if (window._xteriumTokenData) {
+          const foundToken = window._xteriumTokenData.find(
+            (t) => t.symbol.toUpperCase() === tokenSymbol.toUpperCase()
+          )
+          if (foundToken) {
+            if (foundToken.type === "Asset") {
+              detectedInfo = `Detected as: Asset on ${foundToken.network} (Network ID: ${foundToken.network_id})`
+            } else {
+              detectedInfo = `Detected as: Native${foundToken.network ? ` on ${foundToken.network}` : " (default)"}`
+            }
+            tokenObj = foundToken
+          }
+        }
+        console.log("[Xterium] Detected token type:", detectedInfo)
+        return window.xterium
+          .getEstimateFee(
+            window.xterium.connectedWallet.public_key,
+            Number(value),
+            recipient,
+            { token: tokenObj }
+          )
+          .then((fee) => {
+            const fixedFee = window.xterium.fixBalance(fee.partialFee, 12)
+            console.log(`Estimated Fee: ${fixedFee}`)
+            console.log("[Xterium] Transfer form submitted with values:", {
+              token: tokenSymbol,
+              recipient: recipient,
+              value: value,
+              password: "****",
+              detected: detectedInfo
+            })
+            console.log("[Xterium] Final token object:", tokenObj)
+
+            return window.xterium
+              .transferInternal(tokenObj, recipient, Number(value), password)
+              .then((res) => {
+                console.log("[Xterium] Transfer successful:", res)
+                // Update the transferring overlay to show the success animation.
+                window.xterium.updateTransferringAnimationToSuccess(transferringOverlay)
+                // Remove the transfer UI overlay (the one containing the form).
+                document.body.removeChild(overlay)
+                // Wait 3 seconds for the success animation, then resolve.
+                setTimeout(() => {
+                  resolve(res)
+                }, 3000)
+              })
+          })
+          .catch((err) => {
+            console.error("Fee estimation or transfer error:", err)
+            return Promise.reject(err)
+          })
       }
+    },
+    showTransferringAnimation: function () {
+      const overlay = document.createElement("div")
+      overlay.id = "xterium-transferring-overlay"
+      overlay.classList.add("transfer-animation-overlay")
+
+      const container = document.createElement("div")
+      container.classList.add("transfer-animation-container")
+
+      const spinner = document.createElement("div")
+      spinner.classList.add("spinner")
+      container.appendChild(spinner)
+
+      const text = document.createElement("div")
+      text.innerText = "Transferring..."
+      container.appendChild(text)
+
+      overlay.appendChild(container)
+      document.body.appendChild(overlay)
+      return overlay
+    },
+    updateTransferringAnimationToSuccess: function (overlay) {
+      overlay.innerHTML = ""
+
+      const container = document.createElement("div")
+      container.classList.add("transfer-animation-container")
+      const checkContainer = document.createElement("div")
+      checkContainer.classList.add("check-container")
+
+      const checkMark = document.createElement("div")
+      checkMark.classList.add("check-mark")
+      checkMark.innerText = "✓"
+      checkContainer.appendChild(checkMark)
+      container.appendChild(checkContainer)
+
+      const successText = document.createElement("div")
+      successText.innerText = "Transfer Successful"
+      container.appendChild(successText)
+
+      overlay.appendChild(container)
     },
 
     showTransferUI: function () {
       return new Promise((resolve, reject) => {
-        window.postMessage({ type: "XTERIUM_GET_TOKEN_LIST" }, "*")
-        const handleTokenListResponse = (event) => {
-          if (event.source !== window || !event.data) return
-          if (event.data.type !== "XTERIUM_TOKEN_LIST_RESPONSE") return
-          window.removeEventListener("message", handleTokenListResponse)
-          const tokenData = event.data.tokenList || []
-          console.log("[Injected.js] Token list from extension storage:", tokenData)
-          window._xteriumTokenData = tokenData
-          createTransferUI(tokenData)
-        }
-        window.addEventListener("message", handleTokenListResponse)
         const createTransferUI = (tokenData) => {
           const overlay = document.createElement("div")
           overlay.id = "xterium-transfer-overlay"
@@ -469,7 +607,6 @@ if (!window.xterium) {
                   recipientVal,
                   { token: tokenObj }
                 )
-
                 const fixedFee = window.xterium.fixBalance(fee.partialFee, 12)
                 feeDisplay.innerText = `Estimated Fee: ${fixedFee}`
               } catch (error) {
@@ -479,6 +616,7 @@ if (!window.xterium) {
             }, 500)
           }
 
+          // Form submission: first show the approval UI, then show the transferring overlay.
           form.addEventListener("submit", function (e) {
             e.preventDefault()
             errorMsg.style.display = "none"
@@ -486,6 +624,7 @@ if (!window.xterium) {
             const recipientValue = recipientInput.value.trim()
             const valueValue = valueInput.value.trim()
             const passwordValue = passwordInput.value.trim()
+
             console.log("[Xterium] Transfer form submitted with values:", {
               token: tokenValue,
               recipient: recipientValue,
@@ -506,35 +645,82 @@ if (!window.xterium) {
             passwordInput.disabled = true
             submitButton.disabled = true
             cancelButton.disabled = true
+            const feeText = feeDisplay.innerText.replace("Estimated Fee: ", "") || "N/A"
             window.xterium
-              .transferInternal(
-                tokenObj,
-                recipientValue,
-                Number(valueValue),
-                passwordValue
-              )
-              .then((res) => {
-                console.log("[Xterium] Transfer successful:", res)
-                document.body.removeChild(overlay)
-                resolve(res)
+              .showTransferApprovalUI({
+                token: tokenObj,
+                recipient: recipientValue,
+                value: valueValue,
+                fee: feeText
+              })
+              .then(() => {
+                const transferringOverlay = window.xterium.showTransferringAnimation()
+                window.xterium
+                  .transferInternal(
+                    tokenObj,
+                    recipientValue,
+                    Number(valueValue),
+                    passwordValue
+                  )
+                  .then((res) => {
+                    window.xterium.updateTransferringAnimationToSuccess(
+                      transferringOverlay
+                    )
+                    console.log("[Xterium] Transfer successful:", res)
+                    document.body.removeChild(overlay)
+                    setTimeout(() => {
+                      location.reload()
+                    }, 3000)
+                  })
+                  .catch((err) => {
+                    document.body.removeChild(transferringOverlay)
+                    console.error("[Xterium] Transfer error:", err)
+                    errorMsg.innerText = "Transfer error: " + err
+                    errorMsg.style.display = "block"
+                    tokenInput.disabled = false
+                    recipientInput.disabled = false
+                    valueInput.disabled = false
+                    passwordInput.disabled = false
+                    submitButton.disabled = false
+                    cancelButton.disabled = false
+                    reject(err)
+                  })
               })
               .catch((err) => {
-                console.error("[Xterium] Transfer error:", err)
-                errorMsg.innerText = "Transfer error: " + err
-                errorMsg.style.display = "block"
                 tokenInput.disabled = false
                 recipientInput.disabled = false
                 valueInput.disabled = false
                 passwordInput.disabled = false
                 submitButton.disabled = false
                 cancelButton.disabled = false
+                errorMsg.innerText = "Transfer cancelled."
+                errorMsg.style.display = "block"
                 reject(err)
               })
           })
+        } // End of createTransferUI
+
+        window.postMessage({ type: "XTERIUM_GET_TOKEN_LIST" }, "*")
+        const handleTokenListResponse = (event) => {
+          if (event.source !== window || !event.data) return
+          if (event.data.type !== "XTERIUM_TOKEN_LIST_RESPONSE") return
+          window.removeEventListener("message", handleTokenListResponse)
+          let tokenData = event.data.tokenList || []
+          if (typeof tokenData === "string") {
+            try {
+              tokenData = JSON.parse(tokenData)
+            } catch (error) {
+              console.error("[Injected.js] Error parsing token list:", error)
+              tokenData = []
+            }
+          }
+          console.log("[Injected.js] Token list from extension storage:", tokenData)
+          window._xteriumTokenData = tokenData
+          createTransferUI(tokenData)
         }
+        window.addEventListener("message", handleTokenListResponse)
       })
     },
-
     showSuccessMessage: function (wallet) {
       const animationOverlay = document.createElement("div")
       animationOverlay.id = "wallet-check-animation"
@@ -549,29 +735,38 @@ if (!window.xterium) {
       animationOverlay.style.justifyContent = "center"
       animationOverlay.style.alignItems = "center"
 
-      const checkContainer = document.createElement("div")
-      checkContainer.style.width = "100px"
-      checkContainer.style.height = "100px"
-      checkContainer.style.borderRadius = "50%"
-      checkContainer.style.backgroundColor = "#4CAF50"
-      checkContainer.style.display = "flex"
-      checkContainer.style.justifyContent = "center"
-      checkContainer.style.alignItems = "center"
-      checkContainer.style.opacity = "0"
-      checkContainer.style.transform = "scale(0.5)"
+      const successContainer = document.createElement("div")
+      successContainer.style.display = "flex"
+      successContainer.style.flexDirection = "column"
+      successContainer.style.alignItems = "center"
+      successContainer.style.justifyContent = "center"
+      successContainer.style.backgroundColor = "#1C3240" // Updated background color
+      successContainer.style.borderRadius = "12px"
+      successContainer.style.padding = "20px"
+      successContainer.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.2)"
+      successContainer.style.opacity = "0"
+      successContainer.style.transform = "scale(0.8)"
 
       const checkMark = document.createElement("div")
       checkMark.innerText = "✓"
       checkMark.style.color = "white"
       checkMark.style.fontSize = "50px"
-      checkContainer.appendChild(checkMark)
+      checkMark.style.fontWeight = "bold"
+      checkMark.style.marginBottom = "10px"
 
-      animationOverlay.appendChild(checkContainer)
+      const connectedText = document.createElement("div")
+      connectedText.innerText = "Wallet Connected"
+      connectedText.style.color = "white"
+      connectedText.style.fontSize = "20px"
+      connectedText.style.fontWeight = "500"
+
+      successContainer.appendChild(checkMark)
+      successContainer.appendChild(connectedText)
+      animationOverlay.appendChild(successContainer)
       document.body.appendChild(animationOverlay)
-
-      checkContainer.animate(
+      successContainer.animate(
         [
-          { opacity: 0, transform: "scale(0.5)" },
+          { opacity: 0, transform: "scale(0.8)" },
           { opacity: 1, transform: "scale(1)" },
           { opacity: 1, transform: "scale(1)" },
           { opacity: 0, transform: "scale(1.2)" }
@@ -585,6 +780,7 @@ if (!window.xterium) {
           document.body.removeChild(animationOverlay)
         }
       }
+
       console.log("Connected to wallet:", wallet.public_key)
     },
 
@@ -632,6 +828,7 @@ if (!window.xterium) {
     showPopup: function () {
       if (document.getElementById("xterium-popup-overlay")) return
       document.body.style.overflow = "auto"
+
       const overlay = document.createElement("div")
       overlay.id = "xterium-popup-overlay"
       overlay.style.position = "fixed"
@@ -647,14 +844,16 @@ if (!window.xterium) {
       container.style.position = "fixed"
       container.style.width = "450px"
       container.style.height = "600px"
-      container.style.bottom = "20px"
-      container.style.right = "20px"
+      container.style.top = "50%"
+      container.style.left = "50%"
+      container.style.transform = "translate(-50%, -50%)"
       container.style.backgroundColor = "#fff"
       container.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)"
       container.style.borderRadius = "8px"
       container.style.pointerEvents = "auto"
       container.style.overflow = "hidden"
 
+      // Close button remains unchanged
       const closeBtn = document.createElement("button")
       closeBtn.innerText = "X"
       closeBtn.style.position = "absolute"
@@ -665,6 +864,7 @@ if (!window.xterium) {
       closeBtn.style.background = "transparent"
       closeBtn.style.fontSize = "18px"
       closeBtn.style.color = "#333"
+      closeBtn.style.zIndex = "2"
       closeBtn.addEventListener("click", () => {
         document.body.removeChild(overlay)
         document.body.style.overflow = ""
@@ -677,11 +877,192 @@ if (!window.xterium) {
       iframe.style.border = "none"
       iframe.style.overflow = "hidden"
 
-      container.appendChild(closeBtn)
+      const dragBar = document.createElement("div")
+      dragBar.style.position = "absolute"
+      dragBar.style.top = "0"
+      dragBar.style.left = "50%"
+      dragBar.style.transform = "translateX(-50%)"
+      dragBar.style.width = "200px"
+      dragBar.style.height = "30px"
+      dragBar.style.cursor = "move"
+      dragBar.style.background = "transparent"
+      dragBar.style.zIndex = "1"
+
+      let isDragging = false,
+        startX,
+        startY,
+        origX,
+        origY
+      dragBar.addEventListener("mousedown", function (e) {
+        isDragging = true
+        const rect = container.getBoundingClientRect()
+        // Remove centering transform so we work with pixel values
+        container.style.left = rect.left + "px"
+        container.style.top = rect.top + "px"
+        container.style.transform = ""
+        startX = e.clientX
+        startY = e.clientY
+        origX = rect.left
+        origY = rect.top
+
+        function onMouseMove(e) {
+          if (!isDragging) return
+          const dx = e.clientX - startX
+          const dy = e.clientY - startY
+          container.style.left = origX + dx + "px"
+          container.style.top = origY + dy + "px"
+        }
+
+        function onMouseUp() {
+          isDragging = false
+          document.removeEventListener("mousemove", onMouseMove)
+          document.removeEventListener("mouseup", onMouseUp)
+        }
+
+        document.addEventListener("mousemove", onMouseMove)
+        document.addEventListener("mouseup", onMouseUp)
+        e.preventDefault()
+      })
       container.appendChild(iframe)
+      container.appendChild(dragBar)
+      container.appendChild(closeBtn)
       overlay.appendChild(container)
       document.body.appendChild(overlay)
+
       console.log("[Xterium] Popup overlay opened.")
+    },
+    showTransferApprovalUI: function (details) {
+      return new Promise((resolve, reject) => {
+        const overlay = document.createElement("div")
+        overlay.id = "xterium-transfer-approval-overlay"
+        overlay.style.position = "fixed"
+        overlay.style.top = "0"
+        overlay.style.left = "0"
+        overlay.style.width = "100vw"
+        overlay.style.height = "100vh"
+        overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)"
+        overlay.style.zIndex = "10000"
+        overlay.style.display = "flex"
+        overlay.style.justifyContent = "center"
+        overlay.style.alignItems = "center"
+
+        const container = document.createElement("div")
+        container.style.backgroundColor = "#fff"
+        container.style.padding = "20px"
+        container.style.borderRadius = "8px"
+        container.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)"
+        container.style.width = "300px"
+        container.style.textAlign = "center"
+
+        const title = document.createElement("h3")
+        title.innerText = "Confirm Transfer"
+        container.appendChild(title)
+
+        // If sender is provided, display overlapping sender and recipient addresses
+        if (details.sender && details.recipient) {
+          const addressesDiv = document.createElement("div")
+          addressesDiv.style.display = "flex"
+          addressesDiv.style.justifyContent = "center"
+          addressesDiv.style.alignItems = "center"
+          addressesDiv.style.marginBottom = "10px"
+          // Sender circle
+          const senderDiv = document.createElement("div")
+          senderDiv.innerText = formatWalletAddress(details.sender)
+          senderDiv.style.border = "1px solid #ccc"
+          senderDiv.style.borderRadius = "50%"
+          senderDiv.style.width = "50px"
+          senderDiv.style.height = "50px"
+          senderDiv.style.lineHeight = "50px"
+          senderDiv.style.textAlign = "center"
+          senderDiv.style.background = "#fff"
+          senderDiv.style.position = "relative"
+          senderDiv.style.zIndex = "2"
+          // Recipient circle (overlapping)
+          const recipientDiv = document.createElement("div")
+          recipientDiv.innerText = formatWalletAddress(details.recipient)
+          recipientDiv.style.border = "1px solid #ccc"
+          recipientDiv.style.borderRadius = "50%"
+          recipientDiv.style.width = "50px"
+          recipientDiv.style.height = "50px"
+          recipientDiv.style.lineHeight = "50px"
+          recipientDiv.style.textAlign = "center"
+          recipientDiv.style.background = "#fff"
+          recipientDiv.style.position = "relative"
+          recipientDiv.style.left = "-15px" // adjust overlap here
+          recipientDiv.style.zIndex = "1"
+
+          addressesDiv.appendChild(senderDiv)
+          addressesDiv.appendChild(recipientDiv)
+          container.appendChild(addressesDiv)
+        }
+
+        // Display transfer details using formatted address for the recipient
+        const detailsDiv = document.createElement("div")
+        detailsDiv.style.textAlign = "left"
+        detailsDiv.style.marginBottom = "20px"
+        detailsDiv.innerHTML = `
+      <p><strong>Token:</strong> ${details.token.symbol}</p>
+      <p><strong>Recipient:</strong> ${formatWalletAddress(details.recipient)}</p>
+      <p><strong>Amount:</strong> ${details.value}</p>
+      <p><strong>Fee:</strong> ${details.fee}</p>
+    `
+        container.appendChild(detailsDiv)
+
+        const approveBtn = document.createElement("button")
+        approveBtn.innerText = "Approve"
+        approveBtn.style.padding = "10px 15px"
+        approveBtn.style.backgroundColor = "#4CAF50"
+        approveBtn.style.color = "#fff"
+        approveBtn.style.border = "none"
+        approveBtn.style.borderRadius = "4px"
+        approveBtn.style.cursor = "pointer"
+        approveBtn.addEventListener("click", () => {
+          document.body.removeChild(overlay)
+          resolve()
+        })
+
+        const cancelBtn = document.createElement("button")
+        cancelBtn.innerText = "Cancel"
+        cancelBtn.style.padding = "10px 15px"
+        cancelBtn.style.backgroundColor = "#f44336"
+        cancelBtn.style.color = "#fff"
+        cancelBtn.style.border = "none"
+        cancelBtn.style.borderRadius = "4px"
+        cancelBtn.style.cursor = "pointer"
+        cancelBtn.style.marginLeft = "10px"
+        cancelBtn.addEventListener("click", () => {
+          document.body.removeChild(overlay)
+          reject("User cancelled transfer.")
+        })
+
+        container.appendChild(approveBtn)
+        container.appendChild(cancelBtn)
+        overlay.appendChild(container)
+        document.body.appendChild(overlay)
+      })
+    },
+
+    showTransferringAnimation: function () {
+      const overlay = document.createElement("div")
+      overlay.id = "xterium-transferring-overlay"
+      overlay.classList.add("transfer-animation-overlay")
+
+      const container = document.createElement("div")
+      container.classList.add("transfer-animation-container")
+
+      const spinner = document.createElement("div")
+      spinner.classList.add("spinner")
+      container.appendChild(spinner)
+
+      const text = document.createElement("div")
+      text.innerText = "Transferring..."
+      container.appendChild(text)
+
+      overlay.appendChild(container)
+      document.body.appendChild(overlay)
+
+      // Return the overlay so it can be removed once transfer completes.
+      return overlay
     }
   }
 

@@ -1,94 +1,158 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { Storage } from "@plasmohq/storage";
-import { BalanceServices } from "./services/balance.service";
-import { NetworkService } from "./services/network.service";
-import { UserService } from "./services/user.service";
-import { WalletService } from "./services/wallet.service";
+import { BalanceServices } from "../src/services/balance.service";
+import { NetworkService } from "../src/services/network.service";
+import { UserService } from "../src/services/user.service";
+import { WalletService } from "../src/services/wallet.service";
 
 const bgImageUrl = chrome.runtime.getURL("assets/covers/bg-inside.png");
 
 function injectCSS() {
   const style = document.createElement("style");
   style.textContent = `
+    :root {
+      --primary-color: #00B3FF;
+      --secondary-color: #1E1E2F;
+      --highlight-color: #FF005C;
+      --text-color: #FFFFFF;
+      --overlay-bg: rgba(0, 0, 0, 0.8);
+    }
+
     .wallet-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.7);
+      background: var(--overlay-bg);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 10000;
+      font-family: 'Arial', sans-serif;
     }
 
     .wallet-container {
-      background: url('${bgImageUrl}') center/cover no-repeat, #ffffff;
+      background: url('image.png') center/cover no-repeat, var(--secondary-color);
       border-radius: 16px;
       padding: 24px;
-      width: 400px;
-      height: 400px;
+      width: 420px;
       text-align: center;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      animation: fadeIn 0.3s ease-in-out;
+      color: var(--text-color);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+      animation: fadeIn 0.4s ease-in-out;
+      border: 1px solid #333;
       position: relative;
     }
 
     .wallet-header {
       font-size: 24px;
       font-weight: bold;
-      margin-bottom: 12px;
-      color: #333333;
+      margin-bottom: 16px;
+      color: var(--text-color);
     }
-       .wallet-description {
-    font-size: 16px;
-    color: #666666;
-    margin-bottom: 20px;
-  }
-  .wallet-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .wallet-button {
-    padding: 12px;
-    background: linear-gradient(135deg, #4CAF50, #2E7D32);
-    color: #ffffff;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  .wallet-button:hover {
-    background: linear-gradient(135deg, #66BB6A, #388E3C);
-  }
-  .wallet-cancel-button {
-    margin-top: 16px;
-    padding: 12px;
-    background: #f44336;
-    color: #ffffff;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  .wallet-cancel-button:hover {
-    background: #e53935;
-  }
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }`;
 
+    .wallet-description {
+      font-size: 16px;
+      color: #B0B0B0;
+      margin-bottom: 20px;
+    }
+
+    .wallet-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      max-height: 300px;
+      padding-right: 8px;
+    }
+
+    .wallet-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: background 0.3s;
+      cursor: pointer;
+    }
+
+    .wallet-item:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .wallet-item span {
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .wallet-item .token-value {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .wallet-button {
+      padding: 12px;
+      background: linear-gradient(135deg, var(--primary-color), #007ACC);
+      color: var(--text-color);
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 16px;
+    }
+
+    .wallet-button:hover {
+      background: linear-gradient(135deg, #00D4FF, #0099CC);
+    }
+
+    .wallet-cancel-button {
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--highlight-color);
+      color: var(--text-color);
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .wallet-cancel-button:hover {
+      background: #FF3366;
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .spinner {
+      border: 6px solid #444;
+      border-top: 6px solid var(--primary-color);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+  `;
   document.head.appendChild(style);
 }
 
@@ -151,20 +215,24 @@ async function syncTokenListToChromeStorage() {
     const parsedTokenList =
       typeof tokenList === "string" ? JSON.parse(tokenList) : tokenList;
 
-    console.log("[Content.js] Saving token_list to Chrome Storage:", parsedTokenList);
+   // console.log("[Content.js] Saving token_list to Chrome Storage:", parsedTokenList);
     chrome.storage.local.set({ token_list: parsedTokenList }, () => {
-      console.log("[Content.js] token_list saved in Chrome Storage.");
+     // console.log("[Content.js] token_list saved in Chrome Storage.");
     });
   } catch (err) {
     console.error("[Content.js] Failed to sync token list:", err);
   }
 }
-
 saveBalanceToChromeStorage();
 syncTokenListToChromeStorage();
 
 function fixBalanceReverse(value, decimal) {
   return (Number(value) * Math.pow(10, decimal)).toFixed(0);
+}
+
+function formatWalletAddress(address) {
+  if (address.length <= 10) return address;
+  return address.slice(0, 6) + "........" + address.slice(-6);
 }
 
 window.addEventListener("message", async (event) => {
@@ -222,13 +290,9 @@ window.addEventListener("message", async (event) => {
         const amount = BigInt(value);
         let info;
         if (balance.token.type === "Native") {
-          info = await apiInstance.tx.balances
-            .transfer(recipient, amount)
-            .paymentInfo(owner);
+          info = await apiInstance.tx.balances.transfer(recipient, amount).paymentInfo(owner);
         } else if (balance.token.type === "Asset") {
-          info = await apiInstance.tx.assets
-            .transfer(balance.token.network_id, recipient, amount)
-            .paymentInfo(owner);
+          info = await apiInstance.tx.assets.transfer(balance.token.network_id, recipient, amount).paymentInfo(owner);
         } else {
           throw new Error("Unsupported token type.");
         }
@@ -289,7 +353,6 @@ window.addEventListener("message", async (event) => {
         balanceService
           .transfer(owner, Number(smallestUnitValue), recipient, storedPassword)
           .then((result) => {
-            console.log("[Content.js] Native transfer processed successfully:", result);
             window.postMessage(
               {
                 type: "XTERIUM_TRANSFER_RESPONSE",
@@ -348,8 +411,36 @@ window.addEventListener("message", async (event) => {
       }
       break;
     }
-    default:
+    case "XTERIUM_REFRESH_BALANCE": {
+      const publicKey = event.data.publicKey;
+      console.log(`[Content.js] Refreshing balances for wallet: ${publicKey}`);
+      try {
+        await connectToRPC();
+        let tokenList = await storage.get("token_list");
+        if (!tokenList) tokenList = [];
+        if (typeof tokenList === "string") tokenList = JSON.parse(tokenList);
+    
+        const updatedBalances = [];
+        for (const token of tokenList) {
+          const balance = await balanceService.getBalancePerToken(publicKey, token);
+          updatedBalances.push({
+            tokenName: token.symbol,
+            freeBalance: balance.freeBalance,
+            reservedBalance: balance.reservedBalance,
+            is_frozen: balance.is_frozen
+          });
+        }
+        await balanceService.saveBalance(publicKey, updatedBalances);
+        const walletBalances = JSON.parse(await storage.get("wallet_balances") || "{}");
+        walletBalances[publicKey] = updatedBalances;
+        await storage.set("wallet_balances", walletBalances);
+    
+        console.log("[Content.js] Balances updated successfully");
+      } catch (error) {
+        console.error("[Content.js] Error refreshing balances:", error);
+      }
       break;
+    }
   }
 });
 

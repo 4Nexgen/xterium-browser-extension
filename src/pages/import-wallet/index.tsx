@@ -39,7 +39,9 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
     address_type: "",
     mnemonic_phrase: "",
     secret_key: "",
-    public_key: ""
+    public_key: "",
+      balances: [],
+      type: ""
   })
 
   const { toast } = useToast()
