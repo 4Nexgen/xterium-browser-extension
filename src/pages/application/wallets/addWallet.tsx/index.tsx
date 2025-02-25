@@ -37,9 +37,12 @@ const IndexAddWallet = ({ handleCallbacks }) => {
     address_type: "",
     mnemonic_phrase: "",
     secret_key: "",
-    public_key: ""
+    public_key: "",
+    balances: [],
+    type: ""
   })
 
+  const [isLoading, setIsLoading] = useState(false) // Loading spinner state
   const { toast } = useToast()
 
   const getNetwork = () => {
@@ -60,7 +63,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
   }
 
   const generateMnemonic = () => {
-    let generatedMnemonicPhrase = mnemonicGenerate()
+    const generatedMnemonicPhrase = mnemonicGenerate()
     handleInputChange("mnemonic_phrase", generatedMnemonicPhrase)
     createKeys(generatedMnemonicPhrase)
   }
@@ -92,6 +95,19 @@ const IndexAddWallet = ({ handleCallbacks }) => {
     inputMnemonic(mnemonicInput)
   }
 
+  const resetForm = () => {
+    setWalletData({
+      id: 0,
+      name: "",
+      address_type: "",
+      mnemonic_phrase: "",
+      secret_key: "",
+      public_key: "",
+      balances: [],
+      type: ""
+    })
+  }
+
   const saveWallet = () => {
     if (
       !walletData.name ||
@@ -110,6 +126,9 @@ const IndexAddWallet = ({ handleCallbacks }) => {
       })
       return
     }
+
+    setIsLoading(true) // Show loading spinner
+
     userService.getWalletPassword().then((decryptedPassword) => {
       if (decryptedPassword) {
         const encryptionService = new EncryptionService()
@@ -138,17 +157,37 @@ const IndexAddWallet = ({ handleCallbacks }) => {
               ),
               variant: "default"
             })
+
+            setTimeout(() => {
+              setIsLoading(false) // Hide spinner
+              resetForm() // Reset form fields
+              handleCallbacks() // Callback function
+            }, 1500)
+          } else {
+            setIsLoading(false) // Hide spinner if there's an error
           }
         })
-
-        handleCallbacks()
+      } else {
+        setIsLoading(false)
       }
     })
   }
 
   return (
     <>
-      <div className="p-6">
+      <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+        {}
+        {isLoading && (
+          <div className="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin border-4 border-blue-400 border-t-transparent rounded-full w-16 h-16 mb-4"></div>
+              <p className="text-white text-lg font-semibold">
+                {t("Adding wallet...")}
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="mb-3">
           <Label>{t("Enter a unique wallet name")}:</Label>
           <Input
