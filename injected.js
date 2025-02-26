@@ -102,17 +102,20 @@ if (!window.xterium) {
       return new Promise((resolve, reject) => {
         const overlay = document.createElement("div")
         overlay.id = "wallet-connect-overlay"
-        overlay.classList.add("wallet-overlay")
+        overlay.classList.add("inject-overlay")
 
         const container = document.createElement("div")
-        container.classList.add("wallet-container")
+        container.classList.add("inject-container")
+
+        const logo = document.createElement("div")
+        logo.classList.add("wallet-logo")
 
         const header = document.createElement("div")
-        header.classList.add("wallet-header")
+        header.classList.add("inject-header")
         header.innerText = "Connect Your Wallet"
 
         const description = document.createElement("p")
-        description.classList.add("wallet-description")
+        description.classList.add("inject-description")
         description.innerText = "Choose a wallet to proceed:"
 
         const walletList = document.createElement("div")
@@ -120,7 +123,7 @@ if (!window.xterium) {
 
         wallets.forEach((wallet) => {
           const walletButton = document.createElement("button")
-          walletButton.classList.add("wallet-button")
+          walletButton.classList.add("inject-button")
           walletButton.innerText = formatWalletAddress(wallet.public_key)
           walletButton.addEventListener("click", () => {
             document.body.removeChild(overlay)
@@ -131,17 +134,18 @@ if (!window.xterium) {
         })
 
         const cancelButton = document.createElement("button")
-        cancelButton.classList.add("wallet-cancel-button")
-        cancelButton.innerText = "Cancel"
+        cancelButton.classList.add("inject-cancel-button")
+        cancelButton.innerHTML = "&times;"
         cancelButton.addEventListener("click", () => {
           document.body.removeChild(overlay)
           reject("User cancelled wallet connection.")
         })
-
+        container.appendChild(cancelButton)
+        container.appendChild(logo)
         container.appendChild(header)
         container.appendChild(description)
         container.appendChild(walletList)
-        container.appendChild(cancelButton)
+
         overlay.appendChild(container)
         document.body.appendChild(overlay)
       })
@@ -415,46 +419,28 @@ if (!window.xterium) {
         const createTransferUI = (tokenData) => {
           const overlay = document.createElement("div")
           overlay.id = "xterium-transfer-overlay"
-          overlay.style.position = "fixed"
-          overlay.style.top = "0"
-          overlay.style.left = "0"
-          overlay.style.width = "100%"
-          overlay.style.height = "100%"
-          overlay.style.backgroundColor = "rgba(0,0,0,0.5)"
-          overlay.style.zIndex = "10000"
-          overlay.style.display = "flex"
-          overlay.style.justifyContent = "center"
-          overlay.style.alignItems = "center"
+          overlay.classList.add("inject-overlay")
 
           const container = document.createElement("div")
-          container.style.backgroundColor = "#fff"
-          container.style.padding = "20px"
-          container.style.borderRadius = "8px"
-          container.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)"
-          container.style.width = "300px"
-          container.style.textAlign = "center"
+          container.classList.add("inject-container")
 
-          const title = document.createElement("h3")
+          const title = document.createElement("div")
           title.innerText = "Transfer Tokens"
+          title.classList.add("inject-header")
           container.appendChild(title)
 
           const errorMsg = document.createElement("div")
-          errorMsg.style.color = "red"
-          errorMsg.style.marginBottom = "10px"
-          errorMsg.style.display = "none"
+          errorMsg.classList.add("inject-err")
           container.appendChild(errorMsg)
 
           const detectedInfo = document.createElement("div")
-          detectedInfo.style.fontSize = "0.9em"
-          detectedInfo.style.marginBottom = "10px"
-          detectedInfo.style.color = "#333"
           detectedInfo.innerText = "Detected as: Native (default)"
+          detectedInfo.classList.add("inject-description")
           container.appendChild(detectedInfo)
 
           const feeDisplay = document.createElement("div")
-          feeDisplay.style.color = "#555"
-          feeDisplay.style.marginBottom = "10px"
           feeDisplay.innerText = "Estimated Fee: Calculating..."
+          feeDisplay.classList.add("inject-description")
           container.appendChild(feeDisplay)
 
           const form = document.createElement("form")
@@ -462,77 +448,57 @@ if (!window.xterium) {
 
           const tokenLabel = document.createElement("label")
           tokenLabel.innerText = "Token Symbol:"
-          tokenLabel.style.display = "block"
+          tokenLabel.classList.add("inject-label")
           form.appendChild(tokenLabel)
 
-          const tokenInput = document.createElement("input")
-          tokenInput.type = "text"
-          tokenInput.name = "token"
-          tokenInput.required = true
-          tokenInput.style.width = "100%"
-          tokenInput.style.marginBottom = "10px"
-          form.appendChild(tokenInput)
+          const tokenSelect = document.createElement("select")
+          tokenSelect.name = "token"
+          tokenSelect.classList.add("inject-select")
+          form.appendChild(tokenSelect)
 
           const recipientLabel = document.createElement("label")
           recipientLabel.innerText = "Recipient:"
-          recipientLabel.style.display = "block"
+          recipientLabel.classList.add("inject-label")
           form.appendChild(recipientLabel)
 
           const recipientInput = document.createElement("input")
           recipientInput.type = "text"
           recipientInput.name = "recipient"
-          recipientInput.required = true
-          recipientInput.style.width = "100%"
-          recipientInput.style.marginBottom = "10px"
+          recipientInput.classList.add("inject-input")
           form.appendChild(recipientInput)
 
           const valueLabel = document.createElement("label")
           valueLabel.innerText = "Value (smallest unit):"
-          valueLabel.style.display = "block"
+          valueLabel.classList.add("inject-label")
           form.appendChild(valueLabel)
 
           const valueInput = document.createElement("input")
           valueInput.type = "number"
           valueInput.name = "value"
-          valueInput.required = true
-          valueInput.style.width = "100%"
-          valueInput.style.marginBottom = "10px"
+          valueInput.classList.add("inject-input")
           form.appendChild(valueInput)
 
           const passwordLabel = document.createElement("label")
           passwordLabel.innerText = "Password:"
-          passwordLabel.style.display = "block"
+          passwordLabel.classList.add("inject-label")
           form.appendChild(passwordLabel)
 
           const passwordInput = document.createElement("input")
           passwordInput.type = "password"
           passwordInput.name = "password"
-          passwordInput.required = true
-          passwordInput.style.width = "100%"
-          passwordInput.style.marginBottom = "10px"
+          passwordInput.classList.add("inject-input")
           form.appendChild(passwordInput)
 
           const submitButton = document.createElement("button")
           submitButton.type = "submit"
           submitButton.innerText = "Transfer"
-          submitButton.style.padding = "10px 15px"
-          submitButton.style.backgroundColor = "#4CAF50"
-          submitButton.style.color = "#fff"
-          submitButton.style.border = "none"
-          submitButton.style.borderRadius = "4px"
-          submitButton.style.cursor = "pointer"
+          submitButton.classList.add("inject-button")
           form.appendChild(submitButton)
 
           const cancelButton = document.createElement("button")
           cancelButton.type = "button"
-          cancelButton.innerText = "Cancel"
-          cancelButton.style.padding = "10px 15px"
-          cancelButton.style.backgroundColor = "#f44336"
-          cancelButton.style.color = "#fff"
-          cancelButton.style.border = "none"
-          cancelButton.style.borderRadius = "4px"
-          cancelButton.style.cursor = "pointer"
-          cancelButton.style.marginLeft = "10px"
+          cancelButton.classList.add("inject-cancel-button")
+          cancelButton.innerHTML = "&times;"
           cancelButton.addEventListener("click", () => {
             document.body.removeChild(overlay)
             reject("User cancelled transfer.")
@@ -545,12 +511,15 @@ if (!window.xterium) {
 
           console.log("[Xterium] Transfer UI shown.")
 
-          let tokenDetectTimeout = null
-          tokenInput.addEventListener("input", function () {
-            clearTimeout(tokenDetectTimeout)
-            tokenDetectTimeout = setTimeout(() => {
-              detectTokenType(tokenInput.value.trim())
-            }, 500)
+          tokenData.forEach((token) => {
+            const option = document.createElement("option")
+            option.value = token.symbol
+            option.innerText = token.symbol
+            tokenSelect.appendChild(option)
+          })
+
+          tokenSelect.addEventListener("change", function () {
+            detectTokenType(tokenSelect.value)
           })
 
           function detectTokenType(tokenVal) {
@@ -580,14 +549,14 @@ if (!window.xterium) {
           }
 
           let feeTimeout = null
-          tokenInput.addEventListener("input", updateEstimatedFee)
+          tokenSelect.addEventListener("change", updateEstimatedFee)
           recipientInput.addEventListener("input", updateEstimatedFee)
           valueInput.addEventListener("input", updateEstimatedFee)
 
           function updateEstimatedFee() {
             clearTimeout(feeTimeout)
             feeTimeout = setTimeout(async () => {
-              const tokenSymbol = tokenInput.value.trim()
+              const tokenSymbol = tokenSelect.value.trim()
               const recipientVal = recipientInput.value.trim()
               const valueVal = valueInput.value.trim()
               if (!tokenSymbol || !recipientVal || !valueVal) {
@@ -615,12 +584,10 @@ if (!window.xterium) {
               }
             }, 500)
           }
-
-          // Form submission: first show the approval UI, then show the transferring overlay.
           form.addEventListener("submit", function (e) {
             e.preventDefault()
             errorMsg.style.display = "none"
-            const tokenValue = tokenInput.value.trim()
+            const tokenValue = tokenSelect.value.trim()
             const recipientValue = recipientInput.value.trim()
             const valueValue = valueInput.value.trim()
             const passwordValue = passwordInput.value.trim()
@@ -639,7 +606,7 @@ if (!window.xterium) {
               ? { ...foundToken }
               : { symbol: tokenValue, type: "Native" }
             console.log("[Xterium] Final token object:", tokenObj)
-            tokenInput.disabled = true
+            tokenSelect.disabled = true
             recipientInput.disabled = true
             valueInput.disabled = true
             passwordInput.disabled = true
@@ -677,7 +644,7 @@ if (!window.xterium) {
                     console.error("[Xterium] Transfer error:", err)
                     errorMsg.innerText = "Transfer error: " + err
                     errorMsg.style.display = "block"
-                    tokenInput.disabled = false
+                    tokenSelect.disabled = false
                     recipientInput.disabled = false
                     valueInput.disabled = false
                     passwordInput.disabled = false
@@ -687,7 +654,7 @@ if (!window.xterium) {
                   })
               })
               .catch((err) => {
-                tokenInput.disabled = false
+                tokenSelect.disabled = false
                 recipientInput.disabled = false
                 valueInput.disabled = false
                 passwordInput.disabled = false
@@ -698,7 +665,7 @@ if (!window.xterium) {
                 reject(err)
               })
           })
-        } // End of createTransferUI
+        } 
 
         window.postMessage({ type: "XTERIUM_GET_TOKEN_LIST" }, "*")
         const handleTokenListResponse = (event) => {
@@ -935,108 +902,75 @@ if (!window.xterium) {
       return new Promise((resolve, reject) => {
         const overlay = document.createElement("div")
         overlay.id = "xterium-transfer-approval-overlay"
-        overlay.style.position = "fixed"
-        overlay.style.top = "0"
-        overlay.style.left = "0"
-        overlay.style.width = "100vw"
-        overlay.style.height = "100vh"
-        overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)"
-        overlay.style.zIndex = "10000"
-        overlay.style.display = "flex"
-        overlay.style.justifyContent = "center"
-        overlay.style.alignItems = "center"
+        overlay.classList.add("inject-overlay")
 
         const container = document.createElement("div")
-        container.style.backgroundColor = "#fff"
-        container.style.padding = "20px"
-        container.style.borderRadius = "8px"
-        container.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)"
-        container.style.width = "300px"
-        container.style.textAlign = "center"
+        container.classList.add("transfer-container")
 
-        const title = document.createElement("h3")
+        const title = document.createElement("div")
         title.innerText = "Confirm Transfer"
+        title.classList.add("inject-header")
         container.appendChild(title)
 
         // If sender is provided, display overlapping sender and recipient addresses
         if (details.sender && details.recipient) {
           const addressesDiv = document.createElement("div")
-          addressesDiv.style.display = "flex"
-          addressesDiv.style.justifyContent = "center"
-          addressesDiv.style.alignItems = "center"
-          addressesDiv.style.marginBottom = "10px"
+          addressesDiv.classList.add("transfer-address")
+          
           // Sender circle
           const senderDiv = document.createElement("div")
           senderDiv.innerText = formatWalletAddress(details.sender)
-          senderDiv.style.border = "1px solid #ccc"
-          senderDiv.style.borderRadius = "50%"
-          senderDiv.style.width = "50px"
-          senderDiv.style.height = "50px"
-          senderDiv.style.lineHeight = "50px"
-          senderDiv.style.textAlign = "center"
-          senderDiv.style.background = "#fff"
-          senderDiv.style.position = "relative"
-          senderDiv.style.zIndex = "2"
+          senderDiv.classList.add("sender-circle")
+          
           // Recipient circle (overlapping)
           const recipientDiv = document.createElement("div")
           recipientDiv.innerText = formatWalletAddress(details.recipient)
-          recipientDiv.style.border = "1px solid #ccc"
-          recipientDiv.style.borderRadius = "50%"
-          recipientDiv.style.width = "50px"
-          recipientDiv.style.height = "50px"
-          recipientDiv.style.lineHeight = "50px"
-          recipientDiv.style.textAlign = "center"
-          recipientDiv.style.background = "#fff"
-          recipientDiv.style.position = "relative"
-          recipientDiv.style.left = "-15px" // adjust overlap here
-          recipientDiv.style.zIndex = "1"
-
+          recipientDiv.classList.add("recipient-circle")
+          
           addressesDiv.appendChild(senderDiv)
           addressesDiv.appendChild(recipientDiv)
           container.appendChild(addressesDiv)
         }
 
-        // Display transfer details using formatted address for the recipient
-        const detailsDiv = document.createElement("div")
-        detailsDiv.style.textAlign = "left"
-        detailsDiv.style.marginBottom = "20px"
-        detailsDiv.innerHTML = `
-      <p><strong>Token:</strong> ${details.token.symbol}</p>
-      <p><strong>Recipient:</strong> ${formatWalletAddress(details.recipient)}</p>
-      <p><strong>Amount:</strong> ${details.value}</p>
-      <p><strong>Fee:</strong> ${details.fee}</p>
-    `
-        container.appendChild(detailsDiv)
+        const detailsDiv = document.createElement("div");
+detailsDiv.classList.add("details-container");
+
+function createStyledField(label, value) {
+    const field = document.createElement("div");
+    field.classList.add("details-field");
+    field.innerHTML = `<strong>${label}:</strong> ${value}`;
+    return field;
+}
+
+detailsDiv.appendChild(createStyledField("Token", details.token.symbol));
+detailsDiv.appendChild(createStyledField("Recipient", formatWalletAddress(details.recipient)));
+detailsDiv.appendChild(createStyledField("Amount", details.value));
+detailsDiv.appendChild(createStyledField("Fee", details.fee));
+
+container.appendChild(detailsDiv);
+
 
         const approveBtn = document.createElement("button")
+        approveBtn.classList.add("approve-button")
         approveBtn.innerText = "Approve"
-        approveBtn.style.padding = "10px 15px"
-        approveBtn.style.backgroundColor = "#4CAF50"
-        approveBtn.style.color = "#fff"
-        approveBtn.style.border = "none"
-        approveBtn.style.borderRadius = "4px"
-        approveBtn.style.cursor = "pointer"
         approveBtn.addEventListener("click", () => {
           document.body.removeChild(overlay)
           resolve()
         })
 
         const cancelBtn = document.createElement("button")
-        cancelBtn.innerText = "Cancel"
-        cancelBtn.style.padding = "10px 15px"
-        cancelBtn.style.backgroundColor = "#f44336"
-        cancelBtn.style.color = "#fff"
-        cancelBtn.style.border = "none"
-        cancelBtn.style.borderRadius = "4px"
-        cancelBtn.style.cursor = "pointer"
-        cancelBtn.style.marginLeft = "10px"
+        cancelBtn.classList.add("Reject-button")
+        cancelBtn.innerText = "Reject"
         cancelBtn.addEventListener("click", () => {
           document.body.removeChild(overlay)
           reject("User cancelled transfer.")
         })
-
+        const buttonContainer = document.createElement("div");
+buttonContainer.classList.add("button-container");
         container.appendChild(approveBtn)
         container.appendChild(cancelBtn)
+        document.body.appendChild(buttonContainer)
+
         overlay.appendChild(container)
         document.body.appendChild(overlay)
       })
