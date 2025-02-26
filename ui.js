@@ -127,15 +127,7 @@ export function injectCSS() {
     text-align: center;
     align-items: center;
   }
-.spinner {
-      border: 6px solid #444;
-      border-top: 6px solid var(--primary-color);
-      border-radius: 50%;
-      width: 48px;
-      height: 48px;
-      animation: spin 1s linear infinite;
-      margin-bottom: 20px;
-    }
+
 .transfer-address{
   display = "flex"
           justifyContent = "center"
@@ -221,7 +213,69 @@ export function injectCSS() {
     background-color: #f44336;
     color: white;
 }
+.transfer-animation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5); /* Transparent dark background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Make sure it's on top of other elements */
+}
 
+.transfer-animation-container {
+     background: url('${bgImageUrl}') center/cover no-repeat;
+  border-radius: 16px;
+  padding: 24px;
+  width: 400px;
+  min-height: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease-in-out;
+  position: relative;
+}
+  .updatetransfer-animation-container{
+    background: url('${bgImageUrl}') center/cover no-repeat;
+  border-radius: 16px;
+  padding: 24px;
+  width: 400px;
+  min-height: 200px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease-in-out;
+  position: relative;
+  }
+  .check-container{
+  align-items: center;
+  font-size: 40px;
+  text-align: center;
+  }
+  .check-mark{
+  color: green;
+  }
+  .success-text{
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+
+.spinner {
+  border: 6px solid #444;
+  border-top: 6px solid #3498db; /* Spinner color */
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
     @keyframes fadeIn {
       from {
@@ -233,10 +287,9 @@ export function injectCSS() {
         transform: scale(1);
       }
     }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+ 
+  
+   
 
   `
 

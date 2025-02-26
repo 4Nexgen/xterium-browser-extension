@@ -6,7 +6,7 @@ function formatWalletAddress(address) {
 if (!window.xterium) {
   console.log("[Injected.js] Script executed!")
   window.xterium = {
-    extensionId: "jdljmhgiecpgbmellhlpdggmponadiln",
+    extensionId: "aiapofnodjdnompdjafhjbokgnjakbcf",
     isXterium: true,
     isConnected: false,
     connectedWallet: null,
@@ -397,7 +397,8 @@ if (!window.xterium) {
       overlay.innerHTML = ""
 
       const container = document.createElement("div")
-      container.classList.add("transfer-animation-container")
+      container.classList.add("updatetransfer-animation-container")
+
       const checkContainer = document.createElement("div")
       checkContainer.classList.add("check-container")
 
@@ -408,6 +409,7 @@ if (!window.xterium) {
       container.appendChild(checkContainer)
 
       const successText = document.createElement("div")
+      successText.classList.add("success-text")
       successText.innerText = "Transfer Successful"
       container.appendChild(successText)
 
@@ -665,7 +667,7 @@ if (!window.xterium) {
                 reject(err)
               })
           })
-        } 
+        }
 
         window.postMessage({ type: "XTERIUM_GET_TOKEN_LIST" }, "*")
         const handleTokenListResponse = (event) => {
@@ -916,45 +918,47 @@ if (!window.xterium) {
         if (details.sender && details.recipient) {
           const addressesDiv = document.createElement("div")
           addressesDiv.classList.add("transfer-address")
-          
+
           // Sender circle
           const senderDiv = document.createElement("div")
           senderDiv.innerText = formatWalletAddress(details.sender)
           senderDiv.classList.add("sender-circle")
-          
+
           // Recipient circle (overlapping)
           const recipientDiv = document.createElement("div")
           recipientDiv.innerText = formatWalletAddress(details.recipient)
           recipientDiv.classList.add("recipient-circle")
-          
+
           addressesDiv.appendChild(senderDiv)
           addressesDiv.appendChild(recipientDiv)
           container.appendChild(addressesDiv)
         }
 
-        const detailsDiv = document.createElement("div");
-detailsDiv.classList.add("details-container");
+        const detailsDiv = document.createElement("div")
+        detailsDiv.classList.add("details-container")
 
-function createStyledField(label, value) {
-    const field = document.createElement("div");
-    field.classList.add("details-field");
-    field.innerHTML = `<strong>${label}:</strong> ${value}`;
-    return field;
-}
+        function createStyledField(label, value) {
+          const field = document.createElement("div")
+          field.classList.add("details-field")
+          field.innerHTML = `<strong>${label}:</strong> ${value}`
+          return field
+        }
 
-detailsDiv.appendChild(createStyledField("Token", details.token.symbol));
-detailsDiv.appendChild(createStyledField("Recipient", formatWalletAddress(details.recipient)));
-detailsDiv.appendChild(createStyledField("Amount", details.value));
-detailsDiv.appendChild(createStyledField("Fee", details.fee));
+        detailsDiv.appendChild(createStyledField("Token", details.token.symbol))
+        detailsDiv.appendChild(
+          createStyledField("Recipient", formatWalletAddress(details.recipient))
+        )
+        detailsDiv.appendChild(createStyledField("Amount", details.value))
+        detailsDiv.appendChild(createStyledField("Fee", details.fee))
 
-container.appendChild(detailsDiv);
-
+        container.appendChild(detailsDiv)
 
         const approveBtn = document.createElement("button")
         approveBtn.classList.add("approve-button")
         approveBtn.innerText = "Approve"
         approveBtn.addEventListener("click", () => {
           document.body.removeChild(overlay)
+
           resolve()
         })
 
@@ -965,10 +969,11 @@ container.appendChild(detailsDiv);
           document.body.removeChild(overlay)
           reject("User cancelled transfer.")
         })
-        const buttonContainer = document.createElement("div");
-buttonContainer.classList.add("button-container");
+        const buttonContainer = document.createElement("div")
+        buttonContainer.classList.add("button-container")
         container.appendChild(approveBtn)
         container.appendChild(cancelBtn)
+
         document.body.appendChild(buttonContainer)
 
         overlay.appendChild(container)
@@ -976,28 +981,6 @@ buttonContainer.classList.add("button-container");
       })
     },
 
-    showTransferringAnimation: function () {
-      const overlay = document.createElement("div")
-      overlay.id = "xterium-transferring-overlay"
-      overlay.classList.add("transfer-animation-overlay")
-
-      const container = document.createElement("div")
-      container.classList.add("transfer-animation-container")
-
-      const spinner = document.createElement("div")
-      spinner.classList.add("spinner")
-      container.appendChild(spinner)
-
-      const text = document.createElement("div")
-      text.innerText = "Transferring..."
-      container.appendChild(text)
-
-      overlay.appendChild(container)
-      document.body.appendChild(overlay)
-
-      // Return the overlay so it can be removed once transfer completes.
-      return overlay
-    }
   }
 
   window.xterium.loadConnectionState()
