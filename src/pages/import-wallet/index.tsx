@@ -27,6 +27,8 @@ import { useTranslation } from "react-i18next"
 
 const IndexImportWalletPage = ({ handleCallbacks }) => {
   const { t } = useTranslation()
+  const [isLoading, setIsLoading] = useState(false) 
+  const { toast } = useToast()
   const languageTranslationService = new LanguageTranslationService()
   const [selectedLanguage, setSelectedLanguage] = useState("English")
   const networkService = new NetworkService()
@@ -40,11 +42,9 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
     mnemonic_phrase: "",
     secret_key: "",
     public_key: "",
-      balances: [],
-      type: ""
+    balances: [],
+    type: ""
   })
-
-  const { toast } = useToast()
 
   const getNetwork = () => {
     networkService.getNetwork().then((data) => {
@@ -147,6 +147,8 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
       return
     }
 
+    setIsLoading(true)
+
     userService.getWalletPassword().then((decryptedPassword) => {
       if (decryptedPassword) {
         const encryptionService = new EncryptionService()
@@ -175,10 +177,18 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
               ),
               variant: "default"
             })
+            setTimeout(() => {
+              setIsLoading(false) 
+              resetForm() 
+              handleCallbacks(t("Wallets")) 
+            }, 1500)
+          } else {
+            setIsLoading(false) 
           }
         })
-
-        handleCallbacks(t("Wallets"))
+      }
+      else {
+        setIsLoading(false)
       }
     })
   }
@@ -187,8 +197,34 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
     handleCallbacks(t("Wallets"))
   }
 
+  const resetForm = () => {
+    setWalletData({
+      id: 0,
+      name: "",
+      address_type: "",
+      mnemonic_phrase: "",
+      secret_key: "",
+      public_key: "",
+      balances: [],
+      type: ""
+    })
+  }
+
   return (
-    <div className="bg-background-sheet flex justify-center items-center">
+    <>
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin border-4 border-blue-400 border-t-transparent rounded-full w-16 h-16 mb-4"></div>
+              <p className="text-white text-lg font-semibold">
+                {t("Adding wallet...")}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+      <div className="bg-background-sheet flex justify-center items-center">
       <div className="bg-white background-inside-theme h-screen max-w-xl w-full">
         <header className=" p-6 flex items-center border-b border-border-1">
           <div
@@ -230,7 +266,8 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 

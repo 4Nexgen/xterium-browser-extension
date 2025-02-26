@@ -29,7 +29,8 @@ const IndexAddWallet = ({ handleCallbacks }) => {
   const networkService = new NetworkService()
   const userService = new UserService()
   const walletService = new WalletService()
-
+  const [isLoading, setIsLoading] = useState(false) 
+  const { toast } = useToast()
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
   const [walletData, setWalletData] = useState<WalletModel>({
     id: 0,
@@ -41,9 +42,6 @@ const IndexAddWallet = ({ handleCallbacks }) => {
     balances: [],
     type: ""
   })
-
-  const [isLoading, setIsLoading] = useState(false) // Loading spinner state
-  const { toast } = useToast()
 
   const getNetwork = () => {
     networkService.getNetwork().then((data) => {
@@ -127,7 +125,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
       return
     }
 
-    setIsLoading(true) // Show loading spinner
+    setIsLoading(true) 
 
     userService.getWalletPassword().then((decryptedPassword) => {
       if (decryptedPassword) {
