@@ -6,7 +6,7 @@ function formatWalletAddress(address) {
 if (!window.xterium) {
   console.log("[Injected.js] Script executed!")
   window.xterium = {
-    extensionId: "aiapofnodjdnompdjafhjbokgnjakbcf",
+    extensionId: "jjpkkhlnoghlflacjiajhmccglmolbmj",
     isXterium: true,
     isConnected: false,
     connectedWallet: null,
@@ -103,36 +103,43 @@ if (!window.xterium) {
         const overlay = document.createElement("div")
         overlay.id = "wallet-connect-overlay"
         overlay.classList.add("inject-overlay")
-
+    
         const container = document.createElement("div")
         container.classList.add("inject-container")
-
+    
         const logo = document.createElement("div")
         logo.classList.add("wallet-logo")
-
+    
         const header = document.createElement("div")
         header.classList.add("inject-header")
         header.innerText = "Connect Your Wallet"
-
+    
         const description = document.createElement("p")
         description.classList.add("inject-description")
         description.innerText = "Choose a wallet to proceed:"
-
+    
         const walletList = document.createElement("div")
         walletList.classList.add("wallet-list")
-
+    
         wallets.forEach((wallet) => {
           const walletButton = document.createElement("button")
           walletButton.classList.add("inject-button")
           walletButton.innerText = formatWalletAddress(wallet.public_key)
           walletButton.addEventListener("click", () => {
             document.body.removeChild(overlay)
-            window.xterium.showSuccessMessage(wallet)
-            resolve(wallet)
+            // Show approval UI before resolving the wallet
+            window.xterium.showConnectApprovalUI(wallet)
+              .then(() => {
+                window.xterium.showSuccessMessage(wallet)
+                resolve(wallet)
+              })
+              .catch((err) => {
+                reject(err)
+              })
           })
           walletList.appendChild(walletButton)
         })
-
+    
         const cancelButton = document.createElement("button")
         cancelButton.classList.add("inject-cancel-button")
         cancelButton.innerHTML = "&times;"
@@ -145,7 +152,62 @@ if (!window.xterium) {
         container.appendChild(header)
         container.appendChild(description)
         container.appendChild(walletList)
-
+    
+        overlay.appendChild(container)
+        document.body.appendChild(overlay)
+      })
+    },
+    
+    showConnectApprovalUI: function (wallet) {
+      return new Promise((resolve, reject) => {
+        const overlay = document.createElement("div")
+        overlay.id = "xterium-connect-approval-overlay"
+        overlay.classList.add("inject-overlay")
+    
+        const container = document.createElement("div")
+        container.classList.add("transfer-container")
+    
+        const title = document.createElement("div")
+        title.innerText = "Confirm Wallet Connection"
+        title.classList.add("inject-header")
+        container.appendChild(title)
+    
+        const detailsDiv = document.createElement("div")
+        detailsDiv.classList.add("details-container")
+    
+        function createStyledField(label, value) {
+          const field = document.createElement("div")
+          field.classList.add("details-field")
+          field.innerHTML = `<strong>${label}:</strong> ${value}`
+          return field
+        }
+    
+        detailsDiv.appendChild(createStyledField("Wallet Address", formatWalletAddress(wallet.public_key)))
+    
+        container.appendChild(detailsDiv)
+    
+        const approveBtn = document.createElement("button")
+        approveBtn.classList.add("approve-button")
+        approveBtn.innerText = "Approve"
+        approveBtn.addEventListener("click", () => {
+          document.body.removeChild(overlay)
+          resolve()
+        })
+    
+        const cancelBtn = document.createElement("button")
+        cancelBtn.classList.add("Reject-button")
+        cancelBtn.innerText = "Reject"
+        cancelBtn.addEventListener("click", () => {
+          document.body.removeChild(overlay)
+          reject("User cancelled wallet connection.")
+        })
+    
+        const buttonContainer = document.createElement("div")
+        buttonContainer.classList.add("button-container")
+        buttonContainer.appendChild(approveBtn)
+        buttonContainer.appendChild(cancelBtn)
+    
+        container.appendChild(buttonContainer)
         overlay.appendChild(container)
         document.body.appendChild(overlay)
       })
