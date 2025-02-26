@@ -159,12 +159,12 @@ const IndexAddWallet = ({ handleCallbacks }) => {
             })
 
             setTimeout(() => {
-              setIsLoading(false) // Hide spinner
-              resetForm() // Reset form fields
-              handleCallbacks() // Callback function
+              setIsLoading(false) 
+              resetForm() 
+              handleCallbacks() 
             }, 1500)
           } else {
-            setIsLoading(false) // Hide spinner if there's an error
+            setIsLoading(false) 
           }
         })
       } else {
@@ -175,10 +175,9 @@ const IndexAddWallet = ({ handleCallbacks }) => {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
-        {}
-        {isLoading && (
-          <div className="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
             <div className="flex flex-col items-center">
               <div className="animate-spin border-4 border-blue-400 border-t-transparent rounded-full w-16 h-16 mb-4"></div>
               <p className="text-white text-lg font-semibold">
@@ -186,8 +185,9 @@ const IndexAddWallet = ({ handleCallbacks }) => {
               </p>
             </div>
           </div>
-        )}
-
+        </div>
+      )}
+      <div className="p-6">
         <div className="mb-3">
           <Label>{t("Enter a unique wallet name")}:</Label>
           <Input
