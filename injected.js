@@ -70,7 +70,7 @@ if (!window.xterium) {
                   throw new Error("wallets is not an array after parsing")
                 }
                 if (wallets.length === 0) {
-                  window.xterium.showPopup()
+                  window.xterium.showExtension()
                   return reject("No wallets stored.")
                 }
                 window.xterium
@@ -160,58 +160,122 @@ if (!window.xterium) {
     
     showConnectApprovalUI: function (wallet) {
       return new Promise((resolve, reject) => {
-        const overlay = document.createElement("div")
-        overlay.id = "xterium-connect-approval-overlay"
-        overlay.classList.add("inject-overlay")
+        const overlay = document.createElement("div");
+        overlay.id = "xterium-connect-approval-overlay";
+        overlay.classList.add("inject-overlay");
     
-        const container = document.createElement("div")
-        container.classList.add("transfer-container")
+        const outerContainer = document.createElement("div"); 
+        outerContainer.classList.add("outer-container");
     
-        const title = document.createElement("div")
-        title.innerText = "Confirm Wallet Connection"
-        title.classList.add("inject-header")
-        container.appendChild(title)
+        const headerContainer = document.createElement("div");
+        headerContainer.classList.add("header-container");
+
+        const closeButton = document.createElement("button");
+        closeButton.innerHTML = "&times;"; 
+        closeButton.classList.add("close-button"); 
+        closeButton.addEventListener("click", () => {
+          document.body.removeChild(overlay);
+          reject("User closed the wallet connection.");
+        });
     
-        const detailsDiv = document.createElement("div")
-        detailsDiv.classList.add("details-container")
+        const header = document.createElement("p"); 
+        header.innerText = "Xterium"; 
+        header.classList.add("header-title");
+          
+        headerContainer.appendChild(header);
+        headerContainer.appendChild(closeButton);
+        outerContainer.appendChild(headerContainer); 
+        
+        const container = document.createElement("div");
+        container.classList.add("confirm-wallet-container");
     
-        function createStyledField(label, value) {
-          const field = document.createElement("div")
-          field.classList.add("details-field")
-          field.innerHTML = `<strong>${label}:</strong> ${value}`
-          return field
+        const logo = document.createElement("div");
+        logo.classList.add("xterium-logo");
+        container.appendChild(logo);
+    
+        const title = document.createElement("div");
+        title.innerText = "Sign Request";
+        title.classList.add("inject-header");
+        container.appendChild(title);
+    
+        const description = document.createElement("p");
+        description.classList.add("inject-description");
+        description.innerText = "You are signing a message with account";
+        container.appendChild(description);
+    
+        const detailsDiv = document.createElement("div");
+        detailsDiv.classList.add("details-container");
+    
+        function createStyledField(name, value) {
+          const field = document.createElement("span");
+          field.classList.add("styled-text");
+          field.innerHTML = `${name}: ${value} `;
+          return field;
         }
     
-        detailsDiv.appendChild(createStyledField("Wallet Address", formatWalletAddress(wallet.public_key)))
+        detailsDiv.appendChild(createStyledField(formatWalletAddress(wallet.name), formatWalletAddress(wallet.public_key)));
+        container.appendChild(detailsDiv);
     
-        container.appendChild(detailsDiv)
+        const passwordContainer = document.createElement("div");
+        passwordContainer.classList.add("password-container");
     
-        const approveBtn = document.createElement("button")
-        approveBtn.classList.add("approve-button")
-        approveBtn.innerText = "Approve"
+        const passwordInput = document.createElement("input");
+        passwordInput.type = "password";
+        passwordInput.placeholder = "Enter Password";
+        passwordInput.classList.add("inject-input");
+        container.appendChild(passwordInput)
+        
+    
+        window.postMessage({ type: "XTERIUM_GET_PASSWORD" }, "*");
+        
+        let storedPassword = null;
+        const handlePasswordResponse = (event) => {
+          if (event.source !== window || !event.data || event.data.type !== "XTERIUM_PASSWORD_RESPONSE") return;
+          if (event.data.password) {
+            storedPassword = event.data.password;
+            console.log("[Injected.js] Retrieved stored password:", storedPassword); // Indicator log
+          }
+        };
+    
+        window.addEventListener("message", handlePasswordResponse);
+    
+        const approveBtn = document.createElement("button");
+        approveBtn.classList.add("approve-button");
+        approveBtn.innerText = "Approve";
         approveBtn.addEventListener("click", () => {
+          if (!passwordInput.value) {
+            alert("Password is required to connect the wallet.")
+            return
+          }
+          if (passwordInput.value !== storedPassword) {
+            alert("Invalid password. Please try again.")
+            return
+          }
           document.body.removeChild(overlay)
+          window.postMessage({ type: "XTERIUM_CONNECT_APPROVED", password: passwordInput.value }, "*");
           resolve()
         })
     
-        const cancelBtn = document.createElement("button")
-        cancelBtn.classList.add("Reject-button")
-        cancelBtn.innerText = "Reject"
+        const cancelBtn = document.createElement("button");
+        cancelBtn.classList.add("cancel-button");
+        cancelBtn.innerText = "Cancel";
         cancelBtn.addEventListener("click", () => {
-          document.body.removeChild(overlay)
-          reject("User cancelled wallet connection.")
-        })
+          document.body.removeChild(overlay);
+          reject("User cancelled wallet connection.");
+        });
     
-        const buttonContainer = document.createElement("div")
-        buttonContainer.classList.add("button-container")
-        buttonContainer.appendChild(approveBtn)
-        buttonContainer.appendChild(cancelBtn)
-    
-        container.appendChild(buttonContainer)
-        overlay.appendChild(container)
-        document.body.appendChild(overlay)
-      })
+        const buttonContainer = document.createElement("div");
+        buttonContainer.classList.add("confirmbutton-container");
+        buttonContainer.appendChild(cancelBtn);
+        buttonContainer.appendChild(approveBtn);
+        
+        container.appendChild(buttonContainer); 
+        outerContainer.appendChild(container); 
+        overlay.appendChild(outerContainer); 
+        document.body.appendChild(overlay); 
+      });
     },
+    
     getBalance: function (publicKey) {
       return new Promise((resolve, reject) => {
         if (!window.xterium.isConnected || !window.xterium.connectedWallet) {
@@ -856,112 +920,120 @@ if (!window.xterium) {
         )
       })
     },
-    showPopup: function () {
-      if (document.getElementById("xterium-popup-overlay")) return
-      document.body.style.overflow = "auto"
 
-      const overlay = document.createElement("div")
-      overlay.id = "xterium-popup-overlay"
-      overlay.style.position = "fixed"
-      overlay.style.top = "0"
-      overlay.style.left = "0"
-      overlay.style.width = "100%"
-      overlay.style.height = "100%"
-      overlay.style.backgroundColor = "rgba(0,0,0,0.0)"
-      overlay.style.zIndex = "10000"
-      overlay.style.pointerEvents = "none"
-
-      const container = document.createElement("div")
-      container.style.position = "fixed"
-      container.style.width = "450px"
-      container.style.height = "600px"
-      container.style.top = "50%"
-      container.style.left = "50%"
-      container.style.transform = "translate(-50%, -50%)"
-      container.style.backgroundColor = "#fff"
-      container.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)"
-      container.style.borderRadius = "8px"
-      container.style.pointerEvents = "auto"
-      container.style.overflow = "hidden"
-
-      // Close button remains unchanged
-      const closeBtn = document.createElement("button")
-      closeBtn.innerText = "X"
-      closeBtn.style.position = "absolute"
-      closeBtn.style.top = "10px"
-      closeBtn.style.right = "10px"
-      closeBtn.style.cursor = "pointer"
-      closeBtn.style.border = "none"
-      closeBtn.style.background = "transparent"
-      closeBtn.style.fontSize = "18px"
-      closeBtn.style.color = "#333"
-      closeBtn.style.zIndex = "2"
-      closeBtn.addEventListener("click", () => {
-        document.body.removeChild(overlay)
-        document.body.style.overflow = ""
-      })
-
-      const iframe = document.createElement("iframe")
-      iframe.src = `chrome-extension://${window.xterium.extensionId}/popup.html`
-      iframe.style.width = "100%"
-      iframe.style.height = "100%"
-      iframe.style.border = "none"
-      iframe.style.overflow = "hidden"
-
-      const dragBar = document.createElement("div")
-      dragBar.style.position = "absolute"
-      dragBar.style.top = "0"
-      dragBar.style.left = "50%"
-      dragBar.style.transform = "translateX(-50%)"
-      dragBar.style.width = "200px"
-      dragBar.style.height = "30px"
-      dragBar.style.cursor = "move"
-      dragBar.style.background = "transparent"
-      dragBar.style.zIndex = "1"
-
-      let isDragging = false,
-        startX,
-        startY,
-        origX,
-        origY
-      dragBar.addEventListener("mousedown", function (e) {
-        isDragging = true
-        const rect = container.getBoundingClientRect()
-        // Remove centering transform so we work with pixel values
-        container.style.left = rect.left + "px"
-        container.style.top = rect.top + "px"
-        container.style.transform = ""
-        startX = e.clientX
-        startY = e.clientY
-        origX = rect.left
-        origY = rect.top
-
-        function onMouseMove(e) {
-          if (!isDragging) return
-          const dx = e.clientX - startX
-          const dy = e.clientY - startY
-          container.style.left = origX + dx + "px"
-          container.style.top = origY + dy + "px"
-        }
-
-        function onMouseUp() {
-          isDragging = false
-          document.removeEventListener("mousemove", onMouseMove)
-          document.removeEventListener("mouseup", onMouseUp)
-        }
-
-        document.addEventListener("mousemove", onMouseMove)
-        document.addEventListener("mouseup", onMouseUp)
-        e.preventDefault()
-      })
-      container.appendChild(iframe)
-      container.appendChild(dragBar)
-      container.appendChild(closeBtn)
-      overlay.appendChild(container)
-      document.body.appendChild(overlay)
-
-      console.log("[Xterium] Popup overlay opened.")
+    showExtension: function () {
+      const extensionId = "jjpkkhlnoghlflacjiajhmccglmolbmj";
+      const url = `chrome-extension://${extensionId}/popup.html`;
+      window.open(url, "_blank"); 
+      console.log("[Xterium] Extension opened in a new tab.");
     },
+
+    // showPopup: function () {
+    //   if (document.getElementById("xterium-popup-overlay")) return
+    //   document.body.style.overflow = "auto"
+
+    //   const overlay = document.createElement("div")
+    //   overlay.id = "xterium-popup-overlay"
+    //   overlay.style.position = "fixed"
+    //   overlay.style.top = "0"
+    //   overlay.style.left = "0"
+    //   overlay.style.width = "100%"
+    //   overlay.style.height = "100%"
+    //   overlay.style.backgroundColor = "rgba(0,0,0,0.0)"
+    //   overlay.style.zIndex = "10000"
+    //   overlay.style.pointerEvents = "none"
+
+    //   const container = document.createElement("div")
+    //   container.style.position = "fixed"
+    //   container.style.width = "450px"
+    //   container.style.height = "600px"
+    //   container.style.top = "50%"
+    //   container.style.left = "50%"
+    //   container.style.transform = "translate(-50%, -50%)"
+    //   container.style.backgroundColor = "#fff"
+    //   container.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)"
+    //   container.style.borderRadius = "8px"
+    //   container.style.pointerEvents = "auto"
+    //   container.style.overflow = "hidden"
+
+    //   // Close button remains unchanged
+    //   const closeBtn = document.createElement("button")
+    //   closeBtn.innerText = "X"
+    //   closeBtn.style.position = "absolute"
+    //   closeBtn.style.top = "10px"
+    //   closeBtn.style.right = "10px"
+    //   closeBtn.style.cursor = "pointer"
+    //   closeBtn.style.border = "none"
+    //   closeBtn.style.background = "transparent"
+    //   closeBtn.style.fontSize = "18px"
+    //   closeBtn.style.color = "#333"
+    //   closeBtn.style.zIndex = "2"
+    //   closeBtn.addEventListener("click", () => {
+    //     document.body.removeChild(overlay)
+    //     document.body.style.overflow = ""
+    //   })
+
+    //   const iframe = document.createElement("iframe")
+    //   iframe.src = `chrome-extension://${window.xterium.extensionId}/popup.html`
+    //   iframe.style.width = "100%"
+    //   iframe.style.height = "100%"
+    //   iframe.style.border = "none"
+    //   iframe.style.overflow = "hidden"
+
+    //   const dragBar = document.createElement("div")
+    //   dragBar.style.position = "absolute"
+    //   dragBar.style.top = "0"
+    //   dragBar.style.left = "50%"
+    //   dragBar.style.transform = "translateX(-50%)"
+    //   dragBar.style.width = "200px"
+    //   dragBar.style.height = "30px"
+    //   dragBar.style.cursor = "move"
+    //   dragBar.style.background = "transparent"
+    //   dragBar.style.zIndex = "1"
+
+    //   let isDragging = false,
+    //     startX,
+    //     startY,
+    //     origX,
+    //     origY
+    //   dragBar.addEventListener("mousedown", function (e) {
+    //     isDragging = true
+    //     const rect = container.getBoundingClientRect()
+    //     // Remove centering transform so we work with pixel values
+    //     container.style.left = rect.left + "px"
+    //     container.style.top = rect.top + "px"
+    //     container.style.transform = ""
+    //     startX = e.clientX
+    //     startY = e.clientY
+    //     origX = rect.left
+    //     origY = rect.top
+
+    //     function onMouseMove(e) {
+    //       if (!isDragging) return
+    //       const dx = e.clientX - startX
+    //       const dy = e.clientY - startY
+    //       container.style.left = origX + dx + "px"
+    //       container.style.top = origY + dy + "px"
+    //     }
+
+    //     function onMouseUp() {
+    //       isDragging = false
+    //       document.removeEventListener("mousemove", onMouseMove)
+    //       document.removeEventListener("mouseup", onMouseUp)
+    //     }
+
+    //     document.addEventListener("mousemove", onMouseMove)
+    //     document.addEventListener("mouseup", onMouseUp)
+    //     e.preventDefault()
+    //   })
+    //   container.appendChild(iframe)
+    //   container.appendChild(dragBar)
+    //   container.appendChild(closeBtn)
+    //   overlay.appendChild(container)
+    //   document.body.appendChild(overlay)
+
+    //   console.log("[Xterium] Popup overlay opened.")
+    // },
     showTransferApprovalUI: function (details) {
       return new Promise((resolve, reject) => {
         const overlay = document.createElement("div")
