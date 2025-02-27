@@ -80,7 +80,36 @@ syncTokenListToChromeStorage();
 function fixBalanceReverse(value, decimal) {
   return (Number(value) * Math.pow(10, decimal)).toFixed(0);
 }
+window.addEventListener("message", async (event) => {
+  if (!event.data || event.source !== window) return;
 
+  switch (event.data.type) {
+    case "XTERIUM_GET_PASSWORD": {
+      try {
+        const decryptedPassword = await userService.getWalletPassword();
+        window.postMessage(
+          {
+            type: "XTERIUM_PASSWORD_RESPONSE",
+            password: decryptedPassword
+          },
+          "*"
+        );
+      } catch (error) {
+        console.error("[Content.js] Error fetching stored password:", error);
+        window.postMessage(
+          {
+            type: "XTERIUM_PASSWORD_RESPONSE",
+            password: null
+          },
+          "*"
+        );
+      }
+      break;
+    }
+    default:
+      break;
+  }
+});
 window.addEventListener("message", async (event) => {
   if (!event.data || event.source !== window) return;
 
