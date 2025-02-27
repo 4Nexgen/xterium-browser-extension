@@ -1,5 +1,6 @@
 const bgImageUrl = chrome.runtime.getURL("assets/covers/bg-inside.png")
 const logoUrl = chrome.runtime.getURL("assets/app-logo/xterium-logo.png")
+const iconUrl = chrome.runtime.getURL("assets/app-logo/xterium-icon.png")
 export function injectCSS() {
   const style = document.createElement("style")
   style.textContent = `
@@ -188,17 +189,16 @@ export function injectCSS() {
     flex-direction: column;
     gap: 10px;
     margin-top: 20px;
-    
 }
 
 .approve-button, 
-.Reject-button {
-    width: 49%;
+.reject-button {
+    width: 47%;
     padding: 10px;
     font-size: 16px;
     font-weight: bold;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
     text-align: center;
 }
@@ -208,8 +208,8 @@ export function injectCSS() {
     color: white;
 }
 
-.Reject-button {
-    margin-left: 2%;
+.reject-button {
+    margin-right:4%;
     background-color: #f44336;
     color: white;
 }
@@ -270,6 +270,76 @@ export function injectCSS() {
   animation: spin 1s linear infinite;
   margin-bottom: 20px;
 }
+.xterium-logo {
+  background: url('${iconUrl}') center/cover no-repeat;
+  width: 35px;
+  height: 35px;
+  left: 0;
+}
+.styled-text {
+  display: block; 
+  text-align: center; 
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+}
+  .approve-button,
+  .cancel-button {
+    margin-top: 60%;
+  }
+
+.cancel-button {
+  margin-right: 6%;
+  width: 47%;
+  border: 1px solid white;
+  color: white;
+  padding: 9.1px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+}
+.confirm-wallet-container {
+  background: url('${bgImageUrl}') center/cover no-repeat;
+  border-radius: 0 0 16px 16px;
+  padding: 24px;
+  width: 400px;
+  min-height: 550px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease-in-out;
+  position: relative;
+}
+.header-container {
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  background: #111722;
+  border-radius: 16px 16px 0 0;
+  padding: 0.1px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.header-title {
+  text-align: center; 
+  font-size: 18px;
+  flex: 1; 
+  margin: 0; 
+  color: white;
+}
+
+.close-button {
+  background: transparent; 
+  border: none; 
+  font-size: 30px; 
+  cursor: pointer; 
+  color: white; 
+  margin-right: 10px;
+  background-color: transparent;
+}
+
+.close-button:hover {
+  color: #ff0000; 
+}
 
 
 @keyframes spin {
@@ -308,4 +378,3 @@ export function injectScript() {
   }
   ;(document.head || document.documentElement).appendChild(script)
 }
-
