@@ -58,28 +58,28 @@ export function injectCSS() {
       text-align: center;
     }
     .inject-input {
-    required: true;
-    width: 100%;
-    margin-bottom: 10px;
-    background-color: #111722;
-    border: 1px solid transparent; 
-    border-radius: 5px;
-    outline:none;
-}
+      required: true;
+      width: 100%;
+      margin-bottom: 10px;
+      background-color: #111722;
+      border: 1px solid transparent; 
+      border-radius: 5px;
+      outline:none;
+    }
 
-.inject-input:hover {
-    border: 1px solid #0fbab5; 
-    outline: none;
-}
-.inject-select{
-    required: true;
-    width: 100%;
-    margin-bottom: 10px;
-    background-color: #111722;
-    border: 1px solid transparent; 
-    border-radius: 5px;
-    outline:none;
-}
+    .inject-input:hover {
+      border: 1px solid #0fbab5; 
+      outline: none;
+    }
+    .inject-select{
+      required: true;
+      width: 100%;
+      margin-bottom: 10px;
+      background-color: #111722;
+      border: 1px solid transparent; 
+      border-radius: 5px;
+      outline:none;
+    }
     .wallet-list {
       display: flex;
       flex-direction: column;
@@ -103,62 +103,62 @@ export function injectCSS() {
       background: linear-gradient(135deg, #66BB6A, #388E3C);
     }
 
-.inject-cancel-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 40px; 
-  height: 40px;
-  color: white; 
-  background: transparent; 
-  border: none;
-  font-size: 30px; 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: color 0.3s ease; 
-}
+    .inject-cancel-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 40px; 
+      height: 40px;
+      color: white; 
+      background: transparent; 
+      border: none;
+      font-size: 30px; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: color 0.3s ease; 
+    }
 
-.inject-cancel-button:hover {
-  color: red; 
-}
-  .inject-err{
-    color: red;
-    text-align: center;
-    align-items: center;
-  }
+    .inject-cancel-button:hover {
+      color: red; 
+    }
+    .inject-err{
+      color: red;
+      text-align: center;
+      align-items: center;
+    }
 
-.transfer-address{
-  display = "flex"
-          justifyContent = "center"
-          alignItems = "center"
-          marginBottom = "10px"
-  }
-  .sender-circle{
-    border = "1px solid #ccc"
-          borderRadius = "50%"
-          width = "50px"
-          height = "50px"
-          lineHeight = "50px"
-          textAlign = "center"
-          background = "#fff"
-          position = "relative"
-          zIndex = "2"
-  }
-  .recipient-circle{
-    border = "1px solid #ccc"
-          borderRadius = "50%"
-          width = "50px"
-          height = "50px"
-          lineHeight = "50px"
-          textAlign = "center"
-          background = "#fff"
-          position = "relative"
-          left = "-15px" // adjust overlap here
-          zIndex = "1"
-  }
-          .transfer-container {
+    .transfer-address{
+      display = "flex"
+      justifyContent = "center"
+      alignItems = "center"
+      marginBottom = "10px"
+    }
+    .sender-circle{
+      border = "1px solid #ccc"
+      borderRadius = "50%"
+      width = "50px"
+      height = "50px"
+      lineHeight = "50px"
+      textAlign = "center"
+      background = "#fff"
+      position = "relative"
+      zIndex = "2"
+    }
+    .recipient-circle{
+      border = "1px solid #ccc"
+      borderRadius = "50%"
+      width = "50px"
+      height = "50px"
+      lineHeight = "50px"
+      textAlign = "center"
+      background = "#fff"
+      position = "relative"
+      left = "-15px" // adjust overlap here
+      zIndex = "1"
+    }
+    .transfer-container {
       background: url('${bgImageUrl}') center/cover no-repeat;
       border-radius: 16px;
       padding: 24px;
@@ -168,184 +168,183 @@ export function injectCSS() {
       animation: fadeIn 0.3s ease-in-out;
       position: relative;
     }
-      .details-container {
-    text-align: left;
-    margin-bottom: 20px;
-}
+    .details-container {
+      text-align: left;
+      margin-bottom: 20px;
+    }
 
-.details-field {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 10px;
-    background-color: #111722;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    color: white;
-}
-    .button-container {
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
-}
+    .details-field {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #111722;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      color: white;
+    }
+      .button-container {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
 
-.approve-button, 
-.reject-button {
-    width: 47%;
-    padding: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-align: center;
-}
+    .approve-button, 
+    .reject-button {
+      width: 47%;
+      padding: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: center;
+    }
 
-.approve-button {
-    background-color: #4CAF50;
-    color: white;
-}
+    .approve-button {
+      background-color: #4CAF50;
+      color: white;
+    }
 
-.reject-button {
-    margin-right:4%;
-    background-color: #f44336;
-    color: white;
-}
-.transfer-animation-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5); /* Transparent dark background */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999; /* Make sure it's on top of other elements */
-}
+    .reject-button {
+      margin-right:4%;
+      background-color: #f44336;
+      color: white;
+    }
+    .transfer-animation-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5); /* Transparent dark background */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999; /* Make sure it's on top of other elements */
+    }
 
-.transfer-animation-container {
-     background: url('${bgImageUrl}') center/cover no-repeat;
-  border-radius: 16px;
-  padding: 24px;
-  width: 400px;
-  min-height: 400px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.3s ease-in-out;
-  position: relative;
-}
-  .updatetransfer-animation-container{
-    background: url('${bgImageUrl}') center/cover no-repeat;
-  border-radius: 16px;
-  padding: 24px;
-  width: 400px;
-  min-height: 200px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.3s ease-in-out;
-  position: relative;
-  }
-  .check-container{
-  align-items: center;
-  font-size: 40px;
-  text-align: center;
-  }
-  .check-mark{
-  color: green;
-  }
-  .success-text{
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-    margin-top: 20px;
-  }
+    .transfer-animation-container {
+        background: url('${bgImageUrl}') center/cover no-repeat;
+      border-radius: 16px;
+      padding: 24px;
+      width: 400px;
+      min-height: 400px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.3s ease-in-out;
+      position: relative;
+    }
+    .updatetransfer-animation-container{
+      background: url('${bgImageUrl}') center/cover no-repeat;
+      border-radius: 16px;
+      padding: 24px;
+      width: 400px;
+      min-height: 200px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.3s ease-in-out;
+      position: relative;
+    }
+    .check-container{
+      align-items: center;
+      font-size: 40px;
+      text-align: center;
+    }
+    .check-mark{
+      color: green;
+    }
+    .success-text{
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
 
-.spinner {
-  border: 6px solid #444;
-  border-top: 6px solid #3498db; /* Spinner color */
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  animation: spin 1s linear infinite;
-  margin-bottom: 20px;
-}
-.xterium-logo {
-  background: url('${iconUrl}') center/cover no-repeat;
-  width: 35px;
-  height: 35px;
-  left: 0;
-}
-.styled-text {
-  display: block; 
-  text-align: center; 
-  font-size: 16px;
-  font-weight: bold;
-  color: white;
-}
-  .approve-button,
-  .cancel-button {
-    margin-top: 60%;
-  }
+    .spinner {
+      border: 6px solid #444;
+      border-top: 6px solid #3498db; /* Spinner color */
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    .xterium-logo {
+      background: url('${iconUrl}') center/cover no-repeat;
+      width: 35px;
+      height: 35px;
+      left: 0;
+    }
+    .styled-text {
+      display: block; 
+      text-align: center; 
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+    }
+    .approve-button,
+    .cancel-button {
+      margin-top: 60%;
+    }
 
-.cancel-button {
-  margin-right: 6%;
-  width: 47%;
-  border: 1px solid white;
-  color: white;
-  padding: 9.1px;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 5px;
-}
-.confirm-wallet-container {
-  background: url('${bgImageUrl}') center/cover no-repeat;
-  border-radius: 0 0 16px 16px;
-  padding: 24px;
-  width: 400px;
-  min-height: 550px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.3s ease-in-out;
-  position: relative;
-}
-.header-container {
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  background: #111722;
-  border-radius: 16px 16px 0 0;
-  padding: 0.1px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.3s ease-in-out;
-}
+    .cancel-button {
+      margin-right: 6%;
+      width: 47%;
+      border: 1px solid white;
+      color: white;
+      padding: 9.1px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 5px;
+    }
+    .confirm-wallet-container {
+      background: url('${bgImageUrl}') center/cover no-repeat;
+      border-radius: 0 0 16px 16px;
+      padding: 24px;
+      width: 400px;
+      min-height: 550px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.3s ease-in-out;
+      position: relative;
+    }
+    .header-container {
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      background: #111722;
+      border-radius: 16px 16px 0 0;
+      padding: 0.1px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.3s ease-in-out;
+    }
 
-.header-title {
-  text-align: center; 
-  font-size: 18px;
-  flex: 1; 
-  margin: 0; 
-  color: white;
-}
+    .header-title {
+      text-align: center; 
+      font-size: 18px;
+      flex: 1; 
+      margin: 0; 
+      color: white;
+    }
 
-.close-button {
-  background: transparent; 
-  border: none; 
-  font-size: 30px; 
-  cursor: pointer; 
-  color: white; 
-  margin-right: 10px;
-  background-color: transparent;
-}
+    .close-button {
+      background: transparent; 
+      border: none; 
+      font-size: 30px; 
+      cursor: pointer; 
+      color: white; 
+      margin-right: 10px;
+      background-color: transparent;
+    }
 
-.close-button:hover {
-  color: #ff0000; 
-}
+    .close-button:hover {
+      color: #ff0000; 
+    }
 
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
     @keyframes fadeIn {
       from {
@@ -357,12 +356,7 @@ export function injectCSS() {
         transform: scale(1);
       }
     }
- 
-  
-   
-
   `
-
   document.head.appendChild(style)
 }
 
