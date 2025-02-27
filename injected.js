@@ -100,63 +100,55 @@ if (!window.xterium) {
 
     showConnectPrompt: function (wallets) {
       return new Promise((resolve, reject) => {
-        const overlay = document.createElement("div")
-        overlay.id = "wallet-connect-overlay"
-        overlay.classList.add("inject-overlay")
-    
-        const container = document.createElement("div")
-        container.classList.add("inject-container")
-    
-        const logo = document.createElement("div")
-        logo.classList.add("wallet-logo")
-    
-        const header = document.createElement("div")
-        header.classList.add("inject-header")
-        header.innerText = "Connect Your Wallet"
-    
-        const description = document.createElement("p")
-        description.classList.add("inject-description")
-        description.innerText = "Choose a wallet to proceed:"
-    
-        const walletList = document.createElement("div")
-        walletList.classList.add("wallet-list")
-    
-        wallets.forEach((wallet) => {
-          const walletButton = document.createElement("button")
-          walletButton.classList.add("inject-button")
-          walletButton.innerText = formatWalletAddress(wallet.public_key)
-          walletButton.addEventListener("click", () => {
-            document.body.removeChild(overlay)
-            // Show approval UI before resolving the wallet
-            window.xterium.showConnectApprovalUI(wallet)
-              .then(() => {
-                window.xterium.showSuccessMessage(wallet)
-                resolve(wallet)
+          const overlay = document.createElement("div")
+          overlay.id = "wallet-connect-overlay"
+          overlay.classList.add("inject-overlay")
+      
+          const container = document.createElement("div")
+          container.classList.add("inject-container")
+      
+          const logo = document.createElement("div")
+          logo.classList.add("wallet-logo")
+      
+          const header = document.createElement("div")
+          header.classList.add("inject-header")
+          header.innerText = "Connect Your Wallet"
+      
+          const description = document.createElement("p")
+          description.classList.add("inject-description")
+          description.innerText = "Choose a wallet to proceed:"
+      
+          const walletList = document.createElement("div")
+          walletList.classList.add("wallet-list")
+      
+          wallets.forEach((wallet) => {
+              const walletButton = document.createElement("button")
+              walletButton.classList.add("inject-button")
+              walletButton.innerText = formatWalletAddress(wallet.public_key)
+              walletButton.addEventListener("click", () => {
+                  document.body.removeChild(overlay)
+                  resolve(wallet)
               })
-              .catch((err) => {
-                reject(err)
-              })
+              walletList.appendChild(walletButton)
           })
-          walletList.appendChild(walletButton)
-        })
-    
-        const cancelButton = document.createElement("button")
-        cancelButton.classList.add("inject-cancel-button")
-        cancelButton.innerHTML = "&times;"
-        cancelButton.addEventListener("click", () => {
-          document.body.removeChild(overlay)
-          reject("User cancelled wallet connection.")
-        })
-        container.appendChild(cancelButton)
-        container.appendChild(logo)
-        container.appendChild(header)
-        container.appendChild(description)
-        container.appendChild(walletList)
-    
-        overlay.appendChild(container)
-        document.body.appendChild(overlay)
+      
+          const cancelButton = document.createElement("button")
+          cancelButton.classList.add("inject-cancel-button")
+          cancelButton.innerHTML = "&times;"
+          cancelButton.addEventListener("click", () => {
+              document.body.removeChild(overlay)
+              reject("User cancelled wallet connection.")
+          })
+          container.appendChild(cancelButton)
+          container.appendChild(logo)
+          container.appendChild(header)
+          container.appendChild(description)
+          container.appendChild(walletList)
+      
+          overlay.appendChild(container)
+          document.body.appendChild(overlay)
       })
-    },
+  },
     
     showConnectApprovalUI: function (wallet) {
       return new Promise((resolve, reject) => {
