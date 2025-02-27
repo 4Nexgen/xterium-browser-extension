@@ -34,7 +34,9 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
     address_type: "",
     mnemonic_phrase: "",
     secret_key: "",
-    public_key: ""
+    public_key: "",
+    balances: [],
+    type: ""
   })
   const [isAddWalletDrawerOpen, setIsAddWalletDrawerOpen] = useState(false)
   const [isExportWalletDrawerOpen, setIsExportWalletDrawerOpen] = useState(false)

@@ -26,7 +26,7 @@ export class WalletService {
       console.log("[WalletService] Created wallet with balances:", data.balances)
 
       wallets.push(data)
-      await this.storage.set(this.key, JSON.stringify(wallets))
+      await this.storage.set(this.key, wallets)
       return "Wallet created successfully"
     } catch (error) {
       throw new Error(`[WalletService] Failed to create wallet: ${error}`)
@@ -43,7 +43,7 @@ export class WalletService {
       console.log("[WalletService] Updated wallet balances:", data.balances)
 
       wallets[index] = data
-      await this.storage.set(this.key, JSON.stringify(wallets))
+      await this.storage.set(this.key, wallets)
       return "Wallet updated successfully"
     } catch (error) {
       throw new Error(`[WalletService] Failed to update wallet: ${error}`)
@@ -52,8 +52,13 @@ export class WalletService {
 
   async getWallets(): Promise<WalletModel[]> {
     try {
-      const storedData = await this.storage.get<string>(this.key)
-      return storedData ? JSON.parse(storedData) : []
+      const storedData = await this.storage.get(this.key)
+      if (Array.isArray(storedData)) {
+        return storedData as WalletModel[];
+      } else {
+        console.warn("[WalletService] Stored data is not an array, returning empty array.");
+        return [];
+      } 
     } catch (error) {
       console.error("[WalletService] Failed to get wallets:", error)
       return []
@@ -85,7 +90,7 @@ export class WalletService {
       if (wallets.length === filteredWallets.length) {
         throw new Error("Wallet not found.")
       }
-      await this.storage.set(this.key, JSON.stringify(filteredWallets))
+      await this.storage.set(this.key, filteredWallets)
       return true
     } catch (error) {
       throw new Error(`[WalletService] Failed to delete wallet: ${error}`)
