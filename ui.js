@@ -32,15 +32,13 @@ export function injectCSS() {
       text-align: left;
     }
     .wallet-logo {
-        background: url('${logoUrl}') center/cover no-repeat;
-        width: 120px;
-        height: 120px;
-        margin: 0 auto;
-        position: relative;
-        margin-top: 5%;
-
+      background: url('${logoUrl}') center/cover no-repeat;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto;
+      position: relative;
+      margin-top: 5%;
     }
-
     .inject-header {
       font-size: 24px;
       font-weight: bold;
@@ -49,8 +47,6 @@ export function injectCSS() {
       padding-top: 5%;
       text-align: center;
     }
-
-
     .inject-description {
       font-size: 16px;
       color: #666666;
@@ -65,8 +61,8 @@ export function injectCSS() {
       border: 1px solid transparent; 
       border-radius: 5px;
       outline:none;
+      color: white;
     }
-
     .inject-input:hover {
       border: 1px solid #0fbab5; 
       outline: none;
@@ -85,7 +81,6 @@ export function injectCSS() {
       flex-direction: column;
       gap: 10px;
     }
-
     .inject-button {
       padding: 12px;
       background: linear-gradient(135deg, #4CAF50, #2E7D32);
@@ -98,11 +93,9 @@ export function injectCSS() {
       width: 100%;
       margin-top: 2%;
     }
-
     .inject-button:hover {
       background: linear-gradient(135deg, #66BB6A, #388E3C);
     }
-
     .inject-cancel-button {
       position: absolute;
       top: 10px;
@@ -119,7 +112,6 @@ export function injectCSS() {
       cursor: pointer;
       transition: color 0.3s ease; 
     }
-
     .inject-cancel-button:hover {
       color: red; 
     }
@@ -128,7 +120,6 @@ export function injectCSS() {
       text-align: center;
       align-items: center;
     }
-
     .transfer-address{
       display = "flex"
       justifyContent = "center"
