@@ -30,6 +30,7 @@ export function injectCSS() {
     }
     .inject-label{
       text-align: left;
+      color: white;
     }
     .wallet-logo {
       background: url('${logoUrl}') center/cover no-repeat;
@@ -75,6 +76,7 @@ export function injectCSS() {
       border: 1px solid transparent; 
       border-radius: 5px;
       outline:none;
+      color: white;
     }
     .wallet-list {
       display: flex;
