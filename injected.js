@@ -6,7 +6,7 @@ function formatWalletAddress(address) {
 if (!window.xterium) {
   console.log("[Injected.js] Script executed!")
   window.xterium = {
-    extensionId: "plhchpneiklnlplnnlhkmnikaepgfdaf",
+    extensionId: "aiapofnodjdnompdjafhjbokgnjakbcf",
     isXterium: true,
     isConnected: false,
     connectedWallet: null,
@@ -104,8 +104,30 @@ if (!window.xterium) {
         overlay.id = "wallet-connect-overlay"
         overlay.classList.add("inject-overlay")
 
+        const outerContainer = document.createElement("div"); 
+        outerContainer.classList.add("outer-container");
+    
+        const headerContainer = document.createElement("div");
+        headerContainer.classList.add("header-container");
+
+        const closeButton = document.createElement("button");
+        closeButton.innerHTML = "&times;"; 
+        closeButton.classList.add("close-button"); 
+        closeButton.addEventListener("click", () => {
+          document.body.removeChild(overlay);
+          reject("User closed the wallet connection.");
+        });
+    
+        const outerHeader = document.createElement("p"); 
+        outerHeader.innerText = "Xterium"; 
+        outerHeader.classList.add("header-title");
+          
+        headerContainer.appendChild(outerHeader);
+        headerContainer.appendChild(closeButton);
+        outerContainer.appendChild(headerContainer); 
+    
         const container = document.createElement("div")
-        container.classList.add("inject-container")
+        container.classList.add("wallet-connect-container")
 
         const logo = document.createElement("div")
         logo.classList.add("wallet-logo")
@@ -132,21 +154,43 @@ if (!window.xterium) {
           walletList.appendChild(walletButton)
         })
 
-        const cancelButton = document.createElement("button")
-        cancelButton.classList.add("inject-cancel-button")
-        cancelButton.innerHTML = "&times;"
-        cancelButton.addEventListener("click", () => {
-          document.body.removeChild(overlay)
-          reject("User cancelled wallet connection.")
-        })
-        container.appendChild(cancelButton)
+        // const cancelButton = document.createElement("button")
+        // cancelButton.classList.add("inject-cancel-button")
+        // cancelButton.innerHTML = "&times;"
+        // cancelButton.addEventListener("click", () => {
+        //   document.body.removeChild(overlay)
+        //   reject("User cancelled wallet connection.")
+        // })
+        // container.appendChild(cancelButton)
         container.appendChild(logo)
         container.appendChild(header)
         container.appendChild(description)
         container.appendChild(walletList)
 
         overlay.appendChild(container)
+        outerContainer.appendChild(container); 
+        overlay.appendChild(outerContainer); 
         document.body.appendChild(overlay)
+
+        let offsetX, offsetY;
+        outerContainer.addEventListener("mousedown", (e) => {
+            offsetX = e.clientX - outerContainer.getBoundingClientRect().left;
+            offsetY = e.clientY - outerContainer.getBoundingClientRect().top;
+
+            const mouseMoveHandler = (moveEvent) => {
+                outerContainer.style.position = 'absolute';
+                outerContainer.style.left = `${moveEvent.clientX - offsetX}px`;
+                outerContainer.style.top = `${moveEvent.clientY - offsetY}px`;
+            };
+
+            const mouseUpHandler = () => {
+                document.removeEventListener("mousemove", mouseMoveHandler);
+                document.removeEventListener("mouseup", mouseUpHandler);
+            };
+
+            document.addEventListener("mousemove", mouseMoveHandler);
+            document.addEventListener("mouseup", mouseUpHandler);
+        });
       })
     },
 
@@ -277,6 +321,26 @@ if (!window.xterium) {
         outerContainer.appendChild(container)
         overlay.appendChild(outerContainer)
         document.body.appendChild(overlay)
+
+        let offsetX, offsetY;
+        outerContainer.addEventListener("mousedown", (e) => {
+            offsetX = e.clientX - outerContainer.getBoundingClientRect().left;
+            offsetY = e.clientY - outerContainer.getBoundingClientRect().top;
+
+            const mouseMoveHandler = (moveEvent) => {
+                outerContainer.style.position = 'absolute';
+                outerContainer.style.left = `${moveEvent.clientX - offsetX}px`;
+                outerContainer.style.top = `${moveEvent.clientY - offsetY}px`;
+            };
+
+            const mouseUpHandler = () => {
+                document.removeEventListener("mousemove", mouseMoveHandler);
+                document.removeEventListener("mouseup", mouseUpHandler);
+            };
+
+            document.addEventListener("mousemove", mouseMoveHandler);
+            document.addEventListener("mouseup", mouseUpHandler);
+        });
       })
     },
 
@@ -926,7 +990,7 @@ if (!window.xterium) {
     },
 
     showExtension: function () {
-      const extensionId = "plhchpneiklnlplnnlhkmnikaepgfdaf"
+      const extensionId = "aiapofnodjdnompdjafhjbokgnjakbcf"
       const url = `chrome-extension://${extensionId}/popup.html`
       window.open(url, "_blank")
       console.log("[Xterium] Extension opened in a new tab.")
@@ -1092,7 +1156,7 @@ if (!window.xterium) {
         container.appendChild(detailsDiv)
 
         const approveBtn = document.createElement("button")
-        approveBtn.classList.add("approve-button")
+        approveBtn.classList.add("transfer-approve-button")
         approveBtn.innerText = "Approve"
         approveBtn.addEventListener("click", () => {
           document.body.removeChild(overlay)
@@ -1101,14 +1165,14 @@ if (!window.xterium) {
         })
 
         const cancelBtn = document.createElement("button")
-        cancelBtn.classList.add("Reject-button")
+        cancelBtn.classList.add("transfer-reject-button")
         cancelBtn.innerText = "Reject"
         cancelBtn.addEventListener("click", () => {
           document.body.removeChild(overlay)
           reject("User cancelled transfer.")
         })
         const buttonContainer = document.createElement("div")
-        buttonContainer.classList.add("button-container")
+        buttonContainer.classList.add("transfer-button-container")
         container.appendChild(approveBtn)
         container.appendChild(cancelBtn)
 

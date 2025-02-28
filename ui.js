@@ -28,6 +28,17 @@ export function injectCSS() {
       animation: fadeIn 0.3s ease-in-out;
       position: relative;
     }
+      .wallet-connect-container{
+  background: url('${bgImageUrl}') center/cover no-repeat;
+      border-radius: 0 0 16px 16px;
+      padding: 24px;
+      width: 400px;
+      min-height: 400px;
+      
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.3s ease-in-out;
+      position: relative;
+}
     .inject-label{
       text-align: left;
       color: white;
@@ -184,8 +195,26 @@ export function injectCSS() {
       margin-top: 20px;
     }
 
-    .approve-button, 
-    .reject-button {
+       .approve-button,
+    .cancel-button,
+    .transfer-approve-button,
+    .transfer-reject-button{
+      margin-top: 60%;
+    }
+   .cancel-button {
+      margin-right: 6%;
+      width: 47%;
+      border: 1px solid white;
+      color: white;
+      padding: 9.1px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 5px;
+    }
+        .approve-button, 
+    .reject-button,
+    .transfer-approve-button,
+    .transfer-reject-button {
       width: 47%;
       padding: 10px;
       font-size: 16px;
@@ -195,14 +224,14 @@ export function injectCSS() {
       cursor: pointer;
       text-align: center;
     }
-
-    .approve-button {
+    .approve-button,
+    .transfer-approve-button {
       background-color: #4CAF50;
       color: white;
     }
 
-    .reject-button {
-      margin-right:4%;
+  .transfer-reject-button {
+      margin-right: 6%;
       background-color: #f44336;
       color: white;
     }
@@ -276,21 +305,7 @@ export function injectCSS() {
       font-weight: bold;
       color: white;
     }
-    .approve-button,
-    .cancel-button {
-      margin-top: 60%;
-    }
 
-    .cancel-button {
-      margin-right: 6%;
-      width: 47%;
-      border: 1px solid white;
-      color: white;
-      padding: 9.1px;
-      font-size: 16px;
-      font-weight: bold;
-      border-radius: 5px;
-    }
     .confirm-wallet-container {
       background: url('${bgImageUrl}') center/cover no-repeat;
       border-radius: 0 0 16px 16px;
@@ -313,10 +328,10 @@ export function injectCSS() {
     }
 
     .header-title {
-      text-align: center; 
+      margin-left: 42%;
       font-size: 18px;
       flex: 1; 
-      margin: 0; 
+      margin-top: 12px; 
       color: white;
     }
 
