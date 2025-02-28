@@ -43,7 +43,11 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
     secret_key: "",
     public_key: "",
     balances: [],
-    type: ""
+    type: "Xode",
+    metaGenesisHash: "",
+    metaName: "",
+    metaSource: "",
+    tokenSymbol: "",
   })
 
   const getNetwork = () => {
@@ -206,7 +210,11 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
       secret_key: "",
       public_key: "",
       balances: [],
-      type: ""
+      type: "",
+      metaGenesisHash: "",
+      metaName: "",
+      metaSource: "",
+      tokenSymbol: "",
     })
   }
 

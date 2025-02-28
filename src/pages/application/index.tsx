@@ -4,14 +4,14 @@ import { CurrentPageService } from "@/services/current-page.service"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
+import IndexImportWalletPage from "../import-wallet"
 import IndexBalance from "./balance"
 import IndexImUrAi from "./imurai"
 import Layout from "./layout"
 import IndexNetworkStatus from "./network-status"
+import IndexPumpToken from "./pump-token"
 import IndexTokens from "./tokens"
 import IndexWallets from "./wallets"
-import IndexImportWalletPage from "../import-wallet"
-import IndexPumpToken from "./pump-token"
 
 const IndexApplication = () => {
   const { t } = useTranslation()
@@ -20,7 +20,7 @@ const IndexApplication = () => {
 
   const [currentPage, setCurrentPage] = useState<string>(t("Balance"))
   const [selectedWallet, setSelectedWallet] = useState<any>(null)
-  
+
   const getCurrentPage = () => {
     currentPageService.getCurrentPage().then((data) => {
       if (data != null) {
@@ -54,7 +54,9 @@ const IndexApplication = () => {
                 {currentPage === t("Tokens") && <IndexTokens />}
                 {currentPage === t("Network Status") && <IndexNetworkStatus />}
                 {currentPage === t("Pump") && <IndexPumpToken />}
-                {currentPage === t("Wallets") && <IndexWallets handleSetCurrentPage={handleSetCurrentPage} />}
+                {currentPage === t("Wallets") && (
+                  <IndexWallets handleSetCurrentPage={handleSetCurrentPage} />
+                )}
                 {currentPage === t("Support") && <IndexImUrAi />}
               </ScrollArea>
             </div>

@@ -29,7 +29,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
   const networkService = new NetworkService()
   const userService = new UserService()
   const walletService = new WalletService()
-  const [isLoading, setIsLoading] = useState(false) 
+  const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
   const [walletData, setWalletData] = useState<WalletModel>({
@@ -40,7 +40,11 @@ const IndexAddWallet = ({ handleCallbacks }) => {
     secret_key: "",
     public_key: "",
     balances: [],
-    type: ""
+    type: "Xode",
+    metaGenesisHash: "",
+    metaName: "",
+    metaSource: "",
+    tokenSymbol: ""
   })
 
   const getNetwork = () => {
@@ -102,7 +106,11 @@ const IndexAddWallet = ({ handleCallbacks }) => {
       secret_key: "",
       public_key: "",
       balances: [],
-      type: ""
+      type: "",
+      metaGenesisHash: "",
+      metaName: "",
+      metaSource: "",
+      tokenSymbol: ""
     })
   }
 
@@ -125,7 +133,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
       return
     }
 
-    setIsLoading(true) 
+    setIsLoading(true)
 
     userService.getWalletPassword().then((decryptedPassword) => {
       if (decryptedPassword) {
@@ -157,12 +165,12 @@ const IndexAddWallet = ({ handleCallbacks }) => {
             })
 
             setTimeout(() => {
-              setIsLoading(false) 
-              resetForm() 
-              handleCallbacks() 
+              setIsLoading(false)
+              resetForm()
+              handleCallbacks()
             }, 1500)
           } else {
-            setIsLoading(false) 
+            setIsLoading(false)
           }
         })
       } else {
@@ -178,9 +186,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
           <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
             <div className="flex flex-col items-center">
               <div className="animate-spin border-4 border-blue-400 border-t-transparent rounded-full w-16 h-16 mb-4"></div>
-              <p className="text-white text-lg font-semibold">
-                {t("Adding wallet...")}
-              </p>
+              <p className="text-white text-lg font-semibold">{t("Adding wallet...")}</p>
             </div>
           </div>
         </div>

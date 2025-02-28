@@ -6,7 +6,7 @@ function formatWalletAddress(address) {
 if (!window.xterium) {
   console.log("[Injected.js] Script executed!")
   window.xterium = {
-    extensionId: "jjpkkhlnoghlflacjiajhmccglmolbmj",
+    extensionId: "plhchpneiklnlplnnlhkmnikaepgfdaf",
     isXterium: true,
     isConnected: false,
     connectedWallet: null,
@@ -100,140 +100,149 @@ if (!window.xterium) {
 
     showConnectPrompt: function (wallets) {
       return new Promise((resolve, reject) => {
-          const overlay = document.createElement("div")
-          overlay.id = "wallet-connect-overlay"
-          overlay.classList.add("inject-overlay")
-      
-          const container = document.createElement("div")
-          container.classList.add("inject-container")
-      
-          const logo = document.createElement("div")
-          logo.classList.add("wallet-logo")
-      
-          const header = document.createElement("div")
-          header.classList.add("inject-header")
-          header.innerText = "Connect Your Wallet"
-      
-          const description = document.createElement("p")
-          description.classList.add("inject-description")
-          description.innerText = "Choose a wallet to proceed:"
-      
-          const walletList = document.createElement("div")
-          walletList.classList.add("wallet-list")
-      
-          wallets.forEach((wallet) => {
-              const walletButton = document.createElement("button")
-              walletButton.classList.add("inject-button")
-              walletButton.innerText = formatWalletAddress(wallet.public_key)
-              walletButton.addEventListener("click", () => {
-                  document.body.removeChild(overlay)
-                  resolve(wallet)
-              })
-              walletList.appendChild(walletButton)
+        const overlay = document.createElement("div")
+        overlay.id = "wallet-connect-overlay"
+        overlay.classList.add("inject-overlay")
+
+        const container = document.createElement("div")
+        container.classList.add("inject-container")
+
+        const logo = document.createElement("div")
+        logo.classList.add("wallet-logo")
+
+        const header = document.createElement("div")
+        header.classList.add("inject-header")
+        header.innerText = "Connect Your Wallet"
+
+        const description = document.createElement("p")
+        description.classList.add("inject-description")
+        description.innerText = "Choose a wallet to proceed:"
+
+        const walletList = document.createElement("div")
+        walletList.classList.add("wallet-list")
+
+        wallets.forEach((wallet) => {
+          const walletButton = document.createElement("button")
+          walletButton.classList.add("inject-button")
+          walletButton.innerText = formatWalletAddress(wallet.public_key)
+          walletButton.addEventListener("click", () => {
+            document.body.removeChild(overlay)
+            resolve(wallet)
           })
-      
-          const cancelButton = document.createElement("button")
-          cancelButton.classList.add("inject-cancel-button")
-          cancelButton.innerHTML = "&times;"
-          cancelButton.addEventListener("click", () => {
-              document.body.removeChild(overlay)
-              reject("User cancelled wallet connection.")
-          })
-          container.appendChild(cancelButton)
-          container.appendChild(logo)
-          container.appendChild(header)
-          container.appendChild(description)
-          container.appendChild(walletList)
-      
-          overlay.appendChild(container)
-          document.body.appendChild(overlay)
+          walletList.appendChild(walletButton)
+        })
+
+        const cancelButton = document.createElement("button")
+        cancelButton.classList.add("inject-cancel-button")
+        cancelButton.innerHTML = "&times;"
+        cancelButton.addEventListener("click", () => {
+          document.body.removeChild(overlay)
+          reject("User cancelled wallet connection.")
+        })
+        container.appendChild(cancelButton)
+        container.appendChild(logo)
+        container.appendChild(header)
+        container.appendChild(description)
+        container.appendChild(walletList)
+
+        overlay.appendChild(container)
+        document.body.appendChild(overlay)
       })
-  },
-    
+    },
+
     showConnectApprovalUI: function (wallet) {
       return new Promise((resolve, reject) => {
-        const overlay = document.createElement("div");
-        overlay.id = "xterium-connect-approval-overlay";
-        overlay.classList.add("inject-overlay");
-    
-        const outerContainer = document.createElement("div"); 
-        outerContainer.classList.add("outer-container");
-    
-        const headerContainer = document.createElement("div");
-        headerContainer.classList.add("header-container");
+        const overlay = document.createElement("div")
+        overlay.id = "xterium-connect-approval-overlay"
+        overlay.classList.add("inject-overlay")
 
-        const closeButton = document.createElement("button");
-        closeButton.innerHTML = "&times;"; 
-        closeButton.classList.add("close-button"); 
+        const outerContainer = document.createElement("div")
+        outerContainer.classList.add("outer-container")
+
+        const headerContainer = document.createElement("div")
+        headerContainer.classList.add("header-container")
+
+        const closeButton = document.createElement("button")
+        closeButton.innerHTML = "&times;"
+        closeButton.classList.add("close-button")
         closeButton.addEventListener("click", () => {
-          document.body.removeChild(overlay);
-          reject("User closed the wallet connection.");
-        });
-    
-        const header = document.createElement("p"); 
-        header.innerText = "Xterium"; 
-        header.classList.add("header-title");
-          
-        headerContainer.appendChild(header);
-        headerContainer.appendChild(closeButton);
-        outerContainer.appendChild(headerContainer); 
-        
-        const container = document.createElement("div");
-        container.classList.add("confirm-wallet-container");
-    
-        const logo = document.createElement("div");
-        logo.classList.add("xterium-logo");
-        container.appendChild(logo);
-    
-        const title = document.createElement("div");
-        title.innerText = "Sign Request";
-        title.classList.add("inject-header");
-        container.appendChild(title);
-    
-        const description = document.createElement("p");
-        description.classList.add("inject-description");
-        description.innerText = "You are signing a message with account";
-        container.appendChild(description);
-    
-        const detailsDiv = document.createElement("div");
-        detailsDiv.classList.add("details-container");
-    
+          document.body.removeChild(overlay)
+          reject("User closed the wallet connection.")
+        })
+
+        const header = document.createElement("p")
+        header.innerText = "Xterium"
+        header.classList.add("header-title")
+
+        headerContainer.appendChild(header)
+        headerContainer.appendChild(closeButton)
+        outerContainer.appendChild(headerContainer)
+
+        const container = document.createElement("div")
+        container.classList.add("confirm-wallet-container")
+
+        const logo = document.createElement("div")
+        logo.classList.add("xterium-logo")
+        container.appendChild(logo)
+
+        const title = document.createElement("div")
+        title.innerText = "Sign Request"
+        title.classList.add("inject-header")
+        container.appendChild(title)
+
+        const description = document.createElement("p")
+        description.classList.add("inject-description")
+        description.innerText = "You are signing a message with account"
+        container.appendChild(description)
+
+        const detailsDiv = document.createElement("div")
+        detailsDiv.classList.add("details-container")
+
         function createStyledField(name, value) {
-          const field = document.createElement("span");
-          field.classList.add("styled-text");
-          field.innerHTML = `${name}: ${value} `;
-          return field;
+          const field = document.createElement("span")
+          field.classList.add("styled-text")
+          field.innerHTML = `${name}: ${value} `
+          return field
         }
-    
-        detailsDiv.appendChild(createStyledField(formatWalletAddress(wallet.name), formatWalletAddress(wallet.public_key)));
-        container.appendChild(detailsDiv);
-    
-        const passwordContainer = document.createElement("div");
-        passwordContainer.classList.add("password-container");
-    
-        const passwordInput = document.createElement("input");
-        passwordInput.type = "password";
-        passwordInput.placeholder = "Enter Password";
-        passwordInput.classList.add("inject-input");
+
+        detailsDiv.appendChild(
+          createStyledField(
+            formatWalletAddress(wallet.name),
+            formatWalletAddress(wallet.public_key)
+          )
+        )
+        container.appendChild(detailsDiv)
+
+        const passwordContainer = document.createElement("div")
+        passwordContainer.classList.add("password-container")
+
+        const passwordInput = document.createElement("input")
+        passwordInput.type = "password"
+        passwordInput.placeholder = "Enter Password"
+        passwordInput.classList.add("inject-input")
         container.appendChild(passwordInput)
-        
-    
-        window.postMessage({ type: "XTERIUM_GET_PASSWORD" }, "*");
-        
-        let storedPassword = null;
+
+        window.postMessage({ type: "XTERIUM_GET_PASSWORD" }, "*")
+
+        let storedPassword = null
         const handlePasswordResponse = (event) => {
-          if (event.source !== window || !event.data || event.data.type !== "XTERIUM_PASSWORD_RESPONSE") return;
+          if (
+            event.source !== window ||
+            !event.data ||
+            event.data.type !== "XTERIUM_PASSWORD_RESPONSE"
+          )
+            return
           if (event.data.password) {
-            storedPassword = event.data.password;
-            console.log("[Injected.js] Retrieved stored password:", storedPassword); // Indicator log
+            storedPassword = event.data.password
+            console.log("[Injected.js] Retrieved stored password:", storedPassword) // Indicator log
           }
-        };
-    
-        window.addEventListener("message", handlePasswordResponse);
-    
-        const approveBtn = document.createElement("button");
-        approveBtn.classList.add("approve-button");
-        approveBtn.innerText = "Approve";
+        }
+
+        window.addEventListener("message", handlePasswordResponse)
+
+        const approveBtn = document.createElement("button")
+        approveBtn.classList.add("approve-button")
+        approveBtn.innerText = "Approve"
         approveBtn.addEventListener("click", () => {
           if (!passwordInput.value) {
             alert("Password is required to connect the wallet.")
@@ -244,30 +253,33 @@ if (!window.xterium) {
             return
           }
           document.body.removeChild(overlay)
-          window.postMessage({ type: "XTERIUM_CONNECT_APPROVED", password: passwordInput.value }, "*");
+          window.postMessage(
+            { type: "XTERIUM_CONNECT_APPROVED", password: passwordInput.value },
+            "*"
+          )
           resolve()
         })
-    
-        const cancelBtn = document.createElement("button");
-        cancelBtn.classList.add("cancel-button");
-        cancelBtn.innerText = "Cancel";
+
+        const cancelBtn = document.createElement("button")
+        cancelBtn.classList.add("cancel-button")
+        cancelBtn.innerText = "Cancel"
         cancelBtn.addEventListener("click", () => {
-          document.body.removeChild(overlay);
-          reject("User cancelled wallet connection.");
-        });
-    
-        const buttonContainer = document.createElement("div");
-        buttonContainer.classList.add("confirmbutton-container");
-        buttonContainer.appendChild(cancelBtn);
-        buttonContainer.appendChild(approveBtn);
-        
-        container.appendChild(buttonContainer); 
-        outerContainer.appendChild(container); 
-        overlay.appendChild(outerContainer); 
-        document.body.appendChild(overlay); 
-      });
+          document.body.removeChild(overlay)
+          reject("User cancelled wallet connection.")
+        })
+
+        const buttonContainer = document.createElement("div")
+        buttonContainer.classList.add("confirmbutton-container")
+        buttonContainer.appendChild(cancelBtn)
+        buttonContainer.appendChild(approveBtn)
+
+        container.appendChild(buttonContainer)
+        outerContainer.appendChild(container)
+        overlay.appendChild(outerContainer)
+        document.body.appendChild(overlay)
+      })
     },
-    
+
     getBalance: function (publicKey) {
       return new Promise((resolve, reject) => {
         if (!window.xterium.isConnected || !window.xterium.connectedWallet) {
@@ -914,10 +926,10 @@ if (!window.xterium) {
     },
 
     showExtension: function () {
-      const extensionId = "jjpkkhlnoghlflacjiajhmccglmolbmj";
-      const url = `chrome-extension://${extensionId}/popup.html`;
-      window.open(url, "_blank"); 
-      console.log("[Xterium] Extension opened in a new tab.");
+      const extensionId = "plhchpneiklnlplnnlhkmnikaepgfdaf"
+      const url = `chrome-extension://${extensionId}/popup.html`
+      window.open(url, "_blank")
+      console.log("[Xterium] Extension opened in a new tab.")
     },
 
     // showPopup: function () {
@@ -1105,8 +1117,7 @@ if (!window.xterium) {
         overlay.appendChild(container)
         document.body.appendChild(overlay)
       })
-    },
-
+    }
   }
 
   window.xterium.loadConnectionState()

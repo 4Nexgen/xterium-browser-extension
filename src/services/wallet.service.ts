@@ -1,7 +1,9 @@
 import { BalanceModel } from "@/models/balance.model"
 import { TokenModel } from "@/models/token.model"
 import { WalletModel } from "@/models/wallet.model"
+
 import { Storage } from "@plasmohq/storage"
+
 import { BalanceServices } from "./balance.service"
 
 export class WalletService {
@@ -20,11 +22,17 @@ export class WalletService {
       const wallets = await this.getWallets()
       const lastId = wallets.length > 0 ? wallets[wallets.length - 1].id : 0
       data.id = lastId + 1
+
+      const api = await this.balanceService.connect()
+      const genesisHash = api.genesisHash.toHex()
       const tokens = await this.getAllTokens()
+      const tokenSymbol = tokens.length > 0 ? tokens[0].symbol : "Unknown"
+
+      data.metaGenesisHash = genesisHash
+      data.metaSource = "Talisman"
+      data.tokenSymbol = tokenSymbol
+
       data.balances = await this.fetchAllBalances(data.public_key, tokens)
-
-      console.log("[WalletService] Created wallet with balances:", data.balances)
-
       wallets.push(data)
       await this.storage.set(this.key, wallets)
       return "Wallet created successfully"
@@ -40,9 +48,16 @@ export class WalletService {
       const tokens = await this.getAllTokens()
       data.balances = await this.fetchAllBalances(data.public_key, tokens)
 
+      wallets[index] = {
+        ...wallets[index],
+        ...data,
+        metaGenesisHash: data.metaGenesisHash || wallets[index].metaGenesisHash,
+        metaSource: data.metaSource || wallets[index].metaSource,
+        tokenSymbol: data.tokenSymbol || wallets[index].tokenSymbol
+      }
+
       console.log("[WalletService] Updated wallet balances:", data.balances)
 
-      wallets[index] = data
       await this.storage.set(this.key, wallets)
       return "Wallet updated successfully"
     } catch (error) {
@@ -54,11 +69,13 @@ export class WalletService {
     try {
       const storedData = await this.storage.get(this.key)
       if (Array.isArray(storedData)) {
-        return storedData as WalletModel[];
+        return storedData as WalletModel[]
       } else {
-        console.warn("[WalletService] Stored data is not an array, returning empty array.");
-        return [];
-      } 
+        console.warn(
+          "[WalletService] Stored data is not an array, returning empty array."
+        )
+        return []
+      }
     } catch (error) {
       console.error("[WalletService] Failed to get wallets:", error)
       return []
@@ -188,28 +205,31 @@ export class WalletService {
     }
   }
   private async getAllTokens(): Promise<TokenModel[]> {
-    const tokens: TokenModel[] = [this.getDefaultToken()]
+    const tokens: TokenModel[] = [this.getDefaultToken()] // Start with a default token
     try {
-      const api = await this.balanceService.connect()
-      const assetEntries = await api.query.assets.metadata.entries()
+      const api = await this.balanceService.connect() // Connect to the network
+      const assetEntries = await api.query.assets.metadata.entries() // Fetch asset metadata entries
+
       assetEntries.forEach(([key, metadata]) => {
-        const assetId = parseInt(key.args[0].toString())
+        const assetId = parseInt(key.args[0].toString()) // Extract asset ID from the key
         const metaHuman = metadata.toHuman() as {
           name?: string
           symbol?: string
           decimals?: string
         }
+
         const token: TokenModel = {
           id: assetId,
           type: "Asset",
           network: this.getDefaultToken().network,
           network_id: assetId,
-          symbol: metaHuman?.symbol || `Asset ${assetId}`,
-          description: metaHuman?.name || `Asset Token ${assetId}`,
+          symbol: metaHuman.symbol || `Asset ${assetId}`, // Use the symbol or a default
+          description: metaHuman.name || `Asset Token ${assetId}`, // Use the name or a default
           image_url: "",
           preloaded: false,
-          decimals: metaHuman?.decimals ? parseInt(metaHuman.decimals) : 12
+          decimals: metaHuman.decimals ? parseInt(metaHuman.decimals) : 12 // Default to 12 if not provided
         }
+
         tokens.push(token)
       })
       console.log("[WalletService] Fetched tokens:", tokens)

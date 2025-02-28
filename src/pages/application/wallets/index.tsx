@@ -36,7 +36,11 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
     secret_key: "",
     public_key: "",
     balances: [],
-    type: ""
+    type: "Xode",
+    metaGenesisHash: "",
+    metaName: "",
+    metaSource: "",
+    tokenSymbol: ""
   })
   const [isAddWalletDrawerOpen, setIsAddWalletDrawerOpen] = useState(false)
   const [isExportWalletDrawerOpen, setIsExportWalletDrawerOpen] = useState(false)
@@ -74,25 +78,24 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
   }
 
   const expandView = () => {
-    setIsImportWalletPageOpen(true); 
+    setIsImportWalletPageOpen(true)
     const extensionId = chrome.runtime.id
     const url = `chrome-extension://${extensionId}/popup.html#import`
-  
+
     if (window.location.href !== url) {
       window.open(url, "_blank")
     }
     handleCallbacks("import-wallet")
   }
-  
 
   const importWallet = () => {
-    if (!isImportWalletPageOpen) { 
-      expandView();
-      handleSetCurrentPage("import-wallet");
+    if (!isImportWalletPageOpen) {
+      expandView()
+      handleSetCurrentPage("import-wallet")
     } else {
-      handleSetCurrentPage("import-wallet");
+      handleSetCurrentPage("import-wallet")
     }
-  };
+  }
 
   const copyWallet = (value: string) => {
     navigator.clipboard
@@ -139,12 +142,12 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
 
   const handleCallbacks = (action: string) => {
     if (action === "Wallets") {
-      handleSetCurrentPage("Wallets");
-      setIsImportWalletPageOpen(false);
+      handleSetCurrentPage("Wallets")
+      setIsImportWalletPageOpen(false)
     }
 
     setTimeout(() => {
-      getWallets() 
+      getWallets()
     }, 100)
   }
 
@@ -252,11 +255,12 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
           </Button>
         </div>
 
-
         <Drawer open={isAddWalletDrawerOpen} onOpenChange={setIsAddWalletDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">{t("ADD NEW WALLET")}</DrawerTitle>
+              <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
+                {t("ADD NEW WALLET")}
+              </DrawerTitle>
             </DrawerHeader>
             <IndexAddWallet handleCallbacks={callbackUpdates} />
           </DrawerContent>
@@ -267,7 +271,9 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
           onOpenChange={setIsExportWalletDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">{t("EXPORT WALLET")}</DrawerTitle>
+              <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
+                {t("EXPORT WALLET")}
+              </DrawerTitle>
             </DrawerHeader>
             <IndexExportWallet
               selectedWallet={selectedWallet}
@@ -281,7 +287,9 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
           onOpenChange={setIsDeleteWalletDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">{t("DELETE WALLET")}</DrawerTitle>
+              <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
+                {t("DELETE WALLET")}
+              </DrawerTitle>
             </DrawerHeader>
             <IndexDeleteWallet
               selectedWallet={selectedWallet}
@@ -290,7 +298,6 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
           </DrawerContent>
         </Drawer>
       </div>
-
     </>
   )
 }
