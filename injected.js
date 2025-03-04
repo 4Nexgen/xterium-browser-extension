@@ -666,8 +666,21 @@ if (!window.xterium) {
         overlay.id = "xterium-transfer-approval-overlay"
         overlay.classList.add("inject-overlay")
 
+        const outerContainer = document.createElement("div")
+        outerContainer.classList.add("outer-container")
+
+        const headerContainer = document.createElement("div")
+        headerContainer.classList.add("header-container")
+
         const container = document.createElement("div")
         container.classList.add("transfer-container")
+
+        const outerHeader = document.createElement("p")
+        outerHeader.innerText = "Xterium"
+        outerHeader.classList.add("header-title")
+
+        headerContainer.appendChild(outerHeader)
+        outerContainer.appendChild(headerContainer)
 
         const title = document.createElement("div")
         title.innerText = "Confirm Transfer"
@@ -726,6 +739,7 @@ if (!window.xterium) {
         togglePassword.classList.add("fa-solid", "fa-eye-slash"); 
         togglePassword.style.cursor = "pointer";
         togglePassword.style.marginLeft = "10px";
+        togglePassword.style.marginTop = "3.5%";
 
         togglePassword.addEventListener("click", () => {
           if (passwordInput.type === "password") {
@@ -769,7 +783,29 @@ if (!window.xterium) {
         container.appendChild(cancelBtn)
 
         overlay.appendChild(container)
+        outerContainer.appendChild(container)
+        overlay.appendChild(outerContainer)
         document.body.appendChild(overlay)
+
+        let offsetX, offsetY
+        outerContainer.addEventListener("mousedown", (e) => {
+          offsetX = e.clientX - outerContainer.getBoundingClientRect().left
+          offsetY = e.clientY - outerContainer.getBoundingClientRect().top
+
+          const mouseMoveHandler = (moveEvent) => {
+            outerContainer.style.position = "absolute"
+            outerContainer.style.left = `${moveEvent.clientX - offsetX}px`
+            outerContainer.style.top = `${moveEvent.clientY - offsetY}px`
+          }
+
+          const mouseUpHandler = () => {
+            document.removeEventListener("mousemove", mouseMoveHandler)
+            document.removeEventListener("mouseup", mouseUpHandler)
+          }
+
+          document.addEventListener("mousemove", mouseMoveHandler)
+          document.addEventListener("mouseup", mouseUpHandler)
+        })
       })
     },
 

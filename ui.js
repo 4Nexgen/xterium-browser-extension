@@ -221,7 +221,7 @@ export function injectCSS() {
     }
     .transfer-container {
       background: url('${bgImageUrl}') center/cover no-repeat;
-      border-radius: 16px;
+      border-radius: 0 0 16px 16px;
       padding: 24px;
       width: 400px;
       min-height: 300px;      
@@ -256,7 +256,7 @@ export function injectCSS() {
     .cancel-button,
     .transfer-approve-button,
     .transfer-reject-button{
-      margin-top: 60%;
+      margin-top: 55%;
     }
    .cancel-button {
       margin-right: 6%;
@@ -302,7 +302,10 @@ export function injectCSS() {
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 9999; /* Make sure it's on top of other elements */
+      z-index: 9999; 
+      
+      text-align: center;
+      
     }
 
     .transfer-animation-container {
@@ -314,6 +317,12 @@ export function injectCSS() {
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       animation: fadeIn 0.3s ease-in-out;
       position: relative;
+      color: white;
+      display: flex;
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center;
+      text-align: center; 
     }
     .updatetransfer-animation-container{
       background: url('${bgImageUrl}') center/cover no-repeat;
@@ -338,16 +347,18 @@ export function injectCSS() {
       font-size: 20px;
       font-weight: bold;
       margin-top: 20px;
+      color: green;
     }
 
     .spinner {
       border: 6px solid #444;
       border-top: 6px solid #3498db; /* Spinner color */
       border-radius: 50%;
-      width: 48px;
-      height: 48px;
+      width: 50px;
+      height: 50px;
       animation: spin 1s linear infinite;
       margin-bottom: 20px;
+      margin: 0 auto;
     }
     .xterium-logo {
       background: url('${iconUrl}') center/cover no-repeat;
