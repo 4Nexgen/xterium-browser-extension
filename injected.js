@@ -2,6 +2,15 @@ function formatWalletAddress(address) {
   if (address.length <= 10) return address // If address is too short, no need to truncate
   return address.slice(0, 6) + "..." + address.slice(-6)
 }
+(function injectFontAwesome() {
+  if (!document.getElementById("font-awesome-styles")) {
+    const link = document.createElement("link");
+    link.id = "font-awesome-styles";
+    link.rel = "stylesheet";
+    link.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css";
+    document.head.appendChild(link);
+  }
+})();
 
 if (!window.xterium) {
   console.log("[Injected.js] Script executed!")
@@ -280,7 +289,25 @@ if (!window.xterium) {
         passwordInput.type = "password"
         passwordInput.placeholder = "Enter Password"
         passwordInput.classList.add("inject-input")
+
+        const togglePassword = document.createElement("i");
+        togglePassword.classList.add("fa-solid", "fa-eye-slash"); 
+        togglePassword.style.cursor = "pointer";
+        togglePassword.style.marginLeft = "10px";
+
+        togglePassword.addEventListener("click", () => {
+          if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            togglePassword.classList.remove("fa-eye-slash");
+            togglePassword.classList.add("fa-eye"); 
+          } else {
+            passwordInput.type = "password";
+            togglePassword.classList.remove("fa-eye");
+            togglePassword.classList.add("fa-eye-slash");
+          }
+        });
         passwordContainer.appendChild(passwordInput)
+        passwordContainer.appendChild(togglePassword)
         container.appendChild(passwordContainer)
 
         window.postMessage({ type: "XTERIUM_GET_PASSWORD" }, "*")
@@ -693,9 +720,27 @@ if (!window.xterium) {
         const passwordInput = document.createElement("input")
         passwordInput.type = "password"
         passwordInput.placeholder = "Enter Password"
-        passwordInput.classList.add("inject-input")
-        passwordContainer.appendChild(passwordInput)
+        passwordInput.classList.add("request-inject-input")
 
+        const togglePassword = document.createElement("i");
+        togglePassword.classList.add("fa-solid", "fa-eye-slash"); 
+        togglePassword.style.cursor = "pointer";
+        togglePassword.style.marginLeft = "10px";
+
+        togglePassword.addEventListener("click", () => {
+          if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            togglePassword.classList.remove("fa-eye-slash");
+            togglePassword.classList.add("fa-eye"); 
+          } else {
+            passwordInput.type = "password";
+            togglePassword.classList.remove("fa-eye");
+            togglePassword.classList.add("fa-eye-slash");
+          }
+        });
+
+        passwordContainer.appendChild(passwordInput)
+        passwordContainer.appendChild(togglePassword)
         container.appendChild(passwordContainer)
 
         const approveBtn = document.createElement("button")

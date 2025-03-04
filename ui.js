@@ -33,7 +33,7 @@ export function injectCSS() {
       border-radius: 0 0 16px 16px;
       padding: 24px;
       width: 400px;
-      min-height: 400px;
+      min-height: 530px;
       
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       animation: fadeIn 0.3s ease-in-out;
@@ -65,20 +65,60 @@ export function injectCSS() {
       margin-bottom: 20px;
       text-align: center;
     }
-    .inject-input {
-      required: true;
-      width: 100%;
-      margin-bottom: 10px;
-      background-color: #111722;
-      border: 1px solid transparent; 
-      border-radius: 5px;
-      outline:none;
-      color: white;
-    }
-    .inject-input:hover {
-      border: 1px solid #0fbab5; 
-      outline: none;
-    }
+  
+.password-container {
+  position: relative;
+  width: 100%;
+}
+
+.inject-input {
+  width: 100%;
+  background-color: #111722;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  outline: none;
+  color: white;
+  padding: 8px;
+  padding-right: 35px;
+  font-size: 16px;
+}
+
+.inject-input:hover {
+  border: 1px solid #0fbab5;
+  outline: none;
+}
+
+.fa-eye ,.fa-eye-slash {
+  position: absolute;
+  top: 50%;
+  right: 10px; 
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #676767;
+  font-size: 18px;
+}
+.request-inject-input {
+  width: 100%;
+  background-color: #111722;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  outline: none;
+  color: white;
+  padding: 8px;
+  padding-right: 35px;
+  font-size: 16px;
+}
+
+.request-inject-input:hover {
+  border: 1px solid #0fbab5;
+  outline: none;
+}
+  .request-inject-input .fa-eye, 
+  .request-inject-input .fa-eye-slash {
+    margin-top:5%;
+  }
+
+
     .inject-select{
       required: true;
       width: 100%;
@@ -88,12 +128,29 @@ export function injectCSS() {
       border-radius: 5px;
       outline:none;
       color: white;
+      padding: 8px;
     }
     .wallet-list {
       display: flex;
       flex-direction: column;
       gap: 10px;
+      border: 2px solid #676767;
+      height: 220px;
+      padding: 10px;
+      overflow-y: auto;
+      border-radius: 5px;
     }
+      .wallet-list::-webkit-scrollbar {
+        width: 10px;
+        height: 5px;
+      }
+      .wallet-list::-webkit-scrollbar-thumb {
+        background-color: #676767;
+        border-radius: 4px;
+      }
+      .wallet-list::-webkit-scrollbar-track {
+        background-color: #111722;
+      }
     .inject-button {
       padding: 12px;
       background: linear-gradient(135deg, #4CAF50, #2E7D32);
@@ -231,7 +288,7 @@ export function injectCSS() {
     }
 
   .transfer-reject-button {
-      margin-right: 6%;
+      margin-left: 6%;
       background-color: #f44336;
       color: white;
     }
@@ -311,7 +368,7 @@ export function injectCSS() {
       border-radius: 0 0 16px 16px;
       padding: 24px;
       width: 400px;
-      min-height: 550px;
+      min-height: 530px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       animation: fadeIn 0.3s ease-in-out;
       position: relative;
@@ -331,7 +388,7 @@ export function injectCSS() {
       margin-left: 42%;
       font-size: 18px;
       flex: 1; 
-      margin-top: 12px; 
+      margin-top: 5px; 
       color: white;
     }
 
