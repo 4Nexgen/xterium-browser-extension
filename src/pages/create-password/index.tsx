@@ -137,104 +137,106 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
 
   return (
     <>
-      <OutsideLayout headerVariant="outside">
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="w-full space-y-0 h-full">
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-inter font-extrabold text-[12px] leading-[15px] text-white tracking-[0.15em] mb-1">
-                    {t("Enter Password")}:
-                  </FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder={t("Enter Password")}
-                        {...field}
-                        onChange={(e) => {
-                          field.onChange(e)
-                          checkPasswordStrength(e.target.value)
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={toggleShowPassword}
-                        className="absolute inset-y-0 right-3 flex items-center hover:[#9AB3EB]">
-                        {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
-                      </button>
-                    </div>
-                  </FormControl>
+      <div className="sm:bg-background-sheet sm:flex justify-center items-center">
+        <OutsideLayout headerVariant="outside">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="w-full space-y-0 h-full">
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-inter font-extrabold text-[12px] leading-[15px] text-white tracking-[0.15em] mb-1">
+                      {t("Enter Password")}:
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder={t("Enter Password")}
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e)
+                            checkPasswordStrength(e.target.value)
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={toggleShowPassword}
+                          className="absolute inset-y-0 right-3 flex items-center hover:[#9AB3EB]">
+                          {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                        </button>
+                      </div>
+                    </FormControl>
 
-                  <div className="p-0 mt-0 text-[10px]">
-                    {form.formState.errors.password ? (
-                      <FormMessage className="text-[#FD2400] text-[10px] mt-0" />
-                    ) : (
-                      <span>&nbsp;</span>
-                    )}
-                  </div>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-inter font-extrabold text-[12px] leading-[15px] text-white tracking-[0.15em] mb-2">
-                    {t("Confirm Password")}:
-                  </FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        type={showConfirmPassword ? "text" : "password"}
-                        placeholder={t("Enter password")}
-                        {...field}
-                        onChange={(e) => {
-                          field.onChange(e)
-                          checkPasswordStrength(e.target.value)
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={toggleShowConfirmPassword}
-                        className="absolute inset-y-0 right-3 flex items-center hover:[#9AB3EB]">
-                        {showConfirmPassword ? <Eye size={20} /> : <EyeOff size={20} />}
-                      </button>
+                    <div className="p-0 mt-0 text-[10px]">
+                      {form.formState.errors.password ? (
+                        <FormMessage className="text-[#FD2400] text-[10px] mt-0" />
+                      ) : (
+                        <span>&nbsp;</span>
+                      )}
                     </div>
-                  </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-inter font-extrabold text-[12px] leading-[15px] text-white tracking-[0.15em] mb-2">
+                      {t("Confirm Password")}:
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder={t("Enter password")}
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e)
+                            checkPasswordStrength(e.target.value)
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={toggleShowConfirmPassword}
+                          className="absolute inset-y-0 right-3 flex items-center hover:[#9AB3EB]">
+                          {showConfirmPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                        </button>
+                      </div>
+                    </FormControl>
 
-                  <div className="p-0 mt-0 text-[10px]">
-                    {form.formState.errors.confirmPassword ? (
-                      <FormMessage className="text-[#FD2400] text-[10px] mt-0 mb-0" />
-                    ) : (
-                      <span>&nbsp;</span>
-                    )}
-                  </div>
-                </FormItem>
-              )}
-            />
-            <p className="font-inter text-[11px] p-0 font-base text-justify text-white opacity-50">
-              {t("Your password is used to unlock your wallet and is securely stored.")}
-              {t(
-                "We recommend 8 characters with uppercase, lowercase, symbols, and numbers."
-              )}
-            </p>
-            <br />
-            <Button
-              type="submit"
-              variant="jelly"
-              className="text-white"
-              disabled={isLoading}>
-              {isLoading ? t("Processing...") : t("SETUP PASSWORD")}
-            </Button>
-          </form>
-        </Form>
-      </OutsideLayout>
+                    <div className="p-0 mt-0 text-[10px]">
+                      {form.formState.errors.confirmPassword ? (
+                        <FormMessage className="text-[#FD2400] text-[10px] mt-0 mb-0" />
+                      ) : (
+                        <span>&nbsp;</span>
+                      )}
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <p className="font-inter text-[11px] p-0 font-base text-justify text-white opacity-50">
+                {t("Your password is used to unlock your wallet and is securely stored.")}
+                {t(
+                  "We recommend 8 characters with uppercase, lowercase, symbols, and numbers."
+                )}
+              </p>
+              <br />
+              <Button
+                type="submit"
+                variant="jelly"
+                className="text-white"
+                disabled={isLoading}>
+                {isLoading ? t("Processing...") : t("SETUP PASSWORD")}
+              </Button>
+            </form>
+          </Form>
+        </OutsideLayout>
+      </div>
     </>
   )
 }

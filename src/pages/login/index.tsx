@@ -93,9 +93,10 @@ const IndexLogin = ({ onSetCurrentPage }) => {
 
   return (
     <>
+    <div className="sm:bg-background-sheet sm:flex justify-center items-center">
       <OutsideLayout headerVariant="outside">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4 lg:space-y-">
             <FormField
               control={form.control}
               name="password"
@@ -129,6 +130,7 @@ const IndexLogin = ({ onSetCurrentPage }) => {
           </form>
         </Form>
       </OutsideLayout>
+    </div>
     </>
   )
 }
