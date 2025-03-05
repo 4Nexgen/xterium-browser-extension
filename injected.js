@@ -514,27 +514,54 @@ if (!window.xterium) {
       })
     },
 
-    transferInternal: function (token, recipient, value, password) {
+    transfer: function (token, recipient, value, password) {
+      console.log("Transfer initiated with:", { token, recipient, value, password })
+
       return new Promise((resolve, reject) => {
         if (!window.xterium.isConnected || !window.xterium.connectedWallet) {
-          reject("No wallet connected. Please connect your wallet first.")
-          return
+          console.error("No wallet connected.")
+          return reject("No wallet connected. Please connect your wallet first.")
         }
+
         if (!token) {
-          reject("Token parameter is required.")
-          return
+          console.error("Token parameter is required.")
+          return reject("Token parameter is required.")
         }
+
+        let tokenSymbol = ""
+        if (typeof token === "string") {
+          tokenSymbol = token.trim()
+        } else if (token && token.symbol) {
+          tokenSymbol = token.symbol
+        } else {
+          return reject(
+            "Invalid token parameter. Must be a string or object with a symbol property."
+          )
+        }
+
+        const nativeTokenSymbol = ""
+
+        let tokenObj = {
+          symbol: tokenSymbol,
+          type:
+            tokenSymbol.toUpperCase() === nativeTokenSymbol.toUpperCase()
+              ? "Native"
+              : "Asset"
+        }
+
         if (!recipient || recipient.trim() === "") {
-          reject("Recipient address is required.")
-          return
+          console.error("Recipient address is required.")
+          return reject("Recipient address is required.")
         }
+
         if (!value || isNaN(value) || Number(value) <= 0) {
-          reject("Transfer value must be a positive number.")
-          return
+          console.error("Transfer value must be a positive number.")
+          return reject("Transfer value must be a positive number.")
         }
+
         if (!password) {
-          reject("Password is required.")
-          return
+          console.error("Password is required.")
+          return reject("Password is required.")
         }
 
         const owner = window.xterium.connectedWallet.public_key
@@ -544,118 +571,72 @@ if (!window.xterium) {
           .then((balances) => {
             const userBalance = balances.find((b) => b.tokenName === token.symbol)
             if (!userBalance || userBalance.freeBalance < Number(value)) {
-              reject(
+              console.error(
+                `Insufficient balance. Available: ${userBalance ? userBalance.freeBalance : 0} ${token.symbol}.`
+              )
+              return reject(
                 `Insufficient balance. Your available balance is ${userBalance ? userBalance.freeBalance : 0} ${token.symbol}.`
               )
-              return
             }
+
+            return window.xterium.getTokenList()
+          })
+          .then((tokenList) => {
+            console.log("Available tokens:", tokenList)
+
+            if (Array.isArray(tokenList)) {
+              const foundToken = tokenList.find(
+                (t) => t.symbol.toUpperCase() === tokenSymbol.toUpperCase()
+              )
+              if (foundToken) {
+                tokenObj = foundToken
+              } else {
+                console.error("Unknown token type:", tokenSymbol)
+                return reject("Unknown token type. Please select a valid token.")
+              }
+            }
+
+            return window.xterium.getEstimateFee(owner, Number(value), recipient, {
+              token: tokenObj
+            })
+          })
+          .then((fee) => {
+            console.log("Estimated fee:", fee)
+
+            window.postMessage(
+              {
+                type: "XTERIUM_TRANSFER_REQUEST",
+                payload: {
+                  token: tokenObj,
+                  owner,
+                  recipient,
+                  value: Number(value),
+                  password
+                }
+              },
+              "*"
+            )
 
             function handleTransferResponse(event) {
               if (event.source !== window || !event.data) return
               if (event.data.type === "XTERIUM_TRANSFER_RESPONSE") {
                 window.removeEventListener("message", handleTransferResponse)
                 if (event.data.error) {
+                  console.error("Transfer error:", event.data.error)
                   reject(event.data.error)
                 } else {
-                  window.xterium
-                    .getBalance(owner)
-                    .then((updatedBalance) => {
-                      console.log("[Injected.js] Updated balance:", updatedBalance)
-                      window.postMessage(
-                        { type: "XTERIUM_REFRESH_BALANCE", publicKey: owner },
-                        "*"
-                      )
-                      resolve(event.data.response)
-                    })
-                    .catch((balanceErr) => {
-                      console.error(
-                        "[Injected.js] Error fetching updated balance:",
-                        balanceErr
-                      )
-                      reject(balanceErr)
-                    })
+                  resolve(event.data.response)
                 }
               }
             }
 
             window.addEventListener("message", handleTransferResponse)
-            window.postMessage(
-              {
-                type: "XTERIUM_TRANSFER_REQUEST",
-                payload: { token, owner, recipient, value, password }
-              },
-              "*"
-            )
           })
           .catch((err) => {
-            reject(`Failed to fetch balance: ${err}`)
+            console.error("Fee estimation or transfer error:", err)
+            reject(err)
           })
       })
-    },
-
-    transfer: function (token, recipient, value, password) {
-      if (!token) {
-        return Promise.reject("Token parameter is required.")
-      }
-      let tokenSymbol = ""
-      if (typeof token === "string") {
-        tokenSymbol = token.trim()
-      } else if (token && token.symbol) {
-        tokenSymbol = token.symbol
-      } else {
-        return Promise.reject(
-          "Invalid token parameter. Must be a string or object with a symbol property."
-        )
-      }
-
-      const nativeTokenSymbol = ""
-
-      let tokenObj = {
-        symbol: tokenSymbol,
-        type:
-          tokenSymbol.toUpperCase() === nativeTokenSymbol.toUpperCase()
-            ? "Native"
-            : "Asset"
-      }
-
-      return window.xterium
-        .getTokenList()
-        .then((tokenList) => {
-          if (Array.isArray(tokenList)) {
-            const foundToken = tokenList.find(
-              (t) => t.symbol.toUpperCase() === tokenSymbol.toUpperCase()
-            )
-            if (foundToken) {
-              tokenObj = foundToken
-            } else {
-              if (tokenSymbol.toUpperCase() !== nativeTokenSymbol.toUpperCase()) {
-                tokenObj = { symbol: tokenSymbol, type: "Asset" }
-              }
-            }
-          }
-
-          if (window.xterium.updateTokenIndicator) {
-            window.xterium.updateTokenIndicator(tokenObj.type)
-          }
-
-          return window.xterium.getEstimateFee(
-            window.xterium.connectedWallet.public_key,
-            Number(value),
-            recipient,
-            { token: tokenObj }
-          )
-        })
-        .then(() => {
-          return window.xterium
-            .transferInternal(tokenObj, recipient, Number(value), password)
-            .then((res) => {
-              return res
-            })
-        })
-        .catch((err) => {
-          console.error("Fee estimation or transfer error:", err)
-          return Promise.reject(err)
-        })
     },
 
     fixBalance: function (value, decimal = 12) {
