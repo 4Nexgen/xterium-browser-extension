@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button"
 import {
   Drawer,
   DrawerContent,
-  DrawerDescription,
   DrawerHeader,
   DrawerTitle
 } from "@/components/ui/drawer"
@@ -43,7 +42,7 @@ const IndexTokenDetails = ({ selectedBalance, handleCallbacks }) => {
           <TableRow className="flex flex-col gap-4 hover:bg-transparent hover:cursor-default p-6">
             <TableCell className="w-full h-12 flex items-center justify-center text-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
               <div className="text-center">
-                <p className="text-lg font-bold text-purple"> 
+                <p className="text-lg font-bold text-purple">
                   {formatBalance(
                     (balanceData.freeBalance + balanceData.reservedBalance).toString()
                   )}
@@ -53,7 +52,7 @@ const IndexTokenDetails = ({ selectedBalance, handleCallbacks }) => {
             </TableCell>
             <TableCell className="w-full h-12 flex items-center justify-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
               <div className="text-center">
-                <p className="text-lg font-bold text-purple"> 
+                <p className="text-lg font-bold text-purple">
                   {formatBalance(balanceData.freeBalance.toString())}
                 </p>
                 <Label className="text-xs font-semibold">{t("Transferable")}</Label>
@@ -61,9 +60,7 @@ const IndexTokenDetails = ({ selectedBalance, handleCallbacks }) => {
             </TableCell>
             <TableCell className="w-full h-12 flex items-center justify-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
               <div className="text-center">
-                <p className="text-lg font-bold text-purple"> 
-                  0.00
-                </p>
+                <p className="text-lg font-bold text-purple">0.00</p>
                 <Label className="text-xs font-semibold">{t("Locked")}</Label>
               </div>
             </TableCell>

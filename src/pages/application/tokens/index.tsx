@@ -21,7 +21,7 @@ import type { NetworkModel } from "@/models/network.model"
 import { TokenModel } from "@/models/token.model"
 import { NetworkService } from "@/services/network.service"
 import { TokenService } from "@/services/token.service"
-import { Coins, Pencil, Trash, X, LoaderCircle } from "lucide-react"
+import { Coins, LoaderCircle, Pencil, Trash, X } from "lucide-react"
 import Image from "next/image"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -44,7 +44,12 @@ const IndexTokens = () => {
     network_id: 0,
     symbol: "",
     description: "",
-    image_url: "Default"
+    image_url: "Default",
+    preloaded: false,
+    assetId: 0,
+    decimals: 0,
+    marketCap: 0,
+    price: 0
   })
   const [isAddTokenDrawerOpen, setIsAddTokenDrawerOpen] = useState<boolean>(false)
   const [isEditTokenDrawerOpen, setIsEditTokenDrawerOpen] = useState<boolean>(false)
@@ -55,7 +60,7 @@ const IndexTokens = () => {
     setLoading(true)
     let tokenList: any[] = []
 
-    try{
+    try {
       const data = await tokenService.getTokens()
       let preloadedTokenData = TokenData
       if (preloadedTokenData.length > 0) {
@@ -75,19 +80,21 @@ const IndexTokens = () => {
 
       if (data.length > 0) {
         for (let i = 0; i < data.length; i++) {
-          let existingToken = tokenList.filter((d) => d.network_id === data[i].network_id)[0];
+          let existingToken = tokenList.filter(
+            (d) => d.network_id === data[i].network_id
+          )[0]
 
           if (existingToken == null) {
             tokenList.push(data[i])
           }
         }
       }
-      const updatedTokens = await tokenService.fetchAssetDetailsForTokens(tokenList);
+      const updatedTokens = await tokenService.fetchAssetDetailsForTokens(tokenList)
       setTokens(updatedTokens)
     } catch (error) {
       console.error("Error loading tokens:", error)
     } finally {
-      setLoading(false) 
+      setLoading(false)
     }
   }
 
@@ -350,7 +357,9 @@ const IndexTokens = () => {
         <Drawer open={isAddTokenDrawerOpen} onOpenChange={setIsAddTokenDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle className="border-b border-border-1/20 pb-4 text-muted">{t("ADD NEW TOKEN")}</DrawerTitle>
+              <DrawerTitle className="border-b border-border-1/20 pb-4 text-muted">
+                {t("ADD NEW TOKEN")}
+              </DrawerTitle>
             </DrawerHeader>
             <IndexAddToken handleCallbacks={saveAndUpdateToken} />
           </DrawerContent>
@@ -383,7 +392,9 @@ const IndexTokens = () => {
         <Drawer open={isDeleteTokenDrawerOpen} onOpenChange={setIsDeleteTokenDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle className="border-b border-border-1/20 pb-4 text-muted">{t("DELETE TOKEN")}</DrawerTitle>
+              <DrawerTitle className="border-b border-border-1/20 pb-4 text-muted">
+                {t("DELETE TOKEN")}
+              </DrawerTitle>
             </DrawerHeader>
             <IndexDeleteToken
               selectedToken={selectedToken}

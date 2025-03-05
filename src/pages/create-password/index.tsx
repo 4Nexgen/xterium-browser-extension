@@ -1,6 +1,5 @@
 "use client"
 
-import Header from "@/components/header"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -11,11 +10,11 @@ import {
   FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Toaster } from "@/components/ui/toaster"
+import { TokenData } from "@/data/token.data"
 import { useToast } from "@/hooks/use-toast"
+import { TokenService } from "@/services/token.service"
 import { UserService } from "@/services/user.service"
 import { zodResolver } from "@hookform/resolvers/zod"
-import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
 import { Eye, EyeOff, X } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -23,8 +22,6 @@ import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
 import OutsideLayout from "../outsideLayout"
-import { TokenService } from "@/services/token.service"
-import { TokenData } from "@/data/token.data"
 
 const IndexCreatePassword = ({ onSetCurrentPage }) => {
   const { t } = useTranslation()
@@ -82,7 +79,7 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
   }
 
   const createPassword = async (data: z.infer<typeof FormSchema>) => {
-    setIsLoading(true) 
+    setIsLoading(true)
     try {
       const isValid = await userService.createPassword(data.password)
       if (isValid) {
@@ -106,21 +103,23 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
         variant: "destructive"
       })
     } finally {
-      setIsLoading(false) 
+      setIsLoading(false)
     }
   }
-  
+
   const preloadTokens = async () => {
     const tokenService = new TokenService()
     let tokenList = []
-  
+
     try {
       const data = await tokenService.getTokens()
-      let preloadedTokenData = TokenData 
-  
+      let preloadedTokenData = TokenData
+
       for (let i = 0; i < preloadedTokenData.length; i++) {
-        let existingToken = data.find(d => d.network_id === preloadedTokenData[i].network_id)
-  
+        let existingToken = data.find(
+          (d) => d.network_id === preloadedTokenData[i].network_id
+        )
+
         if (existingToken) {
           tokenList.push({ ...existingToken, preloaded: true })
         } else {
@@ -128,7 +127,7 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
           tokenList.push({ ...preloadedTokenData[i], preloaded: true })
         }
       }
-  
+
       const updatedTokens = await tokenService.fetchAssetDetailsForTokens(tokenList)
       console.log("Tokens preloaded and updated:", updatedTokens)
     } catch (error) {
@@ -226,7 +225,11 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
               )}
             </p>
             <br />
-            <Button type="submit" variant="jelly" className="text-white" disabled={isLoading}>
+            <Button
+              type="submit"
+              variant="jelly"
+              className="text-white"
+              disabled={isLoading}>
               {isLoading ? t("Processing...") : t("SETUP PASSWORD")}
             </Button>
           </form>

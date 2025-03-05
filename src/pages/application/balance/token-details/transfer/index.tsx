@@ -22,7 +22,8 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
   const [isSendInProgress, setIsSendInProgress] = useState<boolean>(false)
   const [sendLabel, setSendLabel] = useState<string>("SEND")
   const [partialFee, setPartialFee] = useState<number>(0)
-  const [isInputPasswordDrawerOpen, setIsInputPasswordDrawerOpen] = useState<boolean>(false)
+  const [isInputPasswordDrawerOpen, setIsInputPasswordDrawerOpen] =
+    useState<boolean>(false)
   const [isTransferInProgress, setIsTransferInProgress] = useState<boolean>(false)
   const [confirmTransferLabel, setConfirmTransferLabel] = useState<string>("CONFIRM")
 
@@ -83,11 +84,11 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
 
         setIsSendInProgress(false)
         setSendLabel(t("SEND"))
-        console.log("Raw fee:", results.partialFee.toString());
-        const rawFee = BigInt(results.partialFee);
-        const formattedFee = Number(rawFee) / Math.pow(10, 12); 
+        console.log("Raw fee:", results.partialFee.toString())
+        const rawFee = BigInt(results.partialFee)
+        const formattedFee = Number(rawFee) / Math.pow(10, 12)
 
-        setPartialFee(formattedFee);
+        setPartialFee(formattedFee)
       })
   }
 
@@ -100,11 +101,11 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
     const multiplier = BigInt(10 ** decimal)
     return (BigInt(value) / multiplier).toString()
   }
-  
+
   const fixBalanceReverse = (value: string, decimal: number): string => {
     const multiplier = BigInt(10 ** decimal)
     return (BigInt(parseFloat(value)) * multiplier).toString()
-  }  
+  }
 
   const sendTransferWithPassword = () => {
     userService

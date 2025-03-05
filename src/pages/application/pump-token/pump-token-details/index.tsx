@@ -1,6 +1,6 @@
+import XodeLogo from "data-base64:/assets/networks/xode.png"
 import React from "react"
 import { useTranslation } from "react-i18next"
-import XodeLogo from "data-base64:/assets/networks/xode.png"
 
 const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, minBalance, supply }) => {
   const { t } = useTranslation()
@@ -41,17 +41,17 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, minBalance, supply }
   }
 
   const formatMinBalance = (amount) => {
-    if (!amount) return "0.0000"; 
-    const num = parseFloat(amount.replace(/,/g, ""));
-    if (isNaN(num)) return "0.0000";
-  
-    const formattedValue = (num / 1e12).toFixed(4); 
-    return formattedValue;
-  };
+    if (!amount) return "0.0000"
+    const num = parseFloat(amount.replace(/,/g, ""))
+    if (isNaN(num)) return "0.0000"
+
+    const formattedValue = (num / 1e12).toFixed(4)
+    return formattedValue
+  }
 
   // const calculateMarketCap = (mint, supply) => {
-  //   const marketCap = mint * supply; 
-  //   return formatCurrency(marketCap); 
+  //   const marketCap = mint * supply;
+  //   return formatCurrency(marketCap);
   // };
 
   return (
@@ -101,7 +101,11 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, minBalance, supply }
           <div className="flex items-center justify-between">
             <p className="font-bold text-sm">
               {price}
-              <img src={XodeLogo} alt="Xode Logo" className="h-4 w-4 inline ml-1 mr-1 mb-0.5" /> 
+              <img
+                src={XodeLogo}
+                alt="Xode Logo"
+                className="h-4 w-4 inline ml-1 mr-1 mb-0.5"
+              />
               XON
             </p>
           </div>
@@ -109,7 +113,7 @@ const IndexPumpTokenDetails = ({ selectedPumpTokens, owner, minBalance, supply }
         <div className="border-2 border-primary dark:border-border dark:bg-muted/50 rounded-lg p-2">
           <p className="opacity-70 text-sm">{t("Min Balance")}</p>
           <p className="font-bold text-sm">
-            {formatMinBalance(minBalance)} {" "}
+            {formatMinBalance(minBalance)}{" "}
             {selectedPumpTokens.assetDetail?.symbol ?? "N/A"}
           </p>
         </div>

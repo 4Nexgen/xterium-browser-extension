@@ -1,7 +1,9 @@
 import { PumpTokenModel } from "@/models/pump-token.model"
 import { TokenModel } from "@/models/token.model"
 import { ApiPromise, WsProvider } from "@polkadot/api"
-import { Storage } from "@plasmohq/storage" 
+
+import { Storage } from "@plasmohq/storage"
+
 import pumpTokens from "../data/pump-token/pump-tokens.json"
 import { BalanceServices } from "./balance.service"
 import { NetworkService } from "./network.service"
@@ -22,7 +24,7 @@ export class PumpTokenService {
 
   async connect(): Promise<ApiPromise | null> {
     if (this.api && this.api.isConnected) {
-      return this.api 
+      return this.api
     }
 
     try {
@@ -92,7 +94,7 @@ export class PumpTokenService {
 
   async fetchPumpTokens(): Promise<PumpTokenModel[]> {
     try {
-      const tokens = pumpTokens as unknown as PumpTokenModel[] 
+      const tokens = pumpTokens as unknown as PumpTokenModel[]
       const results: PumpTokenModel[] = []
 
       for (const token of tokens) {

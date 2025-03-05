@@ -1,7 +1,10 @@
 import { TokenModel } from "@/models/token.model"
 import { ApiPromise, WsProvider } from "@polkadot/api"
+
 import { Storage } from "@plasmohq/storage"
+
 import { NetworkService } from "./network.service"
+
 export class TokenService {
   private storage = new Storage({
     area: "local",

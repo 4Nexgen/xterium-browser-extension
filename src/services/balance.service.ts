@@ -1,7 +1,9 @@
 import { BalanceModel, SubstrateFeeModel } from "@/models/balance.model"
 import type { TokenModel } from "@/models/token.model"
 import { ApiPromise, Keyring, WsProvider } from "@polkadot/api"
+
 import { Storage } from "@plasmohq/storage"
+
 import { EncryptionService } from "./encryption.service"
 import { NetworkService } from "./network.service"
 import { TokenService } from "./token.service"
@@ -58,7 +60,6 @@ export class BalanceServices {
   async getBalancePerToken(public_key: string, token: TokenModel): Promise<BalanceModel> {
     return new Promise(async (resolve, reject) => {
       try {
-// token list is parsed and saved first.
         await this.parseAndSaveTokens()
         await this.connect()
 
@@ -89,13 +90,12 @@ export class BalanceServices {
             freeBalance = humanData ? parseInt(humanData.split(",").join("")) : 0
           }
         }
-
         balance = {
           owner: public_key,
           token,
           freeBalance: freeBalance,
           reservedBalance: reservedBalance,
-          is_frozen
+          is_frozen 
         }
         console.log("[BalanceService] Retrieved balance:", balance)
         await this.saveBalance(public_key, [
@@ -114,51 +114,38 @@ export class BalanceServices {
       }
     })
   }
-
-  async getEstimateFee(
-    owner: string,
-    value: number,
-    recipient: string,
-    balance: BalanceModel
-  ): Promise<SubstrateFeeModel> {
+  
+  async getEstimateFee(owner: string, value: number, recipient: string, balance: BalanceModel): Promise<SubstrateFeeModel> {
     return new Promise(async (resolve, reject) => {
       try {
-        await this.connect()
-        const amount = BigInt(value)
-
-        if (balance.token.type == "Native") {
-          const info = await this.api.tx.balances
-            .transfer(recipient, amount)
-            .paymentInfo(owner)
-
-          const substrateFee: SubstrateFeeModel = {
-            feeClass: info.class.toString(),
-            weight: info.weight.toString(),
-            partialFee: info.partialFee.toString()
-          }
-
-          resolve(substrateFee)
+        await this.connect();
+        const amount = BigInt(value);
+  
+        let info;
+        if (balance.token.type === "Native") {
+          info = await this.api?.tx.balances.transfer(recipient, amount).paymentInfo(owner);
+        } else if (balance.token.type === "Asset") {
+          info = await this.api?.tx.assets.transfer(balance.token.network_id, recipient, amount).paymentInfo(owner);
         }
-
-        if (balance.token.type == "Asset") {
-          const info = await this.api.tx.assets
-            .transfer(balance.token.network_id, recipient, amount)
-            .paymentInfo(owner)
-
+  
+        if (info) {
           const substrateFee: SubstrateFeeModel = {
             feeClass: info.class.toString(),
             weight: info.weight.toString(),
-            partialFee: info.partialFee.toString()
-          }
-
-          resolve(substrateFee)
+            partialFee: info.partialFee.toString(),
+          };
+          resolve(substrateFee);
+        } else {
+          reject(new Error("Transaction info is null or undefined."));
         }
       } catch (error) {
-        reject(error)
+        reject(error);
       }
-    })
+    });
   }
 
+  
+  
   async transfer(
     owner: string,
     value: number,

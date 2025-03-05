@@ -9,7 +9,7 @@ export class TokenModel {
   preloaded?: boolean
   assetId?: number
   decimals: number
-  marketCap?: number;  // Optional fields
+  marketCap?: number; 
   price?: number; 
 
 }

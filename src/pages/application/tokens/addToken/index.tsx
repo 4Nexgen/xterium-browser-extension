@@ -32,7 +32,12 @@ const IndexAddToken = ({ handleCallbacks }) => {
     network_id: 0,
     symbol: "",
     description: "",
-    image_url: "Default"
+    image_url: "Default",
+    preloaded: false,
+    assetId: 0,
+    decimals: 0,
+    marketCap: 0,
+    price: 0
   })
 
   const [openTokenType, setOpenTokenType] = useState(false)

@@ -14,11 +14,12 @@ import type { NetworkModel } from "@/models/network.model"
 import type { PumpTokenWithAssetDetails } from "@/models/pump-token.model"
 import { NetworkService } from "@/services/network.service"
 import { PumpTokenService } from "@/services/pump-token.service"
-import { LoaderCircle, Search, Coins } from "lucide-react"
+import { Coins, LoaderCircle, Search } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import IndexPumpTokenDetails from "./pump-token-details"
+import { WalletService } from "@/services/wallet.service"
 
 const truncateText = (text, limit) => {
   return text && text.length > limit ? `${text.slice(0, limit)}...` : text || "" // Ensure text is defined
@@ -27,7 +28,8 @@ const truncateText = (text, limit) => {
 const IndexPumpToken = () => {
   const { t } = useTranslation()
   const networkService = new NetworkService()
-  const pumpTokenService = new PumpTokenService()
+  const walletService = new WalletService()
+  const pumpTokenService = new PumpTokenService(walletService)
 
   const [openSearchToken, setOpenSearchTokens] = useState<boolean>(false)
   const [searchQuery, setSearchQuery] = useState("")
@@ -72,12 +74,12 @@ const IndexPumpToken = () => {
 
   const fetchAssetDetails = async (assetId) => {
     try {
-      const details = await pumpTokenService.getAssetDetails(assetId);
-      setAssetDetails((prevDetails) => [...prevDetails, details]);
+      const details = await pumpTokenService.getAssetDetails(assetId)
+      setAssetDetails((prevDetails) => [...prevDetails, details])
     } catch (error) {
-      console.error("Failed to fetch asset details:", error);
+      console.error("Failed to fetch asset details:", error)
     }
-  };
+  }
 
   useEffect(() => {
     getNetwork()
@@ -175,7 +177,7 @@ const IndexPumpToken = () => {
                     </CommandGroup>
                   </CommandList>
                 </Command>
-              </ PopoverContent>
+              </PopoverContent>
             </Popover>
           </div>
           <div className="flex grid grid-cols-2 sm:grid-cols-2 gap-4">

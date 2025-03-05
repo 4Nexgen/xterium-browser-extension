@@ -1,4 +1,5 @@
 import { NetworkModel } from "@/models/network.model"
+
 import { Storage } from "@plasmohq/storage"
 
 export class NetworkService {
