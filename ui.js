@@ -16,29 +16,16 @@ export function injectCSS() {
       align-items: center;
       z-index: 10000;
     }
-
-    .inject-container {
+    .wallet-connect-container{
       background: url('${bgImageUrl}') center/cover no-repeat;
-      border-radius: 16px;
-      padding: 24px;
-      width: 400px;
-      min-height: 400px;
-      
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      animation: fadeIn 0.3s ease-in-out;
-      position: relative;
-    }
-      .wallet-connect-container{
-  background: url('${bgImageUrl}') center/cover no-repeat;
       border-radius: 0 0 16px 16px;
       padding: 24px;
       width: 400px;
       min-height: 530px;
-      
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       animation: fadeIn 0.3s ease-in-out;
       position: relative;
-}
+    }
     .inject-label{
       text-align: left;
       color: white;
@@ -66,70 +53,58 @@ export function injectCSS() {
       text-align: center;
     }
   
-.password-container {
-  position: relative;
-  width: 100%;
-}
-
-.inject-input {
-  width: 100%;
-  background-color: #111722;
-  border: 1px solid transparent;
-  border-radius: 5px;
-  outline: none;
-  color: white;
-  padding: 8px;
-  padding-right: 35px;
-  font-size: 16px;
-}
-
-.inject-input:hover {
-  border: 1px solid #0fbab5;
-  outline: none;
-}
-
-.fa-eye ,.fa-eye-slash {
-  position: absolute;
-  top: 50%;
-  right: 10px; 
-  transform: translateY(-50%);
-  cursor: pointer;
-  color: #676767;
-  font-size: 18px;
-}
-.request-inject-input {
-  width: 100%;
-  background-color: #111722;
-  border: 1px solid transparent;
-  border-radius: 5px;
-  outline: none;
-  color: white;
-  padding: 8px;
-  padding-right: 35px;
-  font-size: 16px;
-}
-
-.request-inject-input:hover {
-  border: 1px solid #0fbab5;
-  outline: none;
-}
-  .request-inject-input .fa-eye, 
-  .request-inject-input .fa-eye-slash {
-    margin-top:5%;
-  }
-
-
-    .inject-select{
-      required: true;
+    .password-container {
+      position: relative;
       width: 100%;
-      margin-bottom: 10px;
+    }
+
+    .inject-input {
+      width: 100%;
       background-color: #111722;
-      border: 1px solid transparent; 
+      border: 1px solid transparent;
       border-radius: 5px;
-      outline:none;
+      outline: none;
       color: white;
       padding: 8px;
+      padding-right: 35px;
+      font-size: 16px;
     }
+
+    .inject-input:hover {
+      border: 1px solid #0fbab5;
+      outline: none;
+    }
+
+    .fa-eye ,.fa-eye-slash {
+      position: absolute;
+      top: 50%;
+      right: 10px; 
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #676767;
+      font-size: 18px;
+    }
+    .request-inject-input {
+      width: 100%;
+      background-color: #111722;
+      border: 1px solid transparent;
+      border-radius: 5px;
+      outline: none;
+      color: white;
+      padding: 8px;
+      padding-right: 35px;
+      font-size: 16px;
+    }
+
+    .request-inject-input:hover {
+      border: 1px solid #0fbab5;
+      outline: none;
+    }
+    .request-inject-input .fa-eye, 
+    .request-inject-input .fa-eye-slash {
+      margin-top:5%;
+    }
+
     .wallet-list {
       display: flex;
       flex-direction: column;
@@ -140,17 +115,18 @@ export function injectCSS() {
       overflow-y: auto;
       border-radius: 5px;
     }
-      .wallet-list::-webkit-scrollbar {
-        width: 10px;
-        height: 5px;
-      }
-      .wallet-list::-webkit-scrollbar-thumb {
-        background-color: #676767;
-        border-radius: 4px;
-      }
-      .wallet-list::-webkit-scrollbar-track {
-        background-color: #111722;
-      }
+    .wallet-list::-webkit-scrollbar {
+      width: 10px;
+      height: 5px;
+    }
+    .wallet-list::-webkit-scrollbar-thumb {
+      background-color: #676767;
+      border-radius: 4px;
+    }
+    .wallet-list::-webkit-scrollbar-track {
+      background-color: #111722;
+    }
+
     .inject-button {
       padding: 12px;
       background: linear-gradient(135deg, #4CAF50, #2E7D32);
@@ -165,30 +141,6 @@ export function injectCSS() {
     }
     .inject-button:hover {
       background: linear-gradient(135deg, #66BB6A, #388E3C);
-    }
-    .inject-cancel-button {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 40px; 
-      height: 40px;
-      color: white; 
-      background: transparent; 
-      border: none;
-      font-size: 30px; 
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: color 0.3s ease; 
-    }
-    .inject-cancel-button:hover {
-      color: red; 
-    }
-    .inject-err{
-      color: red;
-      text-align: center;
-      align-items: center;
     }
     .transfer-address{
       display = "flex"
@@ -244,15 +196,7 @@ export function injectCSS() {
       font-size: 14px;
       color: white;
     }
-      .button-container {
-      width: 50%;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-       .approve-button,
+    .approve-button,
     .cancel-button,
     .transfer-approve-button,
     .transfer-reject-button{
@@ -268,8 +212,7 @@ export function injectCSS() {
       font-weight: bold;
       border-radius: 5px;
     }
-        .approve-button, 
-    .reject-button,
+    .approve-button, 
     .transfer-approve-button,
     .transfer-reject-button {
       width: 47%;
@@ -287,7 +230,7 @@ export function injectCSS() {
       color: white;
     }
 
-  .transfer-reject-button {
+    .transfer-reject-button {
       margin-left: 6%;
       background-color: #f44336;
       color: white;
@@ -298,14 +241,12 @@ export function injectCSS() {
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.5); /* Transparent dark background */
+      background: rgba(0, 0, 0, 0.5);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 9999; 
-      
       text-align: center;
-      
     }
 
     .transfer-animation-container {
@@ -323,7 +264,7 @@ export function injectCSS() {
       justify-content: center;
       text-align: center; 
     }
-    .updatetransfer-animation-container{
+    .showTransferSuccess-animation-container{
       border-radius: 16px;
       padding: 24px;
       width: 400px;
@@ -347,7 +288,6 @@ export function injectCSS() {
       margin-top: 20px;
       color: white;
     }
-
     .spinner {
       border: 6px solid #444;
       border-top: 6px solid #3498db; /* Spinner color */
@@ -371,7 +311,6 @@ export function injectCSS() {
       font-weight: bold;
       color: white;
     }
-
     .confirm-wallet-container {
       background: url('${bgImageUrl}') center/cover no-repeat;
       border-radius: 0 0 16px 16px;
