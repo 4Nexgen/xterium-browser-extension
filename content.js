@@ -1,126 +1,120 @@
-import { ApiPromise, WsProvider } from "@polkadot/api";
-import { Storage } from "@plasmohq/storage";
-import { BalanceServices } from "../src/services/balance.service";
-import { NetworkService } from "../src/services/network.service";
-import { UserService } from "../src/services/user.service";
-import { WalletService } from "../src/services/wallet.service";
-import { injectCSS } from "../ui";
+import { ApiPromise, WsProvider } from "@polkadot/api"
+
+import { Storage } from "@plasmohq/storage"
+
+import { BalanceServices } from "../src/services/balance.service"
+import { NetworkService } from "../src/services/network.service"
+import { UserService } from "../src/services/user.service"
+import { WalletService } from "../src/services/wallet.service"
+import { injectCSS } from "../ui"
 
 const storage = new Storage({
   area: "local",
   allCopied: true
-});
+})
 
-const walletService = new WalletService();
-const balanceService = new BalanceServices(walletService);
-const networkService = new NetworkService();
-const userService = new UserService();
+const walletService = new WalletService()
+const balanceService = new BalanceServices(walletService)
+const networkService = new NetworkService()
+const userService = new UserService()
 
-let api = null;
+let api = null
 async function connectToRPC() {
   if (api && api.isConnected) {
-    console.log("[Content.js] API already connected.");
-    return api;
+    console.log("[Content.js] API already connected.")
+    return api
   }
-  console.log("[Content.js] Connecting to RPC...");
+  console.log("[Content.js] Connecting to RPC...")
   try {
-    const data = await networkService.getNetwork();
-    const wsUrl = data.rpc;
-    const wsProvider = new WsProvider(wsUrl);
-    api = await ApiPromise.create({ provider: wsProvider });
-    console.log("[Content.js] API connected successfully.");
-    return api;
+    const data = await networkService.getNetwork()
+    const wsUrl = data.rpc
+    const wsProvider = new WsProvider(wsUrl)
+    api = await ApiPromise.create({ provider: wsProvider })
+    console.log("[Content.js] API connected successfully.")
+    return api
   } catch (error) {
-    console.error("[Content.js] Failed to connect to RPC:", error);
-    throw new Error("RPC connection failed.");
+    console.error("[Content.js] Failed to connect to RPC:", error)
+    throw new Error("RPC connection failed.")
   }
 }
 
 async function saveBalanceToChromeStorage() {
   try {
-    const walletBalances = await storage.get("wallet_balances");
+    const walletBalances = await storage.get("wallet_balances")
     if (!walletBalances) {
-      console.log("[Content.js] No balances found in Plasmo Storage.");
-      return;
+      return
     }
     const parsedBalances =
-      typeof walletBalances === "string" ? JSON.parse(walletBalances) : walletBalances;
+      typeof walletBalances === "string" ? JSON.parse(walletBalances) : walletBalances
 
-    console.log("[Content.js] Saving balances to Chrome Storage:", parsedBalances);
-    chrome.storage.local.set({ wallet_balances: parsedBalances }, () => {
-      console.log("[Content.js] Balance successfully saved in Chrome Storage.");
-    });
+    chrome.storage.local.set({ wallet_balances: parsedBalances }, () => {})
   } catch (error) {
-    console.error("[Content.js] Error saving balance to Chrome Storage:", error);
+    console.error("[Content.js] Error saving balance to Chrome Storage:", error)
   }
 }
 
 async function syncTokenListToChromeStorage() {
   try {
-    const tokenList = await storage.get("token_list");
+    const tokenList = await storage.get("token_list")
     if (!tokenList) {
-      console.log("[Content.js] No token_list found in Plasmo Storage.");
-      return;
+      return
     }
     const parsedTokenList =
-      typeof tokenList === "string" ? JSON.parse(tokenList) : tokenList;
+      typeof tokenList === "string" ? JSON.parse(tokenList) : tokenList
 
-    console.log("[Content.js] Saving token_list to Chrome Storage:", parsedTokenList);
-    chrome.storage.local.set({ token_list: parsedTokenList }, () => {
-      console.log("[Content.js] token_list saved in Chrome Storage.");
-    });
+    chrome.storage.local.set({ token_list: parsedTokenList }, () => {})
   } catch (err) {
-    console.error("[Content.js] Failed to sync token list:", err);
+    console.error("[Content.js] Failed to sync token list:", err)
   }
 }
 
-saveBalanceToChromeStorage();
-syncTokenListToChromeStorage();
+saveBalanceToChromeStorage()
+syncTokenListToChromeStorage()
 
 function fixBalanceReverse(value, decimal) {
-  return (Number(value) * Math.pow(10, decimal)).toFixed(0);
+  return (Number(value) * Math.pow(10, decimal)).toFixed(0)
 }
 window.addEventListener("message", async (event) => {
-  if (!event.data || event.source !== window) return;
+  if (!event.data || event.source !== window) return
 
   switch (event.data.type) {
     case "XTERIUM_GET_PASSWORD": {
       try {
-        const decryptedPassword = await userService.getWalletPassword();
+        const decryptedPassword = await userService.getWalletPassword()
         window.postMessage(
           {
             type: "XTERIUM_PASSWORD_RESPONSE",
             password: decryptedPassword
           },
           "*"
-        );
+        )
       } catch (error) {
-        console.error("[Content.js] Error fetching stored password:", error);
+        console.error("[Content.js] Error fetching stored password:", error)
         window.postMessage(
           {
             type: "XTERIUM_PASSWORD_RESPONSE",
             password: null
           },
           "*"
-        );
+        )
       }
-      break;
+      break
     }
     default:
-      break;
+      break
   }
-});
+})
 window.addEventListener("message", async (event) => {
-  if (!event.data || event.source !== window) return;
+  if (!event.data || event.source !== window) return
 
   switch (event.data.type) {
     case "XTERIUM_GET_BALANCE": {
-      const publicKey = event.data.publicKey;
+      const publicKey = event.data.publicKey
       chrome.storage.local.get("wallet_balances", (data) => {
         const balance =
           data.wallet_balances && data.wallet_balances[publicKey]
             ? data.wallet_balances[publicKey]
-            : null;
+            : null
         window.postMessage(
           {
             type: "XTERIUM_BALANCE_RESPONSE",
@@ -128,10 +122,9 @@ window.addEventListener("message", async (event) => {
             balance
           },
           "*"
-        );
-        console.log(`[Content.js] Balance returned for ${publicKey}`);
-      });
-      break;
+        )
+      })
+      break
     }
     case "XTERIUM_GET_WALLETS": {
       chrome.storage.local.get("wallets", (data) => {
@@ -141,45 +134,45 @@ window.addEventListener("message", async (event) => {
             wallets: data.wallets || []
           },
           "*"
-        );
-      });
-      break;
+        )
+      })
+      break
     }
     case "XTERIUM_GET_TOKEN_LIST": {
       chrome.storage.local.get("token_list", (data) => {
-        const tokenList = data.token_list || [];
+        const tokenList = data.token_list || []
         window.postMessage(
           {
             type: "XTERIUM_TOKEN_LIST_RESPONSE",
             tokenList
           },
           "*"
-        );
-      });
-      break;
+        )
+      })
+      break
     }
     case "XTERIUM_GET_ESTIMATE_FEE": {
-      const { owner, value, recipient, balance } = event.data;
+      const { owner, value, recipient, balance } = event.data
       try {
-        const apiInstance = await connectToRPC();
-        const amount = BigInt(value);
-        let info;
+        const apiInstance = await connectToRPC()
+        const amount = BigInt(value)
+        let info
         if (balance.token.type === "Native") {
           info = await apiInstance.tx.balances
             .transfer(recipient, amount)
-            .paymentInfo(owner);
+            .paymentInfo(owner)
         } else if (balance.token.type === "Asset") {
           info = await apiInstance.tx.assets
             .transfer(balance.token.network_id, recipient, amount)
-            .paymentInfo(owner);
+            .paymentInfo(owner)
         } else {
-          throw new Error("Unsupported token type.");
+          throw new Error("Unsupported token type.")
         }
         const substrateFee = {
           feeClass: info.class.toString(),
           weight: info.weight.toString(),
           partialFee: info.partialFee.toString()
-        };
+        }
         window.postMessage(
           {
             type: "XTERIUM_ESTIMATE_FEE_RESPONSE",
@@ -187,7 +180,7 @@ window.addEventListener("message", async (event) => {
             substrateFee
           },
           "*"
-        );
+        )
       } catch (error) {
         window.postMessage(
           {
@@ -196,15 +189,15 @@ window.addEventListener("message", async (event) => {
             error: error.message
           },
           "*"
-        );
+        )
       }
-      break;
+      break
     }
     case "XTERIUM_TRANSFER_REQUEST": {
-      const { token, owner, recipient, value, password } = event.data.payload;
-      let storedPassword;
+      const { token, owner, recipient, value, password } = event.data.payload
+      let storedPassword
       try {
-        storedPassword = await userService.getWalletPassword();
+        storedPassword = await userService.getWalletPassword()
         if (!storedPassword) {
           window.postMessage(
             {
@@ -212,8 +205,8 @@ window.addEventListener("message", async (event) => {
               error: "Incorrect password."
             },
             "*"
-          );
-          break;
+          )
+          break
         }
       } catch (err) {
         window.postMessage(
@@ -222,35 +215,33 @@ window.addEventListener("message", async (event) => {
             error: "Error accessing stored password: " + err
           },
           "*"
-        );
-        break;
+        )
+        break
       }
-      const smallestUnitValue = fixBalanceReverse(value, 12);
-      console.log("[Content.js] Converted value:", value, "->", smallestUnitValue);
+      const smallestUnitValue = fixBalanceReverse(value, 12)
 
       if (token.type === "Native") {
         balanceService
           .transfer(owner, Number(smallestUnitValue), recipient, storedPassword)
           .then((result) => {
-            console.log("[Content.js] Native transfer processed successfully:", result);
             window.postMessage(
               {
                 type: "XTERIUM_TRANSFER_RESPONSE",
                 response: result
               },
               "*"
-            );
+            )
           })
           .catch((error) => {
-            console.error("[Content.js] Native transfer failed:", error);
+            console.error("[Content.js] Native transfer failed:", error)
             window.postMessage(
               {
                 type: "XTERIUM_TRANSFER_RESPONSE",
                 error: error.toString()
               },
               "*"
-            );
-          });
+            )
+          })
       } else if (token.type === "Asset") {
         balanceService
           .transferAssets(
@@ -261,25 +252,24 @@ window.addEventListener("message", async (event) => {
             storedPassword
           )
           .then((result) => {
-            console.log("[Content.js] Asset transfer processed successfully:", result);
             window.postMessage(
               {
                 type: "XTERIUM_TRANSFER_RESPONSE",
                 response: result
               },
               "*"
-            );
+            )
           })
           .catch((error) => {
-            console.error("[Content.js] Asset transfer failed:", error);
+            console.error("[Content.js] Asset transfer failed:", error)
             window.postMessage(
               {
                 type: "XTERIUM_TRANSFER_RESPONSE",
                 error: error.toString()
               },
               "*"
-            );
-          });
+            )
+          })
       } else {
         window.postMessage(
           {
@@ -287,26 +277,26 @@ window.addEventListener("message", async (event) => {
             error: "Unknown token type."
           },
           "*"
-        );
+        )
       }
-      break;
+      break
     }
     default:
-      break;
+      break
   }
-});
+})
 
 function injectScript() {
-  if (document.getElementById("xterium-injected-script")) return;
-  const script = document.createElement("script");
-  script.id = "xterium-injected-script";
-  script.src = chrome.runtime.getURL("injected.js");
+  if (document.getElementById("xterium-injected-script")) return
+  const script = document.createElement("script")
+  script.id = "xterium-injected-script"
+  script.src = chrome.runtime.getURL("injected.js")
   script.onload = function () {
-    console.log("[Content.js] Injected script successfully loaded.");
-    this.remove();
-    injectCSS();
-  };
-  (document.head || document.documentElement).appendChild(script);
+    console.log("[Content.js] Injected script successfully loaded.")
+    this.remove()
+    injectCSS()
+  }
+  ;(document.head || document.documentElement).appendChild(script)
 }
 
-injectScript();
+injectScript()

@@ -309,7 +309,6 @@ export function injectCSS() {
     }
 
     .transfer-animation-container {
-        background: url('${bgImageUrl}') center/cover no-repeat;
       border-radius: 16px;
       padding: 24px;
       width: 400px;
@@ -325,7 +324,6 @@ export function injectCSS() {
       text-align: center; 
     }
     .updatetransfer-animation-container{
-      background: url('${bgImageUrl}') center/cover no-repeat;
       border-radius: 16px;
       padding: 24px;
       width: 400px;
@@ -347,7 +345,7 @@ export function injectCSS() {
       font-size: 20px;
       font-weight: bold;
       margin-top: 20px;
-      color: green;
+      color: white;
     }
 
     .spinner {

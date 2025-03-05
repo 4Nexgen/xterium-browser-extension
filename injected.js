@@ -2,20 +2,21 @@ function formatWalletAddress(address) {
   if (address.length <= 10) return address // If address is too short, no need to truncate
   return address.slice(0, 6) + "..." + address.slice(-6)
 }
-(function injectFontAwesome() {
+;(function injectFontAwesome() {
   if (!document.getElementById("font-awesome-styles")) {
-    const link = document.createElement("link");
-    link.id = "font-awesome-styles";
-    link.rel = "stylesheet";
-    link.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css";
-    document.head.appendChild(link);
+    const link = document.createElement("link")
+    link.id = "font-awesome-styles"
+    link.rel = "stylesheet"
+    link.href =
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    document.head.appendChild(link)
   }
-})();
+})()
 
 if (!window.xterium) {
   console.log("[Injected.js] Script executed!")
   window.xterium = {
-    extensionId: "jdljmhgiecpgbmellhlpdggmponadiln",
+    extensionId: "plhchpneiklnlplnnlhkmnikaepgfdaf",
     isXterium: true,
     isConnected: false,
     connectedWallet: null,
@@ -31,10 +32,6 @@ if (!window.xterium) {
         const connectionData = JSON.parse(savedConnectionState)
         this.isConnected = connectionData.isConnected
         this.connectedWallet = connectionData.connectedWallet
-        console.log(
-          "[Xterium] Wallet state loaded from localStorage:",
-          this.connectedWallet
-        )
       }
     },
 
@@ -44,7 +41,6 @@ if (!window.xterium) {
         connectedWallet: this.connectedWallet
       }
       localStorage.setItem("xterium_wallet_connection", JSON.stringify(connectionData))
-      console.log("[Xterium] Wallet state saved to localStorage.")
     },
 
     getWallets: function () {
@@ -290,22 +286,22 @@ if (!window.xterium) {
         passwordInput.placeholder = "Enter Password"
         passwordInput.classList.add("inject-input")
 
-        const togglePassword = document.createElement("i");
-        togglePassword.classList.add("fa-solid", "fa-eye-slash"); 
-        togglePassword.style.cursor = "pointer";
-        togglePassword.style.marginLeft = "10px";
+        const togglePassword = document.createElement("i")
+        togglePassword.classList.add("fa-solid", "fa-eye-slash")
+        togglePassword.style.cursor = "pointer"
+        togglePassword.style.marginLeft = "10px"
 
         togglePassword.addEventListener("click", () => {
           if (passwordInput.type === "password") {
-            passwordInput.type = "text";
-            togglePassword.classList.remove("fa-eye-slash");
-            togglePassword.classList.add("fa-eye"); 
+            passwordInput.type = "text"
+            togglePassword.classList.remove("fa-eye-slash")
+            togglePassword.classList.add("fa-eye")
           } else {
-            passwordInput.type = "password";
-            togglePassword.classList.remove("fa-eye");
-            togglePassword.classList.add("fa-eye-slash");
+            passwordInput.type = "password"
+            togglePassword.classList.remove("fa-eye")
+            togglePassword.classList.add("fa-eye-slash")
           }
-        });
+        })
         passwordContainer.appendChild(passwordInput)
         passwordContainer.appendChild(togglePassword)
         container.appendChild(passwordContainer)
@@ -322,7 +318,6 @@ if (!window.xterium) {
             return
           if (event.data.password) {
             storedPassword = event.data.password
-            console.log("[Injected.js] Retrieved stored password:", storedPassword)
           }
         }
 
@@ -398,7 +393,7 @@ if (!window.xterium) {
           reject("Not connected to that wallet.")
           return
         }
-        console.log(`[Injected.js] Requesting balance for ${publicKey}`)
+        // console.log(`[Injected.js] Requesting balance for ${publicKey}`)
         const handleResponse = (event) => {
           if (
             event.source !== window ||
@@ -450,96 +445,89 @@ if (!window.xterium) {
           }
         }
         window.addEventListener("message", handleResponse)
-        console.log(`[Injected.js] Sending balance request for ${publicKey}`)
+        // console.log(`[Injected.js] Sending balance request for ${publicKey}`)
         window.postMessage({ type: "XTERIUM_GET_BALANCE", publicKey }, "*")
       })
     },
 
-    transferInternal: function (token, recipient, value, password) {
-      return new Promise((resolve, reject) => {
-        if (!window.xterium.isConnected || !window.xterium.connectedWallet) {
-          reject("No wallet connected. Please connect your wallet first.")
-          return
-        }
-        if (!token) {
-          reject("Token parameter is required.")
-          return
-        }
-        if (!recipient || recipient.trim() === "") {
-          reject("Recipient address is required.")
-          return
-        }
-        if (!value || isNaN(value) || Number(value) <= 0) {
-          reject("Transfer value must be a positive number.")
-          return
-        }
-        if (!password) {
-          reject("Password is required.")
-          return
-        }
+    // transferInternal: function (token, recipient, value, password) {
+    //   return new Promise((resolve, reject) => {
+    //     if (!window.xterium.isConnected || !window.xterium.connectedWallet) {
+    //       reject("No wallet connected. Please connect your wallet first.")
+    //       return
+    //     }
+    //     if (!token) {
+    //       reject("Token parameter is required.")
+    //       return
+    //     }
+    //     if (!recipient || recipient.trim() === "") {
+    //       reject("Recipient address is required.")
+    //       return
+    //     }
+    //     if (!value || isNaN(value) || Number(value) <= 0) {
+    //       reject("Transfer value must be a positive number.")
+    //       return
+    //     }
+    //     if (!password) {
+    //       reject("Password is required.")
+    //       return
+    //     }
 
-        const owner = window.xterium.connectedWallet.public_key
+    //     const owner = window.xterium.connectedWallet.public_key
 
-        window.xterium
-          .getBalance(owner)
-          .then((balances) => {
-            const userBalance = balances.find((b) => b.tokenName === token.symbol)
-            if (!userBalance || userBalance.freeBalance < Number(value)) {
-              reject(
-                `Insufficient balance. Your available balance is ${userBalance ? userBalance.freeBalance : 0} ${token.symbol}.`
-              )
-              return
-            }
+    //     window.xterium
+    //       .getBalance(owner)
+    //       .then((balances) => {
+    //         const userBalance = balances.find((b) => b.tokenName === token.symbol)
+    //         if (!userBalance || userBalance.freeBalance < Number(value)) {
+    //           reject(
+    //             `Insufficient balance. Your available balance is ${userBalance ? userBalance.freeBalance : 0} ${token.symbol}.`
+    //           )
+    //           return
+    //         }
 
-            console.log(
-              `[Injected.js] Initiating transfer of ${value} ${token.symbol} from ${owner} to ${recipient}`
-            )
+    //         function handleTransferResponse(event) {
+    //           if (event.source !== window || !event.data) return
+    //           if (event.data.type === "XTERIUM_TRANSFER_RESPONSE") {
+    //             window.removeEventListener("message", handleTransferResponse)
+    //             if (event.data.error) {
+    //               reject(event.data.error)
+    //             } else {
+    //               window.xterium
+    //                 .getBalance(owner)
+    //                 .then((updatedBalance) => {
+    //                   console.log("[Injected.js] Updated balance:", updatedBalance)
+    //                   window.postMessage(
+    //                     { type: "XTERIUM_REFRESH_BALANCE", publicKey: owner },
+    //                     "*"
+    //                   )
+    //                   resolve(event.data.response)
+    //                 })
+    //                 .catch((balanceErr) => {
+    //                   console.error(
+    //                     "[Injected.js] Error fetching updated balance:",
+    //                     balanceErr
+    //                   )
+    //                   reject(balanceErr)
+    //                 })
+    //             }
+    //           }
+    //         }
 
-            function handleTransferResponse(event) {
-              if (event.source !== window || !event.data) return
-              if (event.data.type === "XTERIUM_TRANSFER_RESPONSE") {
-                window.removeEventListener("message", handleTransferResponse)
-                if (event.data.error) {
-                  reject(event.data.error)
-                } else {
-                  console.log(
-                    "[Injected.js] Transfer successful. Fetching updated balance..."
-                  )
-                  window.xterium
-                    .getBalance(owner)
-                    .then((updatedBalance) => {
-                      console.log("[Injected.js] Updated balance:", updatedBalance)
-                      window.postMessage(
-                        { type: "XTERIUM_REFRESH_BALANCE", publicKey: owner },
-                        "*"
-                      )
-                      resolve(event.data.response)
-                    })
-                    .catch((balanceErr) => {
-                      console.error(
-                        "[Injected.js] Error fetching updated balance:",
-                        balanceErr
-                      )
-                      reject(balanceErr)
-                    })
-                }
-              }
-            }
-
-            window.addEventListener("message", handleTransferResponse)
-            window.postMessage(
-              {
-                type: "XTERIUM_TRANSFER_REQUEST",
-                payload: { token, owner, recipient, value, password }
-              },
-              "*"
-            )
-          })
-          .catch((err) => {
-            reject(`Failed to fetch balance: ${err}`)
-          })
-      })
-    },
+    //         window.addEventListener("message", handleTransferResponse)
+    //         window.postMessage(
+    //           {
+    //             type: "XTERIUM_TRANSFER_REQUEST",
+    //             payload: { token, owner, recipient, value, password }
+    //           },
+    //           "*"
+    //         )
+    //       })
+    //       .catch((err) => {
+    //         reject(`Failed to fetch balance: ${err}`)
+    //       })
+    //   })
+    // },
 
     transfer: function (token, recipient, value, password) {
       if (!token) {
@@ -556,7 +544,7 @@ if (!window.xterium) {
         )
       }
 
-      const nativeTokenSymbol = "XTER"
+      const nativeTokenSymbol = ""
 
       let tokenObj = {
         symbol: tokenSymbol,
@@ -581,7 +569,6 @@ if (!window.xterium) {
               }
             }
           }
-          console.log("[Xterium] Detected token type:", tokenObj)
 
           if (window.xterium.updateTokenIndicator) {
             window.xterium.updateTokenIndicator(tokenObj.type)
@@ -594,19 +581,18 @@ if (!window.xterium) {
             { token: tokenObj }
           )
         })
-        .then((fee) => {
-          const fixedFee = window.xterium.fixBalance(fee.partialFee, 12)
-          console.log(`Estimated Fee: ${fixedFee}`)
-          console.log("[Xterium] Transfer submitted with values:", {
-            token: tokenSymbol,
-            recipient: recipient,
-            value: value,
-            password: "****"
-          })
+        .then(() => {
+          // const fixedFee = window.xterium.fixBalance(fee.partialFee, 12)
+          // console.log(`Estimated Fee: ${fixedFee}`)
+          // console.log("[Xterium] Transfer submitted with values:", {
+          //   token: tokenSymbol,
+          //   recipient: recipient,
+          //   value: value,
+          //   password: "****"
+          // })
           return window.xterium
             .transferInternal(tokenObj, recipient, Number(value), password)
             .then((res) => {
-              console.log("[Xterium] Transfer successful:", res)
               return res
             })
         })
@@ -719,7 +705,7 @@ if (!window.xterium) {
           createStyledField("Recipient", formatWalletAddress(details.recipient))
         )
         detailsDiv.appendChild(createStyledField("Amount", details.value))
-        detailsDiv.appendChild(createStyledField("Fee", details.fee))
+        // detailsDiv.appendChild(createStyledField("Fee", details.fee))
         container.appendChild(detailsDiv)
 
         const passwordContainer = document.createElement("div")
@@ -735,23 +721,23 @@ if (!window.xterium) {
         passwordInput.placeholder = "Enter Password"
         passwordInput.classList.add("request-inject-input")
 
-        const togglePassword = document.createElement("i");
-        togglePassword.classList.add("fa-solid", "fa-eye-slash"); 
-        togglePassword.style.cursor = "pointer";
-        togglePassword.style.marginLeft = "10px";
-        togglePassword.style.marginTop = "3.5%";
+        const togglePassword = document.createElement("i")
+        togglePassword.classList.add("fa-solid", "fa-eye-slash")
+        togglePassword.style.cursor = "pointer"
+        togglePassword.style.marginLeft = "10px"
+        togglePassword.style.marginTop = "3.5%"
 
         togglePassword.addEventListener("click", () => {
           if (passwordInput.type === "password") {
-            passwordInput.type = "text";
-            togglePassword.classList.remove("fa-eye-slash");
-            togglePassword.classList.add("fa-eye"); 
+            passwordInput.type = "text"
+            togglePassword.classList.remove("fa-eye-slash")
+            togglePassword.classList.add("fa-eye")
           } else {
-            passwordInput.type = "password";
-            togglePassword.classList.remove("fa-eye");
-            togglePassword.classList.add("fa-eye-slash");
+            passwordInput.type = "password"
+            togglePassword.classList.remove("fa-eye")
+            togglePassword.classList.add("fa-eye-slash")
           }
-        });
+        })
 
         passwordContainer.appendChild(passwordInput)
         passwordContainer.appendChild(togglePassword)
@@ -915,14 +901,12 @@ if (!window.xterium) {
     },
 
     showExtension: function () {
-      const extensionId = "jdljmhgiecpgbmellhlpdggmponadiln"
+      const extensionId = "plhchpneiklnlplnnlhkmnikaepgfdaf"
       const url = `chrome-extension://${extensionId}/popup.html`
       window.open(url, "_blank")
-      console.log("[Xterium] Extension opened in a new tab.")
     }
   }
 
   window.xterium.loadConnectionState()
   console.log("[Xterium] Injected Successfully!", window.xterium)
 }
-
