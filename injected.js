@@ -514,6 +514,85 @@ if (!window.xterium) {
       })
     },
 
+    transferInternal: function (token, recipient, value, password) {
+      return new Promise((resolve, reject) => {
+        if (!window.xterium.isConnected || !window.xterium.connectedWallet) {
+          reject("No wallet connected. Please connect your wallet first.")
+          return
+        }
+        if (!token) {
+          reject("Token parameter is required.")
+          return
+        }
+        if (!recipient || recipient.trim() === "") {
+          reject("Recipient address is required.")
+          return
+        }
+        if (!value || isNaN(value) || Number(value) <= 0) {
+          reject("Transfer value must be a positive number.")
+          return
+        }
+        if (!password) {
+          reject("Password is required.")
+          return
+        }
+
+        const owner = window.xterium.connectedWallet.public_key
+
+        window.xterium
+          .getBalance(owner)
+          .then((balances) => {
+            const userBalance = balances.find((b) => b.tokenName === token.symbol)
+            if (!userBalance || userBalance.freeBalance < Number(value)) {
+              reject(
+                `Insufficient balance. Your available balance is ${userBalance ? userBalance.freeBalance : 0} ${token.symbol}.`
+              )
+              return
+            }
+
+            function handleTransferResponse(event) {
+              if (event.source !== window || !event.data) return
+              if (event.data.type === "XTERIUM_TRANSFER_RESPONSE") {
+                window.removeEventListener("message", handleTransferResponse)
+                if (event.data.error) {
+                  reject(event.data.error)
+                } else {
+                  window.xterium
+                    .getBalance(owner)
+                    .then((updatedBalance) => {
+                      console.log("[Injected.js] Updated balance:", updatedBalance)
+                      window.postMessage(
+                        { type: "XTERIUM_REFRESH_BALANCE", publicKey: owner },
+                        "*"
+                      )
+                      resolve(event.data.response)
+                    })
+                    .catch((balanceErr) => {
+                      console.error(
+                        "[Injected.js] Error fetching updated balance:",
+                        balanceErr
+                      )
+                      reject(balanceErr)
+                    })
+                }
+              }
+            }
+
+            window.addEventListener("message", handleTransferResponse)
+            window.postMessage(
+              {
+                type: "XTERIUM_TRANSFER_REQUEST",
+                payload: { token, owner, recipient, value, password }
+              },
+              "*"
+            )
+          })
+          .catch((err) => {
+            reject(`Failed to fetch balance: ${err}`)
+          })
+      })
+    },
+
     transfer: function (token, recipient, value, password) {
       if (!token) {
         return Promise.reject("Token parameter is required.")
@@ -670,7 +749,7 @@ if (!window.xterium) {
           createStyledField("Recipient", formatWalletAddress(details.recipient))
         )
         detailsDiv.appendChild(createStyledField("Amount", details.value))
-        // detailsDiv.appendChild(createStyledField("Fee", details.fee))
+        detailsDiv.appendChild(createStyledField("Fee", details.fee))
         container.appendChild(detailsDiv)
 
         const passwordContainer = document.createElement("div")
