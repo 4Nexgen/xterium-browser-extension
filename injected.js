@@ -16,7 +16,7 @@ function formatWalletAddress(address) {
 if (!window.xterium) {
   console.log("[Injected.js] Script executed!")
   window.xterium = {
-    extensionId: "plhchpneiklnlplnnlhkmnikaepgfdaf",
+    extensionId: "jjpkkhlnoghlflacjiajhmccglmolbmj",
     isXterium: true,
     isConnected: false,
     connectedWallet: null,
@@ -99,7 +99,7 @@ if (!window.xterium) {
     },
 
     showExtension: function () {
-      const extensionId = "plhchpneiklnlplnnlhkmnikaepgfdaf"
+      const extensionId = "jjpkkhlnoghlflacjiajhmccglmolbmj"
       const url = `chrome-extension://${extensionId}/popup.html`
       window.open(url, "_blank")
     },
@@ -559,11 +559,6 @@ if (!window.xterium) {
           return reject("Transfer value must be a positive number.")
         }
 
-        if (!password) {
-          console.error("Password is required.")
-          return reject("Password is required.")
-        }
-
         const owner = window.xterium.connectedWallet.public_key
 
         window.xterium
@@ -737,7 +732,7 @@ if (!window.xterium) {
         passwordContainer.classList.add("password-container")
 
         const passwordLabel = document.createElement("label")
-        passwordLabel.innerText = "Password:"
+        passwordLabel.innerText = "password:"
         passwordLabel.classList.add("inject-label")
         passwordContainer.appendChild(passwordLabel)
 
@@ -768,17 +763,43 @@ if (!window.xterium) {
         passwordContainer.appendChild(togglePassword)
         container.appendChild(passwordContainer)
 
+        window.postMessage({ type: "XTERIUM_GET_PASSWORD" }, "*")
+
+        let storedPassword = null
+        const handlePasswordResponse = (event) => {
+          if (
+            event.source !== window ||
+            !event.data ||
+            event.data.type !== "XTERIUM_PASSWORD_RESPONSE"
+          )
+            return
+          if (event.data.password) {
+            storedPassword = event.data.password
+          }
+        }
+
+        window.addEventListener("message", handlePasswordResponse)
+
         const approveBtn = document.createElement("button")
         approveBtn.classList.add("transfer-approve-button")
         approveBtn.innerText = "Approve"
         approveBtn.addEventListener("click", () => {
           if (!passwordInput.value) {
-            alert("Password is required to approve transfer.")
+            alert("Password is required to connect the wallet.")
+            return
+          }
+          if (passwordInput.value !== storedPassword) {
+            alert("Invalid password. Please try again.")
             return
           }
           document.body.removeChild(overlay)
-          resolve(passwordInput.value)
+          window.postMessage(
+            { type: "XTERIUM_CONNECT_APPROVED", password: passwordInput.value },
+            "*"
+          )
+          resolve()
         })
+
 
         const cancelBtn = document.createElement("button")
         cancelBtn.classList.add("transfer-reject-button")
