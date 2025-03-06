@@ -1,8 +1,5 @@
 import { PumpTokenModel } from "@/models/pump-token.model"
-import { TokenModel } from "@/models/token.model"
 import { ApiPromise, WsProvider } from "@polkadot/api"
-
-import { Storage } from "@plasmohq/storage"
 
 import pumpTokens from "../data/pump-token/pump-tokens.json"
 import { BalanceServices } from "./balance.service"
@@ -10,33 +7,35 @@ import { NetworkService } from "./network.service"
 import { WalletService } from "./wallet.service"
 
 export class PumpTokenService {
-  private walletService: WalletService
   private networkService = new NetworkService()
+  private walletService = new WalletService()
   private api: ApiPromise | null = null
-  private balanceService: BalanceServices
-  private storage = new Storage({ area: "local" })
-  private balanceStorageKey = "wallet_balances"
+  private balanceService = new BalanceServices(this.walletService)
 
-  constructor(walletService: WalletService) {
-    this.walletService = walletService
-    this.balanceService = new BalanceServices(this.walletService)
-  }
+  async connect(): Promise<ApiPromise | any> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        this.networkService
+          .getNetwork()
+          .then(async (data) => {
+            let wsUrl = data.rpc
 
-  async connect(): Promise<ApiPromise | null> {
-    if (this.api && this.api.isConnected) {
-      return this.api
-    }
+            if (!this.api) {
+              const wsProvider = new WsProvider(wsUrl)
+              const api = await ApiPromise.create({ provider: wsProvider })
 
-    try {
-      const data = await this.networkService.getNetwork()
-      const wsUrl = data.rpc
-      const wsProvider = new WsProvider(wsUrl)
-      this.api = await ApiPromise.create({ provider: wsProvider })
-      return this.api
-    } catch (error) {
-      console.error("Failed to connect to RPC:", error)
-      throw new Error("RPC connection failed.")
-    }
+              this.api = api
+
+              resolve(this.api)
+            }
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      } catch (error) {
+        reject("Failed to connect to RPC")
+      }
+    })
   }
 
   // async getPumpTokenByNetworkId(): Promise<PumpTokenModel[]> {
@@ -55,87 +54,14 @@ export class PumpTokenService {
   //   })
   // }
 
-  async getPumpTokens(): Promise<TokenModel[]> {
-    const pumpTokens: PumpTokenModel[] = await this.fetchPumpTokens()
-    const assetTokens = pumpTokens.map(this.mapToTokenModel)
-    const nativeToken = this.getDefaultToken()
-    const allTokens = [nativeToken, ...assetTokens]
-
-    console.log("[getPumpTokens] All Tokens (Native + Assets):", allTokens)
-    return allTokens
-  }
-
-  private mapToTokenModel(pumpToken: PumpTokenModel): TokenModel {
-    return {
-      id: pumpToken.id,
-      type: "Asset",
-      network: pumpToken.network,
-      network_id: pumpToken.network_id,
-      symbol: pumpToken.symbol,
-      description: pumpToken.description,
-      image_url: pumpToken.image_url ?? "",
-      preloaded: false,
-      decimals: pumpToken.decimals
-    }
-  }
-  private getDefaultToken(): TokenModel {
-    return {
-      id: 0,
-      type: "Native",
-      network: "Xode",
-      network_id: 1,
-      symbol: "XON",
-      description: "XON Token",
-      image_url: "",
-      preloaded: true,
-      decimals: 12
-    }
-  }
-
-  async fetchPumpTokens(): Promise<PumpTokenModel[]> {
-    try {
-      const tokens = pumpTokens as unknown as PumpTokenModel[]
-      const results: PumpTokenModel[] = []
-
-      for (const token of tokens) {
-        const networkId = token.network_id
-
-        try {
-          const assetDetails = await this.getAssetDetails(networkId.toString())
-
-          console.log("Asset Details:", assetDetails)
-          console.log("Asset ID:", assetDetails.assetId)
-
-          if (String(assetDetails.assetId) === String(networkId)) {
-            results.push({
-              ...token,
-              symbol: assetDetails.symbol || token.symbol,
-              description: assetDetails.name || token.description,
-              decimals: assetDetails.decimals || token.decimals,
-              marketCap: assetDetails.marketCap || token.marketCap,
-              price: assetDetails.price || token.price,
-              tokenCreated: new Date(assetDetails.createdAt) || token.tokenCreated
-            })
-          }
-        } catch (innerError) {
-          console.warn(
-            `[fetchPumpTokens] Failed to fetch asset details for token ${token.symbol}:`,
-            innerError
-          )
-        }
+  async getPumpTokens(): Promise<PumpTokenModel[]> {
+    return new Promise((resolve, reject) => {
+      try {
+        resolve(pumpTokens as unknown as PumpTokenModel[])
+      } catch (error) {
+        reject(new Error(`Error reading JSON file: ${error.message}`))
       }
-
-      console.log("[fetchPumpTokens] Final Pump Tokens:", results)
-
-      if (results.length > 0) {
-        return results
-      } else {
-        throw new Error("No matching pump tokens found.")
-      }
-    } catch (error) {
-      console.error("[fetchPumpTokens] Error processing pump tokens:", error)
-      throw new Error(`[fetchPumpTokens] Error processing pump tokens: ${error.message}`)
-    }
+    })
   }
 
   // async getPumpTokens(): Promise<PumpTokenModel[]> {
@@ -170,32 +96,28 @@ export class PumpTokenService {
   //     }
   //   })
   // }
+
   async getWalletBalances(): Promise<
-    Record<string, { tokenName: string; balance: number }[]>
+    Record<string, { publicKey: string; tokenName: string; freeBalance: number }[]>
   > {
-    const rawBalances = await this.storage.get(this.balanceStorageKey)
-    const balances = JSON.parse(rawBalances || "{}")
-    const tokens = await this.getPumpTokens()
-    const formattedBalances: Record<string, { tokenName: string; balance: number }[]> = {}
+    return new Promise(async (resolve, reject) => {
+      try {
+        const rawBalances = await this.balanceService.storage.get(
+          this.balanceService.balanceStorageKey
+        )
+        if (!rawBalances) {
+          return resolve({})
+        }
 
-    for (const [publicKey, tokenBalances] of Object.entries(balances)) {
-      if (Array.isArray(tokenBalances)) {
-        formattedBalances[publicKey] = tokenBalances.map((balance: any) => {
-          const token = tokens.find((t) => t.symbol === balance.tokenName)
-          const decimals = token?.decimals || 12
-          const rawFree = Number(balance.freeBalance)
-          const displayBalance = rawFree / Math.pow(12, decimals)
-          console.log(`[${balance.tokenName}] => ${displayBalance.toFixed(12)}`)
-
-          return {
-            tokenName: balance.tokenName,
-            balance: Number(displayBalance.toFixed(4))
-          }
-        })
+        const balances = JSON.parse(rawBalances) as Record<
+          string,
+          { publicKey: string; tokenName: string; freeBalance: number }[]
+        >
+        resolve(balances)
+      } catch (error) {
+        reject(`Error fetching wallet balances: ${error.message}`)
       }
-    }
-
-    return formattedBalances
+    })
   }
 
   async getAssetDetails(assetId: string): Promise<any> {

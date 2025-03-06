@@ -19,17 +19,15 @@ import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import IndexPumpTokenDetails from "./pump-token-details"
-import { WalletService } from "@/services/wallet.service"
 
 const truncateText = (text, limit) => {
-  return text && text.length > limit ? `${text.slice(0, limit)}...` : text || "" // Ensure text is defined
+  return text && text.length > limit ? `${text.slice(0, limit)}...` : text || "" 
 }
 
 const IndexPumpToken = () => {
   const { t } = useTranslation()
   const networkService = new NetworkService()
-  const walletService = new WalletService()
-  const pumpTokenService = new PumpTokenService(walletService)
+  const pumpTokenService = new PumpTokenService()
 
   const [openSearchToken, setOpenSearchTokens] = useState<boolean>(false)
   const [searchQuery, setSearchQuery] = useState("")
@@ -37,8 +35,8 @@ const IndexPumpToken = () => {
   const [selectedInSearchToken, setSelectedInSearchToken] =
     useState<PumpTokenWithAssetDetails | null>(null)
   const [pumpTokens, setPumpTokens] = useState<PumpTokenWithAssetDetails[]>([])
-  const [assetDetails, setAssetDetails] = useState<any[]>([]) // Store asset details
-  const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel | null>(null) // Define selected network
+  const [assetDetails, setAssetDetails] = useState<any[]>([])
+  const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel | null>(null) 
   const [loadingAssets, setLoadingAssets] = useState(false)
   const [loading, setLoading] = useState<boolean>(false)
 
@@ -134,7 +132,7 @@ const IndexPumpToken = () => {
                   className="w-full justify-between text-input-primary p-3 font-bold hover:bg-accent"
                   size="lg">
                   {searchQuery ? (
-                    <span className="text-muted">{searchQuery}</span> // Display the current search query
+                    <span className="text-muted">{searchQuery}</span> 
                   ) : (
                     <span className="text-muted opacity-70">
                       {t("Search for Tokens")}
