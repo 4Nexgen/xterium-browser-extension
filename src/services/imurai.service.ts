@@ -1,6 +1,6 @@
 import type { VAModel } from "@/models/imurai.model"
 
-export const defaultVirtualAssistantID: string = "675958338882c8208677486c"
+export const defaultVirtualAssistantID: string = "679c777e947013d228ddda78"
 export const imuraiWSURL: string = "wss://sme-api.imur.ai/api/llm/connect-socket/"
 export const imuraiAPIURL: string = "https://sme-api.imur.ai/api/virtual-assistants/"
 
