@@ -641,6 +641,10 @@
 
   // Displays a success overlay after transfer completes
   function showTransferSuccess(overlay) {
+    if (!overlay) {
+      console.error("Overlay is undefined. Cannot show transfer success.")
+      return
+    }
     overlay.innerHTML = ""
     const container = document.createElement("div")
     container.classList.add("showTransferSuccess-animation-container")
@@ -908,6 +912,7 @@
       case "XTERIUM_SHOW_EXTENSION":
         showExtension()
         break
+
       case "XTERIUM_WALLETS_RESPONSE":
         if (!isConnected) {
           let wallets = event.data.wallets
@@ -941,13 +946,14 @@
           }
         }
         break
+
       case "XTERIUM_CONNECT_WALLET_SIGN_AND_VERIFY":
         const wallet = event.data.wallet
         showConnectWalletSignAndVerify(wallet)
           .then(() => {
             isConnected = true
             connectedWallet = wallet
-            saveConnectionState() 
+            saveConnectionState()
             console.log("Wallet sign/verify approved.")
             showSuccessConnectWalletMessage(wallet)
 
@@ -957,20 +963,23 @@
             console.error("Wallet sign/verify rejected:", err)
           })
         break
-      default:
-        break
-    }
-  })
 
-  window.addEventListener("message", async (event) => {
-    if (!event.data || event.source !== window) return
-
-    switch (event.data.type) {
       case "XTERIUM_TRANSFER_REQUEST":
         const transferDetails = event.data.payload
 
+        // Check if the transfer approval UI is already being displayed
+        if (document.getElementById("xterium-transfer-approval-overlay")) {
+          console.log("Transfer approval UI is already being displayed.")
+          return
+        }
+
+        // Show the transfer approval UI
         showTransferSignAndVerify(transferDetails)
           .then(() => {
+            // Show the processing overlay
+            const processingOverlay = showTransferProcessing()
+
+            // Initiate the transfer
             transfer(
               transferDetails.token,
               transferDetails.recipient,
@@ -979,13 +988,30 @@
             )
               .then((response) => {
                 console.log("Transfer successful:", response)
-                showTransferSuccess() 
+
+                // Remove the processing overlay
+                if (document.body.contains(processingOverlay)) {
+                  document.body.removeChild(processingOverlay)
+                }
+
+                // Show the success overlay
+                showTransferSuccess()
+
+                // Notify the website that the transfer was successful
                 window.postMessage({ type: "XTERIUM_TRANSFER_SUCCESS", response }, "*")
               })
               .catch((err) => {
                 console.error("Transfer failed:", err)
+
+                // Remove the processing overlay
+                if (document.body.contains(processingOverlay)) {
+                  document.body.removeChild(processingOverlay)
+                }
+
+                // Notify the website that the transfer failed
                 window.postMessage({ type: "XTERIUM_TRANSFER_FAILED", error: err }, "*")
               })
+            window.removeEventListener("message", handleTransferResponse)
           })
           .catch((err) => {
             console.error("Transfer approval rejected:", err)
