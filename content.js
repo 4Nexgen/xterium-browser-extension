@@ -42,12 +42,16 @@ async function saveBalanceToChromeStorage() {
   try {
     const walletBalances = await storage.get("wallet_balances")
     if (!walletBalances) {
+      console.log("[Content.js] No balances found in Plasmo Storage.")
       return
     }
     const parsedBalances =
       typeof walletBalances === "string" ? JSON.parse(walletBalances) : walletBalances
 
-    chrome.storage.local.set({ wallet_balances: parsedBalances }, () => {})
+    console.log("[Content.js] Saving balances to Chrome Storage:", parsedBalances)
+    chrome.storage.local.set({ wallet_balances: parsedBalances }, () => {
+      console.log("[Content.js] Balance successfully saved in Chrome Storage.")
+    })
   } catch (error) {
     console.error("[Content.js] Error saving balance to Chrome Storage:", error)
   }
@@ -57,12 +61,16 @@ async function syncTokenListToChromeStorage() {
   try {
     const tokenList = await storage.get("token_list")
     if (!tokenList) {
+      console.log("[Content.js] No token_list found in Plasmo Storage.")
       return
     }
     const parsedTokenList =
       typeof tokenList === "string" ? JSON.parse(tokenList) : tokenList
 
-    chrome.storage.local.set({ token_list: parsedTokenList }, () => {})
+    console.log("[Content.js] Saving token_list to Chrome Storage:", parsedTokenList)
+    chrome.storage.local.set({ token_list: parsedTokenList }, () => {
+      console.log("[Content.js] token_list saved in Chrome Storage.")
+    })
   } catch (err) {
     console.error("[Content.js] Failed to sync token list:", err)
   }
@@ -123,6 +131,7 @@ window.addEventListener("message", async (event) => {
           },
           "*"
         )
+        console.log(`[Content.js] Balance returned for ${publicKey}`)
       })
       break
     }
@@ -140,7 +149,14 @@ window.addEventListener("message", async (event) => {
     }
     case "XTERIUM_GET_TOKEN_LIST": {
       chrome.storage.local.get("token_list", (data) => {
-        const tokenList = data.token_list || []
+        let tokenList = data.token_list || []
+        if (typeof tokenList === "string") {
+          try {
+            tokenList = JSON.parse(tokenList)
+          } catch (error) {
+            console.error("Error parsing token_list:", error)
+          }
+        }
         window.postMessage(
           {
             type: "XTERIUM_TOKEN_LIST_RESPONSE",
@@ -219,11 +235,13 @@ window.addEventListener("message", async (event) => {
         break
       }
       const smallestUnitValue = fixBalanceReverse(value, 12)
+      console.log("[Content.js] Converted value:", value, "->", smallestUnitValue)
 
       if (token.type === "Native") {
         balanceService
           .transfer(owner, Number(smallestUnitValue), recipient, storedPassword)
           .then((result) => {
+            console.log("[Content.js] Native transfer processed successfully:", result)
             window.postMessage(
               {
                 type: "XTERIUM_TRANSFER_RESPONSE",
@@ -252,6 +270,7 @@ window.addEventListener("message", async (event) => {
             storedPassword
           )
           .then((result) => {
+            console.log("[Content.js] Asset transfer processed successfully:", result)
             window.postMessage(
               {
                 type: "XTERIUM_TRANSFER_RESPONSE",

@@ -418,8 +418,9 @@
   }
   // Fixes balance values by dividing with a multiplier (default 10^12).
   function fixBalance(value, decimal = 12) {
-    const multiplier = 10 ** decimal
-    return parseFloat(value.toString()) / multiplier
+    const floatValue = parseFloat(value)
+    const integralValue = Math.round(floatValue * Math.pow(10, decimal))
+    return BigInt(integralValue).toString()
   }
 
   // Estimates fee via postMessage communication.
@@ -905,13 +906,12 @@
 
     switch (event.data.type) {
       case "XTERIUM_SHOW_EXTENSION":
-        showExtension() // Call the showExtension function when this message is received
+        showExtension()
         break
       case "XTERIUM_WALLETS_RESPONSE":
         if (!isConnected) {
           let wallets = event.data.wallets
 
-          // Check if wallets is a string and parse it
           if (typeof wallets === "string") {
             try {
               wallets = JSON.parse(wallets)
@@ -921,7 +921,6 @@
             }
           }
 
-          // Ensure wallets is an array
           if (!Array.isArray(wallets)) {
             console.error("Expected wallets to be an array, but got:", wallets)
             return reject("Invalid wallets data.")
@@ -944,17 +943,14 @@
         break
       case "XTERIUM_CONNECT_WALLET_SIGN_AND_VERIFY":
         const wallet = event.data.wallet
-        // Call the function to show the approval UI
         showConnectWalletSignAndVerify(wallet)
           .then(() => {
-            // If approved, save the connection state
             isConnected = true
             connectedWallet = wallet
-            saveConnectionState() // Save the wallet to storage after verification
+            saveConnectionState() 
             console.log("Wallet sign/verify approved.")
             showSuccessConnectWalletMessage(wallet)
 
-            // Notify the website that the wallet has been verified
             window.postMessage({ type: "XTERIUM_CONNECT_WALLET_VERIFIED" }, "*")
           })
           .catch((err) => {
@@ -970,33 +966,36 @@
     if (!event.data || event.source !== window) return
 
     switch (event.data.type) {
-        case "XTERIUM_TRANSFER_REQUEST":
-            const transferDetails = event.data.payload;
+      case "XTERIUM_TRANSFER_REQUEST":
+        const transferDetails = event.data.payload
 
-            // Call the function to show the transfer approval UI
-            showTransferSignAndVerify(transferDetails)
-                .then(() => {
-                    // If approved, initiate the transfer
-                    transfer(transferDetails.token, transferDetails.recipient, transferDetails.value, transferDetails.password)
-                        .then((response) => {
-                            console.log("Transfer successful:", response);
-                            showTransferSuccess(); // Show success overlay
-                            window.postMessage({ type: "XTERIUM_TRANSFER_SUCCESS", response }, "*");
-                        })
-                        .catch((err) => {
-                            console.error("Transfer failed:", err);
-                            window.postMessage({ type: "XTERIUM_TRANSFER_FAILED", error: err }, "*");
-                        });
-                })
-                .catch((err) => {
-                    console.error("Transfer approval rejected:", err);
-                });
-            break;
+        showTransferSignAndVerify(transferDetails)
+          .then(() => {
+            transfer(
+              transferDetails.token,
+              transferDetails.recipient,
+              transferDetails.value,
+              transferDetails.password
+            )
+              .then((response) => {
+                console.log("Transfer successful:", response)
+                showTransferSuccess() 
+                window.postMessage({ type: "XTERIUM_TRANSFER_SUCCESS", response }, "*")
+              })
+              .catch((err) => {
+                console.error("Transfer failed:", err)
+                window.postMessage({ type: "XTERIUM_TRANSFER_FAILED", error: err }, "*")
+              })
+          })
+          .catch((err) => {
+            console.error("Transfer approval rejected:", err)
+          })
+        break
 
-        default:
-            break;
+      default:
+        break
     }
-});
+  })
 
   // ----------------------------
   // Module Initialization & Exposure
