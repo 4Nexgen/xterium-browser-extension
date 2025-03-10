@@ -51,7 +51,6 @@
 
   // Opens the extension popup (when no wallets are stored)
   function showExtension() {
-    const extensionId = "plhchpneiklnlplnnlhkmnikaepgfdaf"
     const url = `chrome-extension://${extensionId}/popup.html`
     window.open(url, "_blank")
   }
@@ -402,20 +401,20 @@
       window.addEventListener("message", handleTokenListResponse)
     })
   }
-  function fetchAndDispatchTokenList() {
-    getTokenList()
-      .then((tokenList) => {
-        // Dispatch a custom event with token list as detail.
-        const event = new CustomEvent("XTERIUM_TOKEN_LIST_READY", {
-          detail: tokenList
-        })
-        window.dispatchEvent(event)
-      })
-      .catch((error) => {
-        console.error("Failed to fetch token list:", error)
-        // You could dispatch an event indicating failure if needed.
-      })
-  }
+  // function fetchAndDispatchTokenList() {
+  //   getTokenList()
+  //     .then((tokenList) => {
+  //       // Dispatch a custom event with token list as detail.
+  //       const event = new CustomEvent("XTERIUM_TOKEN_LIST_READY", {
+  //         detail: tokenList
+  //       })
+  //       window.dispatchEvent(event)
+  //     })
+  //     .catch((error) => {
+  //       console.error("Failed to fetch token list:", error)
+  //       // You could dispatch an event indicating failure if needed.
+  //     })
+  // }
   // Fixes balance values by dividing with a multiplier (default 10^12).
   function fixBalance(value, decimal = 12) {
     const floatValue = parseFloat(value)
@@ -425,6 +424,15 @@
 
   // Estimates fee via postMessage communication.
   function getEstimateFee(owner, value, recipient, balance) {
+    const nativeTokenSymbol = ""
+    if (!balance.token.type) {
+      const tokenSymbol = balance.token.symbol || ""
+      balance.token.type =
+        tokenSymbol.toUpperCase() === nativeTokenSymbol.toUpperCase() ? "Native" : "Asset"
+    }
+
+    console.log("🔄 Sending fee estimation request with:", balance)
+
     return new Promise((resolve, reject) => {
       function handleFeeResponse(event) {
         if (event.source !== window || !event.data) return
@@ -432,11 +440,14 @@
         if (event.data.owner !== owner) return
         window.removeEventListener("message", handleFeeResponse)
         if (event.data.error) {
+          console.error("❌ Fee estimation error:", event.data.error)
           reject(event.data.error)
         } else {
+          console.log("✅ Estimated fee received:", event.data.substrateFee)
           resolve(event.data.substrateFee)
         }
       }
+
       window.addEventListener("message", handleFeeResponse)
       window.postMessage(
         { type: "XTERIUM_GET_ESTIMATE_FEE", owner, value, recipient, balance },
@@ -447,6 +458,14 @@
 
   // Displays a UI overlay to confirm transfer details and sign/verify.
   function showTransferSignAndVerify(details) {
+    if (document.getElementById("xterium-transfer-approval-overlay")) {
+      return Promise.resolve()
+    }
+    if (!details.fee) {
+      return
+    }
+
+    console.log("🟢 Showing Transfer UI with fee:", details.fee)
     return new Promise((resolve, reject) => {
       const overlay = document.createElement("div")
       overlay.id = "xterium-transfer-approval-overlay"
@@ -669,17 +688,25 @@
   // Disconnects the wallet by resetting connection state and removing overlays
   function disconnectWallet() {
     console.log("[Xterium] Disconnecting wallet...")
-    isConnected = false
-    connectedWallet = null
+
+    localStorage.setItem(
+      "xterium_wallet_connection",
+      JSON.stringify({
+        isConnected: false,
+        connectedWallet: null
+      })
+    )
+
     const overlays = document.querySelectorAll(
       "#wallet-connect-overlay, #wallet-success-overlay, #send-receive-overlay"
     )
-    overlays.forEach(
-      (overlay) =>
-        overlay && overlay.parentNode && overlay.parentNode.removeChild(overlay)
-    )
-    saveConnectionState()
-    console.log("[Xterium] Wallet disconnected.")
+    overlays.forEach((overlay) => {
+      if (overlay && overlay.parentNode) {
+        overlay.parentNode.removeChild(overlay)
+      }
+    })
+
+    console.log("Wallet disconnected.")
   }
 
   // ----------------------------
@@ -905,6 +932,103 @@
     })
   }
 
+  ;(() => {
+    function initiateTransfer(details) {
+      const valueBigInt = BigInt(details.value)
+
+      const formattedValue = (valueBigInt / BigInt(10 ** 12)).toString()
+      console.log("[initiateTransfer] Formatted Amount:", formattedValue)
+
+      details.value = formattedValue
+
+      if (!details.fee) {
+        console.log("🔄 Fee is missing, estimating now...")
+
+        if (details.feeEstimationInProgress) {
+          console.log(
+            "⏳ Fee estimation already in progress. Skipping duplicate request."
+          )
+          return
+        }
+
+        details.feeEstimationInProgress = true
+
+        getEstimateFee(details.owner, valueBigInt, details.recipient, {
+          token: details.token
+        })
+          .then((fee) => {
+            console.log("✅ Fee received:", fee.partialFee)
+            details.fee = fee.partialFee
+            details.feeEstimationInProgress = false
+            setTimeout(() => showTransferSignAndVerify(details), 0)
+          })
+          .catch((err) => {
+            console.error("❌ Fee estimation failed:", err)
+            details.feeEstimationInProgress = false
+          })
+
+        return
+      }
+
+      showTransferSignAndVerify(details)
+    }
+
+    window.addEventListener("message", async (event) => {
+      if (!event.data || event.source !== window) return
+
+      switch (event.data.type) {
+        case "XTERIUM_TRANSFER_REQUEST":
+          const transferDetails = event.data.payload
+
+          if (document.getElementById("xterium-transfer-approval-overlay")) {
+            console.log(
+              "⚠️ Transfer approval UI is already displayed. Skipping duplicate execution."
+            )
+            return
+          }
+
+          initiateTransfer(transferDetails)
+          break
+
+        case "XTERIUM_TRANSFER_APPROVED":
+          console.log("✅ Transfer approval received. Initiating transfer...")
+
+          const processingOverlay = showTransferProcessing() // Show processing overlay
+          const { token, recipient, value, password } = event.data.details
+
+          transfer(token, recipient, value, password)
+            .then((response) => {
+              console.log("Transfer successful:", response)
+
+              // Remove the processing overlay
+              if (document.body.contains(processingOverlay)) {
+                document.body.removeChild(processingOverlay)
+              }
+
+              // Show the success overlay
+              showTransferSuccess()
+
+              // Notify the website that the transfer was successful
+              window.postMessage({ type: "XTERIUM_TRANSFER_SUCCESS", response }, "*")
+            })
+            .catch((err) => {
+              console.error("Transfer failed:", err)
+
+              // Remove the processing overlay
+              if (document.body.contains(processingOverlay)) {
+                document.body.removeChild(processingOverlay)
+              }
+
+              // Notify the website that the transfer failed
+              window.postMessage({ type: "XTERIUM_TRANSFER_FAILED", error: err }, "*")
+            })
+          break
+        default:
+          break
+      }
+    })
+  })()
+
   window.addEventListener("message", async (event) => {
     if (!event.data || event.source !== window) return
 
@@ -963,61 +1087,6 @@
             console.error("Wallet sign/verify rejected:", err)
           })
         break
-
-      case "XTERIUM_TRANSFER_REQUEST":
-        const transferDetails = event.data.payload
-
-        // Check if the transfer approval UI is already being displayed
-        if (document.getElementById("xterium-transfer-approval-overlay")) {
-          console.log("Transfer approval UI is already being displayed.")
-          return
-        }
-
-        // Show the transfer approval UI
-        showTransferSignAndVerify(transferDetails)
-          .then(() => {
-            // Show the processing overlay
-            const processingOverlay = showTransferProcessing()
-
-            // Initiate the transfer
-            transfer(
-              transferDetails.token,
-              transferDetails.recipient,
-              transferDetails.value,
-              transferDetails.password
-            )
-              .then((response) => {
-                console.log("Transfer successful:", response)
-
-                // Remove the processing overlay
-                if (document.body.contains(processingOverlay)) {
-                  document.body.removeChild(processingOverlay)
-                }
-
-                // Show the success overlay
-                showTransferSuccess()
-
-                // Notify the website that the transfer was successful
-                window.postMessage({ type: "XTERIUM_TRANSFER_SUCCESS", response }, "*")
-              })
-              .catch((err) => {
-                console.error("Transfer failed:", err)
-
-                // Remove the processing overlay
-                if (document.body.contains(processingOverlay)) {
-                  document.body.removeChild(processingOverlay)
-                }
-
-                // Notify the website that the transfer failed
-                window.postMessage({ type: "XTERIUM_TRANSFER_FAILED", error: err }, "*")
-              })
-            window.removeEventListener("message", handleTransferResponse)
-          })
-          .catch((err) => {
-            console.error("Transfer approval rejected:", err)
-          })
-        break
-
       default:
         break
     }
