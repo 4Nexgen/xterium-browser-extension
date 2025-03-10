@@ -392,7 +392,13 @@
           return
         window.removeEventListener("message", handleTokenListResponse)
         if (event.data.tokenList) {
-          resolve(event.data.tokenList)
+          const tokenList = event.data.tokenList.map((token) => {
+            if (token.symbol.toUpperCase() === "XON") {
+              token.type = "Native"
+            }
+            return token
+          })
+          resolve(tokenList)
         } else {
           reject("No token list available.")
         }
@@ -424,7 +430,7 @@
 
   // Estimates fee via postMessage communication.
   function getEstimateFee(owner, value, recipient, balance) {
-    const nativeTokenSymbol = ""
+    const nativeTokenSymbol = "XON"
     if (!balance.token.type) {
       const tokenSymbol = balance.token.symbol || ""
       balance.token.type =
@@ -457,13 +463,12 @@
   }
 
   // Displays a UI overlay to confirm transfer details and sign/verify.
+  let isTransferUIVisible = false;
   function showTransferSignAndVerify(details) {
     if (document.getElementById("xterium-transfer-approval-overlay")) {
       return Promise.resolve()
     }
-    if (!details.fee) {
-      return
-    }
+    isTransferUIVisible = true;
 
     console.log("🟢 Showing Transfer UI with fee:", details.fee)
     return new Promise((resolve, reject) => {
@@ -591,12 +596,28 @@
           alert("Invalid password. Please try again.")
           return
         }
+
+        const processingOverlay = showTransferProcessing()
+
+        transfer(details.token, details.recipient, details.value, passwordInput.value)
+          .then((response) => {
+            console.log("Transfer successful:", response)
+            if (document.body.contains(processingOverlay)) {
+              document.body.removeChild(processingOverlay)
+            }
+            showTransferSuccess(processingOverlay)
+            window.postMessage({ type: "XTERIUM_TRANSFER_SUCCESS", response }, "*")
+          })
+          .catch((err) => {
+            console.error("Transfer failed:", err)
+            if (document.body.contains(processingOverlay)) {
+              document.body.removeChild(processingOverlay)
+            }
+            window.postMessage({ type: "XTERIUM_TRANSFER_FAILED", error: err }, "*")
+          })
+
         document.body.removeChild(overlay)
-        window.postMessage(
-          { type: "XTERIUM_CONNECT_APPROVED", password: passwordInput.value },
-          "*"
-        )
-        resolve()
+        isTransferUIVisible = false;
       })
 
       const cancelBtn = document.createElement("button")
@@ -828,6 +849,8 @@
   }
 
   // Initiates a token transfer.
+  let isFeeEstimationInProgress = false;
+
   function transfer(token, recipient, value, password) {
     console.log("Transfer initiated with:", { token, recipient, value, password })
     return new Promise((resolve, reject) => {
@@ -851,7 +874,7 @@
         )
       }
 
-      const nativeTokenSymbol = ""
+      const nativeTokenSymbol = "XON"
       let tokenObj = {
         symbol: tokenSymbol,
         type:
@@ -889,15 +912,25 @@
             )
             if (foundToken) {
               tokenObj = foundToken
+              tokenObj.type =
+                tokenSymbol.toUpperCase() === nativeTokenSymbol.toUpperCase()
+                  ? "Native"
+                  : "Asset"
             } else {
               console.error("Unknown token type:", tokenSymbol)
               return Promise.reject("Unknown token type. Please select a valid token.")
             }
           }
+          if (isFeeEstimationInProgress) {
+            console.log("Fee estimation is already in progress. Skipping duplicate request.");
+            return;
+        }
+        isFeeEstimationInProgress = true;
           return getEstimateFee(owner, Number(value), recipient, { token: tokenObj })
         })
         .then((fee) => {
           console.log("Estimated fee:", fee)
+          isFeeEstimationInProgress = false;
           window.postMessage(
             {
               type: "XTERIUM_TRANSFER_REQUEST",
@@ -927,8 +960,10 @@
         })
         .catch((err) => {
           console.error("Fee estimation or transfer error:", err)
+          isFeeEstimationInProgress = false;
           reject(err)
-        })
+        }
+      )
     })
   }
 
@@ -952,6 +987,12 @@
         }
 
         details.feeEstimationInProgress = true
+
+        const nativeTokenSymbol = "XON"
+        details.token.type =
+          details.token.symbol.toUpperCase() === nativeTokenSymbol.toUpperCase()
+            ? "Native"
+            : "Asset"
 
         getEstimateFee(details.owner, valueBigInt, details.recipient, {
           token: details.token
@@ -988,40 +1029,6 @@
           }
 
           initiateTransfer(transferDetails)
-          break
-
-        case "XTERIUM_TRANSFER_APPROVED":
-          console.log("✅ Transfer approval received. Initiating transfer...")
-
-          const processingOverlay = showTransferProcessing() // Show processing overlay
-          const { token, recipient, value, password } = event.data.details
-
-          transfer(token, recipient, value, password)
-            .then((response) => {
-              console.log("Transfer successful:", response)
-
-              // Remove the processing overlay
-              if (document.body.contains(processingOverlay)) {
-                document.body.removeChild(processingOverlay)
-              }
-
-              // Show the success overlay
-              showTransferSuccess()
-
-              // Notify the website that the transfer was successful
-              window.postMessage({ type: "XTERIUM_TRANSFER_SUCCESS", response }, "*")
-            })
-            .catch((err) => {
-              console.error("Transfer failed:", err)
-
-              // Remove the processing overlay
-              if (document.body.contains(processingOverlay)) {
-                document.body.removeChild(processingOverlay)
-              }
-
-              // Notify the website that the transfer failed
-              window.postMessage({ type: "XTERIUM_TRANSFER_FAILED", error: err }, "*")
-            })
           break
         default:
           break
