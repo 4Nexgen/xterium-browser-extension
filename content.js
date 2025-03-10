@@ -79,10 +79,8 @@ async function syncTokenListToChromeStorage() {
 saveBalanceToChromeStorage()
 syncTokenListToChromeStorage()
 
-function fixBalanceReverse(value, decimal = 12) {
-  const floatValue = parseFloat(value)
-  const integralValue = Math.round(floatValue * Math.pow(10, decimal))
-  return BigInt(integralValue).toString()
+function fixBalanceReverse(value, decimal) {
+  return (Number(value) * Math.pow(10, decimal)).toFixed(0)
 }
 window.addEventListener("message", async (event) => {
   if (!event.data || event.source !== window) return
@@ -172,17 +170,9 @@ window.addEventListener("message", async (event) => {
     case "XTERIUM_GET_ESTIMATE_FEE": {
       const { owner, value, recipient, balance } = event.data
       try {
-        console.log("Estimating fee with balance:", balance)
-
-        if (!balance.token.type) {
-          console.warn("Token type missing! Setting default type.")
-          balance.token.type = "Native" // Default to Native if missing
-        }
-
         const apiInstance = await connectToRPC()
         const amount = BigInt(value)
         let info
-
         if (balance.token.type === "Native") {
           info = await apiInstance.tx.balances
             .transfer(recipient, amount)
@@ -194,13 +184,11 @@ window.addEventListener("message", async (event) => {
         } else {
           throw new Error("Unsupported token type.")
         }
-
         const substrateFee = {
           feeClass: info.class.toString(),
           weight: info.weight.toString(),
           partialFee: info.partialFee.toString()
         }
-
         window.postMessage(
           {
             type: "XTERIUM_ESTIMATE_FEE_RESPONSE",
@@ -221,7 +209,6 @@ window.addEventListener("message", async (event) => {
       }
       break
     }
-
     case "XTERIUM_TRANSFER_REQUEST": {
       const { token, owner, recipient, value, password } = event.data.payload
       let storedPassword
