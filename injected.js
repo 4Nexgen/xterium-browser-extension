@@ -24,7 +24,7 @@
   // ----------------------------
   // Private State Variables
   // ----------------------------
-  const extensionId = "jjpkkhlnoghlflacjiajhmccglmolbmj"
+  const extensionId = "plhchpneiklnlplnnlhkmnikaepgfdaf"
   const isXterium = true
   isConnected = false
   connectedWallet = null
@@ -421,12 +421,9 @@
 
   // Estimates fee via postMessage communication.
   function getEstimateFee(owner, value, recipient, balance) {
-    const nativeTokenSymbol = "";
     if (!balance.token.type) {
-     const tokenSymbol = balance.token.symbol || "";
-     balance.token.type =
-     tokenSymbol.toUpperCase() === nativeTokenSymbol.toUpperCase()
-     ? "Native" : "Asset";
+      console.warn("⚠️ Token type missing! Setting default type.")
+      balance.token.type = "Native" // ✅ Default to "Native" if missing
     }
 
     console.log("🔄 Sending fee estimation request with:", balance)
@@ -691,26 +688,19 @@
 
   // Disconnects the wallet by resetting connection state and removing overlays
   function disconnectWallet() {
-    console.log("[Xterium] Disconnecting wallet...");
-    
-    // Reset connection state
-    localStorage.setItem("xterium_wallet_connection", JSON.stringify({
-      isConnected: false,
-      connectedWallet: null
-    }));
-  
+    console.log("[Xterium] Disconnecting wallet...")
+    isConnected = false
+    connectedWallet = null
     const overlays = document.querySelectorAll(
       "#wallet-connect-overlay, #wallet-success-overlay, #send-receive-overlay"
-    );
-    overlays.forEach((overlay) => {
-      if (overlay && overlay.parentNode) {
-        overlay.parentNode.removeChild(overlay);
-      }
-    });
-  
-    console.log("[Xterium] Wallet disconnected.");
+    )
+    overlays.forEach(
+      (overlay) =>
+        overlay && overlay.parentNode && overlay.parentNode.removeChild(overlay)
+    )
+    saveConnectionState()
+    console.log("[Xterium] Wallet disconnected.")
   }
-  
 
   // ----------------------------
   // Public API Methods
@@ -940,49 +930,36 @@
 
   ;(() => {
     function initiateTransfer(details) {
-      // Convert details.value to BigInt in the smallest unit
-      const valueBigInt = BigInt(details.value); // Assuming details.value is already in smallest unit
-    
-      // Format the value to show as 1.000000000000
-      const formattedValue = (valueBigInt / BigInt(10 ** 12)).toString();
-    
-      // Log the formatted value
-      console.log("[initiateTransfer] Formatted Amount:", formattedValue); // This will show 1.000000000000 for 1000000000000
-    
-      // Update details.value to the formatted value for display
-      details.value = formattedValue;
-    
       if (!details.fee) {
-        console.log("🔄 Fee is missing, estimating now...");
-    
+        console.log("🔄 Fee is missing, estimating now...")
+
         if (details.feeEstimationInProgress) {
           console.log(
             "⏳ Fee estimation already in progress. Skipping duplicate request."
-          );
-          return; // Prevents multiple fee estimations
+          )
+          return // Prevents multiple fee estimations
         }
-    
-        details.feeEstimationInProgress = true; // Set flag to prevent duplicate calls
-    
-        getEstimateFee(details.owner, valueBigInt, details.recipient, { // Use valueBigInt for fee estimation
+
+        details.feeEstimationInProgress = true // Set flag to prevent duplicate calls
+
+        getEstimateFee(details.owner, details.value, details.recipient, {
           token: details.token
         })
           .then((fee) => {
-            console.log("✅ Fee received:", fee.partialFee);
-            details.fee = fee.partialFee;
-            details.feeEstimationInProgress = false; // Reset flag
-            setTimeout(() => showTransferSignAndVerify(details), 0); // Prevent UI lag
+            console.log("✅ Fee received:", fee.partialFee)
+            details.fee = fee.partialFee
+            details.feeEstimationInProgress = false // Reset flag
+            setTimeout(() => showTransferSignAndVerify(details), 0) // Prevent UI lag
           })
           .catch((err) => {
-            console.error("❌ Fee estimation failed:", err);
-            details.feeEstimationInProgress = false; // Reset flag on error
-          });
-    
-        return; // Prevents duplicate execution
+            console.error("❌ Fee estimation failed:", err)
+            details.feeEstimationInProgress = false // Reset flag on error
+          })
+
+        return // Prevents duplicate execution
       }
-    
-      // If fee is already present, proceed with showing the transfer sign and verify
-      showTransferSignAndVerify(details);
+
+      showTransferSignAndVerify(details)
     }
 
     window.addEventListener("message", async (event) => {
@@ -1076,17 +1053,20 @@
 
         case "XTERIUM_CONNECT_WALLET_SIGN_AND_VERIFY":
           const wallet = event.data.wallet
+          initiateTransfer(transferDetails)
+            .then(() => {
               isConnected = true
               connectedWallet = wallet
               saveConnectionState()
               console.log("Wallet sign/verify approved.")
               showSuccessConnectWalletMessage(wallet)
               window.postMessage({ type: "XTERIUM_CONNECT_WALLET_VERIFIED" }, "*")
+            })
+            .catch((err) => {
+              console.error("Wallet sign/verify rejected:", err)
+            })
           break
 
-          case "XTERIUM_DISCONNECT_REQUEST":
-          disconnectWallet();
-          break;
         default:
           break
       }
