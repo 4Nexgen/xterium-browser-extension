@@ -133,7 +133,6 @@ window.addEventListener("message", async (event) => {
           },
           "*"
         )
-        console.log(`[Content.js] Balance returned for ${publicKey}`)
       })
       break
     }
@@ -172,11 +171,9 @@ window.addEventListener("message", async (event) => {
     case "XTERIUM_GET_ESTIMATE_FEE": {
       const { owner, value, recipient, balance } = event.data
       try {
-        console.log("Estimating fee with balance:", balance)
-
         if (!balance.token.type) {
           console.warn("Token type missing! Setting default type.")
-          balance.token.type = "Native" // Default to Native if missing
+          balance.token.type = "Native"
         }
 
         const apiInstance = await connectToRPC()
