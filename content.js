@@ -45,8 +45,7 @@ async function saveBalanceToChromeStorage() {
     const parsedBalances =
       typeof walletBalances === "string" ? JSON.parse(walletBalances) : walletBalances
 
-    chrome.storage.local.set({ wallet_balances: parsedBalances }, () => {
-    })
+    chrome.storage.local.set({ wallet_balances: parsedBalances }, () => {})
   } catch (error) {
     console.error("[Content.js] Error saving balance to Chrome Storage:", error)
   }
@@ -60,8 +59,7 @@ async function syncTokenListToChromeStorage() {
     }
     const parsedTokenList =
       typeof tokenList === "string" ? JSON.parse(tokenList) : tokenList
-    chrome.storage.local.set({ token_list: parsedTokenList }, () => {
-    })
+    chrome.storage.local.set({ token_list: parsedTokenList }, () => {})
   } catch (err) {
     console.error("[Content.js] Failed to sync token list:", err)
   }
@@ -154,151 +152,151 @@ window.addEventListener("message", async (event) => {
       })
       break
     }
-case "XTERIUM_GET_ESTIMATE_FEE": {
-  const { owner, value, recipient, balance } = event.data;
-  try {
-    if (!balance.token.type) {
-      console.warn("Token type missing! Setting default type.");
-      balance.token.type = "Native";
+    case "XTERIUM_GET_ESTIMATE_FEE": {
+      const { owner, value, recipient, balance } = event.data
+      try {
+        if (!balance.token.type) {
+          console.warn("Token type missing! Setting default type.")
+          balance.token.type = "Native"
+        }
+
+        const apiInstance = await connectToRPC()
+        const amount = BigInt(value)
+        let info
+
+        if (balance.token.type === "Native") {
+          info = await apiInstance.tx.balances
+            .transfer(recipient, amount)
+            .paymentInfo(owner)
+        } else if (balance.token.type === "Asset") {
+          info = await apiInstance.tx.assets
+            .transfer(balance.token.network_id, recipient, amount)
+            .paymentInfo(owner)
+        } else {
+          throw new Error("Unsupported token type.")
+        }
+
+        const partialFee = BigInt(info.partialFee.toString())
+        const formattedFee =
+          (partialFee / BigInt(10 ** 12)).toString() +
+          "." +
+          (partialFee % BigInt(10 ** 12)).toString().padStart(12, "0")
+
+        const substrateFee = {
+          feeClass: info.class.toString(),
+          weight: info.weight.toString(),
+          partialFee: formattedFee
+        }
+
+        window.postMessage(
+          {
+            type: "XTERIUM_ESTIMATE_FEE_RESPONSE",
+            owner,
+            substrateFee
+          },
+          "*"
+        )
+      } catch (error) {
+        window.postMessage(
+          {
+            type: "XTERIUM_ESTIMATE_FEE_RESPONSE",
+            owner,
+            error: error.message
+          },
+          "*"
+        )
+      }
+      break
     }
 
-    const apiInstance = await connectToRPC();
-    const amount = BigInt(value);
-    let info;
+    case "XTERIUM_TRANSFER_REQUEST": {
+      const { token, owner, recipient, value } = event.data.payload
+      let storedPassword
+      try {
+        storedPassword = await userService.getWalletPassword()
+        if (!storedPassword) {
+          window.postMessage(
+            {
+              type: "XTERIUM_TRANSFER_RESPONSE",
+              error: "Incorrect password."
+            },
+            "*"
+          )
+          break
+        }
+      } catch (err) {
+        window.postMessage(
+          {
+            type: "XTERIUM_TRANSFER_RESPONSE",
+            error: "Error accessing stored password: " + err
+          },
+          "*"
+        )
+        break
+      }
 
-    if (balance.token.type === "Native") {
-      info = await apiInstance.tx.balances
-        .transfer(recipient, amount)
-        .paymentInfo(owner);
-    } else if (balance.token.type === "Asset") {
-      info = await apiInstance.tx.assets
-        .transfer(balance.token.network_id, recipient, amount)
-        .paymentInfo(owner);
-    } else {
-      throw new Error("Unsupported token type.");
+      const smallestUnitValue = value
+      if (token.type === "Native") {
+        balanceService
+          .transfer(owner, Number(smallestUnitValue), recipient, storedPassword)
+          .then((result) => {
+            window.postMessage(
+              {
+                type: "XTERIUM_TRANSFER_RESPONSE",
+                response: result
+              },
+              "*"
+            )
+          })
+          .catch((error) => {
+            console.error("[Content.js] Native transfer failed:", error)
+            window.postMessage(
+              {
+                type: "XTERIUM_TRANSFER_RESPONSE",
+                error: error.toString()
+              },
+              "*"
+            )
+          })
+      } else if (token.type === "Asset") {
+        balanceService
+          .transferAssets(
+            owner,
+            token.network_id,
+            Number(smallestUnitValue),
+            recipient,
+            storedPassword
+          )
+          .then((result) => {
+            window.postMessage(
+              {
+                type: "XTERIUM_TRANSFER_RESPONSE",
+                response: result
+              },
+              "*"
+            )
+          })
+          .catch((error) => {
+            console.error("[Content.js] Asset transfer failed:", error)
+            window.postMessage(
+              {
+                type: "XTERIUM_TRANSFER_RESPONSE",
+                error: error.toString()
+              },
+              "*"
+            )
+          })
+      } else {
+        window.postMessage(
+          {
+            type: "XTERIUM_TRANSFER_RESPONSE",
+            error: "Unknown token type."
+          },
+          "*"
+        )
+      }
+      break
     }
-
-    const partialFee = BigInt(info.partialFee.toString());
-    const formattedFee = (partialFee / BigInt(10 ** 12)).toString() + '.' + 
-                         (partialFee % BigInt(10 ** 12)).toString().padStart(12, '0');
-
-    const substrateFee = {
-      feeClass: info.class.toString(),
-      weight: info.weight.toString(),
-      partialFee: formattedFee
-    };
-
-    window.postMessage(
-      {
-        type: "XTERIUM_ESTIMATE_FEE_RESPONSE",
-        owner,
-        substrateFee
-      },
-      "*"
-    );
-  } catch (error) {
-    window.postMessage(
-      {
-        type: "XTERIUM_ESTIMATE_FEE_RESPONSE",
-        owner,
-        error: error.message
-      },
-      "*"
-    );
-  }
-  break;
-}
-
-case "XTERIUM_TRANSFER_REQUEST": {
-  const { token, owner, recipient, value } = event.data.payload;
-  let storedPassword;
-  try {
-    storedPassword = await userService.getWalletPassword();
-    if (!storedPassword) {
-      window.postMessage(
-        {
-          type: "XTERIUM_TRANSFER_RESPONSE",
-          error: "Incorrect password."
-        },
-        "*"
-      );
-      break;
-    }
-  } catch (err) {
-    window.postMessage(
-      {
-        type: "XTERIUM_TRANSFER_RESPONSE",
-        error: "Error accessing stored password: " + err
-      },
-      "*"
-    );
-    break;
-  }
-
-  const smallestUnitValue = value;
-  if (token.type === "Native") {
-    balanceService
-      .transfer(owner, Number(smallestUnitValue), recipient, storedPassword)
-      .then((result) => {
-        window.postMessage(
-          {
-            type: "XTERIUM_TRANSFER_RESPONSE",
-            response: result,
-            
-          },
-          "*"
-        );
-      })
-      .catch((error) => {
-        console.error("[Content.js] Native transfer failed:", error);
-        window.postMessage(
-          {
-            type: "XTERIUM_TRANSFER_RESPONSE",
-            error: error.toString()
-          },
-          "*"
-        );
-      });
-  } else if (token.type === "Asset") {
-    balanceService
-      .transferAssets(
-        owner,
-        token.network_id,
-        Number(smallestUnitValue),
-        recipient,
-        storedPassword
-      )
-      .then((result) => {
-        window.postMessage(
-          {
-            type: "XTERIUM_TRANSFER_RESPONSE",
-            response: result,
-           
-          },
-          "*"
-        );
-      })
-      .catch((error) => {
-        console.error("[Content.js] Asset transfer failed:", error);
-        window.postMessage(
-          {
-            type: "XTERIUM_TRANSFER_RESPONSE",
-            error: error.toString()
-          },
-          "*"
-        );
-      });
-  } else {
-    window.postMessage(
-      {
-        type: "XTERIUM_TRANSFER_RESPONSE",
-        error: "Unknown token type."
-      },
-      "*"
-    );
-  }
-  break;
-}
     default:
       break
   }

@@ -4,7 +4,7 @@
   // ----------------------------
 
   // Helper to format wallet addresses
-  let isTransferInProgress = false;
+  let isTransferInProgress = false
   function formatWalletAddress(address) {
     if (address.length <= 10) return address
     return address.slice(0, 6) + "..." + address.slice(-6)
@@ -25,7 +25,7 @@
   // ----------------------------
   // Private State Variables
   // ----------------------------
-  const extensionId = "jjpkkhlnoghlflacjiajhmccglmolbmj"
+  const extensionId = "plhchpneiklnlplnnlhkmnikaepgfdaf"
   const isXterium = true
   isConnected = false
   connectedWallet = null
@@ -414,13 +414,13 @@
   }
 
   function getEstimateFee(owner, value, recipient, balance) {
-    const nativeTokenSymbol = "XON"; 
+    const nativeTokenSymbol = "XON"
 
-if (!balance.token.type) {
-  const tokenSymbol = balance.token.symbol || "";
-  balance.token.type =
-    tokenSymbol.toUpperCase() === nativeTokenSymbol.toUpperCase() ? "Native" : "Asset";
-}
+    if (!balance.token.type) {
+      const tokenSymbol = balance.token.symbol || ""
+      balance.token.type =
+        tokenSymbol.toUpperCase() === nativeTokenSymbol.toUpperCase() ? "Native" : "Asset"
+    }
 
     return new Promise((resolve, reject) => {
       function handleFeeResponse(event) {
@@ -452,11 +452,11 @@ if (!balance.token.type) {
     if (!details.fee) {
       return
     }
-    let numValue = Number(details.value);
+    let numValue = Number(details.value)
     if (numValue >= 1e12) {
-      numValue /= 1e12;
+      numValue /= 1e12
     }
-    const formatted = numValue.toFixed(12).replace(/\.?0+$/, '');
+    const formattedAmount = (Number(details.value) / 1e12).toFixed(12).replace(/\.?0+$/, "");
 
     return new Promise((resolve, reject) => {
       const overlay = document.createElement("div")
@@ -515,7 +515,7 @@ if (!balance.token.type) {
       detailsDiv.appendChild(
         createStyledField("Recipient", formatWalletAddress(details.recipient))
       )
-      detailsDiv.appendChild(createStyledField("Amount", formatted));
+      detailsDiv.appendChild(createStyledField("Amount", formattedAmount))
       detailsDiv.appendChild(createStyledField("Fee", details.fee))
       container.appendChild(detailsDiv)
 
@@ -585,7 +585,7 @@ if (!balance.token.type) {
         }
         document.body.removeChild(overlay)
         window.postMessage(
-          { type: "XTERIUM_TRANSFER_APPROVED",details, password: passwordInput.value },
+          { type: "XTERIUM_TRANSFER_APPROVED", details, password: passwordInput.value },
           "*"
         )
         resolve()
@@ -787,19 +787,21 @@ if (!balance.token.type) {
             if (Array.isArray(balanceData)) {
               fixedBalance = balanceData.map((item) => ({
                 tokenName: item.tokenName,
-                freeBalance: (item.freeBalance),
-                reservedBalance: (item.reservedBalance),
+                freeBalance: (Number(item.freeBalance) / 1e12).toFixed(4),
+                reservedBalance: (Number(item.reservedBalance) / 1e12).toFixed(4),
                 is_frozen: item.is_frozen
               }))
             } else if (typeof balanceData === "object") {
               fixedBalance = Object.keys(balanceData).map((token) => ({
                 tokenName: token,
-                freeBalance: (balanceData[token].freeBalance),
-                reservedBalance: (balanceData[token].reservedBalance),
+                freeBalance: (Number(balanceData[token].freeBalance) / 1e12).toFixed(4),
+                reservedBalance: (
+                  Number(balanceData[token].reservedBalance) / 1e12
+                ).toFixed(4),
                 is_frozen: balanceData[token].is_frozen
               }))
             } else {
-              fixedBalance = fixBalance(balanceData, 12)
+              fixedBalance = (Number(balanceData) / 1e12).toFixed(4)
             }
             resolve(fixedBalance)
           } catch (error) {
@@ -818,10 +820,8 @@ if (!balance.token.type) {
 
   // Initiates a token transfer.
   function transfer(token, recipient, value, password) {
-    const formattedValue = (Number(value) >= 1e12 ? Number(value) / 1e12 : Number(value))
-    .toFixed(12)
-    .replace(/\.?0+$/, '');
-  console.log("Transfer initiated with:", { token, recipient, value: formattedValue });
+    const amount = (Number(value) / 1e12).toFixed(12);
+    console.log("Transfer initiated with:", { token, recipient, amount })
     return new Promise((resolve, reject) => {
       if (!isConnected || !connectedWallet) {
         console.error("No wallet connected.")
@@ -866,9 +866,15 @@ if (!balance.token.type) {
       getBalance(owner)
         .then((balances) => {
           const userBalance = balances.find((b) => b.tokenName === tokenSymbol)
-          if (!userBalance || userBalance.freeBalance < Number(value)) {
+          if (!userBalance) {
+            return reject(`No balance found for token: ${tokenSymbol}.`)
+          }
+          const availableBalance = parseFloat(userBalance.freeBalance)
+          const transferAmount = parseFloat((Number(value) / 1e12).toFixed(12));
+
+          if (transferAmount > availableBalance) {
             return reject(
-              `Insufficient balance. Your available balance is ${userBalance ? userBalance.freeBalance : 0} ${tokenSymbol}.`
+              `Insufficient balance. Your available balance is ${availableBalance.toFixed(12)} ${tokenSymbol}.`
             )
           }
           return getTokenList()
@@ -923,17 +929,17 @@ if (!balance.token.type) {
   }
 
   ;(() => {
-    let isTransferInProgress = false;
+    let isTransferInProgress = false
     function initiateTransfer(details) {
       if (isTransferInProgress) {
-        return;
+        return
       }
-    
-      isTransferInProgress = true;
+
+      isTransferInProgress = true
 
       if (!details.fee) {
         if (details.feeEstimationInProgress) {
-          return;
+          return
         }
 
         details.feeEstimationInProgress = true
@@ -949,7 +955,7 @@ if (!balance.token.type) {
           .catch((err) => {
             console.error("❌ Fee estimation failed:", err)
             details.feeEstimationInProgress = false
-            isTransferInProgress = false;
+            isTransferInProgress = false
           })
 
         return
@@ -958,50 +964,50 @@ if (!balance.token.type) {
       showTransferSignAndVerify(details)
     }
     if (!window.xteriumMessageListenerAdded) {
-    window.addEventListener("message", async (event) => {
-      if (!event.data || event.source !== window) return
+      window.addEventListener("message", async (event) => {
+        if (!event.data || event.source !== window) return
 
-      switch (event.data.type) {
-        case "XTERIUM_TRANSFER_REQUEST":
-          const transferDetails = event.data.payload
+        switch (event.data.type) {
+          case "XTERIUM_TRANSFER_REQUEST":
+            const transferDetails = event.data.payload
 
-          if (document.getElementById("xterium-transfer-approval-overlay")) {
-            return
-          }
+            if (document.getElementById("xterium-transfer-approval-overlay")) {
+              return
+            }
 
-          initiateTransfer(transferDetails)
-          break
+            initiateTransfer(transferDetails)
+            break
 
-        case "XTERIUM_TRANSFER_APPROVED":        
-          const processingOverlay = showTransferProcessing(); 
-          const { token, recipient, value, password } = event.data.details;
-        
-          transfer(token, recipient, value, password)
-            .then((response) => {        
-              if (document.body.contains(processingOverlay)) {
-                document.body.removeChild(processingOverlay);
-              }
-              showTransferSuccess();
-              window.postMessage({ type: "XTERIUM_TRANSFER_SUCCESS", response }, "*");
-              isTransferInProgress = false;
-            })
-            .catch((err) => {
-              console.error("Transfer failed:", err);
-        
-              if (document.body.contains(processingOverlay)) {
-                document.body.removeChild(processingOverlay);
-              }
-        
-              window.postMessage({ type: "XTERIUM_TRANSFER_FAILED", error: err }, "*");
-              isTransferInProgress = false;
-            });
-          break;        
-        default:
-          break
-      }
-    })
-    window.xteriumMessageListenerAdded = true;
-  }
+          case "XTERIUM_TRANSFER_APPROVED":
+            const processingOverlay = showTransferProcessing()
+            const { token, recipient, value, password } = event.data.details
+
+            transfer(token, recipient, value, password)
+              .then((response) => {
+                if (document.body.contains(processingOverlay)) {
+                  document.body.removeChild(processingOverlay)
+                }
+                showTransferSuccess(processingOverlay)
+                window.postMessage({ type: "XTERIUM_TRANSFER_SUCCESS", response }, "*")
+                isTransferInProgress = false
+              })
+              .catch((err) => {
+                console.error("Transfer failed:", err)
+
+                if (document.body.contains(processingOverlay)) {
+                  document.body.removeChild(processingOverlay)
+                }
+
+                window.postMessage({ type: "XTERIUM_TRANSFER_FAILED", error: err }, "*")
+                isTransferInProgress = false
+              })
+            break
+          default:
+            break
+        }
+      })
+      window.xteriumMessageListenerAdded = true
+    }
   })()
 
   window.addEventListener("message", async (event) => {
