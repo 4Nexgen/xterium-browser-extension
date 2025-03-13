@@ -787,15 +787,15 @@ if (!balance.token.type) {
             if (Array.isArray(balanceData)) {
               fixedBalance = balanceData.map((item) => ({
                 tokenName: item.tokenName,
-                freeBalance: fixBalance(item.freeBalance, 12),
-                reservedBalance: fixBalance(item.reservedBalance, 12),
+                freeBalance: (item.freeBalance),
+                reservedBalance: (item.reservedBalance),
                 is_frozen: item.is_frozen
               }))
             } else if (typeof balanceData === "object") {
               fixedBalance = Object.keys(balanceData).map((token) => ({
                 tokenName: token,
-                freeBalance: fixBalance(balanceData[token].freeBalance, 12),
-                reservedBalance: fixBalance(balanceData[token].reservedBalance, 12),
+                freeBalance: (balanceData[token].freeBalance),
+                reservedBalance: (balanceData[token].reservedBalance),
                 is_frozen: balanceData[token].is_frozen
               }))
             } else {
@@ -818,7 +818,10 @@ if (!balance.token.type) {
 
   // Initiates a token transfer.
   function transfer(token, recipient, value, password) {
-    console.log("Transfer initiated with:", { token, recipient, value })
+    const formattedValue = (Number(value) >= 1e12 ? Number(value) / 1e12 : Number(value))
+    .toFixed(12)
+    .replace(/\.?0+$/, '');
+  console.log("Transfer initiated with:", { token, recipient, value: formattedValue });
     return new Promise((resolve, reject) => {
       if (!isConnected || !connectedWallet) {
         console.error("No wallet connected.")
