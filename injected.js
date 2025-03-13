@@ -389,28 +389,60 @@
           event.data.type !== "XTERIUM_TOKEN_LIST_RESPONSE"
         )
           return
+
         window.removeEventListener("message", handleTokenListResponse)
-        if (event.data.tokenList) {
-          const tokenList = event.data.tokenList.map((token) => {
-            if (token.symbol.toUpperCase() === "XON") {
-              token.type = "Native"
-            }
-            return token
-          })
-          resolve(tokenList)
-        } else {
-          reject("No token list available.")
+
+        try {
+          let tokenList = event.data.tokenList
+
+          if (typeof tokenList === "string") {
+            tokenList = JSON.parse(tokenList)
+          }
+
+          if (!Array.isArray(tokenList)) {
+            console.error("Token list is not an array:", tokenList)
+            return reject("Token list is not an array.")
+          }
+
+          const validTokenList = tokenList
+            .map((token) => {
+              if (!token || typeof token !== "object") {
+                console.error("Invalid token format:", token)
+                return null
+              }
+
+              if (!token.symbol || typeof token.symbol !== "string") {
+                console.error("Token symbol is missing or invalid:", token)
+                return null
+              }
+
+              if (!token.type || typeof token.type !== "string") {
+                console.error("Token type is missing or invalid:", token)
+                return null
+              }
+
+              if (token.symbol.toUpperCase() === "XON") {
+                token.type = "Native"
+              }
+
+              return token
+            })
+            .filter((token) => token !== null)
+
+          if (validTokenList.length === 0) {
+            console.error("No valid tokens found in the token list.")
+            return reject("No valid tokens found.")
+          }
+
+          resolve(validTokenList)
+        } catch (error) {
+          console.error("Error parsing token list:", error)
+          reject("Failed to parse token list.")
         }
       }
 
       window.addEventListener("message", handleTokenListResponse)
     })
-  }
-
-  function fixBalance(value, decimal = 12) {
-    const floatValue = parseFloat(value)
-    const integralValue = Math.round(floatValue * Math.pow(10, decimal))
-    return BigInt(integralValue).toString()
   }
 
   function getEstimateFee(owner, value, recipient, balance) {
@@ -456,7 +488,9 @@
     if (numValue >= 1e12) {
       numValue /= 1e12
     }
-    const formattedAmount = (Number(details.value) / 1e12).toFixed(12).replace(/\.?0+$/, "");
+    const formattedAmount = (Number(details.value) / 1e12)
+      .toFixed(12)
+      .replace(/\.?0+$/, "")
 
     return new Promise((resolve, reject) => {
       const overlay = document.createElement("div")
@@ -507,7 +541,7 @@
       function createStyledField(label, value) {
         const field = document.createElement("div")
         field.classList.add("details-field")
-        field.innerHTML = `<strong>${label}:</strong> ${value}`
+        field.innerHTML = `${label}: <strong> ${value} </strong>`
         return field
       }
 
@@ -642,7 +676,7 @@
     container.appendChild(spinner)
 
     const text = document.createElement("div")
-    text.innerText = "Transferring..."
+    text.innerText = "Processing..."
     container.appendChild(text)
 
     overlay.appendChild(container)
@@ -820,7 +854,7 @@
 
   // Initiates a token transfer.
   function transfer(token, recipient, value, password) {
-    const amount = (Number(value) / 1e12).toFixed(12);
+    const amount = (Number(value) / 1e12).toFixed(12)
     console.log("Transfer initiated with:", { token, recipient, amount })
     return new Promise((resolve, reject) => {
       if (!isConnected || !connectedWallet) {
@@ -863,6 +897,11 @@
 
       const owner = connectedWallet.public_key
 
+      if (recipient === owner) {
+        console.error("You cannot transfer to your own wallet.")
+        return reject("You cannot transfer to your own wallet.")
+      }
+
       getBalance(owner)
         .then((balances) => {
           const userBalance = balances.find((b) => b.tokenName === tokenSymbol)
@@ -870,12 +909,11 @@
             return reject(`No balance found for token: ${tokenSymbol}.`)
           }
           const availableBalance = parseFloat(userBalance.freeBalance)
-          const transferAmount = parseFloat((Number(value) / 1e12).toFixed(12));
+          const transferAmount = parseFloat((Number(value) / 1e12).toFixed(12))
 
           if (transferAmount > availableBalance) {
-            return reject(
-              `Insufficient balance. Your available balance is ${availableBalance.toFixed(12)} ${tokenSymbol}.`
-            )
+            alert("Balance not enough. Please enter a valid amount.")
+            return
           }
           return getTokenList()
         })
@@ -988,6 +1026,21 @@
                   document.body.removeChild(processingOverlay)
                 }
                 showTransferSuccess(processingOverlay)
+                getBalance(connectedWallet.public_key)
+                  .then((updatedBalance) => {
+                    console.log("Updated Balance:", updatedBalance)
+                    chrome.storage.local.set({ wallet_balances: updatedBalance }, () => {
+                      console.log("Balance updated in storage.");
+                    });
+                    window.postMessage(
+                      { type: "XTERIUM_UPDATED_BALANCE", balance: updatedBalance },
+                      "*"
+                    )
+                  })
+                  .catch((error) => {
+                    console.error("Error fetching updated balance:", error)
+                  })
+
                 window.postMessage({ type: "XTERIUM_TRANSFER_SUCCESS", response }, "*")
                 isTransferInProgress = false
               })
@@ -1000,6 +1053,22 @@
 
                 window.postMessage({ type: "XTERIUM_TRANSFER_FAILED", error: err }, "*")
                 isTransferInProgress = false
+              })
+            break
+          case "XTERIUM_GET_WALLET_BALANCE":
+            const publicKey = event.data.publicKey
+            getBalance(publicKey)
+              .then((balance) => {
+                window.postMessage(
+                  { type: "XTERIUM_BALANCE_RESPONSE", publicKey, balance },
+                  "*"
+                )
+              })
+              .catch((error) => {
+                window.postMessage(
+                  { type: "XTERIUM_BALANCE_RESPONSE", publicKey, error: error },
+                  "*"
+                )
               })
             break
           default:
