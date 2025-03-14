@@ -898,7 +898,6 @@
       const owner = connectedWallet.public_key
 
       if (recipient === owner) {
-        console.error("You cannot transfer to your own wallet.")
         return reject("You cannot transfer to your own wallet.")
       }
 
@@ -1015,7 +1014,6 @@
 
             initiateTransfer(transferDetails)
             break
-
           case "XTERIUM_TRANSFER_APPROVED":
             const processingOverlay = showTransferProcessing()
             const { token, recipient, value, password } = event.data.details
@@ -1026,34 +1024,30 @@
                   document.body.removeChild(processingOverlay)
                 }
                 showTransferSuccess(processingOverlay)
-                getBalance(connectedWallet.public_key)
-                  .then((updatedBalance) => {
-                    console.log("Updated Balance:", updatedBalance)
-                    chrome.storage.local.set({ wallet_balances: updatedBalance }, () => {
-                      console.log("Balance updated in storage.");
-                    });
-                    window.postMessage(
-                      { type: "XTERIUM_UPDATED_BALANCE", balance: updatedBalance },
-                      "*"
-                    )
-                  })
-                  .catch((error) => {
-                    console.error("Error fetching updated balance:", error)
-                  })
+                window.postMessage(
+                  {
+                    type: "XTERIUM_REFRESH_BALANCE",
+                    publicKey: connectedWallet.public_key,
+                    token
+                  },
+                  "*"
+                )
 
                 window.postMessage({ type: "XTERIUM_TRANSFER_SUCCESS", response }, "*")
                 isTransferInProgress = false
               })
               .catch((err) => {
-                console.error("Transfer failed:", err)
-
                 if (document.body.contains(processingOverlay)) {
                   document.body.removeChild(processingOverlay)
                 }
-
                 window.postMessage({ type: "XTERIUM_TRANSFER_FAILED", error: err }, "*")
                 isTransferInProgress = false
               })
+
+            window.addEventListener("message", (event) => {
+              if (event.data && event.data.type === "XTERIUM_UPDATED_BALANCE") {
+              }
+            })
             break
           case "XTERIUM_GET_WALLET_BALANCE":
             const publicKey = event.data.publicKey

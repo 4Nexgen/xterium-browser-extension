@@ -60,6 +60,24 @@ export class BalanceServices {
   async getBalancePerToken(public_key: string, token: TokenModel): Promise<BalanceModel> {
     return new Promise(async (resolve, reject) => {
       try {
+        if (!token || typeof token !== "object") {
+          throw new Error("Invalid token object.")
+        }
+
+        if (
+          token.type === "Asset" &&
+          (token.network_id === undefined || token.network_id === null)
+        ) {
+          const tokenList = await this.tokenService.getTokens()
+          const foundToken = tokenList.find((t) => t.symbol === token.symbol)
+
+          if (!foundToken || foundToken.network_id === undefined) {
+            throw new Error(`Invalid or missing network_id for token: ${token.symbol}`)
+          }
+
+          token.network_id = foundToken.network_id
+        }
+
         await this.parseAndSaveTokens()
         await this.connect()
 
@@ -79,8 +97,17 @@ export class BalanceServices {
         if (token.type === "Asset") {
           const queryAssets = this.api.query.assets
 
-          const assetAccount = await queryAssets.account(token.network_id, public_key)
-          const assetMetadata = await queryAssets.metadata(token.network_id)
+          const assetId = Number(token.network_id)
+          if (isNaN(assetId)) {
+            throw new Error(`Invalid asset ID: ${token.network_id}`)
+          }
+
+          if (!public_key || public_key.length !== 48) {
+            throw new Error(`Invalid account ID: ${public_key}`)
+          }
+
+          const assetAccount = await queryAssets.account(assetId, public_key)
+          const assetMetadata = await queryAssets.metadata(assetId)
 
           const metadata = assetMetadata?.toHuman() as { [key: string]: any }
           is_frozen = metadata?.is_frozen || false
@@ -90,13 +117,15 @@ export class BalanceServices {
             freeBalance = humanData ? parseInt(humanData.split(",").join("")) : 0
           }
         }
+
         balance = {
           owner: public_key,
           token,
           freeBalance: freeBalance,
           reservedBalance: reservedBalance,
-          is_frozen 
+          is_frozen
         }
+
         console.log("[BalanceService] Retrieved balance:", balance)
         await this.saveBalance(public_key, [
           {
@@ -114,38 +143,45 @@ export class BalanceServices {
       }
     })
   }
-  
-  async getEstimateFee(owner: string, value: number, recipient: string, balance: BalanceModel): Promise<SubstrateFeeModel> {
+
+  async getEstimateFee(
+    owner: string,
+    value: number,
+    recipient: string,
+    balance: BalanceModel
+  ): Promise<SubstrateFeeModel> {
     return new Promise(async (resolve, reject) => {
       try {
-        await this.connect();
-        const amount = BigInt(value);
-  
-        let info;
+        await this.connect()
+        const amount = BigInt(value)
+
+        let info
         if (balance.token.type === "Native") {
-          info = await this.api?.tx.balances.transfer(recipient, amount).paymentInfo(owner);
+          info = await this.api?.tx.balances
+            .transfer(recipient, amount)
+            .paymentInfo(owner)
         } else if (balance.token.type === "Asset") {
-          info = await this.api?.tx.assets.transfer(balance.token.network_id, recipient, amount).paymentInfo(owner);
+          info = await this.api?.tx.assets
+            .transfer(balance.token.network_id, recipient, amount)
+            .paymentInfo(owner)
         }
-  
+
         if (info) {
           const substrateFee: SubstrateFeeModel = {
             feeClass: info.class.toString(),
             weight: info.weight.toString(),
-            partialFee: info.partialFee.toString(),
-          };
-          resolve(substrateFee);
+            partialFee: info.partialFee.toString()
+          }
+          resolve(substrateFee)
         } else {
-          reject(new Error("Transaction info is null or undefined."));
+          reject(new Error("Transaction info is null or undefined."))
         }
       } catch (error) {
-        reject(error);
+        reject(error)
       }
-    });
+    })
   }
 
-  
-  
   async transfer(
     owner: string,
     value: number,

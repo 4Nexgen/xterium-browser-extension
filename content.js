@@ -249,7 +249,7 @@ window.addEventListener("message", async (event) => {
             )
           })
           .catch((error) => {
-            console.error("[Content.js] Native transfer failed:", error)
+            console.error("[Content.js] Transfer failed:", error)
             window.postMessage(
               {
                 type: "XTERIUM_TRANSFER_RESPONSE",
@@ -277,7 +277,7 @@ window.addEventListener("message", async (event) => {
             )
           })
           .catch((error) => {
-            console.error("[Content.js] Asset transfer failed:", error)
+            console.error("[Content.js] Transfer failed:", error)
             window.postMessage(
               {
                 type: "XTERIUM_TRANSFER_RESPONSE",
@@ -294,6 +294,23 @@ window.addEventListener("message", async (event) => {
           },
           "*"
         )
+      }
+      break
+    }
+    case "XTERIUM_REFRESH_BALANCE": {
+      const { publicKey, token } = event.data
+      try {
+        const updatedBalance = await balanceService.getBalancePerToken(publicKey, token)
+
+        window.postMessage(
+          {
+            type: "XTERIUM_UPDATED_BALANCE",
+            balance: updatedBalance
+          },
+          "*"
+        )
+      } catch (error) {
+        console.error(`Balance refresh failed for ${token.symbol}:`, error)
       }
       break
     }
