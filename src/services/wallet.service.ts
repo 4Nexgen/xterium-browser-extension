@@ -29,7 +29,7 @@ export class WalletService {
       const tokenSymbol = tokens.length > 0 ? tokens[0].symbol : "Unknown"
 
       data.metaGenesisHash = genesisHash
-      data.metaSource = "Talisman"
+      data.metaSource = "Xterium"
       data.tokenSymbol = tokenSymbol
 
       data.balances = await this.fetchAllBalances(data.public_key, tokens)
