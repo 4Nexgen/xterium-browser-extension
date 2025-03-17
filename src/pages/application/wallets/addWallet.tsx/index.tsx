@@ -32,6 +32,8 @@ const IndexAddWallet = ({ handleCallbacks }) => {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
+  const [isNameDuplicate, setIsNameDuplicate] = useState(false)
+  const [isMnemonicDuplicate, setIsMnemonicDuplicate] = useState(false)
   const [walletData, setWalletData] = useState<WalletModel>({
     id: 0,
     name: "",
@@ -57,11 +59,65 @@ const IndexAddWallet = ({ handleCallbacks }) => {
     getNetwork()
   }, [])
 
-  const handleInputChange = (field: keyof typeof walletData, value: string) => {
+  const handleInputChange = async (field: keyof typeof walletData, value: string) => {
+    if (field === "name") {
+      const isDuplicate = await checkForDuplicateName(value)
+      setIsNameDuplicate(isDuplicate)
+
+      if (isDuplicate) {
+        toast({
+          description: (
+            <div className="flex items-center">
+              <X className="mr-2 text-red-500" />
+              {t("A wallet with this name already exists. Please enter a unique name.")}
+            </div>
+          ),
+          variant: "destructive"
+        })
+      }
+    }
+    if (field === "mnemonic_phrase") {
+      const isDuplicate = await checkForDuplicateMnemonic(value)
+      setIsMnemonicDuplicate(isDuplicate)
+
+      if (isDuplicate) {
+        toast({
+          description: (
+            <div className="flex items-center">
+              <X className="mr-2 text-red-500" />
+              {t(
+                "A wallet with this mnemonic phrase already exists. Please enter a unique mnemonic phrase."
+              )}
+            </div>
+          ),
+          variant: "destructive"
+        })
+        return
+      }
+    }
     setWalletData((prev) => ({
       ...prev,
       [field]: value
     }))
+  }
+
+  const checkForDuplicateName = async (name: string): Promise<boolean> => {
+    const wallets = await walletService.getWallets()
+    return wallets.some((wallet) => wallet.name === name)
+  }
+
+  const checkForDuplicateMnemonic = async (mnemonic: string): Promise<boolean> => {
+    const wallets = await walletService.getWallets()
+    const encryptionService = new EncryptionService()
+
+    const decryptedMnemonics = await Promise.all(
+      wallets.map(async (wallet) => {
+        const decryptedPassword = await userService.getWalletPassword()
+        return encryptionService.decrypt(decryptedPassword, wallet.mnemonic_phrase)
+      })
+    )
+
+    return decryptedMnemonics.some((decryptedMnemonic) => decryptedMnemonic === mnemonic)
   }
 
   const generateMnemonic = () => {
@@ -115,6 +171,34 @@ const IndexAddWallet = ({ handleCallbacks }) => {
   }
 
   const saveWallet = () => {
+    if (isNameDuplicate) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-red-500" />
+            {t("A wallet with this name already exists. Please enter a unique name.")}
+          </div>
+        ),
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (isMnemonicDuplicate) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-red-500" />
+            {t(
+              "A wallet with this mnemonic phrase already exists. Please enter a unique mnemonic phrase."
+            )}
+          </div>
+        ),
+        variant: "destructive"
+      })
+      return
+    }
+
     if (
       !walletData.name ||
       !walletData.mnemonic_phrase ||
@@ -246,7 +330,18 @@ const IndexAddWallet = ({ handleCallbacks }) => {
           />
         </div>
         <div className="mt-5 mb-3">
-          <Button type="button" variant="jelly" onClick={saveWallet}>
+          <Button
+            type="button"
+            variant="jelly"
+            onClick={saveWallet}
+            disabled={
+              isNameDuplicate ||
+              isMnemonicDuplicate ||
+              !walletData.name ||
+              !walletData.mnemonic_phrase ||
+              !walletData.secret_key ||
+              !walletData.public_key
+            }>
             {t("SAVE")}
           </Button>
         </div>

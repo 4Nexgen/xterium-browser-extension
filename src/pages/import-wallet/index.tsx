@@ -48,6 +48,8 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
     metaSource: "",
     tokenSymbol: ""
   })
+  const [nameError, setNameError] = useState("")
+  const [mnemonicError, setMnemonicError] = useState("")
 
   const getNetwork = () => {
     networkService.getNetwork().then((data) => {
@@ -131,7 +133,28 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
     })
   }
 
-  const saveWallet = () => {
+  const checkForDuplicateName = async (name: string): Promise<boolean> => {
+    const wallets = await walletService.getWallets()
+    return wallets.some((wallet) => wallet.name === name)
+  }
+
+  const checkForDuplicateMnemonic = async (mnemonic: string): Promise<boolean> => {
+    const wallets = await walletService.getWallets()
+    const encryptionService = new EncryptionService()
+
+    const decryptedMnemonics = await Promise.all(
+      wallets.map(async (wallet) => {
+        const decryptedPassword = await userService.getWalletPassword()
+        return encryptionService.decrypt(decryptedPassword, wallet.mnemonic_phrase)
+      })
+    )
+
+    return decryptedMnemonics.some((decryptedMnemonic) => decryptedMnemonic === mnemonic)
+  }
+
+  const saveWallet = async () => {
+    setNameError("")
+    setMnemonicError("")
     if (
       !walletData.name ||
       !walletData.mnemonic_phrase ||
@@ -151,6 +174,22 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
     }
 
     setIsLoading(true)
+
+    const isDuplicateName = await checkForDuplicateName(walletData.name)
+    if (isDuplicateName) {
+      setNameError("A wallet with this name already exists.")
+      setIsLoading(false)
+      return
+    }
+
+    const isDuplicateMnemonic = await checkForDuplicateMnemonic(
+      walletData.mnemonic_phrase
+    )
+    if (isDuplicateMnemonic) {
+      setMnemonicError("This mnemonic phrase is already in use.")
+      setIsLoading(false)
+      return
+    }
 
     userService.getWalletPassword().then((decryptedPassword) => {
       if (decryptedPassword) {
@@ -247,6 +286,7 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
                 value={walletData.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
               />
+              {nameError && <p className="text-red-500 text-sm mt-1">{nameError}</p>}
             </div>
 
             <div className="mb-3">
@@ -257,6 +297,9 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
                 onChange={handleFileUpload}
                 className="w-full p-2 rounded bg-input text-sm font-semibold"
               />
+              {mnemonicError && (
+                <p className="text-red-500 text-sm mt-1">{mnemonicError}</p>
+              )}
             </div>
 
             <div className="mt-5 mb-3">
