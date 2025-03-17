@@ -50,7 +50,6 @@ export class BalanceServices {
       const updatedTokens = await this.tokenService.fetchAssetDetailsForTokens(tokens)
       await this.storage.set("token_list", JSON.stringify(updatedTokens))
       window.localStorage.setItem("token_list", JSON.stringify(updatedTokens))
-      console.log("[BalanceServices] Token list saved from TokenService:", updatedTokens)
     } catch (error) {
       console.error("[BalanceServices] Error saving token list:", error)
       throw error
@@ -126,7 +125,6 @@ export class BalanceServices {
           is_frozen
         }
 
-        console.log("[BalanceService] Retrieved balance:", balance)
         await this.saveBalance(public_key, [
           {
             tokenName: token.symbol,

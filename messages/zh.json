@@ -168,5 +168,6 @@
   "A wallet with this name already exists. Please enter a unique name.": "此名称的钱包已存在。请输入一个唯一的名称。",
   "A wallet with this mnemonic phrase already exists. Please enter a unique mnemonic phrase.": "此助记词的钱包已存在。请输入一个唯一的助记词。",
   "This mnemonic phrase is already in use.": "此助记词已被使用。",
-  "A wallet with this name already exists.": "此名称的钱包已存在。"
+  "A wallet with this name already exists.": "此名称的钱包已存在。",
+  "Sender and recipient addresses must be different!": "发送方和接收方地址必须不同！"
 }

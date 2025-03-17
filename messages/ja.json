@@ -167,5 +167,6 @@
   "A wallet with this name already exists. Please enter a unique name.": "この名前のウォレットはすでに存在します。別の名前を入力してください。",
   "A wallet with this mnemonic phrase already exists. Please enter a unique mnemonic phrase.": "このニーモニックフレーズを持つウォレットはすでに存在します。別のニーモニックフレーズを入力してください。",
   "This mnemonic phrase is already in use.": "このニーモニックフレーズはすでに使用されています。",
-  "A wallet with this name already exists.": "この名前のウォレットはすでに存在します。"
+  "A wallet with this name already exists.": "この名前のウォレットはすでに存在します。",
+  "Sender and recipient addresses must be different!": "送信者と受信者のアドレスは異なる必要があります！"
 }

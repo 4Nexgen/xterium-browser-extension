@@ -163,5 +163,6 @@
   "A wallet with this name already exists. Please enter a unique name.": "A wallet with this name already exists. Please enter a unique name.",
   "A wallet with this mnemonic phrase already exists. Please enter a unique mnemonic phrase.": "A wallet with this mnemonic phrase already exists. Please enter a unique mnemonic phrase.",
   "This mnemonic phrase is already in use.": "This mnemonic phrase is already in use.",
-  "A wallet with this name already exists.": "A wallet with this name already exists."
+  "A wallet with this name already exists.": "A wallet with this name already exists.",
+  "Sender and recipient addresses must be different!": "Sender and recipient addresses must be different!"
 }

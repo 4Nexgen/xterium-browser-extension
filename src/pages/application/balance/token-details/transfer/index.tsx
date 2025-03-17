@@ -69,6 +69,19 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
       return
     }
 
+    if (transferTo.trim() === balanceData.owner) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-red-500" />
+            {t("Sender and recipient addresses must be different!")}
+          </div>
+        ),
+        variant: "destructive"
+      })
+      return
+    }
+
     setIsSendInProgress(true)
     setSendLabel(t("CALCULATING FEES..."))
 
@@ -97,14 +110,9 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
     setConfirmTransferLabel(t("CONFIRM"))
   }, [])
 
-  const fixBalance = (value: string, decimal: number) => {
-    const multiplier = BigInt(10 ** decimal)
-    return (BigInt(value) / multiplier).toString()
-  }
-
   const fixBalanceReverse = (value: string, decimal: number): string => {
     const multiplier = BigInt(10 ** decimal)
-    return (BigInt(parseFloat(value)) * multiplier).toString()
+    return BigInt(Math.round(parseFloat(value) * Math.pow(10, decimal))).toString()
   }
 
   const sendTransferWithPassword = () => {
