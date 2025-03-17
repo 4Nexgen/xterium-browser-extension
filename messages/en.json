@@ -159,5 +159,9 @@
   "Min Balance": "Min Balance",
   "Pump token loading...": "Pump token loading...",
   "Loading tokens...": "Loading tokens...",
-  "No Pump Token Found": "No Pump Token Found"
+  "No Pump Token Found": "No Pump Token Found",
+  "A wallet with this name already exists. Please enter a unique name.": "A wallet with this name already exists. Please enter a unique name.",
+  "A wallet with this mnemonic phrase already exists. Please enter a unique mnemonic phrase.": "A wallet with this mnemonic phrase already exists. Please enter a unique mnemonic phrase.",
+  "This mnemonic phrase is already in use.": "This mnemonic phrase is already in use.",
+  "A wallet with this name already exists.": "A wallet with this name already exists."
 }

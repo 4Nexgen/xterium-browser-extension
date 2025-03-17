@@ -163,5 +163,9 @@
   "Min Balance": "최소 잔액",
   "Pump token loading...": "펌프 토큰 로딩 중...",
   "Loading tokens...": "토큰 로드 중...",
-  "No Pump Token Found": "펌프 토큰을 찾을 수 없습니다"
+  "No Pump Token Found": "펌프 토큰을 찾을 수 없습니다",
+  "A wallet with this name already exists. Please enter a unique name.": "이 이름을 가진 지갑이 이미 존재합니다. 고유한 이름을 입력해주세요.",
+  "A wallet with this mnemonic phrase already exists. Please enter a unique mnemonic phrase.": "이 니모닉 구문을 가진 지갑이 이미 존재합니다. 다른 고유한 니모닉 구문을 입력해주세요.",
+  "This mnemonic phrase is already in use.": "이 니모닉 구문은 이미 사용 중입니다.",
+  "A wallet with this name already exists.": "이 이름을 가진 지갑이 이미 존재합니다."
 }
