@@ -24,7 +24,12 @@ const IndexTokenDetails = ({ selectedBalance, handleCallbacks }) => {
 
   const formatBalance = (balance: string) => {
     const parsedBalance = parseFloat(balance)
-    return isNaN(parsedBalance) ? "0.00" : parsedBalance.toFixed(2)
+    return isNaN(parsedBalance)
+      ? "0.00"
+      : parsedBalance.toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })
   }
 
   const transferComplete = () => {
@@ -76,7 +81,9 @@ const IndexTokenDetails = ({ selectedBalance, handleCallbacks }) => {
       <Drawer open={isTransferDrawerOpen} onOpenChange={setIsTransferDrawerOpen}>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle className="text-center text-purple">{t("TRANSFER")}</DrawerTitle>
+            <DrawerTitle className="text-center text-purple">
+              {t("TRANSFER")}
+            </DrawerTitle>
           </DrawerHeader>
           <IndexTransfer
             selectedBalance={selectedBalance}

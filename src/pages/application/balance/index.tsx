@@ -9,12 +9,7 @@ import {
   CommandItem,
   CommandList
 } from "@/components/ui/command"
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle
-} from "@/components/ui/drawer"
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
@@ -402,9 +397,12 @@ const IndexBalance = () => {
                                 fixBalance(
                                   balancePerToken[balance.token.symbol].toString(),
                                   12
-                                )
+                                ).toLocaleString("en-US", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2
+                                })
                               ) : (
-                                0
+                                "0.00"
                               )}
                             </span>
                           </TableCell>

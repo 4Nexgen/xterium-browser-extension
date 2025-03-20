@@ -29,6 +29,16 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
 
   const { toast } = useToast()
 
+  const formatBalance = (balance: string) => {
+    const parsedBalance = parseFloat(balance)
+    return isNaN(parsedBalance)
+      ? "0.00"
+      : parsedBalance.toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })
+  }
+
   const sendTransfer = () => {
     if (!quantity) {
       toast({
@@ -94,13 +104,11 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
       )
       .then((results) => {
         setIsInputPasswordDrawerOpen(true)
-
         setIsSendInProgress(false)
         setSendLabel(t("SEND"))
         console.log("Raw fee:", results.partialFee.toString())
         const rawFee = BigInt(results.partialFee)
         const formattedFee = Number(rawFee) / Math.pow(10, 12)
-
         setPartialFee(formattedFee)
       })
   }
@@ -224,7 +232,7 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
         <Label className="pb-2">
           {t("Current Balance")}:
           <span className="p-2 font-extrabold text-input-primary">
-            {balanceData.freeBalance || "0"}
+            {formatBalance(balanceData.freeBalance.toString())}
           </span>
         </Label>
         <Label className="pb-2">
