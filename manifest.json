@@ -1,0 +1,34 @@
+{
+    "manifest_version": 3,
+    "name": "Xterium Browser Extension",
+    "version": "1.0",
+    "description": "A browser extension for Xterium.",
+    "permissions": ["activeTab", "scripting", "storage"],
+    "host_permissions": ["<all_urls>"],
+    "background": {
+      "service_worker": "background.js",
+      "type": "module"
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"],
+        "run_at": "document_start",
+        "css": ["assets/covers/bg-inside.png"]
+      
+      }
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": ["injected.js", "popup.html", "assets/covers/bg-inside.png"],
+        "matches": ["<all_urls>"]
+      }
+    ],
+    "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'" 
+    },
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": "build/chrome-mv3-dev/assets/icon.png"
+    }
+  }

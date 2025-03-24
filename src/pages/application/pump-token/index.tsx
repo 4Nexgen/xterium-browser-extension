@@ -14,14 +14,14 @@ import type { NetworkModel } from "@/models/network.model"
 import type { PumpTokenWithAssetDetails } from "@/models/pump-token.model"
 import { NetworkService } from "@/services/network.service"
 import { PumpTokenService } from "@/services/pump-token.service"
-import { LoaderCircle, Search, Coins } from "lucide-react"
+import { Coins, LoaderCircle, Search } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import IndexPumpTokenDetails from "./pump-token-details"
 
 const truncateText = (text, limit) => {
-  return text && text.length > limit ? `${text.slice(0, limit)}...` : text || "" // Ensure text is defined
+  return text && text.length > limit ? `${text.slice(0, limit)}...` : text || "" 
 }
 
 const IndexPumpToken = () => {
@@ -35,8 +35,8 @@ const IndexPumpToken = () => {
   const [selectedInSearchToken, setSelectedInSearchToken] =
     useState<PumpTokenWithAssetDetails | null>(null)
   const [pumpTokens, setPumpTokens] = useState<PumpTokenWithAssetDetails[]>([])
-  const [assetDetails, setAssetDetails] = useState<any[]>([]) // Store asset details
-  const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel | null>(null) // Define selected network
+  const [assetDetails, setAssetDetails] = useState<any[]>([])
+  const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel | null>(null) 
   const [loadingAssets, setLoadingAssets] = useState(false)
   const [loading, setLoading] = useState<boolean>(false)
 
@@ -72,12 +72,12 @@ const IndexPumpToken = () => {
 
   const fetchAssetDetails = async (assetId) => {
     try {
-      const details = await pumpTokenService.getAssetDetails(assetId);
-      setAssetDetails((prevDetails) => [...prevDetails, details]);
+      const details = await pumpTokenService.getAssetDetails(assetId)
+      setAssetDetails((prevDetails) => [...prevDetails, details])
     } catch (error) {
-      console.error("Failed to fetch asset details:", error);
+      console.error("Failed to fetch asset details:", error)
     }
-  };
+  }
 
   useEffect(() => {
     getNetwork()
@@ -132,7 +132,7 @@ const IndexPumpToken = () => {
                   className="w-full justify-between text-input-primary p-3 font-bold hover:bg-accent"
                   size="lg">
                   {searchQuery ? (
-                    <span className="text-muted">{searchQuery}</span> // Display the current search query
+                    <span className="text-muted">{searchQuery}</span> 
                   ) : (
                     <span className="text-muted opacity-70">
                       {t("Search for Tokens")}
@@ -175,7 +175,7 @@ const IndexPumpToken = () => {
                     </CommandGroup>
                   </CommandList>
                 </Command>
-              </ PopoverContent>
+              </PopoverContent>
             </Popover>
           </div>
           <div className="flex grid grid-cols-2 sm:grid-cols-2 gap-4">

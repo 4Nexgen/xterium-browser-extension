@@ -71,7 +71,13 @@ const IndexExportWallet = ({ selectedWallet, handleCallbacks }) => {
         address_type: result.address_type,
         mnemonic_phrase: decryptedMnemonic,
         secret_key: decryptedSecretKey,
-        public_key: result.public_key
+        public_key: result.public_key,
+        type: result.type,
+        balances: result.balances,
+        metaGenesisHash: result.metaGenesisHash,
+        metaName: result.metaName,
+        metaSource: result.metaSource,
+        tokenSymbol: result.tokenSymbol
       }
 
       const jsonBlob = new Blob([JSON.stringify(exportedWalletData)], {

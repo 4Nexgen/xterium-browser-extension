@@ -8,4 +8,8 @@ export class TokenModel {
   image_url: string
   preloaded?: boolean
   assetId?: number
+  decimals?: number
+  marketCap?: number; 
+  price?: number; 
+
 }

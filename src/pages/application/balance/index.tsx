@@ -12,7 +12,6 @@ import {
 import {
   Drawer,
   DrawerContent,
-  DrawerDescription,
   DrawerHeader,
   DrawerTitle
 } from "@/components/ui/drawer"
@@ -41,7 +40,7 @@ const IndexBalance = () => {
   const networkService = new NetworkService()
   const walletService = new WalletService()
   const tokenService = new TokenService()
-  const balanceService = new BalanceServices()
+  const balanceService = new BalanceServices(walletService)
 
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
   const [openWallets, setOpenWallets] = useState<boolean>(false)
@@ -154,15 +153,15 @@ const IndexBalance = () => {
   }
 
   const getBalances = async () => {
-    zeroOutBalances(); 
-  
+    zeroOutBalances()
+
     if (selectedWallet) {
       const sortedBalances = balances.sort((a, b) => {
-        if (a.token.id < b.token.id) return -1;
-        if (a.token.id > b.token.id) return 1;
-        return 0;
-      });
-  
+        if (a.token.id < b.token.id) return -1
+        if (a.token.id > b.token.id) return 1
+        return 0
+      })
+
       const balancePromises = sortedBalances.map(async (balance) => {
         const updatedBalance = await getBalancePerToken(balance.token)
 
@@ -251,9 +250,9 @@ const IndexBalance = () => {
 
   useEffect(() => {
     if (selectedWallet) {
-      getBalances(); 
+      getBalances()
     }
-  }, [selectedWallet]);
+  }, [selectedWallet])
 
   const selectBalance = (data: BalanceModel) => {
     setIsTokenDetailDrawerOpen(true)
@@ -357,8 +356,10 @@ const IndexBalance = () => {
                           (selectedNetwork ? selectedNetwork.name : "")
                       )
                       .sort((a, b) => {
-                        if (a.token.type === "Native" && b.token.type !== "Native") return -1
-                        if (a.token.type !== "Native" && b.token.type === "Native") return 1
+                        if (a.token.type === "Native" && b.token.type !== "Native")
+                          return -1
+                        if (a.token.type !== "Native" && b.token.type === "Native")
+                          return 1
                         return 0
                       })
                       .map((balance) => (
@@ -366,11 +367,13 @@ const IndexBalance = () => {
                           key={balance.token.id}
                           onClick={() => {
                             if (!loadingPerToken[balance.token.symbol]) {
-                              selectBalance(balance);
+                              selectBalance(balance)
                             }
                           }}
                           className={`cursor-pointer hover-bg-custom ${
-                            loadingPerToken[balance.token.symbol] ? "cursor-not-allowed" : ""
+                            loadingPerToken[balance.token.symbol]
+                              ? "cursor-not-allowed"
+                              : ""
                           }`}>
                           <TableCell className="w-[50px] justify-center">
                             <Image
@@ -392,7 +395,9 @@ const IndexBalance = () => {
                           <TableCell className="w-[50px] justify-end pr-2 text-right">
                             <span className="text-lg font-bold text-purple">
                               {loadingPerToken[balance.token.symbol] ? (
-                                <span className="text-sm font-normal opacity-50">Loading...</span>
+                                <span className="text-sm font-normal opacity-50">
+                                  Loading...
+                                </span>
                               ) : balancePerToken[balance.token.symbol] ? (
                                 fixBalance(
                                   balancePerToken[balance.token.symbol].toString(),

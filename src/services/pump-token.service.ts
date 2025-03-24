@@ -4,11 +4,13 @@ import { ApiPromise, WsProvider } from "@polkadot/api"
 import pumpTokens from "../data/pump-token/pump-tokens.json"
 import { BalanceServices } from "./balance.service"
 import { NetworkService } from "./network.service"
+import { WalletService } from "./wallet.service"
 
 export class PumpTokenService {
   private networkService = new NetworkService()
+  private walletService = new WalletService()
   private api: ApiPromise | null = null
-  private balanceService = new BalanceServices()
+  private balanceService = new BalanceServices(this.walletService)
 
   async connect(): Promise<ApiPromise | any> {
     return new Promise(async (resolve, reject) => {

@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
 import i18n from "@/i18n"
 import type { NetworkModel } from "@/models/network.model"
@@ -27,6 +26,8 @@ import { useTranslation } from "react-i18next"
 
 const IndexImportWalletPage = ({ handleCallbacks }) => {
   const { t } = useTranslation()
+  const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
   const languageTranslationService = new LanguageTranslationService()
   const [selectedLanguage, setSelectedLanguage] = useState("English")
   const networkService = new NetworkService()
@@ -39,10 +40,16 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
     address_type: "",
     mnemonic_phrase: "",
     secret_key: "",
-    public_key: ""
+    public_key: "",
+    balances: [],
+    type: "Xode",
+    metaGenesisHash: "",
+    metaName: "",
+    metaSource: "",
+    tokenSymbol: ""
   })
-
-  const { toast } = useToast()
+  const [nameError, setNameError] = useState("")
+  const [mnemonicError, setMnemonicError] = useState("")
 
   const getNetwork = () => {
     networkService.getNetwork().then((data) => {
@@ -126,7 +133,28 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
     })
   }
 
-  const saveWallet = () => {
+  const checkForDuplicateName = async (name: string): Promise<boolean> => {
+    const wallets = await walletService.getWallets()
+    return wallets.some((wallet) => wallet.name === name)
+  }
+
+  const checkForDuplicateMnemonic = async (mnemonic: string): Promise<boolean> => {
+    const wallets = await walletService.getWallets()
+    const encryptionService = new EncryptionService()
+
+    const decryptedMnemonics = await Promise.all(
+      wallets.map(async (wallet) => {
+        const decryptedPassword = await userService.getWalletPassword()
+        return encryptionService.decrypt(decryptedPassword, wallet.mnemonic_phrase)
+      })
+    )
+
+    return decryptedMnemonics.some((decryptedMnemonic) => decryptedMnemonic === mnemonic)
+  }
+
+  const saveWallet = async () => {
+    setNameError("")
+    setMnemonicError("")
     if (
       !walletData.name ||
       !walletData.mnemonic_phrase ||
@@ -142,6 +170,24 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
         ),
         variant: "destructive"
       })
+      return
+    }
+
+    setIsLoading(true)
+
+    const isDuplicateName = await checkForDuplicateName(walletData.name)
+    if (isDuplicateName) {
+      setNameError("A wallet with this name already exists.")
+      setIsLoading(false)
+      return
+    }
+
+    const isDuplicateMnemonic = await checkForDuplicateMnemonic(
+      walletData.mnemonic_phrase
+    )
+    if (isDuplicateMnemonic) {
+      setMnemonicError("This mnemonic phrase is already in use.")
+      setIsLoading(false)
       return
     }
 
@@ -173,10 +219,17 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
               ),
               variant: "default"
             })
+            setTimeout(() => {
+              setIsLoading(false)
+              resetForm()
+              handleCallbacks(t("Wallets"))
+            }, 1500)
+          } else {
+            setIsLoading(false)
           }
         })
-
-        handleCallbacks(t("Wallets"))
+      } else {
+        setIsLoading(false)
       }
     })
   }
@@ -185,50 +238,83 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
     handleCallbacks(t("Wallets"))
   }
 
+  const resetForm = () => {
+    setWalletData({
+      id: 0,
+      name: "",
+      address_type: "",
+      mnemonic_phrase: "",
+      secret_key: "",
+      public_key: "",
+      balances: [],
+      type: "",
+      metaGenesisHash: "",
+      metaName: "",
+      metaSource: "",
+      tokenSymbol: ""
+    })
+  }
+
   return (
-    <div className="bg-background-sheet flex justify-center items-center">
-      <div className="bg-white background-inside-theme h-screen max-w-xl w-full">
-        <header className=" p-6 flex items-center border-b border-border-1">
-          <div
-            onClick={handleBackClick}
-            className="cursor-pointer flex items-center text-xl">
-            <ArrowLeft className="mr-2 ml-3" />
-            <span>{t("Import Wallet from JSON")}</span>
+    <>
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin border-4 border-blue-400 border-t-transparent rounded-full w-16 h-16 mb-4"></div>
+              <p className="text-white text-lg font-semibold">{t("Adding wallet...")}</p>
+            </div>
           </div>
-        </header>
-        <div className="p-10">
-          <div className="mb-3 flex flex-col">
-            <Label>{t("Enter a unique wallet name")}:</Label>
-            <Input
-              type="text"
-              placeholder={t("Wallet Name")}
-              value={walletData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
-            />
-          </div>
+        </div>
+      )}
+      <div className="bg-background-sheet flex justify-center items-center">
+        <div className="bg-white background-inside-theme h-screen max-w-xl w-full">
+          <header className=" p-6 flex items-center border-b border-border-1">
+            <div
+              onClick={handleBackClick}
+              className="cursor-pointer flex items-center text-xl">
+              <ArrowLeft className="mr-2 ml-3" />
+              <span>{t("Import Wallet from JSON")}</span>
+            </div>
+          </header>
+          <div className="p-10">
+            <div className="mb-3 flex flex-col">
+              <Label>{t("Enter a unique wallet name")}:</Label>
+              <Input
+                type="text"
+                placeholder={t("Wallet Name")}
+                value={walletData.name}
+                onChange={(e) => handleInputChange("name", e.target.value)}
+              />
+              {nameError && <p className="text-red-500 text-sm mt-1">{nameError}</p>}
+            </div>
 
-          <div className="mb-3">
-            <Label>{t("Upload Wallet JSON")}:</Label>
-            <input
-              type="file"
-              accept=".json"
-              onChange={handleFileUpload}
-              className="w-full p-2 rounded bg-input text-sm font-semibold"
-            />
-          </div>
+            <div className="mb-3">
+              <Label>{t("Upload Wallet JSON")}:</Label>
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleFileUpload}
+                className="w-full p-2 rounded bg-input text-sm font-semibold"
+              />
+              {mnemonicError && (
+                <p className="text-red-500 text-sm mt-1">{mnemonicError}</p>
+              )}
+            </div>
 
-          <div className="mt-5 mb-3">
-            <Button
-              type="button"
-              variant="jelly"
-              className="my-auto"
-              onClick={saveWallet}>
-              {t("SAVE")}
-            </Button>
+            <div className="mt-5 mb-3">
+              <Button
+                type="button"
+                variant="jelly"
+                className="my-auto"
+                onClick={saveWallet}>
+                {t("SAVE")}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

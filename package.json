@@ -1,7 +1,7 @@
 {
   "name": "xterium-browser-extension",
   "displayName": "Xterium",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Xterium is a Web3 wallet designed to interact with Xode and other Polkadot blockchains, directly from your browser.",
   "author": "Xode",
   "scripts": {
@@ -57,10 +57,23 @@
     "@ianvs/prettier-plugin-sort-imports": "4.1.1",
     "@plasmohq/rps": "1.8.7",
     "@plasmohq/storage": "1.12.0",
+    "@types/bn.js": "^5.1.6",
     "@types/chrome": "0.0.258",
+    "@types/estree": "^1.0.6",
+    "@types/filesystem": "^0.0.36",
+    "@types/filewriter": "^0.0.33",
+    "@types/gensync": "^1.0.4",
+    "@types/har-format": "^1.2.16",
+    "@types/http-cache-semantics": "^4.0.4",
+    "@types/json-schema": "^7.0.15",
     "@types/node": "20.11.5",
+    "@types/normalize-package-data": "^2.4.4",
+    "@types/parse-json": "^4.0.2",
+    "@types/prop-types": "^15.7.14",
     "@types/react": "18.2.48",
     "@types/react-dom": "18.2.18",
+    "@types/scheduler": "^0.23.0",
+    "@types/trusted-types": "^2.0.7",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "prettier": "3.2.4",
@@ -68,18 +81,41 @@
     "typescript": "5.3.3"
   },
   "manifest": {
+    "permissions": [
+      "storage",
+      "scripting",
+      "activeTab"
+    ],
     "host_permissions": [
-      "https://*/*"
+      "https://*/*",
+      "<all_urls>"
     ],
     "web_accessible_resources": [
       {
         "resources": [
-          "assets/**/*.png"
+          "assets/**/*.png",
+          "injected.js",
+          "popup.html"
         ],
         "matches": [
-          "https://www.plasmo.com/*"
+          "https://www.plasmo.com/*",
+          "<all_urls>"
         ]
       }
-    ]
+    ],
+    "content_scripts": [
+      {
+        "matches": [
+          "<all_urls>"
+        ],
+        "js": [
+          "content.js"
+        ],
+        "run_at": "document_start"
+      }
+    ],
+    "background": {
+      "service_worker": "background.js"
+    }
   }
 }

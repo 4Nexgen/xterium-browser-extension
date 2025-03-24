@@ -1,5 +1,6 @@
 import IndexPages from "@/pages/index"
 import { createRoot } from "react-dom/client"
+import IndexBalance from "@/pages/application/balance"
 
 import "../global.css"
 

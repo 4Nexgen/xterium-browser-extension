@@ -1,113 +1,255 @@
+import { BalanceModel } from "@/models/balance.model"
+import { TokenModel } from "@/models/token.model"
 import { WalletModel } from "@/models/wallet.model"
 
 import { Storage } from "@plasmohq/storage"
 
+import { BalanceServices } from "./balance.service"
+
 export class WalletService {
   private storage = new Storage({
-    area: 'local',
+    area: "local",
     allCopied: true
   })
   private key = "wallets"
+  private balanceService: BalanceServices
+  constructor() {
+    this.balanceService = new BalanceServices(this)
+  }
 
   async createWallet(data: WalletModel): Promise<string> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const existingWallets = await this.storage.get<string>(this.key)
-        const wallets: WalletModel[] = existingWallets ? JSON.parse(existingWallets) : []
+    try {
+      const wallets = await this.getWallets()
+      const lastId = wallets.length > 0 ? wallets[wallets.length - 1].id : 0
+      data.id = lastId + 1
 
-        const lastId = wallets.length > 0 ? wallets[wallets.length - 1].id : 0;
-        data.id = lastId + 1
+      const api = await this.balanceService.connect()
+      const genesisHash = api.genesisHash.toHex()
+      const tokens = await this.getAllTokens()
+      const tokenSymbol = tokens.length > 0 ? tokens[0].symbol : "Unknown"
 
-        wallets.push(data)
+      data.metaGenesisHash = genesisHash
+      data.metaSource = "Xterium"
+      data.tokenSymbol = tokenSymbol
 
-        await this.storage.set(this.key, JSON.stringify(wallets))
+      data.balances = await this.fetchAllBalances(data.public_key, tokens)
+      wallets.push(data)
+      await this.storage.set(this.key, wallets)
+      return "Wallet created successfully"
+    } catch (error) {
+      throw new Error(`[WalletService] Failed to create wallet: ${error}`)
+    }
+  }
+  async updateWallet(id: number, data: WalletModel): Promise<string> {
+    try {
+      const wallets = await this.getWallets()
+      const index = wallets.findIndex((wallet) => wallet.id === id)
+      if (index === -1) throw new Error("Wallet not found.")
+      const tokens = await this.getAllTokens()
+      data.balances = await this.fetchAllBalances(data.public_key, tokens)
 
-        resolve("Wallet created successfully")
-      } catch (error) {
-        reject(error)
+      wallets[index] = {
+        ...wallets[index],
+        ...data,
+        metaGenesisHash: data.metaGenesisHash || wallets[index].metaGenesisHash,
+        metaSource: data.metaSource || wallets[index].metaSource,
+        tokenSymbol: data.tokenSymbol || wallets[index].tokenSymbol
       }
-    })
+
+      console.log("[WalletService] Updated wallet balances:", data.balances)
+
+      await this.storage.set(this.key, wallets)
+      return "Wallet updated successfully"
+    } catch (error) {
+      throw new Error(`[WalletService] Failed to update wallet: ${error}`)
+    }
   }
 
   async getWallets(): Promise<WalletModel[]> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const storedData = await this.storage.get<string>(this.key)
-
-        if (!storedData) {
-          return resolve([])
-        }
-
-        const wallets: WalletModel[] = JSON.parse(storedData)
-        resolve(wallets)
-      } catch (error) {
-        reject(error)
+    try {
+      const storedData = await this.storage.get(this.key)
+      if (Array.isArray(storedData)) {
+        return storedData as WalletModel[]
+      } else {
+        console.warn(
+          "[WalletService] Stored data is not an array, returning empty array."
+        )
+        return []
       }
-    })
+    } catch (error) {
+      console.error("[WalletService] Failed to get wallets:", error)
+      return []
+    }
   }
-
   async getWalletById(id: number): Promise<WalletModel> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const storedData = await this.storage.get<string>(this.key)
-
-        if (!storedData) {
-          return reject(new Error("No stored data found."))
-        }
-        const wallets: WalletModel[] = JSON.parse(storedData)
-        const wallet = wallets.find((wallet) => wallet.id === id)
-
-        if (!wallet) {
-          return reject(new Error(`Wallet with id ${id} not found.`))
-        }
-
-        resolve(wallet)
-      } catch (error) {
-        reject(error)
-      }
-    })
+    const wallets = await this.getWallets()
+    const wallet = wallets.find((wallet) => wallet.id === id)
+    if (!wallet) throw new Error(`Wallet with id ${id} not found.`)
+    return wallet
   }
-
-  async updateWallet(id: number, data: WalletModel): Promise<string> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const wallets = await this.getWallets()
-
-        const index = wallets.findIndex((wallet) => wallet.id === id)
-
-        if (index === -1) {
-          reject(new Error("Wallet not found."))
-          return
-        }
-
-        wallets[index] = data
-
-        await this.storage.set(this.key, JSON.stringify(wallets))
-
-        resolve("Wallet updated successfully")
-      } catch (error) {
-        reject(error)
-      }
-    })
+  async getWalletAddress(walletId: number): Promise<string> {
+    const wallet = await this.getWalletById(walletId)
+    if (!wallet.public_key) throw new Error("Address not found for this wallet")
+    return wallet.public_key
   }
-
+  async getBalances(walletId: number): Promise<BalanceModel[]> {
+    const wallet = await this.getWalletById(walletId)
+    if (!wallet.balances) {
+      console.warn("[WalletService] No balances found, initializing default")
+      wallet.balances = [this.getDefaultBalance()]
+    }
+    return wallet.balances
+  }
   async deleteWallet(id: number): Promise<boolean> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const wallets = await this.getWallets()
+    try {
+      const wallets = await this.getWallets()
+      const filteredWallets = wallets.filter((wallet) => wallet.id !== id)
+      if (wallets.length === filteredWallets.length) {
+        throw new Error("Wallet not found.")
+      }
+      await this.storage.set(this.key, filteredWallets)
+      return true
+    } catch (error) {
+      throw new Error(`[WalletService] Failed to delete wallet: ${error}`)
+    }
+  }
+  public async fetchWalletBalances(): Promise<WalletModel[]> {
+    try {
+      const wallets = await this.getWallets()
+      const results: WalletModel[] = []
 
-        const filteredWallets = wallets.filter((wallet) => wallet.id !== id)
+      if (wallets.length === 0) {
+        console.warn("[WalletService] No wallets found.")
+        return []
+      }
+      const tokens = await this.getAllTokens()
 
-        if (wallets.length === filteredWallets.length) {
-          return reject(new Error("Wallet not found."))
+      for (const wallet of wallets) {
+        const publicKey = wallet.public_key
+
+        try {
+          const balances = await Promise.all(
+            tokens.map(async (token) => {
+              try {
+                return await this.balanceService.getBalancePerToken(publicKey, token)
+              } catch (balanceError) {
+                console.warn(
+                  `[fetchWalletBalances] Balance error for ${token.symbol}:`,
+                  balanceError
+                )
+                return this.createDefaultBalance(token)
+              }
+            })
+          )
+          results.push({
+            ...wallet,
+            balances
+          })
+
+          console.log(`[fetchWalletBalances] Wallet ${wallet.id} balances:`, balances)
+        } catch (innerError) {
+          console.warn(
+            `[fetchWalletBalances] Error fetching balances for wallet ${wallet.id}:`,
+            innerError
+          )
         }
+      }
 
-        await this.storage.set(this.key, JSON.stringify(filteredWallets))
-
-        resolve(true)
-      } catch (error) {
-        reject(error)
+      console.log("[fetchWalletBalances] All Wallet Balances (Native + Assets):", results)
+      return results
+    } catch (error) {
+      console.error("[fetchWalletBalances] Failed to fetch wallet balances:", error)
+      throw new Error(`[fetchWalletBalances] Failed: ${error.message}`)
+    }
+  }
+  private async fetchAllBalances(
+    publicKey: string,
+    tokens: TokenModel[]
+  ): Promise<BalanceModel[]> {
+    const balanceRequests = tokens.map(async (token) => {
+      try {
+        return await this.balanceService.getBalancePerToken(publicKey, token)
+      } catch (err) {
+        console.warn(`[WalletService] Failed to fetch balance for ${token.symbol}:`, err)
+        return this.createDefaultBalance(token)
       }
     })
+    const balances = await Promise.all(balanceRequests)
+    const formattedBalances = balances.map((b) => ({
+      tokenName: b.token.symbol,
+      freeBalance: b.freeBalance,
+      reservedBalance: b.reservedBalance,
+      is_frozen: b.is_frozen
+    }))
+    await this.balanceService.saveBalance(publicKey, formattedBalances)
+
+    return balances
+  }
+
+  private getDefaultBalance(): BalanceModel {
+    return {
+      freeBalance: 0,
+      reservedBalance: 0,
+      owner: "",
+      token: this.getDefaultToken(),
+      is_frozen: false
+    }
+  }
+  private createDefaultBalance(token: TokenModel): BalanceModel {
+    return {
+      freeBalance: 0,
+      reservedBalance: 0,
+      owner: "",
+      token,
+      is_frozen: false
+    }
+  }
+  private async getAllTokens(): Promise<TokenModel[]> {
+    const tokens: TokenModel[] = [this.getDefaultToken()] // Start with a default token
+    try {
+      const api = await this.balanceService.connect() // Connect to the network
+      const assetEntries = await api.query.assets.metadata.entries() // Fetch asset metadata entries
+
+      assetEntries.forEach(([key, metadata]) => {
+        const assetId = parseInt(key.args[0].toString()) // Extract asset ID from the key
+        const metaHuman = metadata.toHuman() as {
+          name?: string
+          symbol?: string
+          decimals?: string
+        }
+
+        const token: TokenModel = {
+          id: assetId,
+          type: "Asset",
+          network: this.getDefaultToken().network,
+          network_id: assetId,
+          symbol: metaHuman.symbol || `Asset ${assetId}`, // Use the symbol or a default
+          description: metaHuman.name || `Asset Token ${assetId}`, // Use the name or a default
+          image_url: "",
+          preloaded: false,
+          decimals: metaHuman.decimals ? parseInt(metaHuman.decimals) : 12 // Default to 12 if not provided
+        }
+
+        tokens.push(token)
+      })
+      console.log("[WalletService] Fetched tokens:", tokens)
+    } catch (error) {
+      console.warn("[WalletService] Failed to fetch asset tokens from RPC:", error)
+    }
+    return tokens
+  }
+
+  private getDefaultToken(): TokenModel {
+    return {
+      id: 0,
+      type: "Native",
+      network: "Xode",
+      network_id: 1,
+      symbol: "XON",
+      description: "XON Token",
+      image_url: "",
+      preloaded: false,
+      decimals: 12
+    }
   }
 }

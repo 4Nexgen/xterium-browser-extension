@@ -29,18 +29,25 @@ const IndexAddWallet = ({ handleCallbacks }) => {
   const networkService = new NetworkService()
   const userService = new UserService()
   const walletService = new WalletService()
-
+  const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
+  const [isNameDuplicate, setIsNameDuplicate] = useState(false)
+  const [isMnemonicDuplicate, setIsMnemonicDuplicate] = useState(false)
   const [walletData, setWalletData] = useState<WalletModel>({
     id: 0,
     name: "",
     address_type: "",
     mnemonic_phrase: "",
     secret_key: "",
-    public_key: ""
+    public_key: "",
+    balances: [],
+    type: "Xode",
+    metaGenesisHash: "",
+    metaName: "",
+    metaSource: "",
+    tokenSymbol: ""
   })
-
-  const { toast } = useToast()
 
   const getNetwork = () => {
     networkService.getNetwork().then((data) => {
@@ -52,15 +59,69 @@ const IndexAddWallet = ({ handleCallbacks }) => {
     getNetwork()
   }, [])
 
-  const handleInputChange = (field: keyof typeof walletData, value: string) => {
+  const handleInputChange = async (field: keyof typeof walletData, value: string) => {
+    if (field === "name") {
+      const isDuplicate = await checkForDuplicateName(value)
+      setIsNameDuplicate(isDuplicate)
+
+      if (isDuplicate) {
+        toast({
+          description: (
+            <div className="flex items-center">
+              <X className="mr-2 text-red-500" />
+              {t("A wallet with this name already exists. Please enter a unique name.")}
+            </div>
+          ),
+          variant: "destructive"
+        })
+      }
+    }
+    if (field === "mnemonic_phrase") {
+      const isDuplicate = await checkForDuplicateMnemonic(value)
+      setIsMnemonicDuplicate(isDuplicate)
+
+      if (isDuplicate) {
+        toast({
+          description: (
+            <div className="flex items-center">
+              <X className="mr-2 text-red-500" />
+              {t(
+                "A wallet with this mnemonic phrase already exists. Please enter a unique mnemonic phrase."
+              )}
+            </div>
+          ),
+          variant: "destructive"
+        })
+        return
+      }
+    }
     setWalletData((prev) => ({
       ...prev,
       [field]: value
     }))
   }
 
+  const checkForDuplicateName = async (name: string): Promise<boolean> => {
+    const wallets = await walletService.getWallets()
+    return wallets.some((wallet) => wallet.name === name)
+  }
+
+  const checkForDuplicateMnemonic = async (mnemonic: string): Promise<boolean> => {
+    const wallets = await walletService.getWallets()
+    const encryptionService = new EncryptionService()
+
+    const decryptedMnemonics = await Promise.all(
+      wallets.map(async (wallet) => {
+        const decryptedPassword = await userService.getWalletPassword()
+        return encryptionService.decrypt(decryptedPassword, wallet.mnemonic_phrase)
+      })
+    )
+
+    return decryptedMnemonics.some((decryptedMnemonic) => decryptedMnemonic === mnemonic)
+  }
+
   const generateMnemonic = () => {
-    let generatedMnemonicPhrase = mnemonicGenerate()
+    const generatedMnemonicPhrase = mnemonicGenerate()
     handleInputChange("mnemonic_phrase", generatedMnemonicPhrase)
     createKeys(generatedMnemonicPhrase)
   }
@@ -92,7 +153,52 @@ const IndexAddWallet = ({ handleCallbacks }) => {
     inputMnemonic(mnemonicInput)
   }
 
+  const resetForm = () => {
+    setWalletData({
+      id: 0,
+      name: "",
+      address_type: "",
+      mnemonic_phrase: "",
+      secret_key: "",
+      public_key: "",
+      balances: [],
+      type: "",
+      metaGenesisHash: "",
+      metaName: "",
+      metaSource: "",
+      tokenSymbol: ""
+    })
+  }
+
   const saveWallet = () => {
+    if (isNameDuplicate) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-red-500" />
+            {t("A wallet with this name already exists. Please enter a unique name.")}
+          </div>
+        ),
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (isMnemonicDuplicate) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-red-500" />
+            {t(
+              "A wallet with this mnemonic phrase already exists. Please enter a unique mnemonic phrase."
+            )}
+          </div>
+        ),
+        variant: "destructive"
+      })
+      return
+    }
+
     if (
       !walletData.name ||
       !walletData.mnemonic_phrase ||
@@ -110,6 +216,9 @@ const IndexAddWallet = ({ handleCallbacks }) => {
       })
       return
     }
+
+    setIsLoading(true)
+
     userService.getWalletPassword().then((decryptedPassword) => {
       if (decryptedPassword) {
         const encryptionService = new EncryptionService()
@@ -138,16 +247,34 @@ const IndexAddWallet = ({ handleCallbacks }) => {
               ),
               variant: "default"
             })
+
+            setTimeout(() => {
+              setIsLoading(false)
+              resetForm()
+              handleCallbacks()
+            }, 1500)
+          } else {
+            setIsLoading(false)
           }
         })
-
-        handleCallbacks()
+      } else {
+        setIsLoading(false)
       }
     })
   }
 
   return (
     <>
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin border-4 border-blue-400 border-t-transparent rounded-full w-16 h-16 mb-4"></div>
+              <p className="text-white text-lg font-semibold">{t("Adding wallet...")}</p>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="p-6">
         <div className="mb-3">
           <Label>{t("Enter a unique wallet name")}:</Label>
@@ -203,7 +330,18 @@ const IndexAddWallet = ({ handleCallbacks }) => {
           />
         </div>
         <div className="mt-5 mb-3">
-          <Button type="button" variant="jelly" onClick={saveWallet}>
+          <Button
+            type="button"
+            variant="jelly"
+            onClick={saveWallet}
+            disabled={
+              isNameDuplicate ||
+              isMnemonicDuplicate ||
+              !walletData.name ||
+              !walletData.mnemonic_phrase ||
+              !walletData.secret_key ||
+              !walletData.public_key
+            }>
             {t("SAVE")}
           </Button>
         </div>

@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast"
 import type { BalanceModel } from "@/models/balance.model"
 import { BalanceServices } from "@/services/balance.service"
 import { UserService } from "@/services/user.service"
+import { WalletService } from "@/services/wallet.service"
 import { Check, X } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -13,14 +14,16 @@ import { useTranslation } from "react-i18next"
 const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
   const { t } = useTranslation()
   const userService = new UserService()
-  const balanceService = new BalanceServices()
+  const walletService = new WalletService()
+  const balanceService = new BalanceServices(walletService)
   const [balanceData, setBalanceData] = useState<BalanceModel>(selectedBalance)
   const [quantity, setQuantity] = useState<number>(0)
   const [transferTo, setTransferTo] = useState<string>("")
   const [isSendInProgress, setIsSendInProgress] = useState<boolean>(false)
   const [sendLabel, setSendLabel] = useState<string>("SEND")
   const [partialFee, setPartialFee] = useState<number>(0)
-  const [isInputPasswordDrawerOpen, setIsInputPasswordDrawerOpen] = useState<boolean>(false)
+  const [isInputPasswordDrawerOpen, setIsInputPasswordDrawerOpen] =
+    useState<boolean>(false)
   const [isTransferInProgress, setIsTransferInProgress] = useState<boolean>(false)
   const [confirmTransferLabel, setConfirmTransferLabel] = useState<string>("CONFIRM")
 
@@ -66,6 +69,19 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
       return
     }
 
+    if (transferTo.trim() === balanceData.owner) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-red-500" />
+            {t("Sender and recipient addresses must be different!")}
+          </div>
+        ),
+        variant: "destructive"
+      })
+      return
+    }
+
     setIsSendInProgress(true)
     setSendLabel(t("CALCULATING FEES..."))
 
@@ -81,11 +97,11 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
 
         setIsSendInProgress(false)
         setSendLabel(t("SEND"))
-        console.log("Raw fee:", results.partialFee.toString());
-        const rawFee = BigInt(results.partialFee);
-        const formattedFee = Number(rawFee) / Math.pow(10, 12); 
+        console.log("Raw fee:", results.partialFee.toString())
+        const rawFee = BigInt(results.partialFee)
+        const formattedFee = Number(rawFee) / Math.pow(10, 12)
 
-        setPartialFee(formattedFee);
+        setPartialFee(formattedFee)
       })
   }
 
@@ -94,15 +110,10 @@ const IndexTransfer = ({ selectedBalance, handleCallbacks }) => {
     setConfirmTransferLabel(t("CONFIRM"))
   }, [])
 
-  const fixBalance = (value: string, decimal: number) => {
-    const multiplier = BigInt(10 ** decimal)
-    return (BigInt(value) / multiplier).toString()
-  }
-  
   const fixBalanceReverse = (value: string, decimal: number): string => {
     const multiplier = BigInt(10 ** decimal)
-    return (BigInt(parseFloat(value)) * multiplier).toString()
-  }  
+    return BigInt(Math.round(parseFloat(value) * Math.pow(10, decimal))).toString()
+  }
 
   const sendTransferWithPassword = () => {
     userService
