@@ -20,6 +20,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 import { NetworkData } from "@/data/network.data"
 import { NetworkImages, type NetworkModel } from "@/models/network.model"
 import { NetworkService } from "@/services/network.service"
+import { ApiPromise, Keyring, WsProvider } from "@polkadot/api"
 import { Label } from "@radix-ui/react-dropdown-menu"
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
 import { useTheme } from "next-themes"
@@ -30,9 +31,14 @@ import { useTranslation } from "react-i18next"
 interface HeaderProps {
   currentPage?: string
   variant?: "default" | "outside"
+  handleCurrentNetwork?: (network: NetworkModel) => void
 }
 
-const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => {
+const Header: React.FC<HeaderProps> = ({
+  currentPage,
+  variant = "default",
+  handleCurrentNetwork
+}: HeaderProps) => {
   const { t } = useTranslation()
   const networkService = new NetworkService()
 
@@ -49,18 +55,20 @@ const Header: React.FC<HeaderProps> = ({ currentPage, variant = "default" }) => 
     return networkImages.getBase64Image(imageName)
   }
 
-  const getNetwork = () => {
-    networkService.getNetwork().then((data) => {
-      if (data) {
-        setSelectedNetwork(data)
-      } else {
-        const defaultNetwork = networks.find((network) => network.name === "Xode")
-        if (defaultNetwork) {
-          setSelectedNetwork(defaultNetwork)
-          networkService.setNetwork(defaultNetwork)
-        }
+  const getNetwork = async () => {
+    const data = await networkService.getNetwork()
+    if (data) {
+      setSelectedNetwork(data)
+      handleCurrentNetwork(data)
+    } else {
+      const defaultNetwork = networks.find((network) => network.name === "Xode")
+      if (defaultNetwork) {
+        setSelectedNetwork(defaultNetwork)
+        networkService.setNetwork(defaultNetwork)
+        
+        handleCurrentNetwork(defaultNetwork)
       }
-    })
+    }
   }
 
   useEffect(() => {

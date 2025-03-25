@@ -9,96 +9,114 @@ import {
   CommandItem,
   CommandList
 } from "@/components/ui/command"
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle
-} from "@/components/ui/drawer"
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
-import { TokenData, TokenImages } from "@/data/token.data"
+import { TokenImages } from "@/data/token.data"
 import { BalanceModel } from "@/models/balance.model"
-import type { NetworkModel } from "@/models/network.model"
-import type { TokenModel } from "@/models/token.model"
+import { NetworkModel } from "@/models/network.model"
 import { WalletModel } from "@/models/wallet.model"
-import { BalanceServices } from "@/services/balance.service"
-import { NetworkService } from "@/services/network.service"
 import { TokenService } from "@/services/token.service"
 import { WalletService } from "@/services/wallet.service"
+import { ApiPromise } from "@polkadot/api"
 import { Coins } from "lucide-react"
 import Image from "next/image"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
-import IndexTokenDetails from "./token-details"
+import IndexBalanceDetails from "./balance-details"
 
-const IndexBalance = () => {
+interface IndexBalanceProps {
+  currentNetwork: NetworkModel | null
+  currentWsAPI: ApiPromise | null
+}
+
+const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
   const { t } = useTranslation()
 
-  const networkService = new NetworkService()
-  const walletService = new WalletService()
-  const tokenService = new TokenService()
-  const balanceService = new BalanceServices(walletService)
+  const walletService = useMemo(() => new WalletService(), [])
+  const tokenService = useMemo(() => new TokenService(), [])
 
-  const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
+  const [network, setNetwork] = useState<NetworkModel>(null)
+  const [wsAPI, setWsAPI] = useState<ApiPromise | null>(null)
+
   const [openWallets, setOpenWallets] = useState<boolean>(false)
   const [wallets, setWallets] = useState<WalletModel[]>([])
-  const [selectedWallet, setSelectedWallet] = useState<WalletModel>(null)
+  const [selectedWallet, setSelectedWallet] = useState<WalletModel | null>(null)
   const [balances, setBalances] = useState<BalanceModel[]>([])
-  const [balancePerToken, setBalancePerToken] = useState({})
   const [loadingPerToken, setLoadingPerToken] = useState({})
-  const [isTokenDetailDrawerOpen, setIsTokenDetailDrawerOpen] = useState(false)
-  const [selectedBalance, setSelectedBalance] = useState<BalanceModel>(null)
 
-  const getNetwork = () => {
-    networkService.getNetwork().then((data) => {
-      setSelectedNetwork(data)
-    })
+  const [isTokenDetailDrawerOpen, setIsTokenDetailDrawerOpen] = useState<boolean>(false)
+  const [selectedBalance, setSelectedBalance] = useState<BalanceModel | null>(null)
+
+  useEffect(() => {
+    if (currentNetwork) {
+      setNetwork(currentNetwork)
+    }
+  }, [currentNetwork])
+
+  useEffect(() => {
+    if (currentWsAPI) {
+      setWsAPI(currentWsAPI)
+    }
+  }, [currentWsAPI])
+
+  const getWallets = async () => {
+    const data = await walletService.getWallets()
+    setWallets(data)
+    setSelectedWallet(data[0])
   }
 
   useEffect(() => {
-    getNetwork()
-  }, [])
+    getWallets()
+  }, [wsAPI])
 
-  const getWallets = () => {
-    walletService.getWallets().then((data) => {
-      setWallets(data)
-    })
+  const fixBalance = (value: string, decimal: number) => {
+    const multiplier = 10 ** decimal
+    return parseFloat(value) / multiplier
   }
 
-  const preloadTokens = () => {
-    tokenService.getTokens().then(async (data) => {
-      let preloadedTokenData = TokenData
-      if (preloadedTokenData.length > 0) {
-        for (let i = 0; i < preloadedTokenData.length; i++) {
-          let existingToken = data.filter((d) => d.id == preloadedTokenData[i].id)[0]
-          if (existingToken == null) {
-            await tokenService.createToken(preloadedTokenData[i])
-          }
-        }
-      }
+  const updateBalances = (balance: BalanceModel) => {
+    setLoadingPerToken((prevLoadingPerToken) => ({
+      ...prevLoadingPerToken,
+      [balance.token.symbol]: false
+    }))
 
-      preloadEmptyBalances()
-    })
+    setBalances((prevBalances) =>
+      prevBalances.map((prevBalance) =>
+        prevBalance.token.id === balance.token.id
+          ? {
+              ...prevBalance,
+              freeBalance: balance.freeBalance,
+              reservedBalance: balance.reservedBalance
+            }
+          : prevBalance
+      )
+    )
   }
 
-  const preloadEmptyBalances = () => {
-    let emptyBalances: BalanceModel[] = []
+  const getBalances = async () => {
+    try {
+      const data = await tokenService.getTokens()
+      let emptyBalances: BalanceModel[] = []
 
-    tokenService.getTokens().then((data) => {
       if (data.length > 0) {
         const uniqueTokens = new Set()
 
         for (let i = 0; i < data.length; i++) {
+          setLoadingPerToken((prevLoadingPerToken) => ({
+            ...prevLoadingPerToken,
+            [data[i].symbol]: true
+          }))
+
           let token = data[i]
 
           if (!uniqueTokens.has(token.symbol)) {
             uniqueTokens.add(token.symbol)
 
             emptyBalances.push({
-              owner: "",
+              owner: selectedWallet.public_key,
               token: token,
               freeBalance: 0,
               reservedBalance: 0,
@@ -109,162 +127,68 @@ const IndexBalance = () => {
       }
 
       setBalances(emptyBalances)
-    })
+
+      if (selectedWallet) {
+        const sortedEmptyBalances = [...emptyBalances].sort(
+          (a, b) => a.token.id - b.token.id
+        )
+
+        sortedEmptyBalances.map((balance) => {
+          if (balance.token.type == "Native") {
+            wsAPI.query.system.account(balance.owner, (systemAccountInfo) => {
+              const { free, reserved } = (systemAccountInfo.toJSON() as any).data
+
+              updateBalances({
+                ...balance,
+                freeBalance: fixBalance(free.toString(), 12),
+                reservedBalance: fixBalance(reserved.toString(), 12),
+                is_frozen: false
+              })
+            })
+          }
+
+          if (balance.token.type === "Asset") {
+            wsAPI.query.assets.account(
+              balance.token.id,
+              balance.owner,
+              (assetAccountInfo) => {
+                const humanData = (assetAccountInfo.toHuman() as { [key: string]: any })
+                  ?.balance
+                const free = humanData ? parseInt(humanData.split(",").join("")) : 0
+
+                updateBalances({
+                  ...balance,
+                  freeBalance: fixBalance(free.toString(), 12),
+                  reservedBalance: fixBalance("0", 12),
+                  is_frozen: false
+                })
+              }
+            )
+          }
+        })
+      }
+    } catch (error) {
+      console.error("Error fetching balances:", error)
+    }
   }
 
-  const getTokens = () => {
-    preloadTokens()
-  }
+  useEffect(() => {
+    if (selectedWallet !== null) {
+      getBalances()
+    }
+  }, [selectedWallet])
 
   const getTokenImage = (imageName: string) => {
     const tokenImages = new TokenImages()
     return tokenImages.getBase64Image(imageName)
   }
 
-  useEffect(() => {
-    getWallets()
-    getTokens()
-
-    if (wallets.length > 0) {
-      setSelectedWallet(wallets[0])
-    }
-  }, [selectedNetwork])
-
-  const fixBalance = (value: string, decimal: number) => {
-    const multiplier = 10 ** decimal
-    return parseFloat(value) / multiplier
-  }
-
-  const zeroOutBalances = () => {
-    if (balances.length > 0) {
-      const zeroOutBalances = balances.map((existingBalance) => {
-        let zeroBalance: BalanceModel = {
-          ...existingBalance,
-          freeBalance: 0,
-          reservedBalance: 0,
-          is_frozen: false
-        }
-
-        return zeroBalance
-      })
-
-      setBalances(zeroOutBalances)
-    }
-  }
-
-  const getBalances = async () => {
-    zeroOutBalances()
-
-    if (selectedWallet) {
-      const sortedBalances = balances.sort((a, b) => {
-        if (a.token.id < b.token.id) return -1
-        if (a.token.id > b.token.id) return 1
-        return 0
-      })
-
-      const balancePromises = sortedBalances.map(async (balance) => {
-        const updatedBalance = await getBalancePerToken(balance.token)
-
-        getBalancePerToken(balance.token)
-        setBalances((prevBalances) =>
-          prevBalances.map((prevBalance) =>
-            prevBalance.token.id === updatedBalance.token.id
-              ? {
-                  ...prevBalance,
-                  freeBalance: fixBalance(updatedBalance.freeBalance.toString(), 12),
-                  reservedBalance: fixBalance(
-                    updatedBalance.reservedBalance.toString(),
-                    12
-                  )
-                }
-              : prevBalance
-          )
-        )
-      })
-
-      await Promise.all(balancePromises)
-    }
-  }
-
-  const getBalancePerToken = async (token: TokenModel): Promise<BalanceModel> => {
-    setLoadingPerToken((prevLoadingPerToken) => ({
-      ...prevLoadingPerToken,
-      [token.symbol]: true
-    }))
-
-    try {
-      const data = await balanceService.getBalancePerToken(
-        selectedWallet.public_key,
-        token
-      )
-
-      setBalancePerToken((prevBalancePerToken) => ({
-        ...prevBalancePerToken,
-        [token.symbol]: data.freeBalance
-      }))
-
-      setLoadingPerToken((prevLoadingToken) => ({
-        ...prevLoadingToken,
-        [token.symbol]: false
-      }))
-
-      const newBalance: BalanceModel = {
-        token,
-        freeBalance: data.freeBalance,
-        reservedBalance: data.reservedBalance,
-        is_frozen: data.is_frozen,
-        owner: selectedWallet.public_key
-      }
-
-      return newBalance
-    } catch (error) {
-      setBalancePerToken((prevBalancePerToken) => ({
-        ...prevBalancePerToken,
-        [token.symbol]: "Error"
-      }))
-
-      setLoadingPerToken((prevLoadingToken) => ({
-        ...prevLoadingToken,
-        [token.symbol]: false
-      }))
-
-      const zeroBalance: BalanceModel = {
-        token,
-        freeBalance: 0,
-        reservedBalance: 0,
-        is_frozen: false,
-        owner: selectedWallet.public_key
-      }
-
-      return zeroBalance
-    }
-  }
-
-  useEffect(() => {
-    const matchingWallet = wallets.find(
-      (wallet) => wallet.address_type === selectedNetwork?.name
-    )
-
-    setSelectedWallet(matchingWallet || null)
-  }, [selectedNetwork, wallets])
-
-  useEffect(() => {
-    if (selectedWallet) {
-      getBalances()
-    }
-  }, [selectedWallet])
-
   const selectBalance = (data: BalanceModel) => {
     setIsTokenDetailDrawerOpen(true)
-
-    if (selectedWallet != null) {
-      data.owner = selectedWallet.public_key
-    }
-
     setSelectedBalance(data)
   }
 
-  const transferComplete = () => {
+  const handleTransferCompleteCallbacks = () => {
     setIsTokenDetailDrawerOpen(false)
     getBalances()
   }
@@ -310,8 +234,7 @@ const IndexBalance = () => {
                       {wallets
                         .filter(
                           (wallet) =>
-                            wallet.address_type ===
-                            (selectedNetwork ? selectedNetwork.name : "")
+                            wallet.address_type === (network ? network.name : "")
                         )
                         .map((wallet) => (
                           <CommandItem
@@ -341,9 +264,9 @@ const IndexBalance = () => {
               </PopoverContent>
             </Popover>
           </div>
+
           {balances?.filter(
-            (item) =>
-              item.token.network == (selectedNetwork != null ? selectedNetwork.name : "")
+            (item) => item.token.network == (network != null ? network.name : "")
           )?.length ? (
             <>
               <Card className="mb-3">
@@ -352,8 +275,7 @@ const IndexBalance = () => {
                     {balances
                       .filter(
                         (balance) =>
-                          balance.token.network ===
-                          (selectedNetwork ? selectedNetwork.name : "")
+                          balance.token.network === (network ? network.name : "")
                       )
                       .sort((a, b) => {
                         if (a.token.type === "Native" && b.token.type !== "Native")
@@ -398,13 +320,8 @@ const IndexBalance = () => {
                                 <span className="text-sm font-normal opacity-50">
                                   Loading...
                                 </span>
-                              ) : balancePerToken[balance.token.symbol] ? (
-                                fixBalance(
-                                  balancePerToken[balance.token.symbol].toString(),
-                                  12
-                                )
                               ) : (
-                                0
+                                balance.freeBalance.toString()
                               )}
                             </span>
                           </TableCell>
@@ -435,9 +352,10 @@ const IndexBalance = () => {
                         </DrawerTitle>
                       </div>
                     </DrawerHeader>
-                    <IndexTokenDetails
+                    <IndexBalanceDetails
+                      currentWsAPI={wsAPI}
                       selectedBalance={selectedBalance}
-                      handleCallbacks={transferComplete}
+                      handleTransferCompleteCallbacks={handleTransferCompleteCallbacks}
                     />
                   </DrawerContent>
                 </Drawer>

@@ -81,17 +81,20 @@ export class WalletService {
       return []
     }
   }
+
   async getWalletById(id: number): Promise<WalletModel> {
     const wallets = await this.getWallets()
     const wallet = wallets.find((wallet) => wallet.id === id)
     if (!wallet) throw new Error(`Wallet with id ${id} not found.`)
     return wallet
   }
+
   async getWalletAddress(walletId: number): Promise<string> {
     const wallet = await this.getWalletById(walletId)
     if (!wallet.public_key) throw new Error("Address not found for this wallet")
     return wallet.public_key
   }
+
   async getBalances(walletId: number): Promise<BalanceModel[]> {
     const wallet = await this.getWalletById(walletId)
     if (!wallet.balances) {
@@ -100,6 +103,7 @@ export class WalletService {
     }
     return wallet.balances
   }
+
   async deleteWallet(id: number): Promise<boolean> {
     try {
       const wallets = await this.getWallets()
@@ -113,6 +117,7 @@ export class WalletService {
       throw new Error(`[WalletService] Failed to delete wallet: ${error}`)
     }
   }
+
   public async fetchWalletBalances(): Promise<WalletModel[]> {
     try {
       const wallets = await this.getWallets()
@@ -162,6 +167,7 @@ export class WalletService {
       throw new Error(`[fetchWalletBalances] Failed: ${error.message}`)
     }
   }
+
   private async fetchAllBalances(
     publicKey: string,
     tokens: TokenModel[]
@@ -195,6 +201,7 @@ export class WalletService {
       is_frozen: false
     }
   }
+
   private createDefaultBalance(token: TokenModel): BalanceModel {
     return {
       freeBalance: 0,
@@ -204,6 +211,7 @@ export class WalletService {
       is_frozen: false
     }
   }
+  
   private async getAllTokens(): Promise<TokenModel[]> {
     const tokens: TokenModel[] = [this.getDefaultToken()] // Start with a default token
     try {

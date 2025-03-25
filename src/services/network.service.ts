@@ -1,6 +1,7 @@
-import { NetworkModel } from "@/models/network.model"
-
+import { ApiPromise, Keyring, WsProvider } from "@polkadot/api"
 import { Storage } from "@plasmohq/storage"
+
+import { NetworkModel } from "@/models/network.model"
 
 export class NetworkService {
   private storage = new Storage({
@@ -36,5 +37,15 @@ export class NetworkService {
         reject(error)
       }
     })
+  }
+
+  async connectRPC(rpc: string): Promise<ApiPromise | null> {
+    try {
+      const wsUrl = rpc
+      const wsProvider = new WsProvider(wsUrl)
+      return await ApiPromise.create({ provider: wsProvider })
+    } catch (error) {
+      throw new Error("RPC connection failed.")
+    }
   }
 }
