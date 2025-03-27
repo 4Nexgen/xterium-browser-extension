@@ -174,48 +174,52 @@ const IndexPumpToken = ({ currentNetwork, currentWsAPI }: IndexPumpTokenProps) =
               </div>
 
               {pumpTokens.length > 0 ? (
-                pumpTokens
-                  .filter(
-                    (pumpToken) =>
-                      searchQuery === "" ||
-                      pumpToken.name.toLowerCase().startsWith(searchQuery.toLowerCase())
-                  )
-                  .map((pumpToken) => (
-                    <div className="flex grid grid-cols-2 sm:grid-cols-2 gap-4">
-                      <div
-                        key={pumpToken.id}
-                        className="flex flex-col items-start justify-between border-2 border-primary dark:border-border dark:bg-muted/50 rounded-xl h-full hover:cursor-pointer"
-                        onClick={() => pumpTokenDetails(pumpToken)}>
-                        <div className="w-full flex justify-center mb-4">
-                          <Image
-                            src={
-                              pumpTokenLogoMap[pumpToken.symbol] ||
-                              "/assets/tokens/default.png"
-                            }
-                            alt={pumpToken.name || "Token Image"}
-                            width={40}
-                            height={40}
-                            className="h-36 w-full object-cover object-center rounded-lg"
-                          />
+                <>
+                  <div className="flex grid grid-cols-2 gap-4">
+                    {pumpTokens
+                      .filter(
+                        (pumpToken) =>
+                          searchQuery === "" ||
+                          pumpToken.name
+                            .toLowerCase()
+                            .startsWith(searchQuery.toLowerCase())
+                      )
+                      .map((pumpToken) => (
+                        <div
+                          key={pumpToken.id}
+                          className="flex flex-col items-start justify-between border-2 border-primary dark:border-border dark:bg-muted/50 rounded-xl h-full hover:cursor-pointer"
+                          onClick={() => pumpTokenDetails(pumpToken)}>
+                          <div className="w-full flex justify-center mb-4">
+                            <Image
+                              src={
+                                pumpTokenLogoMap[pumpToken.symbol] ||
+                                "/assets/tokens/default.png"
+                              }
+                              alt={pumpToken.name || "Token Image"}
+                              width={40}
+                              height={40}
+                              className="h-36 w-full object-cover object-center rounded-lg"
+                            />
+                          </div>
+                          <h3 className="font-bold text-sm pl-2">
+                            {pumpToken.name || "No Name Available"} (
+                            {pumpToken.symbol || "N/A"})
+                          </h3>
+                          <p className="pl-2 mt-1">
+                            {t("Created by")}:
+                            <span className="text-muted p-4 underline">
+                              {pumpToken.owner
+                                ? `${pumpToken.owner.slice(0, 4)}...${pumpToken.owner.slice(-4)}`
+                                : "Unknown"}
+                            </span>
+                          </p>
+                          <p className="pl-2 pr-2 opacity-50 leading-snug mt-1 mb-1">
+                            {truncateText(pumpToken.description, 50)}
+                          </p>
                         </div>
-                        <h3 className="font-bold text-sm pl-2">
-                          {pumpToken.name || "No Name Available"} (
-                          {pumpToken.symbol || "N/A"})
-                        </h3>
-                        <p className="pl-2 mt-1">
-                          {t("Created by")}:
-                          <span className="text-muted p-4 underline">
-                            {pumpToken.owner
-                              ? `${pumpToken.owner.slice(0, 4)}...${pumpToken.owner.slice(-4)}`
-                              : "Unknown"}
-                          </span>
-                        </p>
-                        <p className="pl-2 pr-2 opacity-50 leading-snug mt-1 mb-1">
-                          {truncateText(pumpToken.description, 50)}
-                        </p>
-                      </div>
-                    </div>
-                  ))
+                      ))}
+                  </div>
+                </>
               ) : (
                 <div className="flex flex-col w-full items-center justify-center py-[100px] space-y-2">
                   <Coins className="size-20" />

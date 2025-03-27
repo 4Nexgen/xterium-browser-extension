@@ -41,6 +41,11 @@ export class WalletService {
     return true
   }
 
+  async reencryptWallets(data: WalletModel[]): Promise<boolean> {
+    await this.storage.set(this.key, data)
+    return true
+  }
+
   async updateWallet(public_key: string, data: WalletModel): Promise<boolean> {
     try {
       const wallets = await this.getWallets()

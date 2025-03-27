@@ -126,7 +126,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
 
           let token = tokens[i]
           emptyBalances.push({
-            owner: selectedWallet ? selectedWallet.public_key : "",
+            owner: selectedWallet ? selectedWallet : null,
             token: token,
             freeBalance: 0,
             reservedBalance: 0,
@@ -142,19 +142,28 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
       )
 
       sortedEmptyBalances.map((balance) => {
-        balanceServices.getBalance(
-          wsAPI,
-          balance.token,
-          balance.owner,
-          (free, reserved) => {
-            updateBalances({
-              ...balance,
-              freeBalance: fixBalance(free, 12),
-              reservedBalance: fixBalance(reserved, 12),
-              is_frozen: false
-            })
-          }
-        )
+        if (balance.owner !== null) {
+          balanceServices.getBalance(
+            wsAPI,
+            balance.token,
+            balance.owner.public_key,
+            (free, reserved) => {
+              updateBalances({
+                ...balance,
+                freeBalance: fixBalance(free, 12),
+                reservedBalance: fixBalance(reserved, 12),
+                is_frozen: false
+              })
+            }
+          )
+        } else {
+          updateBalances({
+            ...balance,
+            freeBalance: fixBalance("0", 12),
+            reservedBalance: fixBalance("0", 12),
+            is_frozen: false
+          })
+        }
       })
     } catch (error) {
       console.error("Error fetching balances:", error)
@@ -239,33 +248,28 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                       <CommandList>
                         <CommandEmpty>{t("No results found.")}</CommandEmpty>
                         <CommandGroup>
-                          {wallets
-                            .filter(
-                              (wallet) =>
-                                wallet.address_type === (network ? network.name : "")
-                            )
-                            .map((wallet) => (
-                              <CommandItem
-                                key={wallet.id}
-                                value={wallet.name}
-                                onSelect={() => {
-                                  setSelectedWallet(wallet)
-                                  setOpenWallets(false)
-                                }}
-                                className="cursor-pointer hover:bg-accent">
-                                {wallet ? (
-                                  <>
-                                    {wallet.name} &nbsp;
-                                    {"("}
-                                    {wallet.public_key.slice(0, 6)}...
-                                    {wallet.public_key.slice(-6)}
-                                    {")"}
-                                  </>
-                                ) : (
-                                  t("Select address")
-                                )}
-                              </CommandItem>
-                            ))}
+                          {wallets.map((wallet) => (
+                            <CommandItem
+                              key={wallet.id}
+                              value={wallet.name}
+                              onSelect={() => {
+                                setSelectedWallet(wallet)
+                                setOpenWallets(false)
+                              }}
+                              className="cursor-pointer hover:bg-accent">
+                              {wallet ? (
+                                <>
+                                  {wallet.name} &nbsp;
+                                  {"("}
+                                  {wallet.public_key.slice(0, 6)}...
+                                  {wallet.public_key.slice(-6)}
+                                  {")"}
+                                </>
+                              ) : (
+                                t("Select address")
+                              )}
+                            </CommandItem>
+                          ))}
                         </CommandGroup>
                       </CommandList>
                     </Command>

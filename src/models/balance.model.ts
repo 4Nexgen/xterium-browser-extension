@@ -1,13 +1,8 @@
+import type { WalletModel } from "./wallet.model"
 import type { TokenModel } from "./token.model"
 
-export class SubstrateFeeModel {
-  feeClass: string;
-  weight: string;
-  partialFee: string;
-}
-
 export class BalanceModel {
-  owner: string
+  owner: WalletModel | null
   token: TokenModel
   freeBalance: number
   reservedBalance: number

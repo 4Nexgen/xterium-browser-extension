@@ -139,7 +139,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
     onSetIsLogout()
   }
 
-  const callbackUpdates = () => {
+  const handleCallbackDataUpdates = () => {
     setIsChangePasswordDrawerOpen(false)
     setIsChangeLanguageDrawerOpen(false)
   }
@@ -339,7 +339,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
           <DrawerHeader>
             <DrawerTitle>{t("CHANGE PASSWORD")}</DrawerTitle>
           </DrawerHeader>
-          <IndexChangePassword handleCallbacks={callbackUpdates} />
+          <IndexChangePassword handleCallbackDataUpdates={handleCallbackDataUpdates} />
         </DrawerContent>
       </Drawer>
 

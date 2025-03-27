@@ -97,7 +97,7 @@ const IndexTransferDetails = ({
       return
     }
 
-    if (transferTo.trim() === balanceData.owner) {
+    if (transferTo.trim() === balanceData.owner.public_key) {
       toast({
         description: (
           <div className="flex items-center">
@@ -119,7 +119,7 @@ const IndexTransferDetails = ({
     const estimatedFee = await balanceServices.getEstimateTransferFee(
       wsAPI,
       balanceData.token,
-      owner,
+      owner.public_key,
       recipient,
       amount
     )
@@ -151,12 +151,9 @@ const IndexTransferDetails = ({
       setIsConfirmTransferInProgress(true)
       setConfirmTransferLabel(t("TRANSFER IN-PROGRESS..."))
 
-      const wallets = await walletService.getWallets()
-      const walletOwner = wallets.filter((d) => d.public_key === balanceData.owner)[0]
-
       const decryptedMnemonicPhrase = encryptionService.decrypt(
         userPassword,
-        walletOwner.mnemonic_phrase
+        balanceData.owner.mnemonic_phrase
       )
       const keyring = new Keyring({ type: "sr25519" })
       const signature = keyring.addFromUri(decryptedMnemonicPhrase)
@@ -228,7 +225,7 @@ const IndexTransferDetails = ({
             <Label className="pb-2 flex items-center">
               {t("Owner")}:
               <span className="p-2 font-extrabold text-input-primary truncate max-w-full">
-                {balanceData.owner || "N/A"}
+                {balanceData.owner.public_key || "N/A"}
               </span>
             </Label>
             <Label className="pb-2">

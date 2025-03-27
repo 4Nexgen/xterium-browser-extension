@@ -2,15 +2,25 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
+import type { WalletModel } from "@/models/wallet.model"
+import { EncryptionService } from "@/services/encryption.service"
 import { UserService } from "@/services/user.service"
+import { WalletService } from "@/services/wallet.service"
 import { Check, Eye, EyeOff } from "lucide-react"
-import React, { useState } from "react"
+import React, { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
-const IndexChangePassword = ({ handleCallbacks }) => {
+interface IndexChangePasswordProps {
+  handleCallbackDataUpdates: () => void
+}
+
+const IndexChangePassword = ({ handleCallbackDataUpdates }: IndexChangePasswordProps) => {
   const { t } = useTranslation()
-  const userService = new UserService()
+
+  const userService = useMemo(() => new UserService(), [])
+  const walletService = useMemo(() => new WalletService(), [])
+  const encryptionService = useMemo(() => new EncryptionService(), [])
 
   const [oldPassword, setOldPassword] = useState<string>("")
   const [newPassword, setNewPassword] = useState<string>("")
@@ -20,6 +30,7 @@ const IndexChangePassword = ({ handleCallbacks }) => {
   const [showNewPassword, setShowNewPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
 
+  const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
 
   const { toast } = useToast()
@@ -51,50 +62,70 @@ const IndexChangePassword = ({ handleCallbacks }) => {
       path: ["confirmPassword"]
     })
 
-  const changePassword = () => {
+  const changePassword = async () => {
+    setIsProcessing(true)
+
     try {
       FormSchema.parse({ password: newPassword, confirmPassword })
     } catch (err) {
       if (err instanceof z.ZodError) {
         setError(err.errors[0].message)
+        setIsProcessing(false)
         return
       }
     }
 
     if (!oldPassword || !newPassword || !confirmPassword) {
       setError(t("All fields are required."))
+      setIsProcessing(false)
       return
     }
 
-    userService
-      .getPassword(oldPassword)
-      .then((existingPassword) => {
-        if (existingPassword != null) {
-          if (existingPassword !== oldPassword) {
-            setError(t("Old password is incorrect."))
-          } else {
-            userService.updatePassword(newPassword).then((isUpdated) => {
-              if (isUpdated == true) {
-                toast({
-                  description: (
-                    <div className="flex items-center">
-                      <Check className="mr-2 text-green-500" />
-                      {t("Password Changed Successful!")}
-                    </div>
-                  ),
-                  variant: "default"
-                })
+    const isLogin = await userService.login(oldPassword)
+    if (isLogin) {
+      const newEcryptedWallets: WalletModel[] = []
+      const wallets = await walletService.getWallets()
 
-                setError(null)
-                handleCallbacks()
-              }
-            })
-          }
+      if (wallets.length > 0) {
+        wallets.map((wallet) => {
+          let mnemonicPhrase = encryptionService.decrypt(
+            oldPassword,
+            wallet.mnemonic_phrase
+          )
+          let secretKey = encryptionService.decrypt(oldPassword, wallet.secret_key)
+
+          newEcryptedWallets.push({
+            ...wallet,
+            mnemonic_phrase: encryptionService.encrypt(newPassword, mnemonicPhrase),
+            secret_key: encryptionService.encrypt(newPassword, secretKey)
+          })
+        })
+      }
+
+      const updatePassword = await userService.updatePassword(newPassword)
+      if (updatePassword) {
+        const reencryptWallets = await walletService.reencryptWallets(newEcryptedWallets)
+        if (reencryptWallets) {
+          toast({
+            description: (
+              <div className="flex items-center">
+                <Check className="mr-2 text-green-500" />
+                {t("Password Changed Successful!")}
+              </div>
+            ),
+            variant: "default"
+          })
+
+          setError(null)
+          setIsProcessing(false)
+
+          handleCallbackDataUpdates()
         }
-      })
-      .catch((error) => {
-        setError(error)
-      })
+      }
+    } else {
+      setError(t("Old password is incorrect."))
+      setIsProcessing(false)
+    }
   }
 
   return (
@@ -153,7 +184,11 @@ const IndexChangePassword = ({ handleCallbacks }) => {
         </div>
         {error && <div className="text-red-500 mb-4">{error}</div>}
         <div className="mt-3 mb-3">
-          <Button type="button" variant="jelly" onClick={changePassword}>
+          <Button
+            type="button"
+            variant="jelly"
+            onClick={changePassword}
+            disabled={isProcessing}>
             {t("CONFIRM")}
           </Button>
         </div>

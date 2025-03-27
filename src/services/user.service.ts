@@ -63,13 +63,13 @@ export class UserService {
     return ""
   }
 
-  async updatePassword(password: string): Promise<boolean | any> {
+  async updatePassword(password: string): Promise<boolean> {
     const inputHashedPassword = this.hashService.hash(password)
     await this.storage.setItem(this.storageKey, inputHashedPassword)
     return true
   }
 
-  async removePassword(): Promise<boolean | any> {
+  async removePassword(): Promise<boolean> {
     await this.storage.removeItem(this.storageKey)
     return true
   }
