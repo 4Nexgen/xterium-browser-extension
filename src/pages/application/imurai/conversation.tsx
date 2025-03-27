@@ -7,12 +7,15 @@ export default function Conversation() {
   const storage = new Storage()
   const [conversation, setConversation] = useState<Message[]>([])
 
-  useEffect(async () => {
-    const data = await storage.get("conversation") // "value"
-    console.log("test", data)
-    if (typeof data !== undefined) {
-      setConversation(data)
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await storage.get("conversation") // "value"
+      console.log("test", data)
+      if (typeof data !== undefined) {
+        setConversation(data as unknown as Message[])
+      }
     }
+    fetchData()
   }, [])
 
   return (
