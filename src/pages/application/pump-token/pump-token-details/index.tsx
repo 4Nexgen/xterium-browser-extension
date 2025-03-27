@@ -1,10 +1,14 @@
 import { ChainAssetFiles } from "@/data/chains/chain-asset-files"
+import type { NetworkModel } from "@/models/network.model"
 import type { TokenModel } from "@/models/token.model"
+import type { ApiPromise } from "@polkadot/api"
 import Image from "next/image"
 import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 interface IndexPumpTokenDetailsPops {
+  currentNetwork: NetworkModel | null
+  currentWsAPI: ApiPromise | null
   currentPumpToken: TokenModel | null
 }
 

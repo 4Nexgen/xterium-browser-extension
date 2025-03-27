@@ -1,10 +1,18 @@
 export abstract class ChainAssetFiles {
+    private static readonly networkMap: Record<string, () => Promise<{ TokenAssetFiles: new () => ChainAssetFiles }>> = {
+        "Xode": () => import("./xode/token-asset-files.data"),
+        "Polkadot - Asset Hub": () => import("./polkadot-asset-hub/token-asset-files.data"),
+        "Kusama - Asset Hub": () => import("./kusama-asset-hub/token-asset-files.data"),
+    };
+
     static async load(network: string): Promise<ChainAssetFiles> {
-        if (network === "Xode") {
-            const { TokenAssetFiles } = await import("./xode/token-asset-files.data");
-            return new TokenAssetFiles();
+        const importer = this.networkMap[network];
+        if (!importer) {
+            throw new Error(`Unsupported network: ${network}`);
         }
-        throw new Error(`Unsupported network: ${network}`);
+
+        const { TokenAssetFiles } = await importer();
+        return new TokenAssetFiles();
     }
 
     abstract getTokenLogo(symbol: string): string;

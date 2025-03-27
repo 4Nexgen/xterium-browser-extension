@@ -2,19 +2,19 @@ import { ChainAssetFiles } from "../chain-asset-files";
 
 import DefaultLogo from "data-base64:/assets/tokens/default.png";
 
-import AZKLogo from "data-base64:/assets/tokens/azk.png";
-import IXAVLogo from "data-base64:/assets/tokens/ixav.png";
-import IXONLogo from "data-base64:/assets/tokens/ixon.png";
-import XAVLogo from "data-base64:/assets/tokens/xav.png";
-import XGMLogo from "data-base64:/assets/tokens/xgm.png";
-import XONLogo from "data-base64:/assets/tokens/xon.png";
-import IDONLogo from "data-base64:/assets/tokens/idon.png";
-import MPCLogo from "data-base64:/assets/tokens/mpc.png";
-import IMPCLogo from "data-base64:/assets/tokens/impc.png";
-import DONLogo from "data-base64:/assets/tokens/don.png";
+import AZKLogo from "data-base64:/assets/tokens/xode/azk.png";
+import IXAVLogo from "data-base64:/assets/tokens/xode/ixav.png";
+import IXONLogo from "data-base64:/assets/tokens/xode/ixon.png";
+import XAVLogo from "data-base64:/assets/tokens/xode/xav.png";
+import XGMLogo from "data-base64:/assets/tokens/xode/xgm.png";
+import XONLogo from "data-base64:/assets/tokens/xode/xon.png";
+import IDONLogo from "data-base64:/assets/tokens/xode/idon.png";
+import MPCLogo from "data-base64:/assets/tokens/xode/mpc.png";
+import IMPCLogo from "data-base64:/assets/tokens/xode/impc.png";
+import DONLogo from "data-base64:/assets/tokens/xode/don.png";
 
-import MPCCover from "data-base64:/assets/tokens/covers/mpc-cover.png";
-import AZKCover from "data-base64:/assets/tokens/covers/azk-cover.png";
+import MPCCover from "data-base64:/assets/tokens/xode/covers/mpc-cover.png";
+import AZKCover from "data-base64:/assets/tokens/xode/covers/azk-cover.png";
 
 export class TokenAssetFiles extends ChainAssetFiles {
   getTokenLogo(imageName: string): string {

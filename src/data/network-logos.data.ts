@@ -1,7 +1,7 @@
 import DefaultLogo from "data-base64:/assets/tokens/default.png"
 
-import Polkadot from "data-base64:/assets/networks/polkadot.svg"
-import Kusama from "data-base64:/assets/networks/kusama.svg"
+import Polkadot from "data-base64:/assets/networks/polkadot.png"
+import Kusama from "data-base64:/assets/networks/kusama.png"
 import Xode from "data-base64:/assets/networks/xode.png"
 
 export class NetworkLogos {

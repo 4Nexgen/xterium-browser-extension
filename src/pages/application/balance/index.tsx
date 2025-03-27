@@ -168,7 +168,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
   }, [selectedWallet])
 
   const getTokenLogos = async (tokens: TokenModel[]) => {
-    const tokenAssetFiles = await ChainAssetFiles.load("Xode")
+    const tokenAssetFiles = await ChainAssetFiles.load(network.name)
     const newImageMap: { [key: string]: string } = {}
 
     if (tokens.length > 0) {
@@ -333,14 +333,14 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                               <TableCell>
                                 <div className="mb-[2px]">
                                   <span className="text-lg font-bold">
-                                    {balance.token.symbol.length > 20
-                                      ? balance.token.symbol.substring(0, 20) + "..."
+                                    {balance.token.symbol.length > 10
+                                      ? balance.token.symbol.substring(0, 10) + "..."
                                       : balance.token.symbol}
                                   </span>
                                 </div>
                                 <Badge>
-                                  {balance.token.name.length > 20
-                                    ? balance.token.name.substring(0, 20) + "..."
+                                  {balance.token.name.length > 10
+                                    ? balance.token.name.substring(0, 10) + "..."
                                     : balance.token.name}
                                 </Badge>
                               </TableCell>

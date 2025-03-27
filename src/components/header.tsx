@@ -112,7 +112,7 @@ const Header = ({
           </Breadcrumb>
         </>
       )}
-      <div className="w-[160px] min-w-[160px]">
+      <div className="w-[200px] min-w-[200px]">
         <Popover open={openNetworks} onOpenChange={setOpenNetworks}>
           <PopoverTrigger asChild>
             <Button

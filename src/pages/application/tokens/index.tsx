@@ -95,7 +95,7 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
   }, [wsAPI])
 
   const getTokenLogos = async (tokens: TokenModel[]) => {
-    const tokenAssetFiles = await ChainAssetFiles.load("Xode")
+    const tokenAssetFiles = await ChainAssetFiles.load(network.name)
     const newImageMap: { [key: string]: string } = {}
 
     if (tokens.length > 0) {

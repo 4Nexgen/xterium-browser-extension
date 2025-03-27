@@ -77,7 +77,7 @@ const IndexPumpToken = ({ currentNetwork, currentWsAPI }: IndexPumpTokenProps) =
   }, [wsAPI])
 
   const getPumpTokenLogos = async (tokens: TokenModel[]) => {
-    const tokenAssetFiles = await ChainAssetFiles.load("Xode")
+    const tokenAssetFiles = await ChainAssetFiles.load(network.name)
     const newImageMap: { [key: string]: string } = {}
 
     if (tokens.length > 0) {
@@ -173,15 +173,15 @@ const IndexPumpToken = ({ currentNetwork, currentWsAPI }: IndexPumpTokenProps) =
                 </Popover>
               </div>
 
-              <div className="flex grid grid-cols-2 sm:grid-cols-2 gap-4">
-                {pumpTokens.length > 0 ? (
-                  pumpTokens
-                    .filter(
-                      (pumpToken) =>
-                        searchQuery === "" ||
-                        pumpToken.name.toLowerCase().startsWith(searchQuery.toLowerCase())
-                    )
-                    .map((pumpToken) => (
+              {pumpTokens.length > 0 ? (
+                pumpTokens
+                  .filter(
+                    (pumpToken) =>
+                      searchQuery === "" ||
+                      pumpToken.name.toLowerCase().startsWith(searchQuery.toLowerCase())
+                  )
+                  .map((pumpToken) => (
+                    <div className="flex grid grid-cols-2 sm:grid-cols-2 gap-4">
                       <div
                         key={pumpToken.id}
                         className="flex flex-col items-start justify-between border-2 border-primary dark:border-border dark:bg-muted/50 rounded-xl h-full hover:cursor-pointer"
@@ -214,14 +214,14 @@ const IndexPumpToken = ({ currentNetwork, currentWsAPI }: IndexPumpTokenProps) =
                           {truncateText(pumpToken.description, 50)}
                         </p>
                       </div>
-                    ))
-                ) : (
-                  <div className="flex flex-col w-full items-center justify-center py-[100px] space-y-2">
-                    <Coins className="size-20" />
-                    <h4 className="font-bold text-lg">{t("Empty")}</h4>
-                  </div>
-                )}
-              </div>
+                    </div>
+                  ))
+              ) : (
+                <div className="flex flex-col w-full items-center justify-center py-[100px] space-y-2">
+                  <Coins className="size-20" />
+                  <h4 className="font-bold text-lg">{t("Empty")}</h4>
+                </div>
+              )}
             </>
           )}
         </div>
@@ -239,7 +239,11 @@ const IndexPumpToken = ({ currentNetwork, currentWsAPI }: IndexPumpTokenProps) =
             </DrawerTitle>
           </DrawerHeader>
           {selectedPumpToken ? (
-            <IndexPumpTokenDetails currentPumpToken={selectedPumpToken} />
+            <IndexPumpTokenDetails
+              currentNetwork={network}
+              currentWsAPI={wsAPI}
+              currentPumpToken={selectedPumpToken}
+            />
           ) : (
             <p>{t("Loading...")}</p>
           )}

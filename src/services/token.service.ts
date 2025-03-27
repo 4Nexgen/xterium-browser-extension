@@ -85,35 +85,46 @@ export class TokenService {
 
             let pumpToken: TokenModel = null;
             if (pumpTokens.length > 0) {
-              pumpToken = pumpTokens.filter(d => d.token_id === assetId)[0]
+              pumpToken = pumpTokens.filter(d => d.network === network.name && d.token_id === assetId)[0]
             }
 
             if (metadata !== undefined) {
-              const assetProps = asset[1].toHuman()
-              tokens.push({
-                id: assetId,
-                type: pumpToken ? pumpToken.type : "Asset",
-                network: network.name,
-                token_id: assetId,
-                symbol: metadata.symbol,
-                name: metadata.name,
-                description: pumpToken ? pumpToken.description : metadata.name,
-                decimals: metadata.decimals,
-                price: 0,
-                owner: assetProps["owner"],
-                issuer: assetProps["issuer"],
-                admin: assetProps["admin"],
-                freezer: assetProps["freezer"],
-                supply: parseInt(assetProps["supply"]),
-                deposit: parseInt(assetProps["deposit"]),
-                minBalance: parseInt(assetProps["minBalance"]),
-                isSufficient: assetProps["isSufficient"],
-                accounts: parseInt(assetProps["accounts"]),
-                sufficients: parseInt(assetProps["sufficients"]),
-                approvals: parseInt(assetProps["approvals"]),
-                status: assetProps["status"],
-                created_at: pumpToken ? pumpToken.created_at : ""
-              })
+
+              // Special Case - Need more modification on this line
+              if (network.name === "Polkadot - Asset Hub") {
+                if (metadata.symbol !== "DOT" && metadata.symbol !== "MPC") {
+                  return
+                }
+              }
+
+              if (nativeTokenSymbol !== metadata.symbol) {
+                const assetProps = asset[1].toHuman()
+                tokens.push({
+                  id: assetId,
+                  type: pumpToken ? pumpToken.type : "Asset",
+                  network: network.name,
+                  token_id: assetId,
+                  symbol: metadata.symbol,
+                  name: metadata.name,
+                  description: pumpToken ? pumpToken.description : metadata.name,
+                  decimals: metadata.decimals,
+                  price: 0,
+                  owner: assetProps["owner"],
+                  issuer: assetProps["issuer"],
+                  admin: assetProps["admin"],
+                  freezer: assetProps["freezer"],
+                  supply: parseInt(assetProps["supply"]),
+                  deposit: parseInt(assetProps["deposit"]),
+                  minBalance: parseInt(assetProps["minBalance"]),
+                  isSufficient: assetProps["isSufficient"],
+                  accounts: parseInt(assetProps["accounts"]),
+                  sufficients: parseInt(assetProps["sufficients"]),
+                  approvals: parseInt(assetProps["approvals"]),
+                  status: assetProps["status"],
+                  created_at: pumpToken ? pumpToken.created_at : ""
+                })
+              }
+
             }
           })
         }
@@ -183,7 +194,7 @@ export class TokenService {
             if (metadata !== undefined) {
               let pumpToken: TokenModel = null;
               if (pumpTokens.length > 0) {
-                pumpToken = pumpTokens.filter(d => d.token_id === token_id)[0]
+                pumpToken = pumpTokens.filter(d => d.network === network.name && d.token_id === token_id)[0]
               }
 
               const assetProps = asset.toHuman()
