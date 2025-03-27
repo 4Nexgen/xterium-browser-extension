@@ -2,12 +2,9 @@
 
 import Header from "@/components/header"
 import { Toaster } from "@/components/ui/toaster"
-import { UserService } from "@/services/user.service"
 import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
 
-const OutsideLayout = ({ children, headerVariant }) => {
-  const userService = new UserService()
-
+const Layout = ({ children, headerVariant }) => {
   return (
     <>
       <main>
@@ -33,4 +30,4 @@ const OutsideLayout = ({ children, headerVariant }) => {
   )
 }
 
-export default OutsideLayout
+export default Layout

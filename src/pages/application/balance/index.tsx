@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import { ChainAssetFiles } from "@/data/chains/chain-asset-files"
+import { useToast } from "@/hooks/use-toast"
 import { BalanceModel } from "@/models/balance.model"
 import { NetworkModel } from "@/models/network.model"
 import type { TokenModel } from "@/models/token.model"
@@ -22,7 +23,7 @@ import { BalanceServices } from "@/services/balance.service"
 import { TokenService } from "@/services/token.service"
 import { WalletService } from "@/services/wallet.service"
 import { ApiPromise } from "@polkadot/api"
-import { Coins, LoaderCircle } from "lucide-react"
+import { Coins, DollarSign, LoaderCircle, X } from "lucide-react"
 import Image from "next/image"
 import React, { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -36,6 +37,8 @@ interface IndexBalanceProps {
 
 const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
   const { t } = useTranslation()
+
+  const { toast } = useToast()
 
   const walletService = useMemo(() => new WalletService(), [])
   const balanceServices = useMemo(() => new BalanceServices(), [])
@@ -115,8 +118,6 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
       let emptyBalances: BalanceModel[] = []
 
       if (tokens.length > 0) {
-        const uniqueTokens = new Set()
-
         for (let i = 0; i < tokens.length; i++) {
           setLoadingPerToken((prevLoadingPerToken) => ({
             ...prevLoadingPerToken,
@@ -124,44 +125,37 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
           }))
 
           let token = tokens[i]
-
-          if (!uniqueTokens.has(token.symbol)) {
-            uniqueTokens.add(token.symbol)
-
-            emptyBalances.push({
-              owner: selectedWallet.public_key,
-              token: token,
-              freeBalance: 0,
-              reservedBalance: 0,
-              is_frozen: false
-            })
-          }
+          emptyBalances.push({
+            owner: selectedWallet ? selectedWallet.public_key : "",
+            token: token,
+            freeBalance: 0,
+            reservedBalance: 0,
+            is_frozen: false
+          })
         }
       }
 
       setBalances(emptyBalances)
 
-      if (selectedWallet) {
-        const sortedEmptyBalances = [...emptyBalances].sort(
-          (a, b) => a.token.id - b.token.id
-        )
+      const sortedEmptyBalances = [...emptyBalances].sort(
+        (a, b) => a.token.id - b.token.id
+      )
 
-        sortedEmptyBalances.map((balance) => {
-          balanceServices.getBalance(
-            wsAPI,
-            balance.token,
-            balance.owner,
-            (free, reserved) => {
-              updateBalances({
-                ...balance,
-                freeBalance: fixBalance(free, 12),
-                reservedBalance: fixBalance(reserved, 12),
-                is_frozen: false
-              })
-            }
-          )
-        })
-      }
+      sortedEmptyBalances.map((balance) => {
+        balanceServices.getBalance(
+          wsAPI,
+          balance.token,
+          balance.owner,
+          (free, reserved) => {
+            updateBalances({
+              ...balance,
+              freeBalance: fixBalance(free, 12),
+              reservedBalance: fixBalance(reserved, 12),
+              is_frozen: false
+            })
+          }
+        )
+      })
     } catch (error) {
       console.error("Error fetching balances:", error)
     }
@@ -279,9 +273,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                 </Popover>
               </div>
 
-              {balances?.filter(
-                (item) => item.token.network == (network != null ? network.name : "")
-              )?.length ? (
+              {balances.length > 0 ? (
                 <>
                   <Card className="mb-3">
                     <Table>
@@ -302,8 +294,23 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                             <TableRow
                               key={balance.token.id}
                               onClick={() => {
-                                if (!loadingPerToken[balance.token.symbol]) {
+                                if (
+                                  !loadingPerToken[balance.token.symbol] &&
+                                  balance.freeBalance !== 0
+                                ) {
                                   selectBalance(balance)
+                                }
+
+                                if (balance.freeBalance === 0) {
+                                  toast({
+                                    description: (
+                                      <div className="flex items-center">
+                                        <X className="mr-2 text-white-500" />
+                                        {t("Zero balance")}
+                                      </div>
+                                    ),
+                                    variant: "destructive"
+                                  })
                                 }
                               }}
                               className={`cursor-pointer hover-bg-custom ${
@@ -390,11 +397,9 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                   </Card>
                 </>
               ) : (
-                <div className="flex flex-col gap-4 items-center py-[100px]">
-                  <Coins className="size-20" />
-                  <div className="text-center">
-                    <h4 className="font-bold text-lg">{t("No Token Found")}</h4>
-                  </div>
+                <div className="flex absolute justify-center items-center w-full py-[100px] gap-4 flex-col">
+                  <DollarSign className="size-20" />
+                  <h4 className="font-bold text-lg">{t("Empty")}</h4>
                 </div>
               )}
             </>

@@ -10,25 +10,30 @@ import {
   FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { TokenData } from "@/data/chains/xode/token-asset-files.data"
 import { useToast } from "@/hooks/use-toast"
-import { TokenService } from "@/services/token.service"
 import { UserService } from "@/services/user.service"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeOff, X } from "lucide-react"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
-import OutsideLayout from "../outsideLayout"
+import Layout from "../layout"
 
-const IndexCreatePassword = ({ onSetCurrentPage }) => {
+interface IndexCreatePasswordProps {
+  handleSetCurrentPage?: (currentPage: string) => void
+}
+
+const IndexCreatePassword = ({ handleSetCurrentPage }: IndexCreatePasswordProps) => {
   const { t } = useTranslation()
-  const userService = new UserService()
+
+  const userService = useMemo(() => new UserService(), [])
+
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false)
   const [passwordStrength, setPasswordStrength] = useState<string>("")
+
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const { toast } = useToast()
@@ -83,8 +88,7 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
     try {
       const isValid = await userService.createPassword(data.password)
       if (isValid) {
-        await preloadTokens()
-        onSetCurrentPage("application")
+        handleSetCurrentPage("application")
       } else {
         toast({
           description: (
@@ -97,9 +101,8 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
         })
       }
     } catch (error) {
-      console.error("Error creating password:", error)
       toast({
-        description: t("An error occurred while creating the password."),
+        description: t("An error occurred while creating the password. "),
         variant: "destructive"
       })
     } finally {
@@ -107,38 +110,10 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
     }
   }
 
-  const preloadTokens = async () => {
-    const tokenService = new TokenService()
-    let tokenList = []
-
-    try {
-      const data = await tokenService.getTokens()
-      let preloadedTokenData = TokenData
-
-      for (let i = 0; i < preloadedTokenData.length; i++) {
-        let existingToken = data.find(
-          (d) => d.network_id === preloadedTokenData[i].network_id
-        )
-
-        if (existingToken) {
-          tokenList.push({ ...existingToken, preloaded: true })
-        } else {
-          await tokenService.createToken(preloadedTokenData[i])
-          tokenList.push({ ...preloadedTokenData[i], preloaded: true })
-        }
-      }
-
-      const updatedTokens = await tokenService.fetchAssetDetailsForTokens(tokenList)
-      console.log("Tokens preloaded and updated:", updatedTokens)
-    } catch (error) {
-      console.error("Error preloading tokens:", error)
-    }
-  }
-
   return (
     <>
       <div className="sm:bg-background-sheet sm:flex justify-center items-center">
-        <OutsideLayout headerVariant="outside">
+        <Layout headerVariant="outside">
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
@@ -171,9 +146,9 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
                       </div>
                     </FormControl>
 
-                    <div className="p-0 mt-0 text-[10px]">
+                    <div className="p-0 mt-0 text-[12px]">
                       {form.formState.errors.password ? (
-                        <FormMessage className="text-[#FD2400] text-[10px] mt-0" />
+                        <FormMessage className="text-[#FD2400] text-[12px] mt-0 mb-2" />
                       ) : (
                         <span>&nbsp;</span>
                       )}
@@ -193,12 +168,8 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
                       <div className="relative">
                         <Input
                           type={showConfirmPassword ? "text" : "password"}
-                          placeholder={t("Enter password")}
+                          placeholder={t("Enter confirm password")}
                           {...field}
-                          onChange={(e) => {
-                            field.onChange(e)
-                            checkPasswordStrength(e.target.value)
-                          }}
                         />
                         <button
                           type="button"
@@ -209,9 +180,9 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
                       </div>
                     </FormControl>
 
-                    <div className="p-0 mt-0 text-[10px]">
+                    <div className="p-0 mt-0 text-[12px]">
                       {form.formState.errors.confirmPassword ? (
-                        <FormMessage className="text-[#FD2400] text-[10px] mt-0 mb-0" />
+                        <FormMessage className="text-[#FD2400] text-[12px] mt-0 mb-0" />
                       ) : (
                         <span>&nbsp;</span>
                       )}
@@ -235,7 +206,7 @@ const IndexCreatePassword = ({ onSetCurrentPage }) => {
               </Button>
             </form>
           </Form>
-        </OutsideLayout>
+        </Layout>
       </div>
     </>
   )

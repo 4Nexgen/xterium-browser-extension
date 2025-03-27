@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
@@ -21,17 +22,36 @@ import "@polkadot/wasm-crypto/initOnlyAsm"
 
 import type { NetworkModel } from "@/models/network.model"
 import { EncryptionService } from "@/services/encryption.service"
-import { NetworkService } from "@/services/network.service"
 import { UserService } from "@/services/user.service"
+import type { ApiPromise } from "@polkadot/api"
 
-const IndexAddWallet = ({ handleCallbacks }) => {
+interface IndexAddWalletProps {
+  currentNetwork: NetworkModel | null
+  currentWsAPI: ApiPromise | null
+  handleCallbackDataUpdates: () => void
+}
+
+const IndexAddWallet = ({
+  currentNetwork,
+  currentWsAPI,
+  handleCallbackDataUpdates
+}: IndexAddWalletProps) => {
   const { t } = useTranslation()
-  const networkService = new NetworkService()
-  const userService = new UserService()
-  const walletService = new WalletService()
-  const [isLoading, setIsLoading] = useState(false)
+
   const { toast } = useToast()
-  const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
+
+  const walletService = new WalletService()
+  const userService = new UserService()
+  const encryptionService = new EncryptionService()
+
+  const [network, setNetwork] = useState<NetworkModel>(null)
+  const [wsAPI, setWsAPI] = useState<ApiPromise | null>(null)
+
+  const [isProcessing, setIsProcessing] = useState(false)
+
+  const [userPassword, setUserPassword] = useState<string>("")
+  const [isUserPasswordOpen, setIsUserPasswordOpen] = useState<boolean>(false)
+
   const [isNameDuplicate, setIsNameDuplicate] = useState(false)
   const [isMnemonicDuplicate, setIsMnemonicDuplicate] = useState(false)
   const [walletData, setWalletData] = useState<WalletModel>({
@@ -41,27 +61,24 @@ const IndexAddWallet = ({ handleCallbacks }) => {
     mnemonic_phrase: "",
     secret_key: "",
     public_key: "",
-    balances: [],
-    type: "Xode",
-    metaGenesisHash: "",
-    metaName: "",
-    metaSource: "",
-    tokenSymbol: ""
+    type: ""
   })
 
-  const getNetwork = () => {
-    networkService.getNetwork().then((data) => {
-      setSelectedNetwork(data)
-    })
-  }
+  useEffect(() => {
+    if (currentNetwork) {
+      setNetwork(currentNetwork)
+    }
+  }, [currentNetwork])
 
   useEffect(() => {
-    getNetwork()
-  }, [])
+    if (currentWsAPI) {
+      setWsAPI(currentWsAPI)
+    }
+  }, [currentWsAPI])
 
   const handleInputChange = async (field: keyof typeof walletData, value: string) => {
     if (field === "name") {
-      const isDuplicate = await checkForDuplicateName(value)
+      const isDuplicate = await checkDuplicateName(value)
       setIsNameDuplicate(isDuplicate)
 
       if (isDuplicate) {
@@ -76,8 +93,9 @@ const IndexAddWallet = ({ handleCallbacks }) => {
         })
       }
     }
-    if (field === "mnemonic_phrase") {
-      const isDuplicate = await checkForDuplicateMnemonic(value)
+
+    if (field === "public_key") {
+      const isDuplicate = await checkDuplicatePublicKey(value)
       setIsMnemonicDuplicate(isDuplicate)
 
       if (isDuplicate) {
@@ -85,9 +103,7 @@ const IndexAddWallet = ({ handleCallbacks }) => {
           description: (
             <div className="flex items-center">
               <X className="mr-2 text-red-500" />
-              {t(
-                "A wallet with this mnemonic phrase already exists. Please enter a unique mnemonic phrase."
-              )}
+              {t("A wallet with this key already exists.")}
             </div>
           ),
           variant: "destructive"
@@ -95,29 +111,22 @@ const IndexAddWallet = ({ handleCallbacks }) => {
         return
       }
     }
+
     setWalletData((prev) => ({
       ...prev,
       [field]: value
     }))
   }
 
-  const checkForDuplicateName = async (name: string): Promise<boolean> => {
+  const checkDuplicateName = async (name: string): Promise<boolean> => {
     const wallets = await walletService.getWallets()
-    return wallets.some((wallet) => wallet.name === name)
+    return wallets.some((d) => d.name === name)
   }
 
-  const checkForDuplicateMnemonic = async (mnemonic: string): Promise<boolean> => {
+  const checkDuplicatePublicKey = async (publicKey: string): Promise<boolean> => {
     const wallets = await walletService.getWallets()
-    const encryptionService = new EncryptionService()
-
-    const decryptedMnemonics = await Promise.all(
-      wallets.map(async (wallet) => {
-        const decryptedPassword = await userService.getWalletPassword()
-        return encryptionService.decrypt(decryptedPassword, wallet.mnemonic_phrase)
-      })
-    )
-
-    return decryptedMnemonics.some((decryptedMnemonic) => decryptedMnemonic === mnemonic)
+    const isSome = wallets.some((d) => d.public_key === publicKey)
+    return isSome
   }
 
   const generateMnemonic = () => {
@@ -153,24 +162,11 @@ const IndexAddWallet = ({ handleCallbacks }) => {
     inputMnemonic(mnemonicInput)
   }
 
-  const resetForm = () => {
-    setWalletData({
-      id: 0,
-      name: "",
-      address_type: "",
-      mnemonic_phrase: "",
-      secret_key: "",
-      public_key: "",
-      balances: [],
-      type: "",
-      metaGenesisHash: "",
-      metaName: "",
-      metaSource: "",
-      tokenSymbol: ""
-    })
+  const handlePasswordChange = async (value: string) => {
+    setUserPassword(value)
   }
 
-  const saveWallet = () => {
+  const saveWallet = async () => {
     if (isNameDuplicate) {
       toast({
         description: (
@@ -214,67 +210,62 @@ const IndexAddWallet = ({ handleCallbacks }) => {
         ),
         variant: "destructive"
       })
+
       return
     }
 
-    setIsLoading(true)
+    setIsUserPasswordOpen(true)
+  }
 
-    userService.getWalletPassword().then((decryptedPassword) => {
-      if (decryptedPassword) {
-        const encryptionService = new EncryptionService()
+  const confirmSave = async () => {
+    setIsProcessing(true)
 
-        const mnemonic_phrase = encryptionService.encrypt(
-          decryptedPassword,
-          walletData.mnemonic_phrase
-        )
-        const secret_key = encryptionService.encrypt(
-          decryptedPassword,
-          walletData.secret_key
-        )
+    const isLogin = await userService.login(userPassword)
+    if (isLogin) {
+      walletData.mnemonic_phrase = encryptionService.encrypt(
+        userPassword,
+        walletData.mnemonic_phrase
+      )
+      walletData.secret_key = encryptionService.encrypt(
+        userPassword,
+        walletData.secret_key
+      )
+      walletData.address_type = network ? network.name : ""
 
-        walletData.mnemonic_phrase = mnemonic_phrase
-        walletData.secret_key = secret_key
-        walletData.address_type = selectedNetwork ? selectedNetwork.name : ""
-
-        walletService.createWallet(walletData).then((result) => {
-          if (result != null) {
-            toast({
-              description: (
-                <div className="flex items-center">
-                  <Check className="mr-2 text-green-500" />
-                  {t("Wallet Saved Successfully!")}
-                </div>
-              ),
-              variant: "default"
-            })
-
-            setTimeout(() => {
-              setIsLoading(false)
-              resetForm()
-              handleCallbacks()
-            }, 1500)
-          } else {
-            setIsLoading(false)
-          }
+      const createWallet = await walletService.createWallet(walletData)
+      if (createWallet) {
+        toast({
+          description: (
+            <div className="flex items-center">
+              <Check className="mr-2 text-green-500" />
+              {t("Wallet Saved Successfully!")}
+            </div>
+          ),
+          variant: "default"
         })
-      } else {
-        setIsLoading(false)
+
+        setIsUserPasswordOpen(false)
+        setIsProcessing(false)
+
+        handleCallbackDataUpdates()
       }
-    })
+    } else {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-white-500" />
+            {t("Incorrect password!")}
+          </div>
+        ),
+        variant: "destructive"
+      })
+
+      setIsProcessing(false)
+    }
   }
 
   return (
     <>
-      {isLoading && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-            <div className="flex flex-col items-center">
-              <div className="animate-spin border-4 border-blue-400 border-t-transparent rounded-full w-16 h-16 mb-4"></div>
-              <p className="text-white text-lg font-semibold">{t("Adding wallet...")}</p>
-            </div>
-          </div>
-        </div>
-      )}
       <div className="p-6">
         <div className="mb-3">
           <Label>{t("Enter a unique wallet name")}:</Label>
@@ -346,6 +337,40 @@ const IndexAddWallet = ({ handleCallbacks }) => {
           </Button>
         </div>
       </div>
+
+      <Drawer open={isUserPasswordOpen} onOpenChange={setIsUserPasswordOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
+              {t("ENTER YOUR PASSWORD")}
+            </DrawerTitle>
+          </DrawerHeader>
+          <div className="p-6">
+            <div className="mb-3">
+              <Input
+                type="password"
+                placeholder={t("Type your password")}
+                value={userPassword}
+                onChange={(e) => handlePasswordChange(e.target.value)}
+              />
+            </div>
+            <div className="mb-3">
+              <p className="font-inter text-[11px] p-0 font-base text-justify text-white opacity-50">
+                {t("To confirm your transactions, please enter your password.")}
+              </p>
+            </div>
+            <div className="mt-5 mb-3">
+              <Button
+                type="button"
+                variant="jelly"
+                onClick={confirmSave}
+                disabled={userPassword === "" || isProcessing}>
+                {t("CONFIRM")}
+              </Button>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </>
   )
 }

@@ -87,7 +87,11 @@ const IndexApplication = () => {
                   />
                 )}
                 {currentPage === t("Wallets") && (
-                  <IndexWallets handleSetCurrentPage={handleSetCurrentPage} />
+                  <IndexWallets
+                    currentNetwork={currentNetwork}
+                    currentWsAPI={currentWsAPI}
+                    handleSetCurrentPage={handleSetCurrentPage}
+                  />
                 )}
                 {currentPage === t("Support") && <IndexImUrAi />}
                 {currentPage === t("Pump") && (

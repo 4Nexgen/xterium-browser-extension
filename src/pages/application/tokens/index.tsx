@@ -297,15 +297,19 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
               </Card>
             </>
           ) : (
-            <div className="flex flex-col gap-4 items-center py-[100px]">
+            <div className="flex absolute justify-center items-center w-full py-[100px] gap-4 flex-col">
               <Coins className="size-20" />
-              <div className="text-center">
-                <h4 className="font-bold text-lg">{t("No Token Found")}</h4>
-                <p className="opacity-50">
-                  {/* {t("Add new token by clicking the button below.")} */}
-                </p>
-              </div>
+              <h4 className="font-bold text-lg">{t("Empty")}</h4>
             </div>
+            // <div className="flex flex-col gap-4 items-center py-[100px]">
+            //   <Coins className="size-20" />
+            //   <div className="text-center">
+            //     <h4 className="font-bold text-lg">{t("Empty")}</h4>
+            //     <p className="opacity-50">
+            //       {t("Add new token by clicking the button below.")}
+            //     </p>
+            //   </div>
+            // </div>
           )}
         </div>
 

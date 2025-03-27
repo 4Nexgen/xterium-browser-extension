@@ -11,23 +11,39 @@ import {
 import { useToast } from "@/hooks/use-toast"
 import type { NetworkModel } from "@/models/network.model"
 import type { WalletModel } from "@/models/wallet.model"
-import { NetworkService } from "@/services/network.service"
 import { WalletService } from "@/services/wallet.service"
-import { Check, Copy, Download, Trash, Wallet } from "lucide-react"
-import React, { useEffect, useState } from "react"
+import type { ApiPromise } from "@polkadot/api"
+import { Check, Copy, Download, LoaderCircle, Trash, Wallet } from "lucide-react"
+import React, { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import IndexAddWallet from "./addWallet.tsx"
 import IndexDeleteWallet from "./deleteWallet"
 import IndexExportWallet from "./exportWallet"
 
-const IndexWallet = ({ handleSetCurrentPage }) => {
-  const { t } = useTranslation()
-  const networkService = new NetworkService()
-  const walletService = new WalletService()
+interface IndexWalletProps {
+  currentNetwork: NetworkModel | null
+  currentWsAPI: ApiPromise | null
+  handleSetCurrentPage: (currentPage: string) => void
+}
 
-  const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
+const IndexWallet = ({
+  currentNetwork,
+  currentWsAPI,
+  handleSetCurrentPage
+}: IndexWalletProps) => {
+  const { t } = useTranslation()
+
+  const { toast } = useToast()
+
+  const walletService = useMemo(() => new WalletService(), [])
+
+  const [network, setNetwork] = useState<NetworkModel>(null)
+  const [wsAPI, setWsAPI] = useState<ApiPromise | null>(null)
+
   const [wallets, setWallets] = useState<WalletModel[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+
   const [selectedWallet, setSelectedWallet] = useState<WalletModel>({
     id: 0,
     name: "",
@@ -35,43 +51,39 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
     mnemonic_phrase: "",
     secret_key: "",
     public_key: "",
-    balances: [],
-    type: "Xode",
-    metaGenesisHash: "",
-    metaName: "",
-    metaSource: "",
-    tokenSymbol: ""
+    type: ""
   })
+
   const [isAddWalletDrawerOpen, setIsAddWalletDrawerOpen] = useState(false)
   const [isExportWalletDrawerOpen, setIsExportWalletDrawerOpen] = useState(false)
   const [isDeleteWalletDrawerOpen, setIsDeleteWalletDrawerOpen] = useState(false)
   const [isImportWalletPageOpen, setIsImportWalletPageOpen] = useState(false)
 
-  const { toast } = useToast()
+  useEffect(() => {
+    setLoading(true)
 
-  const getNetwork = () => {
-    networkService.getNetwork().then((data) => {
-      setSelectedNetwork(data)
-    })
-  }
+    if (currentNetwork) {
+      setNetwork(currentNetwork)
+    }
+  }, [currentNetwork])
 
-  const getWallets = () => {
-    walletService.getWallets().then((data) => {
-      setWallets(data)
-    })
+  useEffect(() => {
+    if (currentWsAPI) {
+      setWsAPI(currentWsAPI)
+    }
+  }, [currentWsAPI])
+
+  const getWallets = async () => {
+    const wallets = await walletService.getWallets()
+    setWallets(wallets)
+    setLoading(false)
   }
 
   useEffect(() => {
-    getNetwork()
-
-    setTimeout(() => {
+    if (wsAPI !== null) {
       getWallets()
-
-      if (window.location.hash === "#import") {
-        setIsImportWalletPageOpen(true)
-      }
-    }, 100)
-  }, [])
+    }
+  }, [wsAPI])
 
   const addWallet = () => {
     setIsAddWalletDrawerOpen(true)
@@ -79,12 +91,14 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
 
   const expandView = () => {
     setIsImportWalletPageOpen(true)
+
     const extensionId = chrome.runtime.id
     const url = `chrome-extension://${extensionId}/popup.html#import`
 
     if (window.location.href !== url) {
       window.open(url, "_blank")
     }
+
     handleCallbacks("import-wallet")
   }
 
@@ -97,26 +111,17 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
     }
   }
 
-  const copyWallet = (value: string) => {
-    navigator.clipboard
-      .writeText(value)
-      .then(() => {
-        toast({
-          description: (
-            <div className="flex items-center">
-              <Check className="mr-2 text-green-500" />
-              {t("Copied to clipboard!")}
-            </div>
-          ),
-          variant: "default"
-        })
-      })
-      .catch(() => {
-        toast({
-          description: t("Failed to copy address."),
-          variant: "destructive"
-        })
-      })
+  const copyWallet = async (value: string) => {
+    await navigator.clipboard.writeText(value)
+    toast({
+      description: (
+        <div className="flex items-center">
+          <Check className="mr-2 text-green-500" />
+          {t("Copied to clipboard!")}
+        </div>
+      ),
+      variant: "default"
+    })
   }
 
   const exportWallet = (data) => {
@@ -129,7 +134,7 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
     setSelectedWallet(data)
   }
 
-  const callbackUpdates = () => {
+  const handleCallbackDataUpdates = () => {
     setIsAddWalletDrawerOpen(false)
     setIsExportWalletDrawerOpen(false)
     setIsDeleteWalletDrawerOpen(false)
@@ -154,84 +159,91 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
   return (
     <>
       <div className="py-4 flex flex-col justify-between h-full">
-        <div className="flex-1">
-          {wallets.filter(
-            (wallet) =>
-              wallet.address_type === (selectedNetwork ? selectedNetwork.name : "")
-          ).length ? (
+        <div className="py-4">
+          {loading ? (
+            <div className="flex flex-col items-center w-full h-30 gap-4 mt-10">
+              <LoaderCircle className="animate-spin h-12 w-12 text-muted" />
+              <p className="text-muted ml-2 text-lg">
+                {loading ? t("Loading...") : t("Loading...")}
+              </p>
+            </div>
+          ) : wallets.length ? (
             <>
               <Card className="mb-3">
                 <Table>
                   <TableBody>
-                    {wallets
-                      .filter(
-                        (wallet) =>
-                          wallet.address_type ===
-                          (selectedNetwork ? selectedNetwork.name : "")
-                      )
-                      .map((address, index) => (
-                        <TableRow key={index} className="hover-bg-custom">
-                          <TableCell className="px-4">
-                            <div className="mb-[2px]">
-                              <span className="text-lg font-bold">{address.name}</span>
-                            </div>
-                            <span>{address.public_key.slice(0, 6)}</span>
-                            <span>...</span>
-                            <span>{address.public_key.slice(-4)}</span>
-                          </TableCell>
-                          <TableCell className="w-[40px] justify-center text-center">
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <button
-                                    onClick={() => copyWallet(address.public_key)}
-                                    className="w-full h-full flex items-center justify-center">
-                                    <Copy />
-                                  </button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>{t("Copy Address")}</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </TableCell>
-                          <TableCell className="w-[40px] justify-center text-center">
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <button
-                                    onClick={() => exportWallet(address)}
-                                    className="w-full h-full flex items-center justify-center">
-                                    <Download />
-                                  </button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>{t("Export Wallet")}</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </TableCell>
-                          <TableCell className="w-[30px] justify-center text-center text-red-500 pr-4">
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <button
-                                    onClick={() => deleteWallet(address)}
-                                    className="w-full h-full flex items-center justify-center">
-                                    <Trash />
-                                  </button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>{t("Delete Wallet")}</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                    {wallets.map((address, index) => (
+                      <TableRow key={index} className="hover-bg-custom">
+                        <TableCell className="px-4">
+                          <div className="mb-[2px]">
+                            <span className="text-lg font-bold">{address.name}</span>
+                          </div>
+                          <span>{address.public_key.slice(0, 6)}</span>
+                          <span>...</span>
+                          <span>{address.public_key.slice(-4)}</span>
+                        </TableCell>
+                        <TableCell className="w-[40px] justify-center text-center">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <button
+                                  onClick={() => copyWallet(address.public_key)}
+                                  className="w-full h-full flex items-center justify-center">
+                                  <Copy />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{t("Copy Address")}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </TableCell>
+                        <TableCell className="w-[40px] justify-center text-center">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <button
+                                  onClick={() => exportWallet(address)}
+                                  className="w-full h-full flex items-center justify-center">
+                                  <Download />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{t("Export Wallet")}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </TableCell>
+                        <TableCell className="w-[30px] justify-center text-center text-red-500 pr-4">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <button
+                                  onClick={() => deleteWallet(address)}
+                                  className="w-full h-full flex items-center justify-center">
+                                  <Trash />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{t("Delete Wallet")}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </Card>
+
+              <div className="flex flex-row space-x-2">
+                <Button variant="jelly" className="my-auto" onClick={addWallet}>
+                  {t("ADD WALLET")}
+                </Button>
+                <Button variant="jelly" className="my-auto" onClick={importWallet}>
+                  {t("IMPORT WALLET")}
+                </Button>
+              </div>
             </>
           ) : (
             <div className="flex flex-col gap-4 items-center py-[100px]">
@@ -246,15 +258,6 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
           )}
         </div>
 
-        <div className="flex flex-row space-x-2">
-          <Button variant="jelly" className="my-auto" onClick={addWallet}>
-            {t("ADD WALLET")}
-          </Button>
-          <Button variant="jelly" className="my-auto" onClick={importWallet}>
-            {t("IMPORT WALLET")}
-          </Button>
-        </div>
-
         <Drawer open={isAddWalletDrawerOpen} onOpenChange={setIsAddWalletDrawerOpen}>
           <DrawerContent>
             <DrawerHeader>
@@ -262,7 +265,11 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
                 {t("ADD NEW WALLET")}
               </DrawerTitle>
             </DrawerHeader>
-            <IndexAddWallet handleCallbacks={callbackUpdates} />
+            <IndexAddWallet
+              currentNetwork={network}
+              currentWsAPI={wsAPI}
+              handleCallbackDataUpdates={handleCallbackDataUpdates}
+            />
           </DrawerContent>
         </Drawer>
 
@@ -277,7 +284,7 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
             </DrawerHeader>
             <IndexExportWallet
               selectedWallet={selectedWallet}
-              handleCallbacks={callbackUpdates}
+              handleCallbacks={handleCallbackDataUpdates}
             />
           </DrawerContent>
         </Drawer>
@@ -293,7 +300,7 @@ const IndexWallet = ({ handleSetCurrentPage }) => {
             </DrawerHeader>
             <IndexDeleteWallet
               selectedWallet={selectedWallet}
-              handleCallbacks={callbackUpdates}
+              handleCallbacks={handleCallbackDataUpdates}
             />
           </DrawerContent>
         </Drawer>

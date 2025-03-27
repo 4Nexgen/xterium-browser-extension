@@ -123,7 +123,7 @@ export class TokenService {
     return tokens
   }
 
-  async getTokenById(network: NetworkModel, wsAPI: ApiPromise, token_id: number): Promise<TokenModel | null> {
+  async getToken(network: NetworkModel, wsAPI: ApiPromise, token_id: number): Promise<TokenModel | null> {
     const pumpTokens = this.pumpTokens()
 
     if (token_id === 0) {

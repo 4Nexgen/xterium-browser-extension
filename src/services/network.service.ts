@@ -8,7 +8,7 @@ export class NetworkService {
     area: "local",
     allCopied: true
   })
-  private storageKey = "network"
+  private storageKey = "selected_network"
 
   async getNetwork(): Promise<NetworkModel | null> {
     const storedData = await this.storage.get<string>(this.storageKey)

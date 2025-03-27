@@ -218,7 +218,7 @@ const IndexPumpToken = ({ currentNetwork, currentWsAPI }: IndexPumpTokenProps) =
                 ) : (
                   <div className="flex absolute justify-center items-center w-full py-[100px] gap-4 flex-col">
                     <Coins className="size-20" />
-                    <h4 className="font-bold text-lg">{t("No Pump Token Found")}</h4>
+                    <h4 className="font-bold text-lg">{t("Empty")}</h4>
                   </div>
                 )}
               </div>

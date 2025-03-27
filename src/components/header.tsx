@@ -29,9 +29,9 @@ import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 interface HeaderProps {
-  currentPage: string
+  currentPage?: string
   variant?: "default" | "outside"
-  handleCurrentNetwork: (network: NetworkModel) => Promise<void>
+  handleCurrentNetwork?: (network: NetworkModel) => Promise<void>
 }
 
 const Header = ({
