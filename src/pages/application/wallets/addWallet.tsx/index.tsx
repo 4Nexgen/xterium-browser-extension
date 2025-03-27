@@ -15,7 +15,7 @@ import {
   sr25519PairFromSeed
 } from "@polkadot/util-crypto"
 import { Check, RefreshCcw, X } from "lucide-react"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import "@polkadot/wasm-crypto/initOnlyAsm"
@@ -40,17 +40,17 @@ const IndexAddWallet = ({
 
   const { toast } = useToast()
 
-  const walletService = new WalletService()
-  const userService = new UserService()
-  const encryptionService = new EncryptionService()
+  const walletService = useMemo(() => new WalletService(), [])
+  const userService = useMemo(() => new UserService(), [])
+  const encryptionService = useMemo(() => new EncryptionService(), [])
 
   const [network, setNetwork] = useState<NetworkModel>(null)
   const [wsAPI, setWsAPI] = useState<ApiPromise | null>(null)
 
-  const [isProcessing, setIsProcessing] = useState(false)
-
   const [userPassword, setUserPassword] = useState<string>("")
   const [isUserPasswordOpen, setIsUserPasswordOpen] = useState<boolean>(false)
+
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const [isNameDuplicate, setIsNameDuplicate] = useState(false)
   const [isMnemonicDuplicate, setIsMnemonicDuplicate] = useState(false)

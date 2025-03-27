@@ -2,82 +2,40 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import type { WalletModel } from "@/models/wallet.model"
-import { UserService } from "@/services/user.service"
 import { WalletService } from "@/services/wallet.service"
-import CryptoJS from "crypto-js"
-import { X } from "lucide-react"
-import React, { useState } from "react"
+import { Check, X } from "lucide-react"
+import React, { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
-const IndexExportWallet = ({ selectedWallet, handleCallbacks }) => {
-  const { t } = useTranslation()
-  const userService = new UserService()
+interface IndexExportWalletProps {
+  selectedWallet: WalletModel
+}
 
-  const [walletData] = useState<WalletModel>(selectedWallet)
+const IndexExportWallet = ({ selectedWallet }: IndexExportWalletProps) => {
+  const { t } = useTranslation()
 
   const { toast } = useToast()
 
-  const decryptData = (encryptedData, password) => {
-    try {
-      const decrypted = CryptoJS.AES.decrypt(encryptedData, password).toString(
-        CryptoJS.enc.Utf8
-      )
-      if (!decrypted) throw new Error("Decryption failed")
-      return decrypted
-    } catch (error) {
-      console.error("Decryption error:", error)
-      return null
+  const walletService = useMemo(() => new WalletService(), [])
+  const [wallet, setWallet] = useState<WalletModel | null>(null)
+
+  useEffect(() => {
+    if (selectedWallet) {
+      setWallet(selectedWallet)
     }
-  }
+  }, [selectedWallet])
 
   const exportWallet = async () => {
-    try {
-      const walletPassword = await userService.getWalletPassword()
-      if (!walletPassword) {
-        toast({
-          description: (
-            <div className="flex items-center">
-              <X className="mr-2 text-white-500" />
-              {t("Unable to retrieve wallet password.")}
-            </div>
-          ),
-          variant: "destructive"
-        })
-        return
-      }
-
-      let walletService = new WalletService()
-      const result = await walletService.getWalletById(walletData.id)
-
-      const decryptedMnemonic = decryptData(result.mnemonic_phrase, walletPassword)
-      const decryptedSecretKey = decryptData(result.secret_key, walletPassword)
-
-      if (!decryptedMnemonic || !decryptedSecretKey) {
-        toast({
-          description: (
-            <div className="flex items-center">
-              <X className="mr-2 text-white-500" />
-              {t("Failed to decrypt wallet data.")}
-            </div>
-          ),
-          variant: "destructive"
-        })
-        return
-      }
-
+    const result = await walletService.getWallet(wallet.public_key)
+    if (result !== null) {
       const exportedWalletData: WalletModel = {
         id: result.id,
         name: result.name,
         address_type: result.address_type,
-        mnemonic_phrase: decryptedMnemonic,
-        secret_key: decryptedSecretKey,
+        mnemonic_phrase: result.mnemonic_phrase,
+        secret_key: result.secret_key,
         public_key: result.public_key,
-        type: result.type,
-        balances: result.balances,
-        metaGenesisHash: result.metaGenesisHash,
-        metaName: result.metaName,
-        metaSource: result.metaSource,
-        tokenSymbol: result.tokenSymbol
+        type: result.type
       }
 
       const jsonBlob = new Blob([JSON.stringify(exportedWalletData)], {
@@ -87,44 +45,41 @@ const IndexExportWallet = ({ selectedWallet, handleCallbacks }) => {
       const a = document.createElement("a")
 
       a.href = url
-      a.download = `${walletData.name}_wallet.json`
+      a.download = `${wallet.name}_wallet.json`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
 
-      handleCallbacks()
-    } catch (error) {
-      console.error("Export wallet error:", error)
       toast({
         description: (
           <div className="flex items-center">
-            <X className="mr-2 text-white-500" />
-            {t("Something went wrong during export.")}
+            <Check className="mr-2 text-green-500" />
+            {t("Wallet Exported Successfully!")}
           </div>
         ),
-        variant: "destructive"
+        variant: "default"
       })
     }
   }
 
   return (
     <>
-      <div className="p-6">
-        <div className="mb-8">
-          <Label className="text-center tracking-[0.15em] font-semibold leading-2 font-Inter text-base">
-            {t("Are you sure you want to export")} <br />
-            <span className="text-lg font-bold text-[#B375DC]">
-              {walletData.name}
-            </span>{" "}
-            {t("from your wallet list?")}
-          </Label>
+      {wallet && (
+        <div className="p-6">
+          <div className="mb-8">
+            <Label className="text-center tracking-[0.15em] font-semibold leading-2 font-Inter text-base">
+              {t("Are you sure you want to export")} <br />
+              <span className="text-lg font-bold text-[#B375DC]">{wallet.name}</span>{" "}
+              {t("from your wallet list?")}
+            </Label>
+          </div>
+          <div className="mt-3 mb-3">
+            <Button type="button" variant="jelly" onClick={exportWallet}>
+              {t("EXPORT")}
+            </Button>
+          </div>
         </div>
-        <div className="mt-3 mb-3">
-          <Button type="button" variant="jelly" onClick={exportWallet}>
-            {t("EXPORT")}
-          </Button>
-        </div>
-      </div>
+      )}
     </>
   )
 }

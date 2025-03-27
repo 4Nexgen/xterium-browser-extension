@@ -81,17 +81,17 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
   }, [currentWsAPI])
 
   const getTokens = async () => {
-    if (wsAPI !== null) {
-      const tokens = await tokenService.getTokens(network, wsAPI)
-      setTokens(tokens)
-      await getTokenLogos(tokens)
+    const tokens = await tokenService.getTokens(network, wsAPI)
+    setTokens(tokens)
+    await getTokenLogos(tokens)
 
-      setLoading(false)
-    }
+    setLoading(false)
   }
 
   useEffect(() => {
-    getTokens()
+    if (wsAPI !== null) {
+      getTokens()
+    }
   }, [wsAPI])
 
   const getTokenLogos = async (tokens: TokenModel[]) => {
@@ -297,7 +297,7 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
               </Card>
             </>
           ) : (
-            <div className="flex absolute justify-center items-center w-full py-[100px] gap-4 flex-col">
+            <div className="flex flex-col w-full items-center justify-center py-[100px] space-y-2">
               <Coins className="size-20" />
               <h4 className="font-bold text-lg">{t("Empty")}</h4>
             </div>

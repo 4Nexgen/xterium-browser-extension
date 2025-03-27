@@ -44,7 +44,7 @@ export class WalletService {
   async updateWallet(public_key: string, data: WalletModel): Promise<boolean> {
     try {
       const wallets = await this.getWallets()
-      const index = wallets.findIndex((wallet) => wallet.public_key === public_key)
+      const index = wallets.findIndex((d) => d.public_key === public_key)
 
       if (index === -1) {
         return false
@@ -65,13 +65,9 @@ export class WalletService {
   async deleteWallet(public_key: string): Promise<boolean> {
     try {
       const wallets = await this.getWallets()
-      const index = wallets.findIndex((wallet) => wallet.public_key === public_key)
+      const filteredWallets = wallets.filter((d) => d.public_key !== public_key)
 
-      if (index === -1) {
-        return false
-      }
-
-      await this.storage.set(this.key, wallets[index])
+      await this.storage.set(this.key, filteredWallets)
       return true
     } catch (error) {
       throw new Error(`[WalletService] Failed to delete wallet: ${error}`)
