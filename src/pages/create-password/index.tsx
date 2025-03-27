@@ -10,7 +10,7 @@ import {
   FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { TokenData } from "@/data/token.data"
+import { TokenData } from "@/data/chains/xode/token-asset-files.data"
 import { useToast } from "@/hooks/use-toast"
 import { TokenService } from "@/services/token.service"
 import { UserService } from "@/services/user.service"

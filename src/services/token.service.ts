@@ -1,189 +1,236 @@
 import { TokenModel } from "@/models/token.model"
-import { ApiPromise, WsProvider } from "@polkadot/api"
+import { ApiPromise } from "@polkadot/api"
 
-import { Storage } from "@plasmohq/storage"
+import type { NetworkModel } from "@/models/network.model"
 
-import { NetworkService } from "./network.service"
+import pumpTokens from "../data/chains/xode/pump-tokens.json"
 
 export class TokenService {
-  private storage = new Storage({
-    area: "local",
-    allCopied: true
-  })
-  private storageKey = "tokens"
-  private networkService = new NetworkService()
-  private api: ApiPromise | null = null
+  pumpTokens(): TokenModel[] {
+    return pumpTokens as unknown as TokenModel[]
+  }
 
-  async connect(): Promise<ApiPromise | any> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        this.networkService
-          .getNetwork()
-          .then(async (data) => {
-            let wsUrl = data.rpc
+  async getTokens(network: NetworkModel, wsAPI: ApiPromise): Promise<TokenModel[]> {
+    const pumpTokens = this.pumpTokens()
+    const tokens: TokenModel[] = []
 
-            if (!this.api) {
-              const wsProvider = new WsProvider(wsUrl)
-              const api = await ApiPromise.create({ provider: wsProvider })
+    const rpcSystem = wsAPI.rpc.system
 
-              this.api = api
+    const nativeTokenSymbol = (await rpcSystem.properties()).toHuman()["tokenSymbol"][0]
+    const nativeTokenName = (await rpcSystem.chain()).toHuman()
+    const nativeTokenDecimals = (await rpcSystem.properties()).toHuman()[
+      "tokenDecimals"
+    ][0]
 
-              resolve(this.api)
+    tokens.push({
+      id: 0,
+      type: "Native",
+      network: network.name,
+      token_id: 0,
+      symbol: nativeTokenSymbol,
+      name: nativeTokenName,
+      description: nativeTokenName,
+      decimals: nativeTokenDecimals,
+      price: 0,
+      owner: "",
+      issuer: "",
+      admin: "",
+      freezer: "",
+      supply: 0,
+      deposit: 0,
+      minBalance: 0,
+      isSufficient: false,
+      accounts: 0,
+      sufficients: 0,
+      approvals: 0,
+      status: "",
+      created_at: ""
+    })
+
+    const assetMetadatas: {
+      id: number
+      name: string
+      symbol: string
+      deposit: number
+      decimals: number
+      isFrozen: string
+    }[] = []
+
+    const queryAssets = wsAPI.query.assets
+
+    if (queryAssets) {
+      const assetMetadataEntries = await queryAssets.metadata.entries()
+      if (assetMetadataEntries.length > 0) {
+        assetMetadataEntries.map((metadata) => {
+          const assetId = parseInt(metadata[0].toHuman().toString().replace(/,/g, ''))
+          const assetData = metadata[1].toHuman()
+
+          assetMetadatas.push({
+            id: assetId,
+            name: assetData["name"],
+            symbol: assetData["symbol"],
+            deposit: parseInt(assetData["deposit"]),
+            decimals: parseInt(assetData["decimals"]),
+            isFrozen: assetData["isFrozen"]
+          })
+        })
+      }
+
+      if (assetMetadatas.length > 0) {
+        const assetEntries = await queryAssets.asset.entries()
+        if (assetEntries.length > 0) {
+          assetEntries.map((asset) => {
+            const assetId = parseInt(asset[0].toHuman().toString().replace(/,/g, ''))
+            const metadata = assetMetadatas.filter((d) => d.id === assetId)[0]
+
+            let pumpToken: TokenModel = null;
+            if (pumpTokens.length > 0) {
+              pumpToken = pumpTokens.filter(d => d.token_id === assetId)[0]
+            }
+
+            if (metadata !== undefined) {
+              const assetProps = asset[1].toHuman()
+              tokens.push({
+                id: assetId,
+                type: pumpToken ? pumpToken.type : "Asset",
+                network: network.name,
+                token_id: assetId,
+                symbol: metadata.symbol,
+                name: metadata.name,
+                description: pumpToken ? pumpToken.description : metadata.name,
+                decimals: metadata.decimals,
+                price: 0,
+                owner: assetProps["owner"],
+                issuer: assetProps["issuer"],
+                admin: assetProps["admin"],
+                freezer: assetProps["freezer"],
+                supply: parseInt(assetProps["supply"]),
+                deposit: parseInt(assetProps["deposit"]),
+                minBalance: parseInt(assetProps["minBalance"]),
+                isSufficient: assetProps["isSufficient"],
+                accounts: parseInt(assetProps["accounts"]),
+                sufficients: parseInt(assetProps["sufficients"]),
+                approvals: parseInt(assetProps["approvals"]),
+                status: assetProps["status"],
+                created_at: pumpToken ? pumpToken.created_at : ""
+              })
             }
           })
-          .catch((error) => {
-            reject(error)
-          })
-      } catch (error) {
-        reject("Failed to connect to RPC")
-      }
-    })
-  }
-
-  async createToken(data: TokenModel): Promise<string> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const existingTokens = await this.storage.get<string>(this.storageKey)
-        const tokens: TokenModel[] = existingTokens ? JSON.parse(existingTokens) : []
-
-        const lastId = tokens.length > 0 ? tokens[tokens.length - 1].id : 0
-        data.id = lastId + 1
-
-        tokens.push(data)
-
-        await this.storage.set(this.storageKey, JSON.stringify(tokens))
-
-        resolve("Token created successfully")
-      } catch (error) {
-        reject(error)
-      }
-    })
-  }
-
-  async getTokens(): Promise<TokenModel[]> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const storedData = await this.storage.get<string>(this.storageKey)
-
-        if (!storedData) {
-          return resolve([])
-        }
-
-        const tokens: TokenModel[] = JSON.parse(storedData)
-        resolve(tokens)
-      } catch (error) {
-        reject(error)
-      }
-    })
-  }
-
-  async getTokenById(id: number): Promise<TokenModel> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const storedData = await this.storage.get<string>(this.storageKey)
-
-        if (!storedData) {
-          return reject(new Error("No stored data found."))
-        }
-        const tokens: TokenModel[] = JSON.parse(storedData)
-        const token = tokens.find((token) => token.id === id)
-
-        if (!token) {
-          return reject(new Error(`Token with id ${id} not found.`))
-        }
-
-        resolve(token)
-      } catch (error) {
-        reject(error)
-      }
-    })
-  }
-
-  async getAssetDetails(assetId: string): Promise<any> {
-    if (!this.api) {
-      await this.connect()
-    }
-
-    const assetIdNumber = Number(assetId)
-    if (isNaN(assetIdNumber) || assetIdNumber < 0 || assetIdNumber > 2 ** 32 - 1) {
-      throw new Error("Invalid assetId. Must be a valid u32.")
-    }
-
-    const metadata = await this.api.query.assets.metadata(assetIdNumber)
-    const metadataDetails = metadata.toHuman() as { [key: string]: any }
-
-    return {
-      assetId: assetIdNumber,
-      name: metadataDetails.name || "N/A",
-      symbol: metadataDetails.symbol || "N/A",
-      metadataDetails
-    }
-  }
-
-  async fetchAssetDetailsForTokens(tokens: TokenModel[]): Promise<TokenModel[]> {
-    const updatedTokens = [...tokens]
-
-    for (let token of updatedTokens) {
-      if (token.network_id >= 1 && token.network_id <= 9) {
-        try {
-          const assetDetails = await this.getAssetDetails(token.network_id.toString())
-          token.description = assetDetails.name
-          token.symbol = assetDetails.symbol
-          token.assetId = assetDetails.assetId
-        } catch (error) {
-          console.error(
-            `Failed to fetch details for token with network_id ${token.network_id}:`,
-            error
-          )
         }
       }
     }
 
-    await this.storage.set(this.storageKey, JSON.stringify(updatedTokens))
-
-    return updatedTokens
+    return tokens
   }
 
-  async updateToken(id: number, data: TokenModel): Promise<string> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const tokens = await this.getTokens()
+  async getTokenById(network: NetworkModel, wsAPI: ApiPromise, token_id: number): Promise<TokenModel | null> {
+    const pumpTokens = this.pumpTokens()
 
-        const index = tokens.findIndex((token) => token.id === id)
+    if (token_id === 0) {
+      const rpcSystem = wsAPI.rpc.system
 
-        if (index === -1) {
-          reject(new Error("Token not found."))
-          return
-        }
+      const nativeTokenSymbol = (await rpcSystem.properties()).toHuman()["tokenSymbol"][0]
+      const nativeTokenName = (await rpcSystem.chain()).toHuman()
+      const nativeTokenDecimals = (await rpcSystem.properties()).toHuman()[
+        "tokenDecimals"
+      ][0]
 
-        tokens[index] = data
-
-        await this.storage.set(this.storageKey, JSON.stringify(tokens))
-
-        resolve("Token updated successfully")
-      } catch (error) {
-        reject(error)
+      const token: TokenModel = {
+        id: 0,
+        type: "Native",
+        network: network.name,
+        token_id: 0,
+        symbol: nativeTokenSymbol,
+        name: nativeTokenName,
+        description: nativeTokenName,
+        decimals: nativeTokenDecimals,
+        price: 0,
+        owner: "",
+        issuer: "",
+        admin: "",
+        freezer: "",
+        supply: 0,
+        deposit: 0,
+        minBalance: 0,
+        isSufficient: false,
+        accounts: 0,
+        sufficients: 0,
+        approvals: 0,
+        status: "",
+        created_at: ""
       }
-    })
+
+      return token
+    } else {
+      const queryAssets = wsAPI.query.assets
+
+      if (queryAssets) {
+        const assetMetadata = await queryAssets.metadata(token_id)
+
+        if (assetMetadata) {
+          const assetData = assetMetadata.toHuman()
+          const metadata = {
+            id: token_id,
+            name: assetData["name"],
+            symbol: assetData["symbol"],
+            deposit: parseInt(assetData["deposit"]),
+            decimals: parseInt(assetData["decimals"]),
+            isFrozen: assetData["isFrozen"]
+          }
+
+          const asset = await queryAssets.asset(token_id)
+          if (asset) {
+            if (metadata !== undefined) {
+              let pumpToken: TokenModel = null;
+              if (pumpTokens.length > 0) {
+                pumpToken = pumpTokens.filter(d => d.token_id === token_id)[0]
+              }
+
+              const assetProps = asset.toHuman()
+              const token: TokenModel = {
+                id: token_id,
+                type: pumpToken ? pumpToken.type : "Asset",
+                network: network.name,
+                token_id: token_id,
+                symbol: metadata.symbol,
+                name: metadata.name,
+                description: pumpToken ? pumpToken.description : metadata.name,
+                decimals: metadata.decimals,
+                price: 0,
+                owner: assetProps["owner"],
+                issuer: assetProps["issuer"],
+                admin: assetProps["admin"],
+                freezer: assetProps["freezer"],
+                supply: parseInt(assetProps["supply"]),
+                deposit: parseInt(assetProps["deposit"]),
+                minBalance: parseInt(assetProps["minBalance"]),
+                isSufficient: assetProps["isSufficient"],
+                accounts: parseInt(assetProps["accounts"]),
+                sufficients: parseInt(assetProps["sufficients"]),
+                approvals: parseInt(assetProps["approvals"]),
+                status: assetProps["status"],
+                created_at: pumpToken ? pumpToken.created_at : ""
+              }
+
+              return token
+            }
+          }
+        }
+      }
+    }
+
+    return null
   }
 
-  async deleteToken(id: number): Promise<boolean> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const tokens = await this.getTokens()
+  async createToken(network: NetworkModel, wsAPI: ApiPromise, data: TokenModel): Promise<string> {
+    return "Token created successfully"
+  }
 
-        const filteredTokens = tokens.filter((token) => token.id !== id)
+  async updateToken(network: NetworkModel, wsAPI: ApiPromise, token_id: number, data: TokenModel): Promise<string> {
+    return "Token updated successfully"
+  }
 
-        if (tokens.length === filteredTokens.length) {
-          return reject(new Error("Token not found."))
-        }
-
-        await this.storage.set(this.storageKey, JSON.stringify(filteredTokens))
-
-        resolve(true)
-      } catch (error) {
-        reject(error)
-      }
-    })
+  async deleteToken(network: NetworkModel, wsAPI: ApiPromise, token_id: number): Promise<boolean> {
+    return true
   }
 }

@@ -1,4 +1,5 @@
 import { BalanceModel } from "./balance.model";
+
 export class WalletModel {
   id: number
   name: string
@@ -13,4 +14,3 @@ export class WalletModel {
   balances: BalanceModel[];
   type: string;
 }
-

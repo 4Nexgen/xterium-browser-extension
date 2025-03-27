@@ -1,173 +1,159 @@
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger
-} from "@/components/ui/drawer"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from "@/components/ui/tooltip"
-import { TokenData, TokenImages } from "@/data/token.data"
-import { toast } from "@/hooks/use-toast"
+import { ChainAssetFiles } from "@/data/chains/chain-asset-files"
 import type { NetworkModel } from "@/models/network.model"
 import { TokenModel } from "@/models/token.model"
-import { NetworkService } from "@/services/network.service"
 import { TokenService } from "@/services/token.service"
-import { Coins, LoaderCircle, Pencil, Trash, X } from "lucide-react"
+import type { ApiPromise } from "@polkadot/api"
+import { Coins, LoaderCircle } from "lucide-react"
 import Image from "next/image"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
-import IndexAddToken from "./addToken"
-import IndexDeleteToken from "./deleteToken"
-import IndexEditToken from "./editToken"
+// import { Button } from "@/components/ui/button"
+// import {
+//   Tooltip,
+//   TooltipContent,
+//   TooltipProvider,
+//   TooltipTrigger
+// } from "@/components/ui/tooltip"
+// import {
+//   Drawer,
+//   DrawerContent,
+//   DrawerHeader,
+//   DrawerTitle,
+//   DrawerTrigger
+// } from "@/components/ui/drawer"
 
-const IndexTokens = () => {
+// import { toast } from "@/hooks/use-toast"
+
+// import IndexAddToken from "./addToken"
+// import IndexDeleteToken from "./deleteToken"
+// import IndexEditToken from "./editToken"
+
+interface IndexTokensProps {
+  currentNetwork: NetworkModel | null
+  currentWsAPI: ApiPromise | null
+}
+
+const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
   const { t } = useTranslation()
-  const networkService = new NetworkService()
-  const tokenService = new TokenService()
 
-  const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
+  const tokenService = useMemo(() => new TokenService(), [])
+
+  const [network, setNetwork] = useState<NetworkModel | null>(null)
+  const [wsAPI, setWsAPI] = useState<ApiPromise | null>(null)
+
   const [tokens, setTokens] = useState<TokenModel[]>([])
-  const [selectedToken, setSelectedToken] = useState<TokenModel>({
-    id: 0,
-    type: "",
-    network: "",
-    network_id: 0,
-    symbol: "",
-    description: "",
-    image_url: "Default",
-    preloaded: false,
-    assetId: 0,
-    decimals: 0,
-    marketCap: 0,
-    price: 0
-  })
-  const [isAddTokenDrawerOpen, setIsAddTokenDrawerOpen] = useState<boolean>(false)
-  const [isEditTokenDrawerOpen, setIsEditTokenDrawerOpen] = useState<boolean>(false)
-  const [isDeleteTokenDrawerOpen, setIsDeleteTokenDrawerOpen] = useState(false)
-  const [loading, setLoading] = useState<boolean>(false)
+  const [tokenLogoMap, setTokenLogoMap] = useState<{ [key: string]: string }>({})
 
-  const preloadTokens = async () => {
+  const [loading, setLoading] = useState<boolean>(true)
+
+  // const [selectedToken, setSelectedToken] = useState<TokenModel>({
+  //   id: 0,
+  //   type: "",
+  //   token_id: 0,
+  //   network: "",
+  //   symbol: "",
+  //   description: "",
+  //   decimals: 0,
+  //   price: 0,
+  //   image_url: "Default"
+  // })
+
+  // const [isAddTokenDrawerOpen, setIsAddTokenDrawerOpen] = useState<boolean>(false)
+  // const [isEditTokenDrawerOpen, setIsEditTokenDrawerOpen] = useState<boolean>(false)
+  // const [isDeleteTokenDrawerOpen, setIsDeleteTokenDrawerOpen] = useState(false)
+
+  useEffect(() => {
     setLoading(true)
-    let tokenList: any[] = []
 
-    try {
-      const data = await tokenService.getTokens()
-      let preloadedTokenData = TokenData
-      if (preloadedTokenData.length > 0) {
-        for (let i = 0; i < preloadedTokenData.length; i++) {
-          let existingToken = data.filter(
-            (d) => d.network_id === preloadedTokenData[i].network_id // Match by network_id
-          )[0]
+    if (currentNetwork) {
+      setNetwork(currentNetwork)
+    }
+  }, [currentNetwork])
 
-          if (existingToken != null) {
-            tokenList.push({ ...existingToken, preloaded: true })
-          } else {
-            await tokenService.createToken(preloadedTokenData[i])
-            tokenList.push({ ...preloadedTokenData[i], preloaded: true })
-          }
-        }
-      }
+  useEffect(() => {
+    if (currentWsAPI) {
+      setWsAPI(currentWsAPI)
+    }
+  }, [currentWsAPI])
 
-      if (data.length > 0) {
-        for (let i = 0; i < data.length; i++) {
-          let existingToken = tokenList.filter(
-            (d) => d.network_id === data[i].network_id
-          )[0]
+  const getTokens = async () => {
+    if (wsAPI !== null) {
+      const tokens = await tokenService.getTokens(network, wsAPI)
+      setTokens(tokens)
+      await getTokenLogos(tokens)
 
-          if (existingToken == null) {
-            tokenList.push(data[i])
-          }
-        }
-      }
-      const updatedTokens = await tokenService.fetchAssetDetailsForTokens(tokenList)
-      setTokens(updatedTokens)
-    } catch (error) {
-      console.error("Error loading tokens:", error)
-    } finally {
       setLoading(false)
     }
   }
 
-  const getNetwork = () => {
-    networkService.getNetwork().then((data) => {
-      setSelectedNetwork(data)
-    })
-  }
-
-  const getTokens = () => {
-    preloadTokens()
-  }
-
-  const getTokenImage = (imageName: string) => {
-    const tokenImages = new TokenImages()
-    return tokenImages.getBase64Image(imageName)
-  }
-
   useEffect(() => {
-    getNetwork()
+    getTokens()
+  }, [wsAPI])
 
-    setTimeout(() => {
-      getTokens()
-    }, 100)
-  }, [])
+  const getTokenLogos = async (tokens: TokenModel[]) => {
+    const tokenAssetFiles = await ChainAssetFiles.load("Xode")
+    const newImageMap: { [key: string]: string } = {}
 
-  const addToken = () => {
-    setIsAddTokenDrawerOpen(true)
-  }
-
-  const editToken = (data: TokenModel) => {
-    if (data.preloaded) {
-      toast({
-        description: (
-          <div className="flex items-center">
-            <X className="mr-2 text-red-500" />
-            {t("This token is preloaded and cannot be edited!")}
-          </div>
-        ),
-        variant: "default"
-      })
-      return
+    if (tokens.length > 0) {
+      for (const token of tokens) {
+        newImageMap[token.symbol] = tokenAssetFiles.getTokenLogo(token.symbol)
+      }
     }
-    setIsEditTokenDrawerOpen(true)
-    setSelectedToken(data)
+
+    setTokenLogoMap(newImageMap)
   }
 
-  const deleteToken = (data: TokenModel) => {
-    if (data.preloaded) {
-      toast({
-        description: (
-          <div className="flex items-center">
-            <X className="mr-2 text-red-500" />
-            {t("This token is preloaded and cannot be deleted!")}
-          </div>
-        ),
-        variant: "default"
-      })
-      return
-    }
-    setIsDeleteTokenDrawerOpen(true)
-    setSelectedToken(data)
-  }
+  // const addToken = () => {
+  //   setIsAddTokenDrawerOpen(true)
+  // }
 
-  const saveAndUpdateToken = () => {
-    setIsAddTokenDrawerOpen(false)
-    setIsEditTokenDrawerOpen(false)
-    setIsDeleteTokenDrawerOpen(false)
+  // const editToken = (data: TokenModel) => {
+  //   if (data.preloaded) {
+  //     toast({
+  //       description: (
+  //         <div className="flex items-center">
+  //           <X className="mr-2 text-red-500" />
+  //           {t("This token is preloaded and cannot be edited!")}
+  //         </div>
+  //       ),
+  //       variant: "default"
+  //     })
+  //     return
+  //   }
+  //   setIsEditTokenDrawerOpen(true)
+  //   setSelectedToken(data)
+  // }
 
-    setTimeout(() => {
-      getTokens()
-    }, 100)
-  }
+  // const deleteToken = (data: TokenModel) => {
+  //   if (data.preloaded) {
+  //     toast({
+  //       description: (
+  //         <div className="flex items-center">
+  //           <X className="mr-2 text-red-500" />
+  //           {t("This token is preloaded and cannot be deleted!")}
+  //         </div>
+  //       ),
+  //       variant: "default"
+  //     })
+  //     return
+  //   }
+  //   setIsDeleteTokenDrawerOpen(true)
+  //   setSelectedToken(data)
+  // }
+
+  // const saveAndUpdateToken = () => {
+  //   setIsAddTokenDrawerOpen(false)
+  //   setIsEditTokenDrawerOpen(false)
+  //   setIsDeleteTokenDrawerOpen(false)
+
+  //   setTimeout(() => {
+  //     getTokens()
+  //   }, 100)
+  // }
 
   return (
     <>
@@ -177,10 +163,10 @@ const IndexTokens = () => {
             <div className="flex flex-col items-center w-full h-30 gap-4 mt-10">
               <LoaderCircle className="animate-spin h-12 w-12 text-muted" />
               <p className="text-muted ml-2 text-lg">
-                {loading ? t("Loading tokens...") : t("Loading tokens...")}
+                {loading ? t("Loading...") : t("Loading...")}
               </p>
             </div>
-          ) : tokens?.filter((item) => item.network == selectedNetwork.name)?.length ? (
+          ) : tokens?.filter((item) => item.network == network.name)?.length ? (
             <>
               <Card className="mb-3 card-bg-image border-border">
                 <CardHeader>
@@ -194,13 +180,15 @@ const IndexTokens = () => {
                       .filter(
                         (token) =>
                           token.type === "Native" &&
-                          token.network === (selectedNetwork ? selectedNetwork.name : "")
+                          token.network === (network ? network.name : "")
                       )
                       .map((token) => (
                         <TableRow key={token.id}>
                           <TableCell className="w-[50px] justify-center">
                             <Image
-                              src={getTokenImage(token.image_url)}
+                              src={
+                                tokenLogoMap[token.symbol] || "/assets/tokens/default.png"
+                              }
                               alt={`${token.description} Logo`}
                               className="ml-1"
                               width={40}
@@ -213,46 +201,7 @@ const IndexTokens = () => {
                             </div>
                             <Badge>{token.description}</Badge>
                           </TableCell>
-                          <TableCell className="w-[30px] justify-center text-center pr-4">
-                            <div className="flex gap-2 items-center">
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <button
-                                      onClick={() => editToken(token)}
-                                      className={`w-full h-full flex items-center justify-center text-primary dark:text-white ${
-                                        token.preloaded
-                                          ? "opacity-50 cursor-not-allowed"
-                                          : ""
-                                      }`}>
-                                      <Pencil />
-                                    </button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>{t("Edit Token")}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <button
-                                      onClick={() => deleteToken(token)}
-                                      className={`w-full h-full flex items-center justify-center text-destructive ${
-                                        token.preloaded
-                                          ? "opacity-50 cursor-not-allowed"
-                                          : ""
-                                      }`}>
-                                      <Trash />
-                                    </button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>{t("Delete Token")}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </div>
-                          </TableCell>
+                          <TableCell className="w-[30px] justify-center text-center pr-4"></TableCell>
                         </TableRow>
                       ))}
                   </TableBody>
@@ -271,13 +220,15 @@ const IndexTokens = () => {
                       .filter(
                         (token) =>
                           token.type === "Asset" &&
-                          token.network === (selectedNetwork ? selectedNetwork.name : "")
+                          token.network === (network ? network.name : "")
                       )
                       .map((token) => (
                         <TableRow key={token.id} className="cursor-pointer">
                           <TableCell className="w-[50px] justify-center">
                             <Image
-                              src={getTokenImage(token.image_url)}
+                              src={
+                                tokenLogoMap[token.symbol] || "/assets/tokens/default.png"
+                              }
                               alt={`${token.description} Logo`}
                               className="ml-1"
                               width={40}
@@ -286,13 +237,21 @@ const IndexTokens = () => {
                           </TableCell>
                           <TableCell>
                             <div className="mb-[2px]">
-                              <span className="text-lg font-bold">{token.symbol}</span>
+                              <span className="text-lg font-bold">
+                                {token.symbol.length > 20
+                                  ? token.symbol.substring(0, 20) + "..."
+                                  : token.symbol}
+                              </span>
                             </div>
-                            <Badge>{token.description}</Badge>
+                            <Badge>
+                              {token.description.length > 20
+                                ? token.description.substring(0, 20) + "..."
+                                : token.description}
+                            </Badge>
                           </TableCell>
                           <TableCell className="w-[30px] justify-center text-center pr-4">
                             <div className="flex gap-2 items-center">
-                              <TooltipProvider>
+                              {/* <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger>
                                     <button
@@ -328,7 +287,7 @@ const IndexTokens = () => {
                                     <p>{t("Delete Token")}</p>
                                   </TooltipContent>
                                 </Tooltip>
-                              </TooltipProvider>
+                              </TooltipProvider> */}
                             </div>
                           </TableCell>
                         </TableRow>
@@ -343,14 +302,14 @@ const IndexTokens = () => {
               <div className="text-center">
                 <h4 className="font-bold text-lg">{t("No Token Found")}</h4>
                 <p className="opacity-50">
-                  {t("Add new token by clicking the button below.")}
+                  {/* {t("Add new token by clicking the button below.")} */}
                 </p>
               </div>
             </div>
           )}
         </div>
 
-        <Button variant="jelly" className="my-auto" onClick={addToken}>
+        {/* <Button variant="jelly" className="my-auto" onClick={addToken}>
           {t("ADD NEW TOKEN")}
         </Button>
 
@@ -372,7 +331,7 @@ const IndexTokens = () => {
               <DrawerTitle className="flex items-center justify-center space-x-2 border-b border-border-1/20 pb-4 text-muted">
                 <span>{t("Edit")}</span>
                 <Image
-                  src={getTokenImage(selectedToken.image_url)}
+                  src={getTokenLogo(selectedToken.symbol)}
                   alt={`${selectedToken.symbol} logo`}
                   width={18}
                   height={18}
@@ -401,7 +360,7 @@ const IndexTokens = () => {
               handleCallbacks={saveAndUpdateToken}
             />
           </DrawerContent>
-        </Drawer>
+        </Drawer> */}
       </div>
     </>
   )

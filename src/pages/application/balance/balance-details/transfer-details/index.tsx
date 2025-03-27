@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { BalanceModel } from "@/models/balance.model"
+import { BalanceServices } from "@/services/balance.service"
 import { EncryptionService } from "@/services/encryption.service"
 import { UserService } from "@/services/user.service"
 import { WalletService } from "@/services/wallet.service"
@@ -27,6 +28,7 @@ const IndexTransferDetails = ({
   const { t } = useTranslation()
 
   const userService = useMemo(() => new UserService(), [])
+  const balanceServices = useMemo(() => new BalanceServices(), [])
   const encryptionService = useMemo(() => new EncryptionService(), [])
   const walletService = useMemo(() => new WalletService(), [])
 
@@ -109,27 +111,15 @@ const IndexTransferDetails = ({
     const owner = balanceData.owner
     const recipient = transferTo
     const amount = parseFloat(fixBalanceReverse(quantity.toString(), 12))
-    let dispatchInfo: RuntimeDispatchInfo = null
+    const estimatedFee = await balanceServices.getEstimateTransferFee(
+      wsAPI,
+      balanceData.token,
+      owner,
+      recipient,
+      amount
+    )
 
-    if (balanceData.token.type == "Native") {
-      dispatchInfo = await wsAPI.tx.balances
-        .transfer(recipient, amount)
-        .paymentInfo(owner)
-    }
-
-    if (balanceData.token.type == "Asset") {
-      const assetId = balanceData.token.network_id
-      dispatchInfo = await wsAPI.tx.assets
-        .transfer(assetId, recipient, amount)
-        .paymentInfo(owner)
-    }
-
-    if (dispatchInfo !== null) {
-      const rawFee = BigInt(dispatchInfo.partialFee.toString())
-      const formattedFee = Number(rawFee) / Math.pow(10, 12)
-      setEstimatedFee(formattedFee)
-    }
-
+    setEstimatedFee(estimatedFee)
     setIsEstimatedFeesDrawerOpen(true)
 
     setIsSendInProgress(false)
@@ -161,70 +151,38 @@ const IndexTransferDetails = ({
         const recipient = transferTo
         const amount = Number(fixBalanceReverse(quantity.toString(), 12))
 
-        if (balanceData.token.type == "Native") {
-          wsAPI.tx.balances
-            .transferAllowDeath(recipient, amount)
-            .signAndSend(signature, (result) => {
-              console.log(result.status)
+        balanceServices.transfer(
+          wsAPI,
+          balanceData.token,
+          signature,
+          recipient,
+          amount,
+          (extrinsicResults) => {
+            if (extrinsicResults.isInBlock) {
+              toast({
+                description: (
+                  <div className="flex items-center">
+                    <Check className="mr-2 text-green-500" />
+                    {t("Transfer Successful!")}
+                  </div>
+                ),
+                variant: "default"
+              })
+            } else if (extrinsicResults.isError) {
+              toast({
+                description: (
+                  <div className="flex items-center">
+                    <X className="mr-2 text-red-500" />
+                    {t("Error: ")}: {extrinsicResults.dispatchError.toString()}
+                  </div>
+                ),
+                variant: "destructive"
+              })
+            }
 
-              handleTransferStatusCallbacks(result.status)
-
-              if (result.status.isInBlock) {
-                toast({
-                  description: (
-                    <div className="flex items-center">
-                      <Check className="mr-2 text-green-500" />
-                      {t("Transfer Successful!")}
-                    </div>
-                  ),
-                  variant: "default"
-                })
-              } else if (result.isError) {
-                toast({
-                  description: (
-                    <div className="flex items-center">
-                      <X className="mr-2 text-red-500" />
-                      {t("Error: ")}: {result.dispatchError.toString()}
-                    </div>
-                  ),
-                  variant: "destructive"
-                })
-              }
-            })
-        }
-
-        if (balanceData.token.type == "Asset") {
-          const assetId = balanceData.token.network_id
-          const formattedAmount = wsAPI.createType("Compact<u128>", amount)
-
-          wsAPI.tx.assets
-            .transfer(assetId, recipient, formattedAmount)
-            .signAndSend(signature, (result) => {
-              handleTransferStatusCallbacks(result.status)
-
-              if (result.status.isInBlock) {
-                toast({
-                  description: (
-                    <div className="flex items-center">
-                      <Check className="mr-2 text-green-500" />
-                      {t("Transfer Successful!")}
-                    </div>
-                  ),
-                  variant: "default"
-                })
-              } else if (result.isError) {
-                toast({
-                  description: (
-                    <div className="flex items-center">
-                      <X className="mr-2 text-red-500" />
-                      {t("Error: ")}: {result.dispatchError.toString()}
-                    </div>
-                  ),
-                  variant: "destructive"
-                })
-              }
-            })
-        }
+            handleTransferStatusCallbacks(extrinsicResults.status)
+          }
+        )
       } else {
         // navigate to login
       }
@@ -257,7 +215,7 @@ const IndexTransferDetails = ({
             <Label className="pb-2">
               {t("Description")}:
               <span className="p-2 font-extrabold text-input-primary">
-                {balanceData.token.description || "N/A"}
+                {balanceData.token.name || "N/A"}
               </span>
             </Label>
             <Label className="pb-2">

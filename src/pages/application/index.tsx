@@ -64,9 +64,7 @@ const IndexApplication = () => {
           <div className="background-inside-theme">
             <Header
               currentPage={currentPage}
-              handleCurrentNetwork={(network) => {
-                handleCurrentNetwork(network)
-              }}
+              handleCurrentNetwork={handleCurrentNetwork}
             />
             <div className="h-[calc(100vh-60px)]">
               <ScrollArea className="px-4 h-full">
@@ -76,13 +74,28 @@ const IndexApplication = () => {
                     currentWsAPI={currentWsAPI}
                   />
                 )}
-                {currentPage === t("Tokens") && <IndexTokens />}
-                {currentPage === t("Network Status") && <IndexNetworkStatus />}
-                {currentPage === t("Pump") && <IndexPumpToken />}
+                {currentPage === t("Tokens") && (
+                  <IndexTokens
+                    currentNetwork={currentNetwork}
+                    currentWsAPI={currentWsAPI}
+                  />
+                )}
+                {currentPage === t("Network Status") && (
+                  <IndexNetworkStatus
+                    currentNetwork={currentNetwork}
+                    currentWsAPI={currentWsAPI}
+                  />
+                )}
                 {currentPage === t("Wallets") && (
                   <IndexWallets handleSetCurrentPage={handleSetCurrentPage} />
                 )}
                 {currentPage === t("Support") && <IndexImUrAi />}
+                {currentPage === t("Pump") && (
+                  <IndexPumpToken
+                    currentNetwork={currentNetwork}
+                    currentWsAPI={currentWsAPI}
+                  />
+                )}
               </ScrollArea>
             </div>
           </div>

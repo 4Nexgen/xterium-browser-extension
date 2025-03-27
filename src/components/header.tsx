@@ -17,10 +17,10 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/u
 import { Popover } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { NetworkData } from "@/data/network.data"
-import { NetworkImages, type NetworkModel } from "@/models/network.model"
+import { NetworkLogos } from "@/data/network-logos.data"
+import { networkData } from "@/data/networks.data"
+import { NetworkModel } from "@/models/network.model"
 import { NetworkService } from "@/services/network.service"
-import { ApiPromise, Keyring, WsProvider } from "@polkadot/api"
 import { Label } from "@radix-ui/react-dropdown-menu"
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
 import { useTheme } from "next-themes"
@@ -29,12 +29,12 @@ import React, { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 interface HeaderProps {
-  currentPage?: string
+  currentPage: string
   variant?: "default" | "outside"
-  handleCurrentNetwork?: (network: NetworkModel) => void
+  handleCurrentNetwork: (network: NetworkModel) => Promise<void>
 }
 
-const Header: React.FC<HeaderProps> = ({
+const Header = ({
   currentPage,
   variant = "default",
   handleCurrentNetwork
@@ -42,7 +42,7 @@ const Header: React.FC<HeaderProps> = ({
   const { t } = useTranslation()
   const networkService = new NetworkService()
 
-  const [networks, setNetworks] = useState<NetworkModel[]>(NetworkData)
+  const [networks, setNetworks] = useState<NetworkModel[]>([])
   const [openNetworks, setOpenNetworks] = useState<boolean>(false)
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
   const [isChangeNetwork, setIsChangeNetwork] = useState<boolean>(false)
@@ -50,30 +50,38 @@ const Header: React.FC<HeaderProps> = ({
 
   const { theme } = useTheme()
 
-  const getNetworkImage = (imageName: string) => {
-    const networkImages = new NetworkImages()
-    return networkImages.getBase64Image(imageName)
+  useEffect(() => {
+    if (networkData.length > 0) {
+      setNetworks(networkData)
+    }
+  }, [networkData])
+
+  const getNetworkLogo = (imageName: string) => {
+    const networkImages = new NetworkLogos()
+    return networkImages.getLogo(imageName)
   }
 
   const getNetwork = async () => {
     const data = await networkService.getNetwork()
     if (data) {
       setSelectedNetwork(data)
-      handleCurrentNetwork(data)
+      if (handleCurrentNetwork) handleCurrentNetwork(data)
     } else {
       const defaultNetwork = networks.find((network) => network.name === "Xode")
       if (defaultNetwork) {
         setSelectedNetwork(defaultNetwork)
         networkService.setNetwork(defaultNetwork)
-        
-        handleCurrentNetwork(defaultNetwork)
+
+        if (handleCurrentNetwork) handleCurrentNetwork(defaultNetwork)
       }
     }
   }
 
   useEffect(() => {
-    getNetwork()
-  }, [])
+    if (networks.length > 0) {
+      getNetwork()
+    }
+  }, [networks])
 
   const confirmChangeNetwork = () => {
     networkService.setNetwork(chosenNetwork).then((results) => {
@@ -116,10 +124,10 @@ const Header: React.FC<HeaderProps> = ({
               <div className="flex items-center">
                 <div className="w-5 h-5 mr-2 relative">
                   <Image
-                    src={getNetworkImage(selectedNetwork ? selectedNetwork.name : "")}
+                    src={getNetworkLogo(selectedNetwork ? selectedNetwork.name : "")}
                     alt="XON Logo"
-                    layout="fill"
-                    objectFit="contain"
+                    fill
+                    style={{ objectFit: "contain" }}
                   />
                 </div>
                 {selectedNetwork ? selectedNetwork.name : "Select Network"}
@@ -149,10 +157,10 @@ const Header: React.FC<HeaderProps> = ({
                       <div className="flex items-center">
                         <div className="w-5 h-5 mr-2 relative">
                           <Image
-                            src={getNetworkImage(network.name)}
+                            src={getNetworkLogo(network.name)}
                             alt="XON Logo"
-                            layout="fill"
-                            objectFit="contain"
+                            style={{ objectFit: "contain" }}
+                            fill
                           />
                         </div>
                         {network.name}
@@ -179,11 +187,12 @@ const Header: React.FC<HeaderProps> = ({
                 <br />
                 <div className="flex items-center justify-center space-x-2">
                   <Image
-                    src={getNetworkImage(chosenNetwork ? chosenNetwork.name : "")}
+                    src={getNetworkLogo(chosenNetwork ? chosenNetwork.name : "")}
                     alt="XON Logo"
                     width={22}
                     height={22}
                     className="rounded"
+                    style={{ objectFit: "contain" }}
                   />
                   <span className="text-lg font-bold text-[#B375DC]">
                     {chosenNetwork ? chosenNetwork.name : "Select Network"}

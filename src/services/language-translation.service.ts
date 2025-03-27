@@ -1,5 +1,4 @@
 import { Storage } from "@plasmohq/storage"
-
 import i18n from "../i18n"
 
 export class LanguageTranslationService {
@@ -7,8 +6,7 @@ export class LanguageTranslationService {
     area: "local",
     allCopied: true
   })
-
-  private key = "language"
+  private storageKey = "language"
 
   async changeLanguage(lng: string): Promise<void> {
     i18n.changeLanguage(lng)
@@ -22,30 +20,21 @@ export class LanguageTranslationService {
       ko: "Korean",
       zh: "Chinese"
     }
+
     return languageMap[lng] || "English"
   }
 
   async getStoredLanguage(): Promise<string | null> {
-    return new Promise((resolve, reject) => {
-      this.storage
-        .get<string>(this.key)
-        .then((language) => {
-          if (language) {
-            resolve(language)
-          } else {
-            resolve(null)
-          }
-        })
-        .catch((error) => reject(`Error retrieving language: ${error}`))
-    })
+    const storedData = await this.storage.get<string>(this.storageKey)
+    if (!storedData) {
+      return null
+    }
+
+    return storedData
   }
 
-  async setStoredLanguage(lng: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.storage
-        .set(this.key, lng)
-        .then(() => resolve())
-        .catch((error) => reject(`Error storing language: ${error}`))
-    })
+  async setStoredLanguage(lng: string): Promise<boolean> {
+    await this.storage.set(this.storageKey, lng)
+    return true
   }
 }

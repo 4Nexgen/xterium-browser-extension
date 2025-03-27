@@ -2,14 +2,23 @@ export class TokenModel {
   id: number
   type: string
   network: string
-  network_id: number
-  symbol?: string
-  description?: string
-  image_url: string
-  preloaded?: boolean
-  assetId?: number
-  decimals?: number
-  marketCap?: number; 
-  price?: number; 
-
+  token_id: number
+  symbol: string
+  name: string
+  description: string
+  decimals: number
+  price: number;
+  owner: string
+  issuer: string
+  admin: string
+  freezer: string
+  supply: number
+  deposit: number
+  minBalance: number
+  isSufficient: boolean
+  accounts: number
+  sufficients: number
+  approvals: number
+  status: string
+  created_at: string
 }

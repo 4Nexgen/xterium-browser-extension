@@ -8,44 +8,27 @@ export class NetworkService {
     area: "local",
     allCopied: true
   })
-  private storageKey = "networks"
+  private storageKey = "network"
 
-  async getNetwork(): Promise<NetworkModel> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const storedData = await this.storage.get<string>(this.storageKey)
+  async getNetwork(): Promise<NetworkModel | null> {
+    const storedData = await this.storage.get<string>(this.storageKey)
 
-        if (!storedData) {
-          return resolve(null)
-        }
+    if (!storedData) {
+      return null
+    }
 
-        const network: NetworkModel = JSON.parse(storedData)
-        resolve(network)
-      } catch (error) {
-        reject(error)
-      }
-    })
+    const network: NetworkModel = JSON.parse(storedData)
+    return network
   }
 
-  async setNetwork(data: NetworkModel): Promise<boolean | any> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await this.storage.set(this.storageKey, JSON.stringify(data))
-
-        resolve(true)
-      } catch (error) {
-        reject(error)
-      }
-    })
+  async setNetwork(data: NetworkModel): Promise<boolean> {
+    await this.storage.set(this.storageKey, JSON.stringify(data))
+    return true
   }
 
   async connectRPC(rpc: string): Promise<ApiPromise | null> {
-    try {
-      const wsUrl = rpc
-      const wsProvider = new WsProvider(wsUrl)
-      return await ApiPromise.create({ provider: wsProvider })
-    } catch (error) {
-      throw new Error("RPC connection failed.")
-    }
+    const wsUrl = rpc
+    const wsProvider = new WsProvider(wsUrl)
+    return await ApiPromise.create({ provider: wsProvider })
   }
 }

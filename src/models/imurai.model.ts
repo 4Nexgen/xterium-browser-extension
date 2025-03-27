@@ -1,4 +1,4 @@
-export interface VAModel {
+export class VAModel {
   id: string
   name: string
   description: string
