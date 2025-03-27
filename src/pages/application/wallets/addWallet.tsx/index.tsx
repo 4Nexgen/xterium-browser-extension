@@ -53,8 +53,8 @@ const IndexAddWallet = ({
   const [isProcessing, setIsProcessing] = useState(false)
 
   const [isNameDuplicate, setIsNameDuplicate] = useState(false)
-  const [isMnemonicDuplicate, setIsMnemonicDuplicate] = useState(false)
-  const [walletData, setWalletData] = useState<WalletModel>({
+  const [isPublicKeyDuplicate, setIsPublicKeyDuplicate] = useState(false)
+  const [wallet, setWallet] = useState<WalletModel>({
     id: 0,
     name: "",
     address_type: "",
@@ -76,7 +76,18 @@ const IndexAddWallet = ({
     }
   }, [currentWsAPI])
 
-  const handleInputChange = async (field: keyof typeof walletData, value: string) => {
+  const checkDuplicateName = async (name: string): Promise<boolean> => {
+    const wallets = await walletService.getWallets()
+    return wallets.some((d) => d.name === name)
+  }
+
+  const checkDuplicatePublicKey = async (publicKey: string): Promise<boolean> => {
+    const wallets = await walletService.getWallets()
+    const isSome = wallets.some((d) => d.public_key === publicKey)
+    return isSome
+  }
+
+  const handleInputChange = async (field: keyof typeof wallet, value: string) => {
     if (field === "name") {
       const isDuplicate = await checkDuplicateName(value)
       setIsNameDuplicate(isDuplicate)
@@ -96,7 +107,7 @@ const IndexAddWallet = ({
 
     if (field === "public_key") {
       const isDuplicate = await checkDuplicatePublicKey(value)
-      setIsMnemonicDuplicate(isDuplicate)
+      setIsPublicKeyDuplicate(isDuplicate)
 
       if (isDuplicate) {
         toast({
@@ -108,25 +119,13 @@ const IndexAddWallet = ({
           ),
           variant: "destructive"
         })
-        return
       }
     }
 
-    setWalletData((prev) => ({
+    setWallet((prev) => ({
       ...prev,
       [field]: value
     }))
-  }
-
-  const checkDuplicateName = async (name: string): Promise<boolean> => {
-    const wallets = await walletService.getWallets()
-    return wallets.some((d) => d.name === name)
-  }
-
-  const checkDuplicatePublicKey = async (publicKey: string): Promise<boolean> => {
-    const wallets = await walletService.getWallets()
-    const isSome = wallets.some((d) => d.public_key === publicKey)
-    return isSome
   }
 
   const generateMnemonic = () => {
@@ -180,7 +179,7 @@ const IndexAddWallet = ({
       return
     }
 
-    if (isMnemonicDuplicate) {
+    if (isPublicKeyDuplicate) {
       toast({
         description: (
           <div className="flex items-center">
@@ -196,10 +195,10 @@ const IndexAddWallet = ({
     }
 
     if (
-      !walletData.name ||
-      !walletData.mnemonic_phrase ||
-      !walletData.secret_key ||
-      !walletData.public_key
+      !wallet.name ||
+      !wallet.mnemonic_phrase ||
+      !wallet.secret_key ||
+      !wallet.public_key
     ) {
       toast({
         description: (
@@ -222,17 +221,14 @@ const IndexAddWallet = ({
 
     const isLogin = await userService.login(userPassword)
     if (isLogin) {
-      walletData.mnemonic_phrase = encryptionService.encrypt(
+      wallet.mnemonic_phrase = encryptionService.encrypt(
         userPassword,
-        walletData.mnemonic_phrase
+        wallet.mnemonic_phrase
       )
-      walletData.secret_key = encryptionService.encrypt(
-        userPassword,
-        walletData.secret_key
-      )
-      walletData.address_type = network ? network.name : ""
+      wallet.secret_key = encryptionService.encrypt(userPassword, wallet.secret_key)
+      wallet.address_type = network ? network.name : ""
 
-      const createWallet = await walletService.createWallet(walletData)
+      const createWallet = await walletService.createWallet(wallet)
       if (createWallet) {
         toast({
           description: (
@@ -272,7 +268,7 @@ const IndexAddWallet = ({
           <Input
             type="text"
             placeholder={t("Wallet Name")}
-            value={walletData.name}
+            value={wallet.name}
             onChange={(e) => handleInputChange("name", e.target.value)}
           />
         </div>
@@ -281,7 +277,7 @@ const IndexAddWallet = ({
           <div className="flex items-center gap-2">
             <textarea
               placeholder={t("Mnemonic Phrase")}
-              value={walletData.mnemonic_phrase}
+              value={wallet.mnemonic_phrase}
               onChange={(e) => {
                 handleInputChange("mnemonic_phrase", e.target.value)
                 onUserInput(e)
@@ -304,7 +300,7 @@ const IndexAddWallet = ({
           <Label>{t("Secret Key")}:</Label>
           <textarea
             placeholder={t("Secret Key")}
-            value={walletData.secret_key}
+            value={wallet.secret_key}
             onChange={(e) => handleInputChange("secret_key", e.target.value)}
             className="w-full p-2 bg-input rounded text-sm font-semibold"
             rows={3}
@@ -315,7 +311,7 @@ const IndexAddWallet = ({
           <Input
             type="text"
             placeholder={t("Public Key")}
-            value={walletData.public_key}
+            value={wallet.public_key}
             onChange={(e) => handleInputChange("public_key", e.target.value)}
             readOnly
           />
@@ -327,11 +323,11 @@ const IndexAddWallet = ({
             onClick={saveWallet}
             disabled={
               isNameDuplicate ||
-              isMnemonicDuplicate ||
-              !walletData.name ||
-              !walletData.mnemonic_phrase ||
-              !walletData.secret_key ||
-              !walletData.public_key
+              isPublicKeyDuplicate ||
+              !wallet.name ||
+              !wallet.mnemonic_phrase ||
+              !wallet.secret_key ||
+              !wallet.public_key
             }>
             {t("SAVE")}
           </Button>

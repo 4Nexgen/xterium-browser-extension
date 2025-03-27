@@ -182,8 +182,8 @@ const IndexWallet = ({
                           <span>...</span>
                           <span>{wallet.public_key.slice(-4)}</span>
                         </TableCell>
-                        <TableCell className="w-[30px] flex justify-center items-center text-center text-red-500 pr-4">
-                          <div className="flex gap-2">
+                        <TableCell className="min-w-[30px] flex justify-end items-center text-red-500 pr-4">
+                          <div className="flex gap-2 text-right">
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger>

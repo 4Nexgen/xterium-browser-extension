@@ -58,7 +58,7 @@ const IndexApplication = () => {
   return (
     <main className="max-h-screen">
       {currentPage === "import-wallet" ? (
-        <IndexImportWalletPage handleCallbacks={handleSetCurrentPage} />
+        <IndexImportWalletPage handleSetCurrentPage={handleSetCurrentPage} />
       ) : (
         <Layout onSetCurrentPage={handleSetCurrentPage}>
           <div className="background-inside-theme">

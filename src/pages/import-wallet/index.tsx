@@ -3,81 +3,83 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
 import i18n from "@/i18n"
-import type { NetworkModel } from "@/models/network.model"
 import type { WalletModel } from "@/models/wallet.model"
-import { EncryptionService } from "@/services/encryption.service"
 import { LanguageTranslationService } from "@/services/language-translation.service"
-import { NetworkService } from "@/services/network.service"
-import { UserService } from "@/services/user.service"
 import { WalletService } from "@/services/wallet.service"
-import { u8aToHex } from "@polkadot/util"
-import {
-  cryptoWaitReady,
-  encodeAddress,
-  mnemonicToMiniSecret,
-  mnemonicValidate,
-  sr25519PairFromSeed
-} from "@polkadot/util-crypto"
 import { ArrowLeft, Check, X } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
-const IndexImportWalletPage = ({ handleCallbacks }) => {
+interface IndexImportWalletPageProps {
+  handleSetCurrentPage: (currentPage: string) => void
+}
+
+const IndexImportWalletPage = ({ handleSetCurrentPage }: IndexImportWalletPageProps) => {
   const { t } = useTranslation()
-  const [isLoading, setIsLoading] = useState(false)
+
   const { toast } = useToast()
-  const languageTranslationService = new LanguageTranslationService()
-  const [selectedLanguage, setSelectedLanguage] = useState("English")
-  const networkService = new NetworkService()
-  const userService = new UserService()
-  const walletService = new WalletService()
-  const [selectedNetwork, setSelectedNetwork] = useState<NetworkModel>(null)
-  const [walletData, setWalletData] = useState<WalletModel>({
+
+  const walletService = useMemo(() => new WalletService(), [])
+  const languageTranslationService = useMemo(() => new LanguageTranslationService(), [])
+
+  const [isProcessing, setIsProcessing] = useState(false)
+
+  const [isNameDuplicate, setIsNameDuplicate] = useState(false)
+  const [isPublicKeyDuplicate, setIsPublicKeyDuplicate] = useState(false)
+  const [wallet, setWallet] = useState<WalletModel>({
     id: 0,
     name: "",
     address_type: "",
     mnemonic_phrase: "",
     secret_key: "",
     public_key: "",
-    balances: [],
-    type: "Xode",
-    metaGenesisHash: "",
-    metaName: "",
-    metaSource: "",
-    tokenSymbol: ""
+    type: ""
   })
-  const [nameError, setNameError] = useState("")
-  const [mnemonicError, setMnemonicError] = useState("")
 
-  const getNetwork = () => {
-    networkService.getNetwork().then((data) => {
-      setSelectedNetwork(data)
-    })
-  }
-
-  const getStoredLanguage = () => {
-    languageTranslationService
-      .getStoredLanguage()
-      .then((storedLanguage) => {
-        if (storedLanguage) {
-          setSelectedLanguage(languageTranslationService.getLanguageName(storedLanguage))
-          i18n.changeLanguage(storedLanguage)
-        }
-      })
-      .catch((error) => {
-        console.error("Error loading stored language:", error)
-      })
+  const initializedLanguage = async () => {
+    const storedLanguage = await languageTranslationService.getStoredLanguage()
+    if (storedLanguage) {
+      i18n.changeLanguage(storedLanguage)
+    }
   }
 
   useEffect(() => {
-    getNetwork()
-    getStoredLanguage()
+    initializedLanguage()
   }, [])
 
-  const handleInputChange = (field: keyof typeof walletData, value: string) => {
-    setWalletData((prev) => ({
+  const checkDuplicateName = async (name: string): Promise<boolean> => {
+    const wallets = await walletService.getWallets()
+    return wallets.some((d) => d.name === name)
+  }
+
+  const checkDuplicatePublicKey = async (publicKey: string): Promise<boolean> => {
+    const wallets = await walletService.getWallets()
+    const isSome = wallets.some((d) => d.public_key === publicKey)
+    return isSome
+  }
+
+  const handleInputChange = async (field: keyof typeof wallet, value: string) => {
+    if (field === "name") {
+      const isDuplicate = await checkDuplicateName(value)
+      setIsNameDuplicate(isDuplicate)
+
+      if (isDuplicate) {
+        toast({
+          description: (
+            <div className="flex items-center">
+              <X className="mr-2 text-red-500" />
+              {t("A wallet with this name already exists. Please enter a unique name.")}
+            </div>
+          ),
+          variant: "destructive"
+        })
+      }
+    }
+
+    setWallet((prev) => ({
       ...prev,
       [field]: value
     }))
@@ -90,29 +92,14 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
       reader.onload = (e) => {
         try {
           const jsonData = JSON.parse(e.target.result as string)
-
-          if (jsonData.mnemonic_phrase && mnemonicValidate(jsonData.mnemonic_phrase)) {
-            handleInputChange("mnemonic_phrase", jsonData.mnemonic_phrase)
-            handleInputChange("secret_key", jsonData.secret_key || "")
-            handleInputChange("public_key", jsonData.public_key || "")
-            createKeys(jsonData.mnemonic_phrase)
-          } else {
-            toast({
-              description: (
-                <div className="flex items-center">
-                  <X className="mr-2 text-red-500" />
-                  Invalid mnemonic phrase in JSON!
-                </div>
-              ),
-              variant: "destructive"
-            })
-          }
+          const uploadedWallet = jsonData as unknown as WalletModel
+          setWallet(uploadedWallet)
         } catch (error) {
           toast({
             description: (
               <div className="flex items-center">
                 <X className="mr-2 text-red-500" />
-                Failed to read the JSON file!
+                {t("Failed to read the JSON file!")}
               </div>
             ),
             variant: "destructive"
@@ -123,49 +110,36 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
     }
   }
 
-  const createKeys = (mnemonicPhrase) => {
-    cryptoWaitReady().then(() => {
-      const seed = mnemonicToMiniSecret(mnemonicPhrase)
-      const { publicKey, secretKey } = sr25519PairFromSeed(seed)
+  useEffect(() => {
+    const executePublicKeyChecker = async () => {
+      const isDuplicate = await checkDuplicatePublicKey(wallet.public_key)
+      setIsPublicKeyDuplicate(isDuplicate)
 
-      handleInputChange("secret_key", u8aToHex(secretKey))
-      handleInputChange("public_key", encodeAddress(publicKey))
-    })
-  }
+      if (isDuplicate) {
+        toast({
+          description: (
+            <div className="flex items-center">
+              <X className="mr-2 text-red-500" />
+              {t("This wallet is already exists.")}
+            </div>
+          ),
+          variant: "destructive"
+        })
+      }
+    }
 
-  const checkForDuplicateName = async (name: string): Promise<boolean> => {
-    const wallets = await walletService.getWallets()
-    return wallets.some((wallet) => wallet.name === name)
-  }
+    executePublicKeyChecker()
+  }, [wallet])
 
-  const checkForDuplicateMnemonic = async (mnemonic: string): Promise<boolean> => {
-    const wallets = await walletService.getWallets()
-    const encryptionService = new EncryptionService()
+  const importWallet = async () => {
+    setIsProcessing(true)
 
-    const decryptedMnemonics = await Promise.all(
-      wallets.map(async (wallet) => {
-        const decryptedPassword = await userService.getWalletPassword()
-        return encryptionService.decrypt(decryptedPassword, wallet.mnemonic_phrase)
-      })
-    )
-
-    return decryptedMnemonics.some((decryptedMnemonic) => decryptedMnemonic === mnemonic)
-  }
-
-  const saveWallet = async () => {
-    setNameError("")
-    setMnemonicError("")
-    if (
-      !walletData.name ||
-      !walletData.mnemonic_phrase ||
-      !walletData.secret_key ||
-      !walletData.public_key
-    ) {
+    if (isNameDuplicate) {
       toast({
         description: (
           <div className="flex items-center">
             <X className="mr-2 text-red-500" />
-            All fields must be filled out!
+            {t("A wallet with this name already exists. Please enter a unique name.")}
           </div>
         ),
         variant: "destructive"
@@ -173,100 +147,42 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
       return
     }
 
-    setIsLoading(true)
-
-    const isDuplicateName = await checkForDuplicateName(walletData.name)
-    if (isDuplicateName) {
-      setNameError("A wallet with this name already exists.")
-      setIsLoading(false)
+    if (isPublicKeyDuplicate) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-red-500" />
+            {t("A wallet with this key already exists.")}
+          </div>
+        ),
+        variant: "destructive"
+      })
       return
     }
 
-    const isDuplicateMnemonic = await checkForDuplicateMnemonic(
-      walletData.mnemonic_phrase
-    )
-    if (isDuplicateMnemonic) {
-      setMnemonicError("This mnemonic phrase is already in use.")
-      setIsLoading(false)
-      return
+    const createWallet = await walletService.createWallet(wallet)
+    if (createWallet) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <Check className="mr-2 text-green-500" />
+            {t("Wallet Imported Successfully!")}
+          </div>
+        ),
+        variant: "default"
+      })
+
+      setIsProcessing(false)
+      handleSetCurrentPage(t("Wallets"))
     }
-
-    userService.getWalletPassword().then((decryptedPassword) => {
-      if (decryptedPassword) {
-        const encryptionService = new EncryptionService()
-
-        const mnemonic_phrase = encryptionService.encrypt(
-          decryptedPassword,
-          walletData.mnemonic_phrase
-        )
-        const secret_key = encryptionService.encrypt(
-          decryptedPassword,
-          walletData.secret_key
-        )
-
-        walletData.mnemonic_phrase = mnemonic_phrase
-        walletData.secret_key = secret_key
-        walletData.address_type = selectedNetwork ? selectedNetwork.name : ""
-
-        walletService.createWallet(walletData).then((result) => {
-          if (result != null) {
-            toast({
-              description: (
-                <div className="flex items-center">
-                  <Check className="mr-2 text-green-500" />
-                  Wallet Imported Successfully!
-                </div>
-              ),
-              variant: "default"
-            })
-            setTimeout(() => {
-              setIsLoading(false)
-              resetForm()
-              handleCallbacks(t("Wallets"))
-            }, 1500)
-          } else {
-            setIsLoading(false)
-          }
-        })
-      } else {
-        setIsLoading(false)
-      }
-    })
   }
 
   const handleBackClick = () => {
-    handleCallbacks(t("Wallets"))
-  }
-
-  const resetForm = () => {
-    setWalletData({
-      id: 0,
-      name: "",
-      address_type: "",
-      mnemonic_phrase: "",
-      secret_key: "",
-      public_key: "",
-      balances: [],
-      type: "",
-      metaGenesisHash: "",
-      metaName: "",
-      metaSource: "",
-      tokenSymbol: ""
-    })
+    handleSetCurrentPage(t("Wallets"))
   }
 
   return (
     <>
-      {isLoading && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-            <div className="flex flex-col items-center">
-              <div className="animate-spin border-4 border-blue-400 border-t-transparent rounded-full w-16 h-16 mb-4"></div>
-              <p className="text-white text-lg font-semibold">{t("Adding wallet...")}</p>
-            </div>
-          </div>
-        </div>
-      )}
       <div className="bg-background-sheet flex justify-center items-center">
         <div className="bg-white background-inside-theme h-screen max-w-xl w-full">
           <header className=" p-6 flex items-center border-b border-border-1">
@@ -283,10 +199,9 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
               <Input
                 type="text"
                 placeholder={t("Wallet Name")}
-                value={walletData.name}
+                value={wallet.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
               />
-              {nameError && <p className="text-red-500 text-sm mt-1">{nameError}</p>}
             </div>
 
             <div className="mb-3">
@@ -297,9 +212,6 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
                 onChange={handleFileUpload}
                 className="w-full p-2 rounded bg-input text-sm font-semibold"
               />
-              {mnemonicError && (
-                <p className="text-red-500 text-sm mt-1">{mnemonicError}</p>
-              )}
             </div>
 
             <div className="mt-5 mb-3">
@@ -307,13 +219,24 @@ const IndexImportWalletPage = ({ handleCallbacks }) => {
                 type="button"
                 variant="jelly"
                 className="my-auto"
-                onClick={saveWallet}>
-                {t("SAVE")}
+                disabled={
+                  isNameDuplicate ||
+                  isPublicKeyDuplicate ||
+                  !wallet.name ||
+                  !wallet.mnemonic_phrase ||
+                  !wallet.secret_key ||
+                  !wallet.public_key ||
+                  isProcessing
+                }
+                onClick={importWallet}>
+                {t("IMPORT")}
               </Button>
             </div>
           </div>
         </div>
       </div>
+
+      <Toaster />
     </>
   )
 }

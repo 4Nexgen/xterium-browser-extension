@@ -22,7 +22,7 @@ import { z } from "zod"
 import Layout from "../layout"
 
 interface IndexCreatePasswordProps {
-  handleSetCurrentPage?: (currentPage: string) => void
+  handleSetCurrentPage: (currentPage: string) => void
 }
 
 const IndexCreatePassword = ({ handleSetCurrentPage }: IndexCreatePasswordProps) => {

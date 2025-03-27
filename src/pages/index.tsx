@@ -48,7 +48,9 @@ const IndexPages = () => {
       {currentPage === "create-password" && (
         <IndexCreatePassword handleSetCurrentPage={handleSetCurrentPage} />
       )}
-      {currentPage === "login" && <IndexLogin onSetCurrentPage={handleSetCurrentPage} />}
+      {currentPage === "login" && (
+        <IndexLogin handleSetCurrentPage={handleSetCurrentPage} />
+      )}
       {currentPage === "application" && <IndexApplication />}
     </>
   )

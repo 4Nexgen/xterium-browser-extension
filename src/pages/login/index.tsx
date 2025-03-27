@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -24,7 +23,11 @@ import { z } from "zod"
 
 import OutsideLayout from "../layout"
 
-const IndexLogin = ({ onSetCurrentPage }) => {
+interface IndexLoginProps {
+  handleSetCurrentPage: (currentPage: string) => void
+}
+
+const IndexLogin = ({ handleSetCurrentPage }: IndexLoginProps) => {
   const { t } = useTranslation()
 
   const userService = useMemo(() => new UserService(), [])
@@ -74,7 +77,7 @@ const IndexLogin = ({ onSetCurrentPage }) => {
   const login = async (data: z.infer<typeof FormSchema>) => {
     const isLogin = await userService.login(data.password)
     if (isLogin) {
-      onSetCurrentPage("application")
+      handleSetCurrentPage("application")
     } else {
       toast({
         description: (
