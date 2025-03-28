@@ -1,7 +1,7 @@
 {
   "name": "xterium-browser-extension",
   "displayName": "Xterium",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Xterium is a Web3 wallet designed to interact with Xode and other Polkadot blockchains, directly from your browser.",
   "author": "Xode",
   "scripts": {
