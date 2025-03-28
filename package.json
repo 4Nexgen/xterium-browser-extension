@@ -10,7 +10,7 @@
     "dev:plasmo": "sh run-dev.sh && plasmo dev",
     "dev:next": "next dev --port 1947",
     "build": "run-p build:*",
-    "build:plasmo": "plasmo build",
+    "build:plasmo": "sh run-dev.sh && plasmo build",
     "build:next": "next build"
   },
   "dependencies": {
