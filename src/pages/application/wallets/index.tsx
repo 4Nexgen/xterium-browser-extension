@@ -169,73 +169,76 @@ const IndexWallet = ({
             </div>
           ) : wallets.length > 0 ? (
             <>
-              <Card className="mb-3">
-                <Table>
-                  <TableBody>
-                    {wallets.map((wallet, index) => (
-                      <TableRow key={index} className="hover-bg-custom">
-                        <TableCell className="px-4">
-                          <div className="mb-[2px]">
-                            <span className="text-lg font-bold">{wallet.name}</span>
-                          </div>
-                          <span>{wallet.public_key.slice(0, 6)}</span>
-                          <span>...</span>
-                          <span>{wallet.public_key.slice(-4)}</span>
-                        </TableCell>
-                        <TableCell className="min-w-[30px] flex justify-end items-center text-red-500 pr-4">
-                          <div className="flex gap-2 text-right">
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <Button
-                                    onClick={() => copyWallet(wallet.public_key)}
-                                    className="flex items-center justify-center bg-transparent border-0 p-2 hover:bg-transparent"
-                                    variant="outline">
-                                    <Copy className="text-white" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>{t("Copy Address")}</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <Button
-                                    onClick={() => exportWallet(wallet)}
-                                    className="flex items-center justify-center bg-transparent border-0 p-2 hover:bg-transparent"
-                                    variant="outline">
-                                    <Download className="text-white" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>{t("Export Wallet")}</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <Button
-                                    onClick={() => deleteWallet(wallet)}
-                                    className="flex items-center justify-center bg-transparent border-0 p-2 hover:bg-transparent"
-                                    variant="outline">
-                                    <Trash className="text-red" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>{t("Delete Wallet")}</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Card>
+              {wallets.map((wallet, index) => (
+                <div key={index}>
+                  <Card className="mb-1 dark:border-[#16514d]">
+                    <Table>
+                      <TableBody>
+                        <TableRow className="hover-bg-custom">
+                          <TableCell className="px-4">
+                            <div className="mb-[2px]">
+                              <span className="text-lg font-bold">{wallet.name}</span>
+                            </div>
+                            <span>{wallet.public_key.slice(0, 6)}</span>
+                            <span>...</span>
+                            <span>{wallet.public_key.slice(-4)}</span>
+                          </TableCell>
+                          <TableCell className="min-w-[30px] flex justify-end items-center text-red-500 pr-4">
+                            <div className="flex gap-2 text-right">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Button
+                                      onClick={() => copyWallet(wallet.public_key)}
+                                      className="flex items-center justify-center bg-transparent border-0 p-2 hover:bg-transparent"
+                                      variant="outline">
+                                      <Copy className="text-white" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>{t("Copy Address")}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Button
+                                      onClick={() => exportWallet(wallet)}
+                                      className="flex items-center justify-center bg-transparent border-0 p-2 hover:bg-transparent"
+                                      variant="outline">
+                                      <Download className="text-white" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>{t("Export Wallet")}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Button
+                                      onClick={() => deleteWallet(wallet)}
+                                      className="flex items-center justify-center bg-transparent border-0 p-2 hover:bg-transparent"
+                                      variant="outline">
+                                      <Trash className="text-red" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>{t("Delete Wallet")}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </Card>
+                </div>
+              ))}
+              <div className="mt-4"></div>
             </>
           ) : (
             <div className="flex flex-col w-full items-center justify-center py-[100px] space-y-2">
@@ -257,7 +260,7 @@ const IndexWallet = ({
         </div>
 
         <Drawer open={isAddWalletDrawerOpen} onOpenChange={setIsAddWalletDrawerOpen}>
-          <DrawerContent>
+          <DrawerContent className="border-0">
             <DrawerHeader>
               <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
                 {t("ADD NEW WALLET")}
@@ -274,7 +277,7 @@ const IndexWallet = ({
         <Drawer
           open={isExportWalletDrawerOpen}
           onOpenChange={setIsExportWalletDrawerOpen}>
-          <DrawerContent>
+          <DrawerContent className="border-0">
             <DrawerHeader>
               <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
                 {t("EXPORT WALLET")}
@@ -287,7 +290,7 @@ const IndexWallet = ({
         <Drawer
           open={isDeleteWalletDrawerOpen}
           onOpenChange={setIsDeleteWalletDrawerOpen}>
-          <DrawerContent>
+          <DrawerContent className="border-0">
             <DrawerHeader>
               <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
                 {t("DELETE WALLET")}

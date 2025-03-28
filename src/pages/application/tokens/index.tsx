@@ -166,92 +166,83 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
                 {loading ? t("Loading...") : t("Loading...")}
               </p>
             </div>
-          ) : tokens?.filter((item) => item.network == network.name)?.length ? (
+          ) : tokens.length ? (
             <>
-              <Card className="mb-3 card-bg-image border-border">
-                <CardHeader>
-                  <CardTitle>
-                    <b>{t("NATIVE TOKEN")}</b>
-                  </CardTitle>
-                </CardHeader>
-                <Table>
-                  <TableBody>
-                    {tokens
-                      .filter(
-                        (token) =>
-                          token.type === "Native" &&
-                          token.network === (network ? network.name : "")
-                      )
-                      .map((token) => (
-                        <TableRow key={token.id}>
-                          <TableCell className="w-[50px] justify-center">
-                            <Image
-                              src={
-                                tokenLogoMap[token.symbol] || "/assets/tokens/default.png"
-                              }
-                              alt={`${token.description} Logo`}
-                              className="ml-1"
-                              width={40}
-                              height={40}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <div className="mb-[2px]">
-                              <span className="text-lg font-bold">{token.symbol}</span>
-                            </div>
-                            <Badge>{token.description}</Badge>
-                          </TableCell>
-                          <TableCell className="w-[30px] justify-center text-center pr-4"></TableCell>
-                        </TableRow>
-                      ))}
-                  </TableBody>
-                </Table>
-              </Card>
+              {tokens
+                .filter(
+                  (token) =>
+                    token.type === "Native" &&
+                    token.network === (network ? network.name : "")
+                )
+                .map((token, index) => (
+                  <div key={index}>
+                    <Card className="mb-1 card-bg-image dark:border-[#16514d]">
+                      <Table>
+                        <TableBody>
+                          <TableRow>
+                            <TableCell className="w-[50px] justify-center">
+                              <Image
+                                src={
+                                  tokenLogoMap[token.symbol] ||
+                                  "/assets/tokens/default.png"
+                                }
+                                alt={`${token.description} Logo`}
+                                className="ml-1"
+                                width={40}
+                                height={40}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <div className="mb-[2px]">
+                                <span className="text-lg font-bold">{token.symbol}</span>
+                              </div>
+                              <Badge>{token.description}</Badge>
+                            </TableCell>
+                            <TableCell className="w-[30px] justify-center text-center pr-4"></TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </Card>
+                  </div>
+                ))}
 
-              <Card className="mb-3 border-border">
-                <CardHeader>
-                  <CardTitle>
-                    <b>{t("ASSETS")}</b>
-                  </CardTitle>
-                </CardHeader>
-                <Table>
-                  <TableBody>
-                    {tokens
-                      .filter(
-                        (token) =>
-                          (token.type === "Asset" || token.type === "Pump") &&
-                          token.network === (network ? network.name : "")
-                      )
-                      .map((token) => (
-                        <TableRow key={token.id} className="cursor-pointer">
-                          <TableCell className="w-[50px] justify-center">
-                            <Image
-                              src={
-                                tokenLogoMap[token.symbol] || "/assets/tokens/default.png"
-                              }
-                              alt={`${token.description} Logo`}
-                              className="ml-1"
-                              width={40}
-                              height={40}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <div className="mb-[2px]">
-                              <span className="text-lg font-bold">
-                                {token.symbol.length > 20
-                                  ? token.symbol.substring(0, 20) + "..."
-                                  : token.symbol}
-                              </span>
-                            </div>
-                            <Badge>
-                              {token.description.length > 20
-                                ? token.description.substring(0, 20) + "..."
-                                : token.description}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="w-[30px] justify-center text-center pr-4">
-                            <div className="flex gap-2 items-center">
-                              {/* <TooltipProvider>
+              {tokens
+                .filter((token) => token.type === "Asset" || token.type === "Pump")
+                .map((token) => (
+                  <div key={token.id}>
+                    <Card className="mb-1 dark:border-[#16514d]">
+                      <Table>
+                        <TableBody>
+                          <TableRow className="cursor-pointer">
+                            <TableCell className="w-[50px] justify-center">
+                              <Image
+                                src={
+                                  tokenLogoMap[token.symbol] ||
+                                  "/assets/tokens/default.png"
+                                }
+                                alt={`${token.description} Logo`}
+                                className="ml-1"
+                                width={40}
+                                height={40}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <div className="mb-[2px]">
+                                <span className="text-lg font-bold">
+                                  {token.symbol.length > 20
+                                    ? token.symbol.substring(0, 20) + "..."
+                                    : token.symbol}
+                                </span>
+                              </div>
+                              <Badge>
+                                {token.description.length > 20
+                                  ? token.description.substring(0, 20) + "..."
+                                  : token.description}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="w-[30px] justify-center text-center pr-4">
+                              <div className="flex gap-2 items-center">
+                                {/* <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger>
                                     <button
@@ -288,13 +279,14 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
                                   </TooltipContent>
                                 </Tooltip>
                               </TooltipProvider> */}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                  </TableBody>
-                </Table>
-              </Card>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </Card>
+                  </div>
+                ))}
             </>
           ) : (
             <div className="flex flex-col w-full items-center justify-center py-[100px] space-y-2">
@@ -318,7 +310,7 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
         </Button>
 
         <Drawer open={isAddTokenDrawerOpen} onOpenChange={setIsAddTokenDrawerOpen}>
-          <DrawerContent>
+          <DrawerContent className="border-0">
             <DrawerHeader>
               <DrawerTitle className="border-b border-border-1/20 pb-4 text-muted">
                 {t("ADD NEW TOKEN")}
@@ -330,7 +322,7 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
 
         <Drawer open={isEditTokenDrawerOpen} onOpenChange={setIsEditTokenDrawerOpen}>
           <DrawerTrigger asChild></DrawerTrigger>
-          <DrawerContent>
+          <DrawerContent className="border-0">
             <DrawerHeader>
               <DrawerTitle className="flex items-center justify-center space-x-2 border-b border-border-1/20 pb-4 text-muted">
                 <span>{t("Edit")}</span>
@@ -353,7 +345,7 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
         </Drawer>
 
         <Drawer open={isDeleteTokenDrawerOpen} onOpenChange={setIsDeleteTokenDrawerOpen}>
-          <DrawerContent>
+          <DrawerContent className="border-0">
             <DrawerHeader>
               <DrawerTitle className="border-b border-border-1/20 pb-4 text-muted">
                 {t("DELETE TOKEN")}

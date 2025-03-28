@@ -150,8 +150,8 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
             (free, reserved) => {
               updateBalances({
                 ...balance,
-                freeBalance: fixBalance(free, 12),
-                reservedBalance: fixBalance(reserved, 12),
+                freeBalance: fixBalance(free, balance.token.decimals),
+                reservedBalance: fixBalance(reserved, balance.token.decimals),
                 is_frozen: false
               })
             }
@@ -159,8 +159,8 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
         } else {
           updateBalances({
             ...balance,
-            freeBalance: fixBalance("0", 12),
-            reservedBalance: fixBalance("0", 12),
+            freeBalance: fixBalance("0", balance.token.decimals),
+            reservedBalance: fixBalance("0", balance.token.decimals),
             is_frozen: false
           })
         }
@@ -279,127 +279,87 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
 
               {balances.length > 0 ? (
                 <>
-                  <Card className="mb-3">
-                    <Table>
-                      <TableBody>
-                        {balances
-                          .filter(
-                            (balance) =>
-                              balance.token.network === (network ? network.name : "")
-                          )
-                          .sort((a, b) => {
-                            if (a.token.type === "Native" && b.token.type !== "Native")
-                              return -1
-                            if (a.token.type !== "Native" && b.token.type === "Native")
-                              return 1
-                            return 0
-                          })
-                          .map((balance) => (
-                            <TableRow
-                              key={balance.token.id}
-                              onClick={() => {
-                                if (
-                                  !loadingPerToken[balance.token.symbol] &&
-                                  balance.freeBalance !== 0
-                                ) {
-                                  selectBalance(balance)
-                                }
-
-                                if (balance.freeBalance === 0) {
-                                  toast({
-                                    description: (
-                                      <div className="flex items-center">
-                                        <X className="mr-2 text-white-500" />
-                                        {t("Zero balance")}
-                                      </div>
-                                    ),
-                                    variant: "destructive"
-                                  })
-                                }
-                              }}
-                              className={`cursor-pointer hover-bg-custom ${
-                                loadingPerToken[balance.token.symbol]
-                                  ? "cursor-not-allowed"
-                                  : ""
-                              }`}>
-                              <TableCell className="w-[50px] justify-center">
-                                <Image
-                                  src={
-                                    tokenLogoMap[balance.token.symbol] ||
-                                    "/assets/tokens/default.png"
+                  {balances
+                    .sort((a, b) => {
+                      if (a.token.type === "Native" && b.token.type !== "Native")
+                        return -1
+                      if (a.token.type !== "Native" && b.token.type === "Native") return 1
+                      return 0
+                    })
+                    .map((balance, index) => (
+                      <div key={index}>
+                        <Card className="mb-1 dark:border-[#16514d]">
+                          <Table>
+                            <TableBody>
+                              <TableRow
+                                onClick={() => {
+                                  if (
+                                    !loadingPerToken[balance.token.symbol] &&
+                                    balance.freeBalance !== 0
+                                  ) {
+                                    selectBalance(balance)
                                   }
-                                  width={40}
-                                  height={40}
-                                  alt={balance.token.symbol}
-                                  className="ml-1"
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <div className="mb-[2px]">
-                                  <span className="text-lg font-bold">
-                                    {balance.token.symbol.length > 10
-                                      ? balance.token.symbol.substring(0, 10) + "..."
-                                      : balance.token.symbol}
-                                  </span>
-                                </div>
-                                <Badge>
-                                  {balance.token.name.length > 10
-                                    ? balance.token.name.substring(0, 10) + "..."
-                                    : balance.token.name}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="w-[50px] justify-end pr-2 text-right">
-                                <span className="text-lg font-bold text-purple">
-                                  {loadingPerToken[balance.token.symbol] ? (
-                                    <span className="text-sm font-normal opacity-50">
-                                      Loading...
-                                    </span>
-                                  ) : (
-                                    balance.freeBalance.toString()
-                                  )}
-                                </span>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                      </TableBody>
-                    </Table>
 
-                    <Drawer
-                      open={isTokenDetailDrawerOpen}
-                      onOpenChange={setIsTokenDetailDrawerOpen}>
-                      <DrawerContent>
-                        <DrawerHeader>
-                          <div className="flex justify-center items-center w-full border-b border-border-1/20 pb-4 text-muted">
-                            {selectedBalance ? (
-                              <Image
-                                src={
-                                  tokenLogoMap[selectedBalance.token.symbol] ||
-                                  "/assets/tokens/default.png"
-                                }
-                                alt={selectedBalance.token.symbol}
-                                width={32}
-                                height={32}
-                                className="mr-2"
-                              />
-                            ) : (
-                              <div>{t("No Image")}</div>
-                            )}
-                            <DrawerTitle>
-                              {selectedBalance ? selectedBalance.token.symbol : ""}
-                            </DrawerTitle>
-                          </div>
-                        </DrawerHeader>
-                        <IndexBalanceDetails
-                          currentNetwork={network}
-                          currentWsAPI={wsAPI}
-                          selectedBalance={selectedBalance}
-                          handleTransferCompleteCallbacks={
-                            handleTransferCompleteCallbacks
-                          }
-                        />
-                      </DrawerContent>
-                    </Drawer>
-                  </Card>
+                                  if (balance.freeBalance === 0) {
+                                    toast({
+                                      description: (
+                                        <div className="flex items-center">
+                                          <X className="mr-2 text-white-500" />
+                                          {t("Zero balance")}
+                                        </div>
+                                      ),
+                                      variant: "destructive"
+                                    })
+                                  }
+                                }}
+                                className={`cursor-pointer hover-bg-custom ${
+                                  loadingPerToken[balance.token.symbol]
+                                    ? "cursor-not-allowed"
+                                    : ""
+                                }`}>
+                                <TableCell className="w-[50px] justify-center">
+                                  <Image
+                                    src={
+                                      tokenLogoMap[balance.token.symbol] ||
+                                      "/assets/tokens/default.png"
+                                    }
+                                    width={40}
+                                    height={40}
+                                    alt={balance.token.symbol}
+                                    className="ml-1"
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <div className="mb-[2px]">
+                                    <span className="text-lg font-bold">
+                                      {balance.token.symbol.length > 10
+                                        ? balance.token.symbol.substring(0, 10) + "..."
+                                        : balance.token.symbol}
+                                    </span>
+                                  </div>
+                                  <Badge>
+                                    {balance.token.name.length > 10
+                                      ? balance.token.name.substring(0, 10) + "..."
+                                      : balance.token.name}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="w-[50px] justify-end pr-2 text-right">
+                                  <span className="text-lg font-bold text-purple">
+                                    {loadingPerToken[balance.token.symbol] ? (
+                                      <span className="text-sm font-normal opacity-50">
+                                        Loading...
+                                      </span>
+                                    ) : (
+                                      balance.freeBalance.toString()
+                                    )}
+                                  </span>
+                                </TableCell>
+                              </TableRow>
+                            </TableBody>
+                          </Table>
+                        </Card>
+                      </div>
+                    ))}
                 </>
               ) : (
                 <div className="flex flex-col w-full items-center justify-center py-[100px] space-y-2">
@@ -411,6 +371,38 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
           )}
         </div>
       </div>
+
+      <Drawer open={isTokenDetailDrawerOpen} onOpenChange={setIsTokenDetailDrawerOpen}>
+        <DrawerContent className="border-0">
+          <DrawerHeader>
+            <div className="flex justify-center items-center w-full border-b border-border-1/20 pb-4 text-muted">
+              {selectedBalance ? (
+                <Image
+                  src={
+                    tokenLogoMap[selectedBalance.token.symbol] ||
+                    "/assets/tokens/default.png"
+                  }
+                  alt={selectedBalance.token.symbol}
+                  width={32}
+                  height={32}
+                  className="mr-2"
+                />
+              ) : (
+                <div>{t("No Image")}</div>
+              )}
+              <DrawerTitle>
+                {selectedBalance ? selectedBalance.token.symbol : ""}
+              </DrawerTitle>
+            </div>
+          </DrawerHeader>
+          <IndexBalanceDetails
+            currentNetwork={network}
+            currentWsAPI={wsAPI}
+            selectedBalance={selectedBalance}
+            handleTransferCompleteCallbacks={handleTransferCompleteCallbacks}
+          />
+        </DrawerContent>
+      </Drawer>
     </>
   )
 }

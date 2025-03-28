@@ -104,7 +104,7 @@ const IndexDeleteWallet = ({
       )}
 
       <Drawer open={isUserPasswordOpen} onOpenChange={setIsUserPasswordOpen}>
-        <DrawerContent>
+        <DrawerContent className="border-0">
           <DrawerHeader>
             <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
               {t("ENTER YOUR PASSWORD")}

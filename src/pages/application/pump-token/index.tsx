@@ -234,7 +234,7 @@ const IndexPumpToken = ({ currentNetwork, currentWsAPI }: IndexPumpTokenProps) =
       <Drawer
         open={isPumpTokenDetailsDrawerOpen}
         onOpenChange={setIsPumpTokenDetailsDrawerOpen}>
-        <DrawerContent>
+        <DrawerContent className="border-0">
           <DrawerHeader>
             <DrawerTitle className="border-b border-border-1/20 pb-4 text-muted">
               {selectedPumpToken

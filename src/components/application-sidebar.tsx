@@ -280,9 +280,9 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   side="top"
-                  className="w-[--radix-popper-anchor-width]">
+                  className="w-[--radix-popper-anchor-width] border-0">
                   <DropdownMenuGroup>
-                    <DropdownMenuSub>
+                    {/* <DropdownMenuSub>
                       <DropdownMenuSubTrigger>{t("Theme")}</DropdownMenuSubTrigger>
                       <DropdownMenuPortal>
                         <DropdownMenuSubContent>
@@ -298,7 +298,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
                           </DropdownMenuItem>
                         </DropdownMenuSubContent>
                       </DropdownMenuPortal>
-                    </DropdownMenuSub>
+                    </DropdownMenuSub> */}
                     <DropdownMenuItem onClick={expandView}>
                       <span>{t("Expand View")}</span>
                     </DropdownMenuItem>
@@ -335,7 +335,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
       <Drawer
         open={isChangePasswordDrawerOpen}
         onOpenChange={setIsChangePasswordDrawerOpen}>
-        <DrawerContent>
+        <DrawerContent className="border-0">
           <DrawerHeader>
             <DrawerTitle>{t("CHANGE PASSWORD")}</DrawerTitle>
           </DrawerHeader>
@@ -346,7 +346,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
       <Drawer
         open={isChangeLanguageDrawerOpen}
         onOpenChange={setIsChangeLanguageDrawerOpen}>
-        <DrawerContent>
+        <DrawerContent className="border-0">
           <DrawerHeader>
             <DrawerTitle>{t("CHANGE LANGUAGE")}</DrawerTitle>
           </DrawerHeader>

@@ -175,7 +175,7 @@ const Header = ({
       </div>
 
       <Drawer open={isChangeNetwork} onOpenChange={setIsChangeNetwork}>
-        <DrawerContent>
+        <DrawerContent className="border-0">
           <DrawerHeader>
             <DrawerTitle>{t("CHANGE NETWORK")}</DrawerTitle>
           </DrawerHeader>

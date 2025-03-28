@@ -378,7 +378,7 @@ const IndexTransferDetails = ({
             open={isEstimatedFeesDrawerOpen}
             onOpenChange={setIsEstimatedFeesDrawerOpen}
             dismissible={!isConfirmTransferInProgress}>
-            <DrawerContent>
+            <DrawerContent className="border-0">
               <DrawerHeader>
                 <DrawerTitle>
                   {t("SEND ")}
@@ -409,7 +409,7 @@ const IndexTransferDetails = ({
         open={isUserPasswordOpen}
         onOpenChange={setIsUserPasswordOpen}
         dismissible={userPassword === ""}>
-        <DrawerContent>
+        <DrawerContent className="border-0">
           <DrawerHeader>
             <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
               {t("ENTER YOUR PASSWORD")}

@@ -75,7 +75,7 @@ const IndexBalanceDetails = ({
         <Table className="w-full">
           <TableBody>
             <TableRow className="flex flex-col gap-4 hover:bg-transparent hover:cursor-default p-6">
-              <TableCell className="w-full h-12 flex items-center justify-center text-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
+              <TableCell className="w-full h-12 flex items-center justify-center text-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-[#16514d] dark:border-border dark:bg-muted/50">
                 <div className="text-center">
                   <p className="text-lg font-bold text-purple">
                     {formatBalance(
@@ -85,7 +85,7 @@ const IndexBalanceDetails = ({
                   <Label className="text-xs font-semibold">{t("Total")}</Label>
                 </div>
               </TableCell>
-              <TableCell className="w-full h-12 flex items-center justify-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
+              <TableCell className="w-full h-12 flex items-center justify-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-[#16514d] dark:border-border dark:bg-muted/50">
                 <div className="text-center">
                   <p className="text-lg font-bold text-purple">
                     {formatBalance(balanceData.freeBalance.toString())}
@@ -93,7 +93,7 @@ const IndexBalanceDetails = ({
                   <Label className="text-xs font-semibold">{t("Transferable")}</Label>
                 </div>
               </TableCell>
-              <TableCell className="w-full h-12 flex items-center justify-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-border dark:bg-muted/50">
+              <TableCell className="w-full h-12 flex items-center justify-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-[#16514d] dark:border-border dark:bg-muted/50">
                 <div className="text-center">
                   <p className="text-lg font-bold text-purple">0.00</p>
                   <Label className="text-xs font-semibold">{t("Locked")}</Label>
@@ -112,7 +112,7 @@ const IndexBalanceDetails = ({
       </div>
 
       <Drawer open={isTransferDrawerOpen} onOpenChange={setIsTransferDrawerOpen}>
-        <DrawerContent>
+        <DrawerContent className="border-0">
           <DrawerHeader>
             <DrawerTitle className="text-center text-purple">{t("TRANSFER")}</DrawerTitle>
           </DrawerHeader>
