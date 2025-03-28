@@ -12,8 +12,15 @@ interface IndexPumpTokenDetailsPops {
   currentPumpToken: TokenModel | null
 }
 
-const IndexPumpTokenDetails = ({ currentPumpToken }: IndexPumpTokenDetailsPops) => {
+const IndexPumpTokenDetails = ({
+  currentNetwork,
+  currentWsAPI,
+  currentPumpToken
+}: IndexPumpTokenDetailsPops) => {
   const { t } = useTranslation()
+
+  const [network, setNetwork] = useState<NetworkModel | null>(null)
+  const [wsAPI, setWsAPI] = useState<ApiPromise | null>(null)
 
   const [pumpToken, setPumpToken] = useState<TokenModel | null>(null)
 
@@ -21,6 +28,18 @@ const IndexPumpTokenDetails = ({ currentPumpToken }: IndexPumpTokenDetailsPops) 
   const [pumpTokenCoverMap, setPumpTokenCoverMap] = useState<{ [key: string]: string }>(
     {}
   )
+
+  useEffect(() => {
+    if (currentNetwork) {
+      setNetwork(currentNetwork)
+    }
+  }, [currentNetwork])
+
+  useEffect(() => {
+    if (currentWsAPI) {
+      setWsAPI(currentWsAPI)
+    }
+  }, [currentWsAPI])
 
   useEffect(() => {
     if (currentPumpToken) {
@@ -31,7 +50,7 @@ const IndexPumpTokenDetails = ({ currentPumpToken }: IndexPumpTokenDetailsPops) 
   useEffect(() => {
     if (pumpToken) {
       const getPumpTokenAssetFiles = async (token: TokenModel) => {
-        const tokenAssetFiles = await ChainAssetFiles.load("Xode")
+        const tokenAssetFiles = await ChainAssetFiles.load(network.name)
 
         const newLogoMap: { [key: string]: string } = {}
         const newCoverMap: { [key: string]: string } = {}
