@@ -36,6 +36,7 @@ const IndexPumpTokenDetails = ({ currentPumpToken }: IndexPumpTokenDetailsPops) 
         const newLogoMap: { [key: string]: string } = {}
         const newCoverMap: { [key: string]: string } = {}
 
+        newLogoMap["XON"] = tokenAssetFiles.getTokenLogo("XON")
         newLogoMap[token.symbol] = tokenAssetFiles.getTokenLogo(token.symbol)
         newCoverMap[token.symbol] = tokenAssetFiles.getTokenCover(token.symbol)
 
@@ -130,7 +131,7 @@ const IndexPumpTokenDetails = ({ currentPumpToken }: IndexPumpTokenDetailsPops) 
                 <p className="font-bold text-sm">
                   {pumpToken.price}
                   <Image
-                    src={pumpTokenCoverMap["XON"] || "/assets/tokens/default.png"}
+                    src={pumpTokenLogoMap["XON"] || "/assets/tokens/default.png"}
                     alt="Xode Logo"
                     width={40}
                     height={40}
