@@ -219,7 +219,7 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
                     {tokens
                       .filter(
                         (token) =>
-                          token.type === "Asset" &&
+                          (token.type === "Asset" || token.type === "Pump") &&
                           token.network === (network ? network.name : "")
                       )
                       .map((token) => (
