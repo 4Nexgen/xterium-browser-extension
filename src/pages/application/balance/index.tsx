@@ -390,6 +390,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                           </div>
                         </DrawerHeader>
                         <IndexBalanceDetails
+                          currentNetwork={network}
                           currentWsAPI={wsAPI}
                           selectedBalance={selectedBalance}
                           handleTransferCompleteCallbacks={

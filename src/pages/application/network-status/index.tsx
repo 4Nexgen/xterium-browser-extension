@@ -25,7 +25,7 @@ const IndexNetworkStatus = ({
   const [networkStatus, setNetworkStatus] = useState({
     totalBlocks: 0,
     totalAddresses: 0,
-    avgBlockInterval: "0",
+    avgBlockInterval: 12,
     lastGasFee: 0
   })
 
@@ -60,16 +60,19 @@ const IndexNetworkStatus = ({
   }
 
   const getNetworkStatus = async () => {
-    const totalBlocks = await xodeService.getTotalBlocks(wsAPI)
-    const totalAddresses = await xodeService.getTotalAddresses(wsAPI)
+    xodeService.getTotalBlocks(wsAPI, (totalBlocks) => {
+      setNetworkStatus((prevStatus) => ({
+        ...prevStatus,
+        totalBlocks
+      }))
+    })
 
-    setNetworkStatus((prevStatus) => ({
-      prevStatus,
-      totalBlocks,
-      totalAddresses,
-      avgBlockInterval: "12 secs",
-      lastGasFee: 0.002
-    }))
+    xodeService.getTotalAddresses(wsAPI, (totalAddresses) => {
+      setNetworkStatus((prevStatus) => ({
+        ...prevStatus,
+        totalAddresses
+      }))
+    })
 
     setLoading(false)
   }
@@ -124,7 +127,7 @@ const IndexNetworkStatus = ({
                     size="30"
                   />
                   <p className="text-2xl font-extrabold mt-6 text-primary dark:text-white">
-                    {networkStatus.avgBlockInterval}
+                    {networkStatus.avgBlockInterval} secs
                   </p>
                   <Label className="text-sm opacity-50">{t("AVG Block Intervals")}</Label>
                 </div>

@@ -4,8 +4,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { BalanceModel } from "@/models/balance.model"
+import { NetworkModel } from "@/models/network.model"
 import { BalanceServices } from "@/services/balance.service"
 import { EncryptionService } from "@/services/encryption.service"
+import { TokenService } from "@/services/token.service"
 import { UserService } from "@/services/user.service"
 import { WalletService } from "@/services/wallet.service"
 import { ApiPromise, Keyring } from "@polkadot/api"
@@ -15,12 +17,14 @@ import React, { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 interface IndexTransferDetailsProps {
+  currentNetwork: NetworkModel | null
   currentWsAPI: ApiPromise | null
   selectedBalance: BalanceModel | null
   handleTransferStatusCallbacks: (status: ExtrinsicStatus) => void
 }
 
 const IndexTransferDetails = ({
+  currentNetwork,
   currentWsAPI,
   selectedBalance,
   handleTransferStatusCallbacks
@@ -28,10 +32,12 @@ const IndexTransferDetails = ({
   const { t } = useTranslation()
 
   const userService = useMemo(() => new UserService(), [])
+  const tokenService = useMemo(() => new TokenService(), [])
   const balanceServices = useMemo(() => new BalanceServices(), [])
   const encryptionService = useMemo(() => new EncryptionService(), [])
   const walletService = useMemo(() => new WalletService(), [])
 
+  const [network, setNetwork] = useState<NetworkModel>(null)
   const [wsAPI, setWsAPI] = useState<ApiPromise | null>(null)
 
   const [balanceData, setBalanceData] = useState<BalanceModel | null>(null)
@@ -56,12 +62,18 @@ const IndexTransferDetails = ({
   const [isProcessing, setIsProcessing] = useState(false)
 
   useEffect(() => {
+    setSendLabel(t("SEND"))
+    setConfirmTransferLabel(t("CONFIRM"))
+
+    if (currentNetwork) {
+      setNetwork(currentNetwork)
+    }
+  }, [currentNetwork])
+
+  useEffect(() => {
     if (currentWsAPI) {
       setWsAPI(currentWsAPI)
     }
-
-    setSendLabel(t("SEND"))
-    setConfirmTransferLabel(t("CONFIRM"))
   }, [currentWsAPI])
 
   useEffect(() => {
@@ -69,6 +81,11 @@ const IndexTransferDetails = ({
       setBalanceData(selectedBalance)
     }
   }, [selectedBalance])
+
+  const fixBalance = (value: string, decimal: number) => {
+    const multiplier = 10 ** decimal
+    return parseFloat(value) / multiplier
+  }
 
   const sendTransfer = async () => {
     if (!quantity || quantity <= 0) {
@@ -123,6 +140,77 @@ const IndexTransferDetails = ({
       recipient,
       amount
     )
+
+    if (balanceData.token.type === "Native") {
+      if (quantity + estimatedFee > balanceData.freeBalance) {
+        toast({
+          description: (
+            <div className="flex items-center">
+              <X className="mr-2 text-red-500" />
+              {t("Not enough balance.")}
+            </div>
+          ),
+          variant: "destructive"
+        })
+
+        setIsSendInProgress(false)
+        setSendLabel(t("SEND"))
+
+        return
+      }
+    }
+
+    if (balanceData.token.type === "Asset") {
+      const nativeToken = await tokenService.getToken(network, wsAPI, 0)
+      if (nativeToken) {
+        const { free: ownerFreeBalance, reserved: ownerReservedBalance } =
+          await balanceServices.getBalanceWithoutCallback(
+            wsAPI,
+            nativeToken,
+            balanceData.owner.public_key
+          )
+
+        if (
+          quantity > balanceData.freeBalance ||
+          estimatedFee > fixBalance(ownerFreeBalance, 12)
+        ) {
+          toast({
+            description: (
+              <div className="flex items-center">
+                <X className="mr-2 text-red-500" />
+                {t("Not enough balance.")}
+              </div>
+            ),
+            variant: "destructive"
+          })
+
+          setIsSendInProgress(false)
+          setSendLabel(t("SEND"))
+
+          return
+        }
+
+        const { free: recipientFreeBalance, reserved: recipientReservedBalance } =
+          await balanceServices.getBalanceWithoutCallback(wsAPI, nativeToken, recipient)
+
+        if (fixBalance(recipientFreeBalance, 12) <= 0) {
+          toast({
+            description: (
+              <div className="flex items-center">
+                <X className="mr-2 text-red-500" />
+                {t("The recipient does not have an existential balance.")}
+              </div>
+            ),
+            variant: "destructive"
+          })
+
+          setIsSendInProgress(false)
+          setSendLabel(t("SEND"))
+
+          return
+        }
+      }
+    }
 
     setEstimatedFee(estimatedFee)
     setIsEstimatedFeesDrawerOpen(true)

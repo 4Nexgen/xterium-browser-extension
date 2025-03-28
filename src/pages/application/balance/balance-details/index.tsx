@@ -3,6 +3,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/u
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import type { BalanceModel } from "@/models/balance.model"
+import { NetworkModel } from "@/models/network.model"
 import type { ApiPromise } from "@polkadot/api"
 import type { ExtrinsicStatus } from "@polkadot/types/interfaces"
 import React, { useEffect, useState } from "react"
@@ -11,22 +12,31 @@ import { useTranslation } from "react-i18next"
 import IndexTransferDetails from "./transfer-details"
 
 interface IndexBalanceDetailsProps {
+  currentNetwork: NetworkModel | null
   currentWsAPI: ApiPromise | null
   selectedBalance: BalanceModel | null
   handleTransferCompleteCallbacks: () => void
 }
 
 const IndexBalanceDetails = ({
+  currentNetwork,
   currentWsAPI,
   selectedBalance,
   handleTransferCompleteCallbacks
 }: IndexBalanceDetailsProps) => {
   const { t } = useTranslation()
 
+  const [network, setNetwork] = useState<NetworkModel>(null)
   const [wsAPI, setWsAPI] = useState<ApiPromise | null>(null)
 
   const [balanceData, setBalanceData] = useState<BalanceModel | null>(null)
   const [isTransferDrawerOpen, setIsTransferDrawerOpen] = useState(false)
+
+  useEffect(() => {
+    if (currentNetwork) {
+      setNetwork(currentNetwork)
+    }
+  }, [currentNetwork])
 
   useEffect(() => {
     if (currentWsAPI) {
@@ -107,6 +117,7 @@ const IndexBalanceDetails = ({
             <DrawerTitle className="text-center text-purple">{t("TRANSFER")}</DrawerTitle>
           </DrawerHeader>
           <IndexTransferDetails
+            currentNetwork={network}
             currentWsAPI={wsAPI}
             selectedBalance={selectedBalance}
             handleTransferStatusCallbacks={(status) => {

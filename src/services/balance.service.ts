@@ -24,6 +24,29 @@ export class BalanceServices {
     }
   }
 
+  async getBalanceWithoutCallback(
+    wsAPI: ApiPromise,
+    token: TokenModel,
+    owner: string
+  ): Promise<{ free: string; reserved: string }> {
+    return new Promise((resolve, reject) => {
+      if (token.type === "Native") {
+        wsAPI.query.system.account(owner, (systemAccountInfo: any) => {
+          const { free, reserved } = (systemAccountInfo.toJSON() as any).data;
+          resolve({ free: free.toString(), reserved: reserved.toString() });
+        });
+      }
+
+      if (token.type === "Asset" || token.type === "Pump") {
+        wsAPI.query.assets.account(token.token_id, owner, (assetAccountInfo: any) => {
+          const humanData = (assetAccountInfo.toHuman() as { [key: string]: any })?.balance;
+          const free = humanData ? parseInt(humanData.split(",").join("")) : 0;
+          resolve({ free: free.toString(), reserved: "0" });
+        });
+      }
+    });
+  }
+
   async getEstimateTransferFee(
     wsAPI: ApiPromise,
     token: TokenModel,
@@ -39,7 +62,10 @@ export class BalanceServices {
 
     if (token.type === "Asset" || token.type === "Pump") {
       const assetId = token.token_id;
-      dispatchInfo = await wsAPI.tx.assets.transfer(assetId, recipient, amount).paymentInfo(owner);
+      const bigIntAmount = BigInt(amount)
+      const formattedAmount = wsAPI.createType("Compact<u128>", bigIntAmount)
+
+      dispatchInfo = await wsAPI.tx.assets.transfer(assetId, recipient, formattedAmount).paymentInfo(owner);
     }
 
     if (dispatchInfo !== null) {
@@ -67,8 +93,10 @@ export class BalanceServices {
     }
 
     if (token.type === "Asset" || token.type === "Pump") {
-      const formattedAmount = wsAPI.createType("Compact<u128>", amount)
-      wsAPI.tx.balances
+      const bigIntAmount = BigInt(amount)
+      const formattedAmount = wsAPI.createType("Compact<u128>", bigIntAmount)
+
+      wsAPI.tx.assets
         .transfer(token.token_id, recipient, formattedAmount)
         .signAndSend(signature, (result) => {
           onResult(result);
