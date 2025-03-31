@@ -1,5 +1,5 @@
-import type { WalletModel } from "./wallet.model"
 import type { TokenModel } from "./token.model"
+import type { WalletModel } from "./wallet.model"
 
 export class BalanceModel {
   owner: WalletModel | null
@@ -7,4 +7,5 @@ export class BalanceModel {
   freeBalance: number
   reservedBalance: number
   isFrozen: boolean
+  status: string
 }

@@ -6,26 +6,45 @@ import type { ISubmittableResult } from "@polkadot/types/types"
 import { boolean } from "zod"
 
 export class BalanceServices {
-  getBalance(
+  async getAssetStatus(wsAPI: ApiPromise, assetId: number): Promise<string> {
+    try {
+      const assetDetails = await wsAPI.query.assets.asset(assetId)
+      const parsedDetails = assetDetails.toHuman() as { status?: string } | null
+
+      console.log(parsedDetails)
+
+      if (!parsedDetails) {
+        return "unknown"
+      }
+
+      return parsedDetails.status ?? "unknown"
+    } catch (error) {
+      console.error("Error fetching asset status:", error)
+      return "unknown"
+    }
+  }
+
+  async getBalance(
     wsAPI: ApiPromise,
     token: TokenModel,
     owner: string,
-    callback: (free: string, reserved: string, frozen: boolean) => void
+    callback: (free: string, reserved: string, status: string) => void
   ) {
     if (token.type === "Native") {
       wsAPI.query.system.account(owner, (systemAccountInfo: any) => {
         const { free, reserved } = (systemAccountInfo.toJSON() as any).data
-        callback(free.toString(), reserved.toString(), false)
+        callback(free.toString(), reserved.toString(), "active")
       })
     }
 
     if (token.type === "Asset" || token.type === "Pump") {
-      wsAPI.query.assets.account(token.token_id, owner, (assetAccountInfo: any) => {
+      wsAPI.query.assets.account(token.token_id, owner, async (assetAccountInfo: any) => {
         const humanData = (assetAccountInfo.toHuman() as { [key: string]: any })?.balance
         const free = humanData ? parseInt(humanData.split(",").join("")) : 0
-        const status = assetAccountInfo.status
-        const frozen = status === "Frozen"
-        callback(free.toString(), "0", frozen)
+        const status = await this.getAssetStatus(wsAPI, token.token_id)
+
+        console.log(status)
+        callback(free.toString(), "0", status)
       })
     }
   }
@@ -34,12 +53,16 @@ export class BalanceServices {
     wsAPI: ApiPromise,
     token: TokenModel,
     owner: string
-  ): Promise<{ free: string; reserved: string; frozen: boolean }> {
+  ): Promise<{ free: string; reserved: string; status: string }> {
     return new Promise((resolve, reject) => {
       if (token.type === "Native") {
         wsAPI.query.system.account(owner, (systemAccountInfo: any) => {
           const { free, reserved } = (systemAccountInfo.toJSON() as any).data
-          resolve({ free: free.toString(), reserved: reserved.toString(), frozen: false })
+          resolve({
+            free: free.toString(),
+            reserved: reserved.toString(),
+            status: "active"
+          })
         })
       }
 
@@ -48,9 +71,8 @@ export class BalanceServices {
           const humanData = (assetAccountInfo.toHuman() as { [key: string]: any })
             ?.balance
           const free = humanData ? parseInt(humanData.split(",").join("")) : 0
-          const status = assetAccountInfo.status
-          const frozen = status === "Frozen"
-          resolve({ free: free.toString(), reserved: "0", frozen })
+          const status = assetAccountInfo.status === "Frozen" ? "frozen" : "active"
+          resolve({ free: free.toString(), reserved: "0", status })
         })
       }
     })

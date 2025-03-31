@@ -107,7 +107,8 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
               ...prevBalance,
               freeBalance: balance.freeBalance,
               reservedBalance: balance.reservedBalance,
-              isFrozen: balance.isFrozen
+              isFrozen: balance.isFrozen,
+              status: balance.isFrozen ? "Frozen" : balance.status
             }
           : prevBalance
       )
@@ -135,7 +136,8 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
             token: token,
             freeBalance: 0,
             reservedBalance: 0,
-            isFrozen: token.type === "Asset" ? false : undefined
+            isFrozen: false,
+            status: token.type === "Asset" ? "inactive" : "active"
           })
         }
       }
@@ -146,27 +148,41 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
         (a, b) => a.token.id - b.token.id
       )
 
-      sortedEmptyBalances.map((balance) => {
+      sortedEmptyBalances.map(async (balance) => {
         if (balance.owner !== null) {
-          balanceServices.getBalance(
-            wsAPI,
-            balance.token,
-            balance.owner.public_key,
-            (free, reserved, frozen) => {
-              updateBalances({
-                ...balance,
-                freeBalance: fixBalance(free, balance.token.decimals),
-                reservedBalance: fixBalance(reserved, balance.token.decimals),
-                isFrozen: frozen
-              })
-            }
-          )
+          try {
+            const assetDetails = await wsAPI.query.assets.asset(balance.token.id)
+            const parsedDetails = assetDetails.toHuman() as { status?: string } | null
+
+            const isFrozen = parsedDetails?.status === "Frozen"
+
+            balanceServices.getBalance(
+              wsAPI,
+              balance.token,
+              balance.owner.public_key,
+              (free, reserved, frozen) => {
+                updateBalances({
+                  ...balance,
+                  freeBalance: fixBalance(free, balance.token.decimals),
+                  reservedBalance: fixBalance(reserved, balance.token.decimals),
+                  isFrozen: isFrozen, // Use isFrozen flag
+                  status: isFrozen ? "Frozen" : balance.status
+                })
+              }
+            )
+          } catch (error) {
+            console.error(
+              `Error fetching asset status for ${balance.token.symbol}:`,
+              error
+            )
+          }
         } else {
           updateBalances({
             ...balance,
             freeBalance: fixBalance("0", balance.token.decimals),
             reservedBalance: fixBalance("0", balance.token.decimals),
-            isFrozen: false
+            isFrozen: false,
+            status: "inactive"
           })
         }
       })
@@ -195,7 +211,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
   }
 
   const selectBalance = (data: BalanceModel) => {
-    if (data.isFrozen) {
+    if (data.status === "Frozen") {
       toast({
         description: (
           <div className="flex items-center">
@@ -207,6 +223,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
       })
       return
     }
+
     setIsTokenDetailDrawerOpen(true)
     setSelectedBalance(data)
   }
