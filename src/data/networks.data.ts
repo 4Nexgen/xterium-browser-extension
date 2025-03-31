@@ -10,9 +10,5 @@ export const networkData = [
   {
     name: "Kusama - Asset Hub",
     rpc: "wss://kusama-asset-hub-rpc.polkadot.io"
-  },
-  {
-    name: "Testing",
-    rpc: "wss://dot-rpc.staginglab.info/dot"
   }
 ]

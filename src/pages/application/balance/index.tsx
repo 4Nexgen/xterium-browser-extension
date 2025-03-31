@@ -160,12 +160,12 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
               wsAPI,
               balance.token,
               balance.owner.public_key,
-              (free, reserved, frozen) => {
+              (free, reserved) => {
                 updateBalances({
                   ...balance,
                   freeBalance: fixBalance(free, balance.token.decimals),
                   reservedBalance: fixBalance(reserved, balance.token.decimals),
-                  isFrozen: isFrozen, // Use isFrozen flag
+                  isFrozen: isFrozen,
                   status: isFrozen ? "Frozen" : balance.status
                 })
               }

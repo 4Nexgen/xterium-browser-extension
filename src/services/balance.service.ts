@@ -7,21 +7,24 @@ import { boolean } from "zod"
 
 export class BalanceServices {
   async getAssetStatus(wsAPI: ApiPromise, assetId: number): Promise<string> {
-    try {
-      const assetDetails = await wsAPI.query.assets.asset(assetId)
-      const parsedDetails = assetDetails.toHuman() as { status?: string } | null
+    return new Promise(async (resolve, reject) => {
+      try {
+        const assetDetails = await wsAPI.query.assets.asset(assetId)
+        const parsedDetails = assetDetails.toHuman() as { status?: string } | null
 
-      console.log(parsedDetails)
+        console.log(parsedDetails)
 
-      if (!parsedDetails) {
-        return "unknown"
+        if (!parsedDetails) {
+          resolve("unknown")
+          return
+        }
+
+        resolve(parsedDetails.status ?? "unknown")
+      } catch (error) {
+        console.error("Error fetching asset status:", error)
+        reject("Error fetching asset status")
       }
-
-      return parsedDetails.status ?? "unknown"
-    } catch (error) {
-      console.error("Error fetching asset status:", error)
-      return "unknown"
-    }
+    })
   }
 
   async getBalance(
@@ -43,7 +46,6 @@ export class BalanceServices {
         const free = humanData ? parseInt(humanData.split(",").join("")) : 0
         const status = await this.getAssetStatus(wsAPI, token.token_id)
 
-        console.log(status)
         callback(free.toString(), "0", status)
       })
     }
