@@ -87,6 +87,23 @@ const IndexTransferDetails = ({
     return parseFloat(value) / multiplier
   }
 
+  const formatBalance = (balance: number): string => {
+    const str = balance.toString()
+    const [integerPart, decimalPart] = str.split(".")
+
+    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+
+    if (!decimalPart) {
+      return `${formattedInteger}.00`
+    } else {
+      const trimmedDecimal = decimalPart.replace(/0+$/, "")
+      if (trimmedDecimal === "") {
+        return `${formattedInteger}.00`
+      }
+      return `${formattedInteger}.${trimmedDecimal}`
+    }
+  }
+
   const sendTransfer = async () => {
     if (!quantity || quantity <= 0) {
       toast({
@@ -331,7 +348,7 @@ const IndexTransferDetails = ({
             <Label className="pb-2">
               {t("Current Balance")}:
               <span className="p-2 font-extrabold text-input-primary">
-                {balanceData.freeBalance || "0"}
+                {formatBalance(balanceData.freeBalance || 0)}
               </span>
             </Label>
             <Label className="pb-2">

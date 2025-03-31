@@ -85,6 +85,10 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
     }
   }, [wsAPI])
 
+  const formatBalance = (value: number): string => {
+    return value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
   const fixBalance = (value: string, decimal: number) => {
     const multiplier = 10 ** decimal
     return parseFloat(value) / multiplier
@@ -350,7 +354,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                                         Loading...
                                       </span>
                                     ) : (
-                                      balance.freeBalance.toString()
+                                      formatBalance(balance.freeBalance)
                                     )}
                                   </span>
                                 </TableCell>

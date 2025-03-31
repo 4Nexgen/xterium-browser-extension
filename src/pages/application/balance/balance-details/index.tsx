@@ -54,10 +54,9 @@ const IndexBalanceDetails = ({
     setIsTransferDrawerOpen(true)
   }
 
-  const formatBalance = (balance: string) => {
-    const parsedBalance = parseFloat(balance)
-    return isNaN(parsedBalance) ? "0.00" : parsedBalance.toFixed(2)
-  }
+  const formatBalance = (value: number): string => {
+    return value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
 
   const handleTransferStatusCallbacks = (status: ExtrinsicStatus) => {
     if (status.isInBlock) {
@@ -79,7 +78,7 @@ const IndexBalanceDetails = ({
                 <div className="text-center">
                   <p className="text-lg font-bold text-purple">
                     {formatBalance(
-                      (balanceData.freeBalance + balanceData.reservedBalance).toString()
+                      (balanceData.freeBalance + balanceData.reservedBalance)
                     )}
                   </p>
                   <Label className="text-xs font-semibold">{t("Total")}</Label>
@@ -88,7 +87,7 @@ const IndexBalanceDetails = ({
               <TableCell className="w-full h-12 flex items-center justify-center bg-tablecell-detail rounded-xl relative border-2 border-primary dark:border-[#16514d] dark:border-border dark:bg-muted/50">
                 <div className="text-center">
                   <p className="text-lg font-bold text-purple">
-                    {formatBalance(balanceData.freeBalance.toString())}
+                    {formatBalance(balanceData.freeBalance)}
                   </p>
                   <Label className="text-xs font-semibold">{t("Transferable")}</Label>
                 </div>
