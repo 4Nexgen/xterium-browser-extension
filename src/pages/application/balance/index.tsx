@@ -86,8 +86,8 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
   }, [wsAPI])
 
   const formatBalance = (value: number): string => {
-    return value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
+    return value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  }
 
   const fixBalance = (value: string, decimal: number) => {
     const multiplier = 10 ** decimal
@@ -106,7 +106,8 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
           ? {
               ...prevBalance,
               freeBalance: balance.freeBalance,
-              reservedBalance: balance.reservedBalance
+              reservedBalance: balance.reservedBalance,
+              isFrozen: balance.isFrozen
             }
           : prevBalance
       )
@@ -134,7 +135,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
             token: token,
             freeBalance: 0,
             reservedBalance: 0,
-            is_frozen: false
+            isFrozen: token.type === "Asset" ? false : undefined
           })
         }
       }
@@ -151,12 +152,12 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
             wsAPI,
             balance.token,
             balance.owner.public_key,
-            (free, reserved) => {
+            (free, reserved, frozen) => {
               updateBalances({
                 ...balance,
                 freeBalance: fixBalance(free, balance.token.decimals),
                 reservedBalance: fixBalance(reserved, balance.token.decimals),
-                is_frozen: false
+                isFrozen: frozen
               })
             }
           )
@@ -165,7 +166,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
             ...balance,
             freeBalance: fixBalance("0", balance.token.decimals),
             reservedBalance: fixBalance("0", balance.token.decimals),
-            is_frozen: false
+            isFrozen: false
           })
         }
       })
@@ -194,6 +195,18 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
   }
 
   const selectBalance = (data: BalanceModel) => {
+    if (data.isFrozen) {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-white-500" />
+            {t("This asset was frozen and cannot be transferred.")}
+          </div>
+        ),
+        variant: "destructive"
+      })
+      return
+    }
     setIsTokenDetailDrawerOpen(true)
     setSelectedBalance(data)
   }

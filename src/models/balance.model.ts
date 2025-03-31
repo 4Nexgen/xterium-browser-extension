@@ -6,5 +6,5 @@ export class BalanceModel {
   token: TokenModel
   freeBalance: number
   reservedBalance: number
-  is_frozen: boolean
+  isFrozen: boolean
 }
