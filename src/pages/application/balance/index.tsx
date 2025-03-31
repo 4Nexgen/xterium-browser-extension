@@ -86,8 +86,8 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
   }, [wsAPI])
 
   const formatBalance = (value: number): string => {
-    return value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
+    return value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  }
 
   const fixBalance = (value: string, decimal: number) => {
     const multiplier = 10 ** decimal
@@ -106,7 +106,9 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
           ? {
               ...prevBalance,
               freeBalance: balance.freeBalance,
-              reservedBalance: balance.reservedBalance
+              reservedBalance: balance.reservedBalance,
+              isFrozen: balance.isFrozen,
+              status: balance.isFrozen ? "Frozen" : balance.status
             }
           : prevBalance
       )
@@ -134,7 +136,8 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
             token: token,
             freeBalance: 0,
             reservedBalance: 0,
-            is_frozen: false
+            isFrozen: false,
+            status: token.type === "Asset" ? "inactive" : "active"
           })
         }
       }
@@ -145,27 +148,41 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
         (a, b) => a.token.id - b.token.id
       )
 
-      sortedEmptyBalances.map((balance) => {
+      sortedEmptyBalances.map(async (balance) => {
         if (balance.owner !== null) {
-          balanceServices.getBalance(
-            wsAPI,
-            balance.token,
-            balance.owner.public_key,
-            (free, reserved) => {
-              updateBalances({
-                ...balance,
-                freeBalance: fixBalance(free, balance.token.decimals),
-                reservedBalance: fixBalance(reserved, balance.token.decimals),
-                is_frozen: false
-              })
-            }
-          )
+          try {
+            const assetDetails = await wsAPI.query.assets.asset(balance.token.id)
+            const parsedDetails = assetDetails.toHuman() as { status?: string } | null
+
+            const isFrozen = parsedDetails?.status === "Frozen"
+
+            balanceServices.getBalance(
+              wsAPI,
+              balance.token,
+              balance.owner.public_key,
+              (free, reserved) => {
+                updateBalances({
+                  ...balance,
+                  freeBalance: fixBalance(free, balance.token.decimals),
+                  reservedBalance: fixBalance(reserved, balance.token.decimals),
+                  isFrozen: isFrozen,
+                  status: isFrozen ? "Frozen" : balance.status
+                })
+              }
+            )
+          } catch (error) {
+            console.error(
+              `Error fetching asset status for ${balance.token.symbol}:`,
+              error
+            )
+          }
         } else {
           updateBalances({
             ...balance,
             freeBalance: fixBalance("0", balance.token.decimals),
             reservedBalance: fixBalance("0", balance.token.decimals),
-            is_frozen: false
+            isFrozen: false,
+            status: "inactive"
           })
         }
       })
@@ -194,6 +211,19 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
   }
 
   const selectBalance = (data: BalanceModel) => {
+    if (data.status === "Frozen") {
+      toast({
+        description: (
+          <div className="flex items-center">
+            <X className="mr-2 text-white-500" />
+            {t("This asset was frozen and cannot be transferred.")}
+          </div>
+        ),
+        variant: "destructive"
+      })
+      return
+    }
+
     setIsTokenDetailDrawerOpen(true)
     setSelectedBalance(data)
   }

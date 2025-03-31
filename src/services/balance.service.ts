@@ -1,26 +1,53 @@
+import { TokenModel } from "@/models/token.model"
 import { ApiPromise } from "@polkadot/api"
 import type { KeyringPair } from "@polkadot/keyring/types"
 import type { RuntimeDispatchInfo } from "@polkadot/types/interfaces"
 import type { ISubmittableResult } from "@polkadot/types/types"
-
-import { TokenModel } from "@/models/token.model"
+import { boolean } from "zod"
 
 export class BalanceServices {
-  getBalance(wsAPI: ApiPromise, token: TokenModel, owner: string, callback: (free: string, reserved: string) => void) {
+  async getAssetStatus(wsAPI: ApiPromise, assetId: number): Promise<string> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const assetDetails = await wsAPI.query.assets.asset(assetId)
+        const parsedDetails = assetDetails.toHuman() as { status?: string } | null
+
+        console.log(parsedDetails)
+
+        if (!parsedDetails) {
+          resolve("unknown")
+          return
+        }
+
+        resolve(parsedDetails.status ?? "unknown")
+      } catch (error) {
+        console.error("Error fetching asset status:", error)
+        reject("Error fetching asset status")
+      }
+    })
+  }
+
+  async getBalance(
+    wsAPI: ApiPromise,
+    token: TokenModel,
+    owner: string,
+    callback: (free: string, reserved: string, status: string) => void
+  ) {
     if (token.type === "Native") {
       wsAPI.query.system.account(owner, (systemAccountInfo: any) => {
-        const { free, reserved } = (systemAccountInfo.toJSON() as any).data;
-        callback(free.toString(), reserved.toString());
-      });
+        const { free, reserved } = (systemAccountInfo.toJSON() as any).data
+        callback(free.toString(), reserved.toString(), "active")
+      })
     }
 
     if (token.type === "Asset" || token.type === "Pump") {
-      wsAPI.query.assets.account(token.token_id, owner, (assetAccountInfo: any) => {
-        const humanData = (assetAccountInfo.toHuman() as { [key: string]: any })
-          ?.balance
+      wsAPI.query.assets.account(token.token_id, owner, async (assetAccountInfo: any) => {
+        const humanData = (assetAccountInfo.toHuman() as { [key: string]: any })?.balance
         const free = humanData ? parseInt(humanData.split(",").join("")) : 0
-        callback(free.toString(), "0");
-      });
+        const status = await this.getAssetStatus(wsAPI, token.token_id)
+
+        callback(free.toString(), "0", status)
+      })
     }
   }
 
@@ -28,23 +55,29 @@ export class BalanceServices {
     wsAPI: ApiPromise,
     token: TokenModel,
     owner: string
-  ): Promise<{ free: string; reserved: string }> {
+  ): Promise<{ free: string; reserved: string; status: string }> {
     return new Promise((resolve, reject) => {
       if (token.type === "Native") {
         wsAPI.query.system.account(owner, (systemAccountInfo: any) => {
-          const { free, reserved } = (systemAccountInfo.toJSON() as any).data;
-          resolve({ free: free.toString(), reserved: reserved.toString() });
-        });
+          const { free, reserved } = (systemAccountInfo.toJSON() as any).data
+          resolve({
+            free: free.toString(),
+            reserved: reserved.toString(),
+            status: "active"
+          })
+        })
       }
 
       if (token.type === "Asset" || token.type === "Pump") {
         wsAPI.query.assets.account(token.token_id, owner, (assetAccountInfo: any) => {
-          const humanData = (assetAccountInfo.toHuman() as { [key: string]: any })?.balance;
-          const free = humanData ? parseInt(humanData.split(",").join("")) : 0;
-          resolve({ free: free.toString(), reserved: "0" });
-        });
+          const humanData = (assetAccountInfo.toHuman() as { [key: string]: any })
+            ?.balance
+          const free = humanData ? parseInt(humanData.split(",").join("")) : 0
+          const status = assetAccountInfo.status === "Frozen" ? "frozen" : "active"
+          resolve({ free: free.toString(), reserved: "0", status })
+        })
       }
-    });
+    })
   }
 
   async getEstimateTransferFee(
@@ -52,28 +85,32 @@ export class BalanceServices {
     token: TokenModel,
     owner: string,
     recipient: string,
-    amount: number,
+    amount: number
   ): Promise<number> {
-    let dispatchInfo: RuntimeDispatchInfo | null = null;
+    let dispatchInfo: RuntimeDispatchInfo | null = null
 
     if (token.type === "Native") {
-      dispatchInfo = await wsAPI.tx.balances.transfer(recipient, amount).paymentInfo(owner);
+      dispatchInfo = await wsAPI.tx.balances
+        .transfer(recipient, amount)
+        .paymentInfo(owner)
     }
 
     if (token.type === "Asset" || token.type === "Pump") {
-      const assetId = token.token_id;
+      const assetId = token.token_id
       const bigIntAmount = BigInt(amount)
       const formattedAmount = wsAPI.createType("Compact<u128>", bigIntAmount)
 
-      dispatchInfo = await wsAPI.tx.assets.transfer(assetId, recipient, formattedAmount).paymentInfo(owner);
+      dispatchInfo = await wsAPI.tx.assets
+        .transfer(assetId, recipient, formattedAmount)
+        .paymentInfo(owner)
     }
 
     if (dispatchInfo !== null) {
-      const rawFee = BigInt(dispatchInfo.partialFee.toString());
-      return Number(rawFee) / Math.pow(10, 12);
+      const rawFee = BigInt(dispatchInfo.partialFee.toString())
+      return Number(rawFee) / Math.pow(10, 12)
     }
 
-    return 0;
+    return 0
   }
 
   async transfer(
@@ -82,14 +119,14 @@ export class BalanceServices {
     signature: KeyringPair,
     recipient: string,
     amount: number,
-    onResult: (status: ISubmittableResult) => void,
+    onResult: (status: ISubmittableResult) => void
   ): Promise<void> {
     if (token.type === "Native") {
       wsAPI.tx.balances
         .transferAllowDeath(recipient, amount)
         .signAndSend(signature, (result) => {
-          onResult(result);
-        });
+          onResult(result)
+        })
     }
 
     if (token.type === "Asset" || token.type === "Pump") {
@@ -99,8 +136,8 @@ export class BalanceServices {
       wsAPI.tx.assets
         .transfer(token.token_id, recipient, formattedAmount)
         .signAndSend(signature, (result) => {
-          onResult(result);
-        });
+          onResult(result)
+        })
     }
   }
 }
