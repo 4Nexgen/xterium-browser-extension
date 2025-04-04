@@ -6,7 +6,7 @@ const Themes = ({ children }) => {
     <>
       <ThemeProvider
         attribute="class"
-        defaultTheme="system"
+        defaultTheme="dark"
         enableSystem
         disableTransitionOnChange>
         {children}
