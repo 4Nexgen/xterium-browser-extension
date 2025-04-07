@@ -111,6 +111,12 @@ body {
   background-position: top center;
 }
 
+.native-token-background-box {
+  background: url("../assets/covers/native-token-bg.png") no-repeat;
+  background-size: contain;
+  background-position: top center;
+}
+
 /* HTML: <div class="loader"></div> */
 .loader {
   margin-left: 14px;

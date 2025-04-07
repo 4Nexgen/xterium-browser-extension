@@ -1,11 +1,13 @@
 import { Badge } from "@/components/ui/badge"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import { ChainAssetFiles } from "@/data/chains/chain-asset-files"
 import type { NetworkModel } from "@/models/network.model"
 import { TokenModel } from "@/models/token.model"
 import { TokenService } from "@/services/token.service"
 import type { ApiPromise } from "@polkadot/api"
+import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
 import { Coins, LoaderCircle } from "lucide-react"
 import Image from "next/image"
 import React, { useEffect, useMemo, useState } from "react"
@@ -157,8 +159,41 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
 
   return (
     <>
-      <div className="py-4 flex flex-col justify-between h-full">
-        <div className="py-4">
+      <div className="flex flex-col justify-between h-full gap-4 overflow-hidden">
+        <div className="p-4 h-[150px] z-10 flex flex-col items-center justify-center">
+          <img src={XteriumLogo} className="w-[150px]" alt="Xterium Logo" />
+          <div className="mx-auto px-4 w-full">
+            <div className="native-token-background-box w-[300px] mx-auto">
+              {tokens
+                .filter(
+                  (token) =>
+                    token.type === "Native" &&
+                    token.network === (network ? network.name : "")
+                )
+                .map((token, index) => (
+                  <div key={index} className="p-2 px-8">
+                    <h2 className="text-[9px] uppercase font-bold">Native Token</h2>
+                    <div className="flex items-center gap-4">
+                      <Image
+                        src={tokenLogoMap[token.symbol] || "/assets/tokens/default.png"}
+                        alt={`${token.description} Logo`}
+                        className="ml-1"
+                        width={40}
+                        height={40}
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-lg font-bold">{token.symbol}</span>
+                        <div className="bg-primary rounded-xl border-muted border-1 text-center font-bold px-2">
+                          {token.description}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+        <div className="px-4 pt-16 -mt-8 flex-1 max-h-[calc(100% - 150px)] bg-red-500 background-box overflow-hidden">
           {loading ? (
             <div className="flex flex-col items-center w-full h-30 gap-4 mt-10">
               <LoaderCircle className="animate-spin h-12 w-12 text-muted" />
@@ -168,81 +203,45 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
             </div>
           ) : tokens.length ? (
             <>
-              {tokens
-                .filter(
-                  (token) =>
-                    token.type === "Native" &&
-                    token.network === (network ? network.name : "")
-                )
-                .map((token, index) => (
-                  <div key={index}>
-                    <Card className="mb-1 card-bg-image dark:border-[#16514d]">
-                      <Table>
-                        <TableBody>
-                          <TableRow>
-                            <TableCell className="w-[50px] justify-center">
-                              <Image
-                                src={
-                                  tokenLogoMap[token.symbol] ||
-                                  "/assets/tokens/default.png"
-                                }
-                                alt={`${token.description} Logo`}
-                                className="ml-1"
-                                width={40}
-                                height={40}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <div className="mb-[2px]">
-                                <span className="text-lg font-bold">{token.symbol}</span>
-                              </div>
-                              <Badge>{token.description}</Badge>
-                            </TableCell>
-                            <TableCell className="w-[30px] justify-center text-center pr-4"></TableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-                    </Card>
-                  </div>
-                ))}
-
-              {tokens
-                .filter((token) => token.type === "Asset" || token.type === "Pump")
-                .map((token) => (
-                  <div key={token.id}>
-                    <Card className="mb-1 dark:border-[#16514d]">
-                      <Table>
-                        <TableBody>
-                          <TableRow className="cursor-pointer">
-                            <TableCell className="w-[50px] justify-center">
-                              <Image
-                                src={
-                                  tokenLogoMap[token.symbol] ||
-                                  "/assets/tokens/default.png"
-                                }
-                                alt={`${token.description} Logo`}
-                                className="ml-1"
-                                width={40}
-                                height={40}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <div className="mb-[2px]">
-                                <span className="text-lg font-bold">
-                                  {token.symbol.length > 20
-                                    ? token.symbol.substring(0, 20) + "..."
-                                    : token.symbol}
-                                </span>
-                              </div>
-                              <Badge>
-                                {token.description.length > 20
-                                  ? token.description.substring(0, 20) + "..."
-                                  : token.description}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="w-[30px] justify-center text-center pr-4">
-                              <div className="flex gap-2 items-center">
-                                {/* <TooltipProvider>
+              <h1 className="text-center text-xl mb-4">Tokens</h1>
+              <ScrollArea className="bg-background rounded-lg p-2 h-[calc(100%-60px)]">
+                {tokens
+                  .filter((token) => token.type === "Asset" || token.type === "Pump")
+                  .map((token) => (
+                    <div key={token.id}>
+                      <Card className="mb-1 dark:border-[#16514d]">
+                        <Table>
+                          <TableBody>
+                            <TableRow className="cursor-pointer">
+                              <TableCell className="w-[50px] justify-center">
+                                <Image
+                                  src={
+                                    tokenLogoMap[token.symbol] ||
+                                    "/assets/tokens/default.png"
+                                  }
+                                  alt={`${token.description} Logo`}
+                                  className="ml-1"
+                                  width={40}
+                                  height={40}
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <div className="mb-[2px]">
+                                  <span className="text-lg font-bold">
+                                    {token.symbol.length > 20
+                                      ? token.symbol.substring(0, 20) + "..."
+                                      : token.symbol}
+                                  </span>
+                                </div>
+                                <Badge>
+                                  {token.description.length > 20
+                                    ? token.description.substring(0, 20) + "..."
+                                    : token.description}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="w-[30px] justify-center text-center pr-4">
+                                <div className="flex gap-2 items-center">
+                                  {/* <TooltipProvider>
                                 <Tooltip>
                                   <TooltipTrigger>
                                     <button
@@ -279,14 +278,15 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
                                   </TooltipContent>
                                 </Tooltip>
                               </TooltipProvider> */}
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-                    </Card>
-                  </div>
-                ))}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          </TableBody>
+                        </Table>
+                      </Card>
+                    </div>
+                  ))}
+              </ScrollArea>
             </>
           ) : (
             <div className="flex flex-col w-full items-center justify-center py-[100px] space-y-2">
