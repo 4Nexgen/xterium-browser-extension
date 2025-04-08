@@ -117,6 +117,12 @@ body {
   background-position: top center;
 }
 
+.network-box {
+  background: url("../assets/covers/network-status-thumb.png") no-repeat;
+  background-size: contain;
+  background-position: top center;
+}
+
 /* HTML: <div class="loader"></div> */
 .loader {
   margin-left: 14px;
