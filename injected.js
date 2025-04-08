@@ -25,8 +25,7 @@
   // ----------------------------
   // Private State Variables
   // ----------------------------
-  const extensionId = "klfhdmiebenifpdmdmkjicdohjilabdg"
-  const isXterium = true
+  const extensionId = "plhchpneiklnlplnnlhkmnikaepgfdaf"
   isConnected = false
   connectedWallet = null
 
@@ -252,7 +251,7 @@
           event.data.type !== "XTERIUM_PASSWORD_RESPONSE"
         )
           return
-        if (event.data.password) {
+        if (event.data.isAuthenticated) {
           storedPassword = event.data.password
         }
       }
@@ -262,21 +261,66 @@
       const approveBtn = document.createElement("button")
       approveBtn.classList.add("approve-button")
       approveBtn.innerText = "Approve"
-      approveBtn.addEventListener("click", () => {
+      approveBtn.addEventListener("click", async () => {
         if (!passwordInput.value) {
           alert("Password is required to connect the wallet.")
           return
         }
-        if (passwordInput.value !== storedPassword) {
-          alert("Invalid password. Please try again.")
-          return
-        }
-        document.body.removeChild(overlay)
+
         window.postMessage(
-          { type: "XTERIUM_CONNECT_APPROVED", password: passwordInput.value },
+          {
+            type: "XTERIUM_GET_PASSWORD",
+            password: passwordInput.value // Send the input password for verification
+          },
           "*"
         )
-        resolve()
+
+        // Create a promise to wait for the verification response
+        const verificationPromise = new Promise((resolveVerify, rejectVerify) => {
+          const handlePasswordResponse = (event) => {
+            if (
+              event.source !== window ||
+              !event.data ||
+              event.data.type !== "XTERIUM_PASSWORD_RESPONSE"
+            )
+              return
+
+            window.removeEventListener("message", handlePasswordResponse)
+
+            if (event.data.isAuthenticated) {
+              resolveVerify(true) // Resolve the promise if authenticated
+            } else {
+              resolveVerify(false) // Resolve the promise if not authenticated
+            }
+          }
+
+          window.addEventListener("message", handlePasswordResponse)
+
+          // Set a timeout in case the response never comes
+          setTimeout(() => {
+            window.removeEventListener("message", handlePasswordResponse)
+            rejectVerify(new Error("Password verification timed out"))
+          }, 5000)
+        })
+
+        // Wait for the verification result
+        try {
+          const isAuthenticated = await verificationPromise
+
+          if (isAuthenticated) {
+            document.body.removeChild(overlay)
+            window.postMessage(
+              { type: "XTERIUM_CONNECT_APPROVED", password: passwordInput.value },
+              "*"
+            )
+            resolve() // Resolve the main promise
+          } else {
+            alert("Invalid password. Please try again.")
+          }
+        } catch (error) {
+          console.error("Password verification error:", error)
+          alert("Error verifying password. Please try again.")
+        }
       })
 
       const cancelBtn = document.createElement("button")
@@ -284,7 +328,7 @@
       cancelBtn.innerText = "Cancel"
       cancelBtn.addEventListener("click", () => {
         document.body.removeChild(overlay)
-        reject("User cancelled wallet connection.")
+        reject("User  cancelled wallet connection.")
       })
 
       const buttonContainer = document.createElement("div")
@@ -300,15 +344,18 @@
       outerContainer.addEventListener("mousedown", (e) => {
         offsetX = e.clientX - outerContainer.getBoundingClientRect().left
         offsetY = e.clientY - outerContainer.getBoundingClientRect().top
+
         const mouseMoveHandler = (moveEvent) => {
           outerContainer.style.position = "absolute"
           outerContainer.style.left = `${moveEvent.clientX - offsetX}px`
           outerContainer.style.top = `${moveEvent.clientY - offsetY}px`
         }
+
         const mouseUpHandler = () => {
           document.removeEventListener("mousemove", mouseMoveHandler)
           document.removeEventListener("mouseup", mouseUpHandler)
         }
+
         document.addEventListener("mousemove", mouseMoveHandler)
         document.addEventListener("mouseup", mouseUpHandler)
       })
@@ -446,14 +493,6 @@
   }
 
   function getEstimateFee(owner, value, recipient, balance) {
-    const nativeTokenSymbol = "XON"
-
-    if (!balance.token.type) {
-      const tokenSymbol = balance.token.symbol || ""
-      balance.token.type =
-        tokenSymbol.toUpperCase() === nativeTokenSymbol.toUpperCase() ? "Native" : "Asset"
-    }
-
     return new Promise((resolve, reject) => {
       function handleFeeResponse(event) {
         if (event.source !== window || !event.data) return
@@ -461,7 +500,7 @@
         if (event.data.owner !== owner) return
         window.removeEventListener("message", handleFeeResponse)
         if (event.data.error) {
-          console.error("❌ Fee estimation error:", event.data.error)
+          console.error("Fee estimation error:", event.data.error)
           reject(event.data.error)
         } else {
           resolve(event.data.substrateFee)
@@ -711,30 +750,6 @@
     overlay.appendChild(container)
   }
 
-  // Disconnects the wallet by resetting connection state and removing overlays
-  // function disconnectWallet() {
-  //   console.log("[Xterium] Disconnecting wallet...")
-
-  //   localStorage.setItem(
-  //     "xterium_wallet_connection",
-  //     JSON.stringify({
-  //       isConnected: false,
-  //       connectedWallet: null
-  //     })
-  //   )
-
-  //   const overlays = document.querySelectorAll(
-  //     "#wallet-connect-overlay, #wallet-success-overlay, #send-receive-overlay"
-  //   )
-  //   overlays.forEach((overlay) => {
-  //     if (overlay && overlay.parentNode) {
-  //       overlay.parentNode.removeChild(overlay)
-  //     }
-  //   })
-
-  //   console.log("Wallet disconnected.")
-  // }
-
   // ----------------------------
   // Public API Methods
   // ----------------------------
@@ -792,63 +807,38 @@
   function getBalance(publicKey) {
     return new Promise((resolve, reject) => {
       if (!isConnected || !connectedWallet) {
-        console.error("[Injected.js] getBalance error: No wallet connected.")
         return reject("No wallet connected.")
       }
-      if (connectedWallet.public_key !== publicKey) {
-        console.error(
-          "[Injected.js] getBalance error: Requested public key does not match the connected wallet."
-        )
-        return reject("Not connected to that wallet.")
-      }
 
-      function handleResponse(event) {
+      window.postMessage(
+        {
+          type: "XTERIUM_GET_ALL_BALANCES",
+          publicKey
+        },
+        "*"
+      )
+
+      const handleResponse = (event) => {
         if (
           event.source !== window ||
           !event.data ||
-          event.data.type !== "XTERIUM_BALANCE_RESPONSE"
-        )
+          event.data.type !== "XTERIUM_ALL_BALANCES_RESPONSE"
+        ) {
           return
+        }
+
         if (event.data.publicKey !== publicKey) return
+
         window.removeEventListener("message", handleResponse)
-        if (event.data.balance !== null) {
-          try {
-            let balanceData = event.data.balance
-            if (typeof balanceData === "string") {
-              balanceData = JSON.parse(balanceData)
-            }
-            let fixedBalance
-            if (Array.isArray(balanceData)) {
-              fixedBalance = balanceData.map((item) => ({
-                tokenName: item.tokenName,
-                freeBalance: (Number(item.freeBalance) / 1e12).toFixed(4),
-                reservedBalance: (Number(item.reservedBalance) / 1e12).toFixed(4),
-                is_frozen: item.is_frozen
-              }))
-            } else if (typeof balanceData === "object") {
-              fixedBalance = Object.keys(balanceData).map((token) => ({
-                tokenName: token,
-                freeBalance: (Number(balanceData[token].freeBalance) / 1e12).toFixed(4),
-                reservedBalance: (
-                  Number(balanceData[token].reservedBalance) / 1e12
-                ).toFixed(4),
-                is_frozen: balanceData[token].is_frozen
-              }))
-            } else {
-              fixedBalance = (Number(balanceData) / 1e12).toFixed(4)
-            }
-            resolve(fixedBalance)
-          } catch (error) {
-            console.error("[Injected.js] Error parsing balance response:", error)
-            reject("Failed to parse balance data.")
-          }
+
+        if (event.data.error) {
+          reject(event.data.error)
         } else {
-          reject("No balance found.")
+          resolve(event.data.balances)
         }
       }
 
       window.addEventListener("message", handleResponse)
-      window.postMessage({ type: "XTERIUM_GET_BALANCE", publicKey }, "*")
     })
   }
 
@@ -990,7 +980,7 @@
             setTimeout(() => showTransferSignAndVerify(details), 0)
           })
           .catch((err) => {
-            console.error("❌ Fee estimation failed:", err)
+            console.error("Fee estimation failed:", err)
             details.feeEstimationInProgress = false
             isTransferInProgress = false
           })
@@ -1106,6 +1096,16 @@
               .then((wallet) => {
                 isConnected = true
                 connectedWallet = wallet
+                saveConnectionState()
+
+                window.postMessage(
+                  {
+                    type: "XTERIUM_GET_ALL_BALANCES",
+                    publicKey: wallet.public_key
+                  },
+                  "*"
+                )
+
                 window.postMessage({ type: "XTERIUM_WALLET_SELECTED", wallet }, "*")
               })
               .catch((err) => {
@@ -1129,6 +1129,15 @@
           .catch((err) => {
             console.error("Wallet sign/verify rejected:", err)
           })
+        break
+      case "XTERIUM_ALL_BALANCES_RESPONSE":
+        if (event.data.publicKey === connectedWallet?.public_key) {
+          console.log("Received balances:", event.data.balances)
+
+          if (event.data.error) {
+            console.error("Error fetching balances:", event.data.error)
+          }
+        }
         break
       default:
         break
