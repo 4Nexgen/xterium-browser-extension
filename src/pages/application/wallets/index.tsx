@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
+import { ScrollArea } from "@/components/ui/scroll-area.jsx"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import {
   Tooltip,
@@ -13,6 +14,7 @@ import type { NetworkModel } from "@/models/network.model"
 import type { WalletModel } from "@/models/wallet.model"
 import { WalletService } from "@/services/wallet.service"
 import type { ApiPromise } from "@polkadot/api"
+import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
 import { Check, Copy, Download, LoaderCircle, Trash, Wallet } from "lucide-react"
 import React, { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -159,7 +161,10 @@ const IndexWallet = ({
   return (
     <>
       <div className="py-4 flex flex-col justify-between h-full">
-        <div className="py-4">
+        <div className="p-4">
+          <img src={XteriumLogo} className="w-[150px] mx-auto" alt="Xterium Logo" />
+        </div>
+        <div className="p-4 flex-1 flex flex-col gap-4">
           {loading ? (
             <div className="flex flex-col items-center w-full h-30 gap-4 mt-10">
               <LoaderCircle className="animate-spin h-12 w-12 text-muted" />
@@ -168,10 +173,10 @@ const IndexWallet = ({
               </p>
             </div>
           ) : wallets.length > 0 ? (
-            <>
+            <ScrollArea className="border-2 border-muted rounded-lg p-4 bg-background h-[300px]">
               {wallets.map((wallet, index) => (
                 <div key={index}>
-                  <Card className="mb-1 dark:border-[#16514d]">
+                  <Card className="mb-1 border dark:border-muted">
                     <Table>
                       <TableBody>
                         <TableRow className="hover-bg-custom">
@@ -179,9 +184,13 @@ const IndexWallet = ({
                             <div className="mb-[2px]">
                               <span className="text-lg font-bold">{wallet.name}</span>
                             </div>
-                            <span>{wallet.public_key.slice(0, 6)}</span>
-                            <span>...</span>
-                            <span>{wallet.public_key.slice(-4)}</span>
+                            <span className="text-[#7cb9ff]">
+                              {wallet.public_key.slice(0, 6)}
+                            </span>
+                            <span className="text-[#7cb9ff]">...</span>
+                            <span className="text-[#7cb9ff]">
+                              {wallet.public_key.slice(-4)}
+                            </span>
                           </TableCell>
                           <TableCell className="min-w-[30px] flex justify-end items-center text-red-500 pr-4">
                             <div className="flex gap-2 text-right">
@@ -238,8 +247,7 @@ const IndexWallet = ({
                   </Card>
                 </div>
               ))}
-              <div className="mt-4"></div>
-            </>
+            </ScrollArea>
           ) : (
             <div className="flex flex-col w-full items-center justify-center py-[100px] space-y-2">
               <Wallet className="size-20" />

@@ -12,6 +12,7 @@ import {
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import { ChainAssetFiles } from "@/data/chains/chain-asset-files"
 import { useToast } from "@/hooks/use-toast"
@@ -23,6 +24,7 @@ import { BalanceServices } from "@/services/balance.service"
 import { TokenService } from "@/services/token.service"
 import { WalletService } from "@/services/wallet.service"
 import { ApiPromise } from "@polkadot/api"
+import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
 import { Coins, DollarSign, LoaderCircle, X } from "lucide-react"
 import Image from "next/image"
 import React, { useEffect, useMemo, useState } from "react"
@@ -235,8 +237,78 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
 
   return (
     <>
-      <div className="py-4 flex flex-col justify-between h-full">
-        <div className="py-4">
+      <div className="flex flex-col justify-between h-full gap-4 overflow-hidden">
+        <div className="p-4 h-[150px] z-10 flex flex-col items-center justify-center">
+          <img src={XteriumLogo} className="w-[150px]" alt="Xterium Logo" />
+          <div className="rounded-lg bg-gradient-to-t from-blue-500 to-cyan-500 p-4 w-[300px] mx-auto">
+            <div className="px-2 py-1 rounded-lg bg-background border-2 border-muted">
+              <Label className="text-primary text-[9px] mb-0">{t("Address")}</Label>
+              <Popover open={openWallets} onOpenChange={setOpenWallets}>
+                <PopoverTrigger asChild className="h-[20px]">
+                  <Button
+                    style={{ padding: "0px", background: "transparent", border: "none" }}
+                    variant="roundedOutline"
+                    role="combobox"
+                    aria-expanded={openWallets}
+                    className="w-full justify-between text-input-primary p-3 font-bold hover:bg-accent"
+                    size="lg">
+                    {selectedWallet ? (
+                      <>
+                        <span className="text-muted">
+                          {selectedWallet.name} &nbsp;
+                          {"("}
+                          {selectedWallet.public_key.slice(0, 6)}...
+                          {selectedWallet.public_key.slice(-6)}
+                          {")"}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-muted opacity-70 text-xs">
+                        {t("Select wallet")}
+                      </span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="p-0"
+                  align="start"
+                  style={{ width: "var(--radix-popper-anchor-width)" }}>
+                  <Command>
+                    <CommandInput placeholder={t("Choose wallet")} />
+                    <CommandList>
+                      <CommandEmpty>{t("No results found.")}</CommandEmpty>
+                      <CommandGroup>
+                        {wallets.map((wallet) => (
+                          <CommandItem
+                            key={wallet.id}
+                            value={wallet.name}
+                            onSelect={() => {
+                              setSelectedWallet(wallet)
+                              setOpenWallets(false)
+                            }}
+                            className="cursor-pointer hover:bg-accent">
+                            {wallet ? (
+                              <>
+                                {wallet.name} &nbsp;
+                                {"("}
+                                {wallet.public_key.slice(0, 6)}...
+                                {wallet.public_key.slice(-6)}
+                                {")"}
+                              </>
+                            ) : (
+                              t("Select address")
+                            )}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+        </div>
+        <div className="px-4 pt-16 -mt-8 flex-1 max-h-[calc(100% - 150px)] bg-red-500 background-box overflow-hidden">
           {loadingTokens ? (
             <div className="flex flex-col items-center w-full h-30 gap-4 mt-10">
               <LoaderCircle className="animate-spin h-12 w-12 text-muted" />
@@ -246,155 +318,94 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
             </div>
           ) : (
             <>
-              <div className="mb-3">
-                <Label className="text-muted font-bold">{t("Address")}</Label>
-                <Popover open={openWallets} onOpenChange={setOpenWallets}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="roundedOutline"
-                      role="combobox"
-                      aria-expanded={openWallets}
-                      className="w-full justify-between text-input-primary p-3 font-bold hover:bg-accent"
-                      size="lg">
-                      {selectedWallet ? (
-                        <>
-                          <span className="text-muted">
-                            {selectedWallet.name} &nbsp;
-                            {"("}
-                            {selectedWallet.public_key.slice(0, 6)}...
-                            {selectedWallet.public_key.slice(-6)}
-                            {")"}
-                          </span>
-                        </>
-                      ) : (
-                        <span className="text-muted opacity-70">
-                          {t("Select wallet")}
-                        </span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="p-0"
-                    align="start"
-                    style={{ width: "var(--radix-popper-anchor-width)" }}>
-                    <Command>
-                      <CommandInput placeholder={t("Choose wallet")} />
-                      <CommandList>
-                        <CommandEmpty>{t("No results found.")}</CommandEmpty>
-                        <CommandGroup>
-                          {wallets.map((wallet) => (
-                            <CommandItem
-                              key={wallet.id}
-                              value={wallet.name}
-                              onSelect={() => {
-                                setSelectedWallet(wallet)
-                                setOpenWallets(false)
-                              }}
-                              className="cursor-pointer hover:bg-accent">
-                              {wallet ? (
-                                <>
-                                  {wallet.name} &nbsp;
-                                  {"("}
-                                  {wallet.public_key.slice(0, 6)}...
-                                  {wallet.public_key.slice(-6)}
-                                  {")"}
-                                </>
-                              ) : (
-                                t("Select address")
-                              )}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </div>
-
+              <h1 className="text-center text-xl mb-4">Balance</h1>
               {balances.length > 0 ? (
-                <>
-                  {balances
-                    .sort((a, b) => {
-                      if (a.token.type === "Native" && b.token.type !== "Native")
-                        return -1
-                      if (a.token.type !== "Native" && b.token.type === "Native") return 1
-                      return 0
-                    })
-                    .map((balance, index) => (
-                      <div key={index}>
-                        <Card className="mb-1 dark:border-[#16514d]">
-                          <Table>
-                            <TableBody>
-                              <TableRow
-                                onClick={() => {
-                                  if (
-                                    !loadingPerToken[balance.token.symbol] &&
-                                    balance.freeBalance !== 0
-                                  ) {
-                                    selectBalance(balance)
-                                  }
-
-                                  if (balance.freeBalance === 0) {
-                                    toast({
-                                      description: (
-                                        <div className="flex items-center">
-                                          <X className="mr-2 text-white-500" />
-                                          {t("Zero balance")}
-                                        </div>
-                                      ),
-                                      variant: "destructive"
-                                    })
-                                  }
-                                }}
-                                className={`cursor-pointer hover-bg-custom ${
-                                  loadingPerToken[balance.token.symbol]
-                                    ? "cursor-not-allowed"
-                                    : ""
-                                }`}>
-                                <TableCell className="w-[50px] justify-center">
-                                  <Image
-                                    src={
-                                      tokenLogoMap[balance.token.symbol] ||
-                                      "/assets/tokens/default.png"
+                <ScrollArea className="bg-background rounded-lg p-2 h-[calc(100%-60px)]">
+                  <>
+                    {balances
+                      .sort((a, b) => {
+                        if (a.token.type === "Native" && b.token.type !== "Native")
+                          return -1
+                        if (a.token.type !== "Native" && b.token.type === "Native")
+                          return 1
+                        return 0
+                      })
+                      .map((balance, index) => (
+                        <div key={index}>
+                          <Card className="mb-1 border dark:border-muted">
+                            <Table>
+                              <TableBody>
+                                <TableRow
+                                  onClick={() => {
+                                    if (
+                                      !loadingPerToken[balance.token.symbol] &&
+                                      balance.freeBalance !== 0
+                                    ) {
+                                      selectBalance(balance)
                                     }
-                                    width={40}
-                                    height={40}
-                                    alt={balance.token.symbol}
-                                    className="ml-1"
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <div className="mb-[2px]">
-                                    <span className="text-lg font-bold">
-                                      {balance.token.symbol.length > 10
-                                        ? balance.token.symbol.substring(0, 10) + "..."
-                                        : balance.token.symbol}
-                                    </span>
-                                  </div>
-                                  <Badge>
-                                    {balance.token.name.length > 10
-                                      ? balance.token.name.substring(0, 10) + "..."
-                                      : balance.token.name}
-                                  </Badge>
-                                </TableCell>
-                                <TableCell className="w-[50px] justify-end pr-2 text-right">
-                                  <span className="text-lg font-bold text-purple">
-                                    {loadingPerToken[balance.token.symbol] ? (
-                                      <span className="text-sm font-normal opacity-50">
-                                        Loading...
+
+                                    if (balance.freeBalance === 0) {
+                                      toast({
+                                        description: (
+                                          <div className="flex items-center">
+                                            <X className="mr-2 text-white-500" />
+                                            {t("Zero balance")}
+                                          </div>
+                                        ),
+                                        variant: "destructive"
+                                      })
+                                    }
+                                  }}
+                                  className={`cursor-pointer hover-bg-custom ${
+                                    loadingPerToken[balance.token.symbol]
+                                      ? "cursor-not-allowed"
+                                      : ""
+                                  }`}>
+                                  <TableCell className="w-[50px] justify-center">
+                                    <Image
+                                      src={
+                                        tokenLogoMap[balance.token.symbol] ||
+                                        "/assets/tokens/default.png"
+                                      }
+                                      width={40}
+                                      height={40}
+                                      alt={balance.token.symbol}
+                                      className="ml-1"
+                                    />
+                                  </TableCell>
+                                  <TableCell>
+                                    <div className="mb-[2px]">
+                                      <span className="text-lg font-bold">
+                                        {balance.token.symbol.length > 10
+                                          ? balance.token.symbol.substring(0, 10) + "..."
+                                          : balance.token.symbol}
                                       </span>
-                                    ) : (
-                                      formatBalance(balance.freeBalance)
-                                    )}
-                                  </span>
-                                </TableCell>
-                              </TableRow>
-                            </TableBody>
-                          </Table>
-                        </Card>
-                      </div>
-                    ))}
-                </>
+                                    </div>
+                                    <Badge>
+                                      {balance.token.name.length > 10
+                                        ? balance.token.name.substring(0, 10) + "..."
+                                        : balance.token.name}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="w-[50px] justify-end pr-2 text-right">
+                                    <span className="text-lg font-bold text-purple">
+                                      {loadingPerToken[balance.token.symbol] ? (
+                                        <span className="text-sm font-normal opacity-50">
+                                          Loading...
+                                        </span>
+                                      ) : (
+                                        formatBalance(balance.freeBalance)
+                                      )}
+                                    </span>
+                                  </TableCell>
+                                </TableRow>
+                              </TableBody>
+                            </Table>
+                          </Card>
+                        </div>
+                      ))}
+                  </>
+                </ScrollArea>
               ) : (
                 <div className="flex flex-col w-full items-center justify-center py-[100px] space-y-2">
                   <DollarSign className="size-20" />

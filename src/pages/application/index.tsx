@@ -1,5 +1,4 @@
 import Header from "@/components/header"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import type { NetworkModel } from "@/models/network.model"
 import { CurrentPageService } from "@/services/current-page.service"
 import { NetworkService } from "@/services/network.service"
@@ -67,40 +66,38 @@ const IndexApplication = () => {
               handleCurrentNetwork={handleCurrentNetwork}
             />
             <div className="h-[calc(100vh-60px)]">
-              <ScrollArea className="px-4 h-full">
-                {currentPage === t("Balance") && (
-                  <IndexBalance
-                    currentNetwork={currentNetwork}
-                    currentWsAPI={currentWsAPI}
-                  />
-                )}
-                {currentPage === t("Tokens") && (
-                  <IndexTokens
-                    currentNetwork={currentNetwork}
-                    currentWsAPI={currentWsAPI}
-                  />
-                )}
-                {currentPage === t("Network Status") && (
-                  <IndexNetworkStatus
-                    currentNetwork={currentNetwork}
-                    currentWsAPI={currentWsAPI}
-                  />
-                )}
-                {currentPage === t("Wallets") && (
-                  <IndexWallets
-                    currentNetwork={currentNetwork}
-                    currentWsAPI={currentWsAPI}
-                    handleSetCurrentPage={handleSetCurrentPage}
-                  />
-                )}
-                {currentPage === t("Support") && <IndexImUrAi />}
-                {currentPage === t("Pump") && (
-                  <IndexPumpToken
-                    currentNetwork={currentNetwork}
-                    currentWsAPI={currentWsAPI}
-                  />
-                )}
-              </ScrollArea>
+              {currentPage === t("Balance") && (
+                <IndexBalance
+                  currentNetwork={currentNetwork}
+                  currentWsAPI={currentWsAPI}
+                />
+              )}
+              {currentPage === t("Tokens") && (
+                <IndexTokens
+                  currentNetwork={currentNetwork}
+                  currentWsAPI={currentWsAPI}
+                />
+              )}
+              {currentPage === t("Network Status") && (
+                <IndexNetworkStatus
+                  currentNetwork={currentNetwork}
+                  currentWsAPI={currentWsAPI}
+                />
+              )}
+              {currentPage === t("Wallets") && (
+                <IndexWallets
+                  currentNetwork={currentNetwork}
+                  currentWsAPI={currentWsAPI}
+                  handleSetCurrentPage={handleSetCurrentPage}
+                />
+              )}
+              {currentPage === t("Support") && <IndexImUrAi />}
+              {currentPage === t("Pump") && (
+                <IndexPumpToken
+                  currentNetwork={currentNetwork}
+                  currentWsAPI={currentWsAPI}
+                />
+              )}
             </div>
           </div>
         </Layout>

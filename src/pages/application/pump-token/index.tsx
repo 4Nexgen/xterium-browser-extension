@@ -10,6 +10,7 @@ import {
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { ChainAssetFiles } from "@/data/chains/chain-asset-files"
 import type { NetworkModel } from "@/models/network.model"
 import type { TokenModel } from "@/models/token.model"
@@ -99,8 +100,8 @@ const IndexPumpToken = ({ currentNetwork, currentWsAPI }: IndexPumpTokenProps) =
   }
 
   return (
-    <>
-      <div className="py-4 flex flex-col justify-between h-full">
+    <ScrollArea>
+      <div className="p-4 flex flex-col justify-between h-full">
         <div className="py-4">
           {loading ? (
             <div className="flex flex-col items-center w-full h-30 gap-4 mt-10">
@@ -253,7 +254,7 @@ const IndexPumpToken = ({ currentNetwork, currentWsAPI }: IndexPumpTokenProps) =
           )}
         </DrawerContent>
       </Drawer>
-    </>
+    </ScrollArea>
   )
 }
 
