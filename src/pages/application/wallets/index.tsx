@@ -173,10 +173,10 @@ const IndexWallet = ({
               </p>
             </div>
           ) : wallets.length > 0 ? (
-            <ScrollArea className="border-2 border-muted rounded-lg p-4 bg-background h-[300px]">
+            <ScrollArea className="bg-background border dark:border-muted border-4 rounded-lg p-2 h-[300px]">
               {wallets.map((wallet, index) => (
                 <div key={index}>
-                  <Card className="mb-1 border dark:border-muted">
+                  <Card className="mb-1.5 border dark:border-muted bg-[#183F44] rounded-sm">
                     <Table>
                       <TableBody>
                         <TableRow className="hover-bg-custom">

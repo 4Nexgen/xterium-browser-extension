@@ -240,9 +240,9 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
       <div className="flex flex-col justify-between h-full gap-4 overflow-hidden">
         <div className="p-4 h-[150px] z-10 flex flex-col items-center justify-center">
           <img src={XteriumLogo} className="w-[150px]" alt="Xterium Logo" />
-          <div className="rounded-lg bg-gradient-to-t from-blue-500 to-cyan-500 p-4 w-[300px] mx-auto">
-            <div className="px-2 py-1 rounded-lg bg-background border-2 border-muted">
-              <Label className="text-primary text-[9px] mb-0">{t("Address")}</Label>
+          <div className="rounded-lg bg-[#0ABBB5] p-4 w-[300px] mx-auto">
+            <div className="px-2 py-1 rounded-sm bg-background border-2 border-[#3E7596]">
+              {/* <Label className="text-primary text-[9px] mb-0">{t("Address")}</Label> */}
               <Popover open={openWallets} onOpenChange={setOpenWallets}>
                 <PopoverTrigger asChild className="h-[20px]">
                   <Button
@@ -320,7 +320,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
             <>
               <h1 className="text-center text-xl mb-4">Balance</h1>
               {balances.length > 0 ? (
-                <ScrollArea className="bg-background rounded-lg p-2 h-[calc(100%-60px)]">
+                <ScrollArea className="bg-background border dark:border-muted border-4 rounded-lg p-2 h-[calc(100%-60px)]">
                   <>
                     {balances
                       .sort((a, b) => {
@@ -332,7 +332,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                       })
                       .map((balance, index) => (
                         <div key={index}>
-                          <Card className="mb-1 border dark:border-muted">
+                          <Card className="mb-1.5 border dark:border-muted bg-[#183F44] rounded-sm">
                             <Table>
                               <TableBody>
                                 <TableRow
@@ -390,7 +390,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                                   <TableCell className="w-[50px] justify-end pr-2 text-right">
                                     <span className="text-lg font-bold text-purple">
                                       {loadingPerToken[balance.token.symbol] ? (
-                                        <span className="text-sm font-normal opacity-50">
+                                        <span className="text-sm text-white font-normal opacity-100">
                                           Loading...
                                         </span>
                                       ) : (
