@@ -11,6 +11,7 @@ import imuraiChatAvatar from "data-base64:/assets/imurai/imurai-chat-avatar.png"
 import activeIndicator from "data-base64:/assets/imurai/online-indicator.png"
 import { BotMessageSquare, Loader2, SendHorizonal } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
+import ReactMarkdown from "react-markdown-it"
 
 import { Storage } from "@plasmohq/storage"
 
@@ -157,7 +158,7 @@ const IndexImUrAi = () => {
                       )}
                       <p
                         className={`flex-1 px-4 rounded-lg ${item.role == "user" ? "justify-end bg-primary py-2" : ""}`}>
-                        {item.content}
+                        <ReactMarkdown>{item.content}</ReactMarkdown>
                       </p>
                     </li>
                   )
@@ -171,7 +172,9 @@ const IndexImUrAi = () => {
                         <BotMessageSquare className="size-6" />
                       )}
                     </div>
-                    <p className="flex-1 px-4 rounded-lg">{messageComposition}</p>
+                    <p className="flex-1 px-4 rounded-lg">
+                      <ReactMarkdown>{messageComposition}</ReactMarkdown>
+                    </p>
                   </li>
                 ) : (
                   ""
