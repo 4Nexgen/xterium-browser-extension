@@ -209,7 +209,7 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
                   .filter((token) => token.type === "Asset" || token.type === "Pump")
                   .map((token) => (
                     <div key={token.id}>
-                      <Card className="mb-1 dark:border-[#16514d]">
+                      <Card className="mb-1 border dark:border-muted">
                         <Table>
                           <TableBody>
                             <TableRow className="cursor-pointer">

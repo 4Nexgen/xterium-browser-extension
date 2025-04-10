@@ -332,7 +332,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                       })
                       .map((balance, index) => (
                         <div key={index}>
-                          <Card className="mb-1 dark:border-[#16514d]">
+                          <Card className="mb-1 border dark:border-muted">
                             <Table>
                               <TableBody>
                                 <TableRow
