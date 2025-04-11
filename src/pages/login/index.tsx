@@ -93,45 +93,47 @@ const IndexLogin = ({ handleSetCurrentPage }: IndexLoginProps) => {
 
   return (
     <>
-      <div className="sm:bg-background-sheet sm:flex justify-center items-center">
-        <OutsideLayout headerVariant="outside">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="w-full space-y-4 lg:space-y-">
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-inter text-white font-extrabold text-[12px] leading-[15px] tracking-[0.15em] mb-2">
-                      {t("Enter Password")}:
-                    </FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          type={showPassword ? "text" : "password"}
-                          placeholder={t("Enter password")}
-                          {...field}
-                        />
-                        <button
-                          type="button"
-                          onClick={toggleShowPassword}
-                          className="absolute inset-y-0 right-0 px-3 text-sm font-semibold">
-                          {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
-                        </button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" variant="jelly" className="w-full text-white">
-                {t("UNLOCK")}
-              </Button>
-            </form>
-          </Form>
-        </OutsideLayout>
+      <div className="bg-background-sheet flex justify-center items-center">
+        <div className="bg-white background-inside-theme h-screen max-w-xl w-full">
+          <OutsideLayout headerVariant="outside">
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="w-full space-y-4 lg:space-y-">
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="font-inter text-white font-extrabold text-[12px] leading-[15px] tracking-[0.15em] mb-2">
+                        {t("Enter Password")}:
+                      </FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            placeholder={t("Enter password")}
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            onClick={toggleShowPassword}
+                            className="absolute inset-y-0 right-0 px-3 text-sm font-semibold">
+                            {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                          </button>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" variant="jelly" className="w-full text-white">
+                  {t("UNLOCK")}
+                </Button>
+              </form>
+            </Form>
+          </OutsideLayout>
+        </div>
       </div>
     </>
   )

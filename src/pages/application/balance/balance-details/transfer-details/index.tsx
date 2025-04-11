@@ -363,7 +363,7 @@ const IndexTransferDetails = ({
             <Input
               id="quantity"
               type="number"
-              className="mt-2 text-input-primary"
+              className="mt-2 text-input-primary bg-tablecell-detail rounded-lg relative border-2 border-primary dark:border-[#16514d] dark:border-border dark:bg-[#163F45]"
               placeholder="Enter amount"
               value={quantity}
               onChange={(e) => setQuantity(parseFloat(e.target.value))}
@@ -374,7 +374,7 @@ const IndexTransferDetails = ({
             <Input
               id="transferTo"
               type="text"
-              className="mt-2 text-input-primary"
+              className="mt-2 text-input-primary bg-tablecell-detail rounded-lg relative border-2 border-primary dark:border-[#16514d] dark:border-border dark:bg-[#163F45]"
               placeholder={t("Enter recipient address")}
               value={transferTo}
               onChange={(e) => setTransferTo(e.target.value)}
