@@ -39,6 +39,10 @@ window.addEventListener("message", async (event) => {
       try {
         const password = event.data.password
         const isPasswordStored = await userService.login(password)
+
+        console.log("🔑 Input Password:", password)
+        console.log("✅ Password Match:", isPasswordStored)
+
         window.postMessage(
           {
             type: "XTERIUM_PASSWORD_RESPONSE",

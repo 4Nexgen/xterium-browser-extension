@@ -241,86 +241,61 @@
       passwordContainer.appendChild(togglePassword)
       container.appendChild(passwordContainer)
 
-      window.postMessage({ type: "XTERIUM_GET_PASSWORD" }, "*")
-
-      let storedPassword = null
-      const handlePasswordResponse = (event) => {
-        if (
-          event.source !== window ||
-          !event.data ||
-          event.data.type !== "XTERIUM_PASSWORD_RESPONSE"
-        )
-          return
-        if (event.data.isAuthenticated) {
-          storedPassword = event.data.password
-        }
-      }
-
-      window.addEventListener("message", handlePasswordResponse)
+      let storedPassword = null;
 
       const approveBtn = document.createElement("button")
       approveBtn.classList.add("approve-button")
       approveBtn.innerText = "Approve"
       approveBtn.addEventListener("click", async () => {
-        if (!passwordInput.value) {
-          alert("Password is required to connect the wallet.")
-          return
+          if (!passwordInput.value) {
+            alert("Password is required to connect the wallet.")
+            return
+          }
+
+        if (storedPassword && passwordInput.value === storedPassword) {
+          document.body.removeChild(overlay);
+          window.postMessage(
+            { type: "XTERIUM_CONNECT_APPROVED", password: passwordInput.value },
+            "*"
+          );
+          resolve();
+          return;
         }
 
+        const timeoutId = setTimeout(() => {
+          window.removeEventListener("message", handlePasswordResponse)
+          alert("Password verification timed out.")
+        }, 5000)
+      
+        const handlePasswordResponse = (event) => {
+          if (!event.data || event.data.type !== "XTERIUM_PASSWORD_RESPONSE") return
+
+        clearTimeout(timeoutId);
+        window.removeEventListener("message", handlePasswordResponse);
+
+
+        if (event.data.isAuthenticated) {
+          storedPassword = passwordInput.value;
+          document.body.removeChild(overlay);
+          window.postMessage(
+            { type: "XTERIUM_CONNECT_APPROVED", password: passwordInput.value },
+            "*"
+          );
+          resolve();
+        } else {
+          alert("Invalid password. Please try again.");
+        }
+      };
+  
+      window.addEventListener("message", handlePasswordResponse);
+      
         window.postMessage(
           {
             type: "XTERIUM_GET_PASSWORD",
-            password: passwordInput.value // Send the input password for verification
+            password: passwordInput.value
           },
           "*"
         )
-
-        // Create a promise to wait for the verification response
-        const verificationPromise = new Promise((resolveVerify, rejectVerify) => {
-          const handlePasswordResponse = (event) => {
-            if (
-              event.source !== window ||
-              !event.data ||
-              event.data.type !== "XTERIUM_PASSWORD_RESPONSE"
-            )
-              return
-
-            window.removeEventListener("message", handlePasswordResponse)
-
-            if (event.data.isAuthenticated) {
-              resolveVerify(true) // Resolve the promise if authenticated
-            } else {
-              resolveVerify(false) // Resolve the promise if not authenticated
-            }
-          }
-
-          window.addEventListener("message", handlePasswordResponse)
-
-          // Set a timeout in case the response never comes
-          setTimeout(() => {
-            window.removeEventListener("message", handlePasswordResponse)
-            rejectVerify(new Error("Password verification timed out"))
-          }, 5000)
-        })
-
-        // Wait for the verification result
-        try {
-          const isAuthenticated = await verificationPromise
-
-          if (isAuthenticated) {
-            document.body.removeChild(overlay)
-            window.postMessage(
-              { type: "XTERIUM_CONNECT_APPROVED", password: passwordInput.value },
-              "*"
-            )
-            resolve() // Resolve the main promise
-          } else {
-            alert("Invalid password. Please try again.")
-          }
-        } catch (error) {
-          console.error("Password verification error:", error)
-          alert("Error verifying password. Please try again.")
-        }
       })
 
       const cancelBtn = document.createElement("button")
@@ -627,41 +602,42 @@
       passwordContainer.appendChild(togglePassword)
       container.appendChild(passwordContainer)
 
-      window.postMessage({ type: "XTERIUM_GET_PASSWORD" }, "*")
-
-      let storedPassword = null
-      const handlePasswordResponse = (event) => {
-        if (
-          event.source !== window ||
-          !event.data ||
-          event.data.type !== "XTERIUM_PASSWORD_RESPONSE"
-        )
-          return
-        if (event.data.password) {
-          storedPassword = event.data.password
-        }
-      }
-
-      window.addEventListener("message", handlePasswordResponse)
-
+      let storedPassword = null;
+      
       const approveBtn = document.createElement("button")
-      approveBtn.classList.add("transfer-approve-button")
+      approveBtn.classList.add("approve-button")
       approveBtn.innerText = "Approve"
-      approveBtn.addEventListener("click", () => {
+      approveBtn.addEventListener("click", async () => {
         if (!passwordInput.value) {
           alert("Password is required to connect the wallet.")
           return
         }
-        if (passwordInput.value !== storedPassword) {
-          alert("Invalid password. Please try again.")
-          return
+      
+        const handlePasswordResponse = (event) => {
+          if (event.data && event.data.type === "XTERIUM_PASSWORD_RESPONSE") {
+            if (event.data.isAuthenticated) {
+              storedPassword = passwordInput.value
+              document.body.removeChild(overlay)
+              window.postMessage(
+                { type: "XTERIUM_TRANSFER_APPROVED", details, password: passwordInput.value },
+                "*"
+              )
+              resolve()
+            } else {
+              alert("Invalid password. Please try again.")
+            }
+      
+            window.removeEventListener("message", handlePasswordResponse)
+          }
         }
-        document.body.removeChild(overlay)
+      
+        window.addEventListener("message", handlePasswordResponse)
+      
+        // Then send a request to check password
         window.postMessage(
-          { type: "XTERIUM_TRANSFER_APPROVED", details, password: passwordInput.value },
+          { type: "XTERIUM_GET_PASSWORD", password: passwordInput.value },
           "*"
         )
-        resolve()
       })
 
       const cancelBtn = document.createElement("button")
