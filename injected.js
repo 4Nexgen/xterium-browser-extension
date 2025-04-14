@@ -112,7 +112,7 @@
         walletButton.innerText = formatWalletAddress(wallet.public_key)
         walletButton.addEventListener("click", () => {
           document.body.removeChild(overlay)
-          resolve(wallet)
+          handleWalletSelection(wallet)
         })
         walletList.appendChild(walletButton)
       })
@@ -147,6 +147,19 @@
         document.addEventListener("mouseup", mouseUpHandler)
       })
     })
+  }
+
+  function handleWalletSelection(wallet) {
+    showConnectWalletSignAndVerify(wallet)
+      .then(() => {
+        isConnected = true 
+        connectedWallet = wallet 
+        saveConnectionState() 
+      })
+      .catch((error) => {
+        console.error("Wallet connection failed:", error)
+        alert("Failed to connect wallet. Please try again.")
+      })
   }
 
   // Displays a UI overlay for wallet sign/verify process.
