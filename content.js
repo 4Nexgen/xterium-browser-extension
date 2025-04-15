@@ -184,9 +184,11 @@ window.addEventListener("message", async (event) => {
     case "XTERIUM_GET_ESTIMATE_FEE": {
       const { owner, value, recipient, balance } = event.data
       const token = balance.token
-
+    
       try {
         const apiInstance = await connectToRPC()
+        console.log("Connected to RPC successfully.")
+    
         const fee = await balanceService.getEstimateTransferFee(
           apiInstance,
           token,
@@ -194,7 +196,6 @@ window.addEventListener("message", async (event) => {
           recipient,
           Number(value)
         )
-
         window.postMessage(
           {
             type: "XTERIUM_ESTIMATE_FEE_RESPONSE",
@@ -203,8 +204,10 @@ window.addEventListener("message", async (event) => {
           },
           "*"
         )
+    
       } catch (error) {
         console.error("Error estimating fee:", error)
+
         window.postMessage(
           {
             type: "XTERIUM_ESTIMATE_FEE_RESPONSE",
@@ -217,39 +220,65 @@ window.addEventListener("message", async (event) => {
       break
     }
     case "XTERIUM_TRANSFER_REQUEST": {
-      const { token, owner, recipient, value } = event.data.payload
+      const { token, owner, recipient, value, password } = event.data.payload;
+    
       try {
         if (!token || !token.type) {
-          throw new Error("Invalid token data")
+          throw new Error("Invalid token data");
         }
-
-        const apiInstance = await connectToRPC()
-        const result = await balanceService.transfer(
-          apiInstance,
-          token,
-          owner,
-          recipient,
-          Number(value)
-        )
-
+    
+        const apiInstance = await connectToRPC();
+    
+        const result = await new Promise<ISubmittableResult>((resolve, reject) => {
+          balanceService.transfer(
+            apiInstance,
+            token,
+            owner,
+            recipient,
+            Number(value),
+            (result) => {
+              console.log("[Transfer] Received result:", result);
+    
+              if (result.status.isFinalized || result.status.isInBlock) {
+                resolve(result);
+              }
+    
+              // Optionally reject on failure
+              if (result.isError || result.status.isInvalid) {
+                reject(new Error("Transaction failed or invalid"));
+              }
+            }
+          );
+        });
+    
+        // ✅ Post the response after it's resolved
         window.postMessage(
           {
             type: "XTERIUM_TRANSFER_RESPONSE",
-            response: result
+            response: {
+              status: result.status.type,
+              isFinalized: result.isFinalized,
+              isInBlock: result.isInBlock,
+              blockHash: result.status.isFinalized
+                ? result.status.asFinalized?.toString?.() ?? null
+                : null,
+            },
           },
           "*"
-        )
+        );
+    
       } catch (error) {
-        console.error("[Content.js] Transfer failed:", error)
+        console.error("[Content.js] Transfer failed:", error);
         window.postMessage(
           {
             type: "XTERIUM_TRANSFER_RESPONSE",
-            error: error.toString()
+            error: error.toString(),
           },
           "*"
-        )
+        );
       }
-      break
+    
+      break;
     }
     case "XTERIUM_REFRESH_BALANCE": {
       const { publicKey, token } = event.data
