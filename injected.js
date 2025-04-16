@@ -625,6 +625,8 @@
       passwordContainer.appendChild(togglePassword);
       container.appendChild(passwordContainer);
   
+      let storedPassword = null;
+
       // Approve and Reject buttons
       const approveBtn = document.createElement("button");
       approveBtn.classList.add("approve-button");
@@ -634,30 +636,62 @@
           alert("Password is required to connect the wallet.");
           return;
         }
-  
+
+        if (storedPassword && passwordInput.value === storedPassword) {
+          document.body.removeChild(overlay);
+          window.postMessage(
+            { type: "XTERIUM_TRANSFER_APPROVED", password: passwordInput.value },
+            "*"
+          );
+          resolve();
+          return;
+        }
+
+        const timeoutId = setTimeout(() => {
+          window.removeEventListener("message", handlePasswordResponse)
+          alert("Password verification timed out.")
+        }, 5000)
+
         const handlePasswordResponse = (event) => {
-          if (event.data?.type === "XTERIUM_PASSWORD_RESPONSE") {
-            if (event.data.isAuthenticated) {
-              const approvedDetails = { ...details, password: passwordInput.value };
-              document.body.removeChild(overlay);
-  
-              window.postMessage(
-                { type: "XTERIUM_TRANSFER_APPROVED", details: approvedDetails },
-                "*"
-              );
-              resolve();
-            } else {
-              alert("Invalid password.");
-            }
-            window.removeEventListener("message", handlePasswordResponse);
-          }
-        };
-  
-        window.addEventListener("message", handlePasswordResponse);
-        window.postMessage(
-          { type: "XTERIUM_GET_PASSWORD", password: passwordInput.value },
-          "*"
-        );
+
+          console.log("Password Process", event)
+          if (!event.data || event.data.type !== "XTERIUM_PASSWORD_RESPONSE") return
+
+          clearTimeout(timeoutId);
+        window.removeEventListener("message", handlePasswordResponse);
+
+        if (event.data.isAuthenticated) {
+          const pendingTransferDetails = {
+            token: details.token,
+            owner: details.owner,
+            recipient: details.recipient,
+            value: Number(details.value),
+            password: passwordInput.value
+          };
+    
+          document.body.removeChild(overlay);
+          window.postMessage(
+            {
+              type: "XTERIUM_TRANSFER_APPROVED",
+              transferDetails: pendingTransferDetails
+            },
+            "*"
+          );
+          resolve();
+        } else {
+          alert("Invalid password. Please try again.");
+        }
+      };
+       
+      window.addEventListener("message", handlePasswordResponse);
+      
+      window.postMessage(
+        {
+          type: "XTERIUM_GET_PASSWORD",
+          password: passwordInput.value
+        },
+        "*"
+      )
       });
   
       const cancelBtn = document.createElement("button");
@@ -803,7 +837,6 @@
 
   // Retrieves balance for the given public key.
   function getBalance(publicKey) {
-    
     return new Promise((resolve, reject) => {
       if (!isConnected || !connectedWallet) {
         return reject("No wallet connected.");
@@ -811,7 +844,10 @@
   
       const handleResponse = (event) => {
         const data = event.data;
-        console.log("Data", data)
+  
+        console.log("🟡 Received message:", data);
+  
+        // ✅ Ignore any message that is not the expected response
         if (
           event.source !== window ||
           !data ||
@@ -832,15 +868,12 @@
       };
   
       window.addEventListener("message", handleResponse);
-      window.addEventListener("message", (e) => {
-        console.log("🟡 Received message:", e.data);
-      });
   
       const timeoutId = setTimeout(() => {
         console.warn("⏰ Timeout fired");
         window.removeEventListener("message", handleResponse);
         reject("Timeout: No response received from wallet.");
-      }, 10000);
+      }, 15000);
   
       window.postMessage(
         {
@@ -853,7 +886,7 @@
   }
 
   // Initiates a token transfer.
-  function transfer(token, recipient, value, password) {
+  function transfer(token, recipient, value) {
     return new Promise((resolve, reject) => {
       if (!isConnected || !connectedWallet) {
         console.error("No wallet connected.")
@@ -875,7 +908,7 @@
         )
       }
   
-      const nativeTokenSymbol = ""
+      const nativeTokenSymbol = "XON"
       let tokenObj = {
         symbol: tokenSymbol,
         type:
@@ -883,7 +916,11 @@
             ? "Native"
             : "Asset"
       }
-  
+
+      
+      console.log("🔍 Looking for token:", tokenSymbol, tokenObj.type);
+      
+
       if (!recipient || recipient.trim() === "") {
         console.error("Recipient address is required.")
         return reject("Recipient address is required.")
@@ -901,7 +938,7 @@
   
       getBalance(owner)
         .then((balances) => {
-          console.log("🔍 Full balance list:", balances);
+
           const matched = balances.find((b) => {
             return (
               b.token?.symbol?.toUpperCase() === tokenSymbol.toUpperCase() &&
@@ -916,6 +953,8 @@
           const available = parseFloat(matched.freeBalance)
           const toSend = parseFloat((Number(value) / 1e12).toFixed(12))
       
+          console.log("Balances", available)
+
           if (toSend > available) {
             return reject(`Not enough balance. You have ${available}, trying to send ${toSend}`)
           }
@@ -964,7 +1003,6 @@
             owner,
             recipient,
             value: Number(value),
-            password
           };
   
           console.log("🚀 Sending XTERIUM_TRANSFER_REQUEST to window", transferDetails);
@@ -1014,7 +1052,7 @@
         return
       }
   
-      showTransferSignAndVerify(details)
+      // showTransferSignAndVerify(details)
     }
   
     if (!window.xteriumMessageListenerAdded) {
@@ -1024,7 +1062,6 @@
         switch (event.data.type) {
           case "XTERIUM_TRANSFER_REQUEST":
             const transferDetails = event.data.payload
-  
             if (document.getElementById("xterium-transfer-approval-overlay")) {
               return
             }
@@ -1035,35 +1072,49 @@
   
           case "XTERIUM_TRANSFER_APPROVED":
             const processingOverlay = showTransferProcessing()
-            const { token, recipient, value, password } = event.data.details
+
+            const details = event.data.transferDetails;
+
+            if (!details) {
+              console.error("No transfer details found in XTERIUM_TRANSFER_APPROVED event.");
+              if (document.body.contains(processingOverlay)) {
+                document.body.removeChild(processingOverlay);
+              }
+              window.postMessage(
+                { type: "XTERIUM_TRANSFER_FAILED", error: "Missing transfer details" },
+                "*"
+              );
+              break;
+            }
+
+            const { token, recipient, value } = details
       
-            transfer(token, recipient, value, password)
+            transfer(token, recipient, value )
                 .then((response) => {
-                    if (document.body.contains(processingOverlay)) {
-                        document.body.removeChild(processingOverlay)
-                    }
-                    showTransferSuccess(processingOverlay)
-                    window.postMessage(
-                        {
-                            type: "XTERIUM_REFRESH_BALANCE",
-                            publicKey: connectedWallet.public_key,
-                            token
-                        },
-                        "*"
-                    )
-  
-                    window.postMessage({ type: "XTERIUM_TRANSFER_SUCCESS", response }, "*")
-                    isTransferInProgress = false
+                  if (document.body.contains(processingOverlay)) {
+                    document.body.removeChild(processingOverlay);
+                  }
+                  showTransferSuccess(processingOverlay);
+                  window.postMessage(
+                    {
+                      type: "XTERIUM_REFRESH_BALANCE",
+                      publicKey: connectedWallet.public_key,
+                      token,
+                    },
+                    "*"
+                  );
+                  window.postMessage({ type: "XTERIUM_TRANSFER_SUCCESS", response }, "*");
+                  isTransferInProgress = false;
                 })
                 .catch((err) => {
-                    if (document.body.contains(processingOverlay)) {
-                        document.body.removeChild(processingOverlay)
-                    }
-                    window.postMessage({ type: "XTERIUM_TRANSFER_FAILED", error: err }, "*")
-                    isTransferInProgress = false
-                })
-            break
-  
+                  if (document.body.contains(processingOverlay)) {
+                    document.body.removeChild(processingOverlay);
+                  }
+                  window.postMessage({ type: "XTERIUM_TRANSFER_FAILED", error: err }, "*");
+                  isTransferInProgress = false;
+                });
+              break;
+              
           case "XTERIUM_GET_WALLET_BALANCE":
               const publicKey = event.data.publicKey
               getBalance(publicKey)

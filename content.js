@@ -1,14 +1,22 @@
+import React, { useEffect, useMemo, useState } from "react"
 import { BalanceServices } from "../src/services/balance.service"
 import { NetworkService } from "../src/services/network.service"
 import { TokenService } from "../src/services/token.service"
 import { UserService } from "../src/services/user.service"
 import { WalletService } from "../src/services/wallet.service"
+import { EncryptionService } from "../src/services/encryption.service"
+import { BalanceModel } from "../src/models/balance.model"
+import { ApiPromise, Keyring } from "@polkadot/api"
 import { injectCSS } from "../ui"
 
+// const [balanceData, setBalanceData] = useState<BalanceModel | null>(null)
 const walletService = new WalletService()
 const balanceService = new BalanceServices(walletService)
 const networkService = new NetworkService()
 const userService = new UserService()
+const encryptionService = new EncryptionService()
+
+
 
 let api = null
 async function connectToRPC() {
@@ -204,6 +212,8 @@ window.addEventListener("message", async (event) => {
           },
           "*"
         )
+
+        console.log("FEE", fee)
     
       } catch (error) {
         console.error("Error estimating fee:", error)
@@ -220,22 +230,41 @@ window.addEventListener("message", async (event) => {
       break
     }
     case "XTERIUM_TRANSFER_REQUEST": {
-      const { token, owner, recipient, value } = event.data.payload;
+      const { token, owner, recipient, value, password } = event.data.payload;
     
+      console.log("Value", token)
+      console.log("Value", owner)
+      console.log("Value", recipient)
+      console.log("Value", value)
+      console.log("Password", password)
+
       try {
         if (!token || !token.type) {
-          throw new Error("Invalid token data");
-        }
-        
-        const availableBalance = await balanceService.getBalanceWithoutCallback(token, owner); 
-        if (availableBalance < Number(value)) {
-          console.error("Token balance is insufficient for transfer.");
-          return;
+          throw new Error("Invalid token data.");
         }
     
+    
+        const walletModel = await walletService.getWallet(owner);
+        if (!walletModel) {
+          throw new Error("Wallet not found.");
+        }
+    
+        const decryptedMnemonicPhrase = encryptionService.decrypt(
+          password,
+          walletModel.mnemonic_phrase
+        );
+        const keyring = new Keyring({ type: "sr25519" });
+        const signature = keyring.addFromUri(decryptedMnemonicPhrase);
+    
         const apiInstance = await connectToRPC();
-        console.log("Connected to RPC successfully:", apiInstance);
-        console.log("Initiating transfer with:", token, owner, recipient, value);
+        console.log("✅ Connected to RPC successfully.");
+    
+        console.log("🚀 Initiating transfer with:", {
+          token,
+          owner,
+          recipient,
+          value
+        });
     
         balanceService.transfer(
           apiInstance,
@@ -244,7 +273,7 @@ window.addEventListener("message", async (event) => {
           recipient,
           Number(value),
           (transferResult) => {
-            console.log("[Transfer] Received result:", transferResult);
+            console.log("[Transfer] Result:", transferResult);
     
             if (transferResult.status.isFinalized || transferResult.status.isInBlock) {
               window.postMessage(
@@ -265,7 +294,7 @@ window.addEventListener("message", async (event) => {
                 "*"
               );
             }
-          }
+          },
         );
       } catch (error) {
         console.error("[Content.js] Transfer failed:", error);
@@ -279,6 +308,7 @@ window.addEventListener("message", async (event) => {
       }
       break;
     }
+    
     case "XTERIUM_REFRESH_BALANCE": {
       const { publicKey, token } = event.data
       try {
