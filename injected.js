@@ -25,7 +25,7 @@
   // ----------------------------
   // Private State Variables
   // ----------------------------
-  const extensionId = "plhchpneiklnlplnnlhkmnikaepgfdaf"
+  const extensionId = "fiafdhcmleelgciojaimjgbabhmbffmj"
   isConnected = false
   connectedWallet = null
 
@@ -630,7 +630,6 @@
       if (storedPassword && passwordInput.value === storedPassword) {
       }
 
-      // Approve and Reject buttons
       const approveBtn = document.createElement("button")
       approveBtn.classList.add("approve-button")
       approveBtn.innerText = "Approve"
@@ -642,7 +641,30 @@
 
         document.body.removeChild(overlay)
 
-        // Send transfer request directly (password checked only once in XTERIUM_TRANSFER_REQUEST)
+        const processingOverlay = showTransferProcessing()
+
+        const handleTransferResponse = (event) => {
+          if (event.source !== window || !event.data?.type) return
+
+          if (event.data.type === "XTERIUM_TRANSFER_RESPONSE") {
+            window.removeEventListener("message", handleTransferResponse)
+
+            if (event.data.error) {
+              alert("Transfer failed: " + event.data.error)
+              document.body.removeChild(processingOverlay)
+              reject(event.data.error)
+            } else {
+              showTransferSuccess(processingOverlay)
+              setTimeout(() => {
+                document.body.removeChild(processingOverlay)
+                resolve()
+              }, 2000)
+            }
+          }
+        }
+
+        window.addEventListener("message", handleTransferResponse)
+
         window.postMessage(
           {
             type: "XTERIUM_TRANSFER_REQUEST",
@@ -1016,7 +1038,8 @@
           }
 
           case "XTERIUM_TRANSFER_APPROVED": {
-            console.log("Process .......")
+            console.log("Received message:", event)
+            
             const processingOverlay = showTransferProcessing()
             const details = event.data.transferDetails
             const password = event.data.password
