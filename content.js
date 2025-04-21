@@ -1,12 +1,13 @@
+import { ApiPromise, Keyring } from "@polkadot/api"
 import React, { useEffect, useMemo, useState } from "react"
+
+import { BalanceModel } from "../src/models/balance.model"
 import { BalanceServices } from "../src/services/balance.service"
+import { EncryptionService } from "../src/services/encryption.service"
 import { NetworkService } from "../src/services/network.service"
 import { TokenService } from "../src/services/token.service"
 import { UserService } from "../src/services/user.service"
 import { WalletService } from "../src/services/wallet.service"
-import { EncryptionService } from "../src/services/encryption.service"
-import { BalanceModel } from "../src/models/balance.model"
-import { ApiPromise, Keyring } from "@polkadot/api"
 import { injectCSS } from "../ui"
 
 // const [balanceData, setBalanceData] = useState<BalanceModel | null>(null)
@@ -15,8 +16,6 @@ const balanceService = new BalanceServices(walletService)
 const networkService = new NetworkService()
 const userService = new UserService()
 const encryptionService = new EncryptionService()
-
-
 
 let api = null
 async function connectToRPC() {
@@ -192,11 +191,11 @@ window.addEventListener("message", async (event) => {
     case "XTERIUM_GET_ESTIMATE_FEE": {
       const { owner, value, recipient, balance } = event.data
       const token = balance.token
-    
+
       try {
         const apiInstance = await connectToRPC()
         console.log("Connected to RPC successfully.")
-    
+
         const fee = await balanceService.getEstimateTransferFee(
           apiInstance,
           token,
@@ -214,7 +213,6 @@ window.addEventListener("message", async (event) => {
         )
 
         console.log("FEE", fee)
-    
       } catch (error) {
         console.error("Error estimating fee:", error)
 
@@ -230,82 +228,96 @@ window.addEventListener("message", async (event) => {
       break
     }
     case "XTERIUM_TRANSFER_REQUEST": {
-      const { token, owner, recipient, value, password } = event.data.payload;
+      const { token, owner, recipient, value, password } = event.data.payload
+
       try {
-        const apiInstance = await connectToRPC();
-        console.log("✅ Connected to RPC.");
-
-        if (!token || !token.type) {
-          throw new Error("Invalid token data.");
+        // 1. Validate inputs
+        if (!token?.type || !owner || !recipient || !value) {
+          throw new Error("Missing required transfer parameters")
         }
-    
-        const walletModel = await walletService.getWallet(owner);
-        if (!walletModel) {
-          throw new Error("Wallet not found.");
-        }
-    
-        const decryptedMnemonicPhrase = encryptionService.decrypt(
-          password,
-          walletModel.mnemonic_phrase
-        );
-    
-        const keyring = new Keyring({ type: "sr25519" });
-        const signature = keyring.addFromUri(decryptedMnemonicPhrase);
-        
-        console.log("Signature", signature)
 
-        
-    
-        console.log("🚀 Initiating transfer", { from: signature, to: recipient, amount: value })
-    
-        // balanceService.transfer(
-        //   apiInstance,
-        //   token,
-        //   signature,
-        //   recipient,
-        //   Number(value),
-        //   (transferResult) => {
-        //     console.log("[Transfer] Result received:", transferResult);
-    
-        //     if (transferResult.status?.isFinalized || transferResult.status?.isInBlock) {
-        //       console.log("✅ Transfer finalized or in block.");
-        //       window.postMessage(
-        //         {
-        //           type: "XTERIUM_TRANSFER_RESPONSE",
-        //           response: {
-        //             blockHash: transferResult.status.asFinalized?.toString?.() || null,
-        //             events: transferResult.events?.map((e) => e.toHuman?.()),
-        //           },
-        //         },
-        //         "*"
-        //       );
-        //     } else if (transferResult.isError || transferResult.status?.isInvalid) {
-        //       console.error("❌ Transfer failed or invalid.");
-        //       window.postMessage(
-        //         {
-        //           type: "XTERIUM_TRANSFER_RESPONSE",
-        //           error: "Transaction failed or was invalid.",
-        //         },
-        //         "*"
-        //       );
-        //     }
-        //   },
-        //   signature 
-        // );
+        // 2. Connect to RPC
+        const apiInstance = await connectToRPC()
+
+        // 3. Get wallet and decrypt mnemonic
+        const walletModel = await walletService.getWallet(owner)
+        if (!walletModel?.mnemonic_phrase) {
+          throw new Error("Wallet not found")
+        }
+
+        // 4. Decrypt mnemonic
+        let decryptedMnemonic
+        try {
+          decryptedMnemonic = encryptionService.decrypt(
+            password,
+            walletModel.mnemonic_phrase
+          )
+          if (!decryptedMnemonic) throw new Error("Decryption failed")
+        } catch (decryptError) {
+          console.error("Decryption error:", decryptError)
+          throw new Error("Invalid password")
+        }
+
+        // 5. Create keyring pair
+        const keyring = new Keyring({ type: "sr25519" })
+        const keypair = keyring.addFromUri(decryptedMnemonic)
+
+        // 6. Create proper signer implementation
+        const signer = {
+          signPayload: async (payload) => {
+            const payloadU8a = apiInstance.registry
+              .createType("ExtrinsicPayload", payload)
+              .toU8a()
+            return keypair.sign(payloadU8a)
+          },
+          signRaw: async ({ data }) => {
+            const dataU8a = apiInstance.registry.createType("Bytes", data).toU8a()
+            return { signature: keypair.sign(dataU8a) }
+          }
+        }
+
+        // 7. Set signer
+        apiInstance.setSigner(signer)
+
+        console.log("Initiating transfer", {
+          token: token.symbol,
+          from: owner,
+          to: recipient,
+          value: Number(value)
+        })
+
+        // 8. Execute transfer
+        const unsub = await apiInstance.tx.balances
+          .transfer(recipient, value)
+          .signAndSend(keypair, { signer }, ({ status, events }) => {
+            if (status.isInBlock || status.isFinalized) {
+              console.log("Transfer included in block")
+              window.postMessage(
+                {
+                  type: "XTERIUM_TRANSFER_RESPONSE",
+                  response: {
+                    blockHash: status.asFinalized.toString(),
+                    events: events.map((e) => e.toHuman())
+                  }
+                },
+                "*"
+              )
+              unsub()
+            }
+          })
       } catch (error) {
-        console.error("[XTERIUM_TRANSFER_REQUEST] Transfer failed:", error);
+        console.error("Transfer failed:", error)
         window.postMessage(
           {
             type: "XTERIUM_TRANSFER_RESPONSE",
-            error: error.toString(),
+            error: error.message || "Transfer failed"
           },
           "*"
-        );
+        )
       }
-    
-      break;
+      break
     }
-    
+
     case "XTERIUM_REFRESH_BALANCE": {
       const { publicKey, token } = event.data
       try {
