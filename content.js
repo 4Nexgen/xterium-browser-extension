@@ -1,7 +1,4 @@
-import { ApiPromise, Keyring } from "@polkadot/api"
-import React, { useEffect, useMemo, useState } from "react"
-
-import { BalanceModel } from "../src/models/balance.model"
+import { Keyring } from "@polkadot/api"
 import { BalanceServices } from "../src/services/balance.service"
 import { EncryptionService } from "../src/services/encryption.service"
 import { NetworkService } from "../src/services/network.service"
@@ -10,7 +7,6 @@ import { UserService } from "../src/services/user.service"
 import { WalletService } from "../src/services/wallet.service"
 import { injectCSS } from "../ui"
 
-// const [balanceData, setBalanceData] = useState<BalanceModel | null>(null)
 const walletService = new WalletService()
 const balanceService = new BalanceServices(walletService)
 const networkService = new NetworkService()
@@ -46,9 +42,6 @@ window.addEventListener("message", async (event) => {
       try {
         const password = event.data.password
         const isPasswordStored = await userService.login(password)
-
-        console.log("🔑 Input Password:", password)
-        console.log("✅ Password Match:", isPasswordStored)
 
         window.postMessage(
           {
@@ -194,7 +187,6 @@ window.addEventListener("message", async (event) => {
 
       try {
         const apiInstance = await connectToRPC()
-        console.log("Connected to RPC successfully.")
 
         const fee = await balanceService.getEstimateTransferFee(
           apiInstance,
@@ -212,7 +204,6 @@ window.addEventListener("message", async (event) => {
           "*"
         )
 
-        console.log("FEE", fee)
       } catch (error) {
         console.error("Error estimating fee:", error)
 
@@ -231,21 +222,17 @@ window.addEventListener("message", async (event) => {
       const { token, owner, recipient, value, password } = event.data.payload
 
       try {
-        // 1. Validate inputs
         if (!token?.type || !owner || !recipient || !value) {
           throw new Error("Missing required transfer parameters")
         }
 
-        // 2. Connect to RPC
         const apiInstance = await connectToRPC()
 
-        // 3. Get wallet and decrypt mnemonic
         const walletModel = await walletService.getWallet(owner)
         if (!walletModel?.mnemonic_phrase) {
           throw new Error("Wallet not found")
         }
 
-        // 4. Decrypt mnemonic
         let decryptedMnemonic
         try {
           decryptedMnemonic = encryptionService.decrypt(
@@ -258,11 +245,9 @@ window.addEventListener("message", async (event) => {
           throw new Error("Invalid password")
         }
 
-        // 5. Create keyring pair
         const keyring = new Keyring({ type: "sr25519" })
         const keypair = keyring.addFromUri(decryptedMnemonic)
 
-        // 6. Create proper signer implementation
         const signer = {
           signPayload: async (payload) => {
             const payloadU8a = apiInstance.registry
@@ -276,15 +261,7 @@ window.addEventListener("message", async (event) => {
           }
         }
 
-        // 7. Set signer
         apiInstance.setSigner(signer)
-
-        console.log("Initiating transfer", {
-          token: token.symbol,
-          from: owner,
-          to: recipient,
-          value: Number(value)
-        })
 
         let transferTx
         if (token.type === "Native") {
@@ -298,7 +275,6 @@ window.addEventListener("message", async (event) => {
           throw new Error(`Unsupported token type: ${token.type}`)
         }
 
-        // 8. Execute transfer
         const unsub = await transferTx.signAndSend(
           keypair,
           { signer },
@@ -307,8 +283,6 @@ window.addEventListener("message", async (event) => {
               const blockHash = status.isFinalized
                 ? status.asFinalized.toString()
                 : status.asInBlock.toString()
-
-              console.log("Transfer included in block")
 
               window.postMessage(
                 {

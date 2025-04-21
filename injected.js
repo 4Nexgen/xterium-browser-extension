@@ -25,7 +25,7 @@
   // ----------------------------
   // Private State Variables
   // ----------------------------
-  const extensionId = "fiafdhcmleelgciojaimjgbabhmbffmj"
+  const extensionId = "plhchpneiklnlplnnlhkmnikaepgfdaf"
   isConnected = false
   connectedWallet = null
 
@@ -434,8 +434,6 @@
             tokenList = JSON.parse(tokenList)
           }
 
-          console.log("Token List:", tokenList)
-
           if (!Array.isArray(tokenList)) {
             console.error("Token list is not an array:", tokenList)
             return reject("Token list is not an array.")
@@ -485,7 +483,6 @@
   function getEstimateFee(owner, value, recipient, balance) {
     return new Promise((resolve, reject) => {
       function handleFeeResponse(event) {
-        console.log("XTERIUM_ESTIMATE_FEE_RESPONSE Process", event)
         if (event.source !== window || !event.data) return
         if (event.data.type !== "XTERIUM_ESTIMATE_FEE_RESPONSE") return
         if (event.data.owner !== owner) return
@@ -508,12 +505,10 @@
 
   // Displays a UI overlay to confirm transfer details and sign/verify.
   function showTransferSignAndVerify(details) {
-    // Prevent multiple overlays
     if (document.getElementById("xterium-transfer-approval-overlay")) {
       return Promise.resolve()
     }
 
-    // Ensure fee exists before proceeding
     if (!details.fee) {
       return
     }
@@ -553,7 +548,6 @@
       title.classList.add("inject-header")
       container.appendChild(title)
 
-      // Address display (Sender and Recipient)
       if (details.sender && details.recipient) {
         const addressesDiv = document.createElement("div")
         addressesDiv.classList.add("transfer-address")
@@ -571,7 +565,6 @@
         container.appendChild(addressesDiv)
       }
 
-      // Transfer details
       const detailsDiv = document.createElement("div")
       detailsDiv.classList.add("details-container")
 
@@ -590,7 +583,6 @@
       detailsDiv.appendChild(createStyledField("Fee", details.fee))
       container.appendChild(detailsDiv)
 
-      // Password input
       const passwordContainer = document.createElement("div")
       passwordContainer.classList.add("password-container")
 
@@ -831,9 +823,6 @@
       const handleResponse = (event) => {
         const data = event.data
 
-        console.log("🟡 Received message:", data)
-
-        // ✅ Ignore any message that is not the expected response
         if (
           event.source !== window ||
           !data ||
@@ -874,13 +863,11 @@
   // Initiates a token transfer.
   function transfer(token, recipient, value, password) {
     return new Promise((resolve, reject) => {
-      // ✅ Check connection
       if (!isConnected || !connectedWallet) {
         console.error("No wallet connected.")
         return reject("No wallet connected. Please connect your wallet first.")
       }
 
-      // ✅ Validate token
       let tokenSymbol = ""
       if (typeof token === "string") {
         tokenSymbol = token.trim()
@@ -901,7 +888,6 @@
             : "Asset"
       }
 
-      // ✅ Validate recipient and amount
       if (!recipient || recipient.trim() === "") {
         return reject("Recipient address is required.")
       }
@@ -914,7 +900,6 @@
         return reject("You cannot transfer to your own wallet.")
       }
 
-      // ✅ Step 1: Check balance
       getBalance(owner)
         .then((balances) => {
           const matched = balances.find(
@@ -937,7 +922,6 @@
           return getTokenList()
         })
 
-        // ✅ Step 2: Match token from list
         .then((tokenList) => {
           if (Array.isArray(tokenList)) {
             const foundToken = tokenList.find(
@@ -953,7 +937,6 @@
           return getEstimateFee(owner, Number(value), recipient, { token: tokenObj })
         })
 
-        // ✅ Step 3: Post transfer request message
         .then(() => {
           function handleTransferResponse(event) {
             const data = event.data
@@ -1034,62 +1017,6 @@
             if (!document.getElementById("xterium-transfer-approval-overlay")) {
               initiateTransfer(transferDetails)
             }
-            break
-          }
-
-          case "XTERIUM_TRANSFER_APPROVED": {
-            console.log("Received message:", event)
-            
-            const processingOverlay = showTransferProcessing()
-            const details = event.data.transferDetails
-            const password = event.data.password
-
-            console.log("Details", details)
-
-            console.log("Password", password)
-
-            if (!details || !password) {
-              console.error("Missing transfer details or password.")
-              if (document.body.contains(processingOverlay)) {
-                document.body.removeChild(processingOverlay)
-              }
-              window.postMessage(
-                {
-                  type: "XTERIUM_TRANSFER_FAILED",
-                  error: "Missing transfer details or password"
-                },
-                "*"
-              )
-              break
-            }
-
-            const { token, recipient, value } = details
-
-            transfer(token, recipient, value, password)
-              .then((response) => {
-                if (document.body.contains(processingOverlay)) {
-                  document.body.removeChild(processingOverlay)
-                }
-                showTransferSuccess(processingOverlay)
-                window.postMessage(
-                  {
-                    type: "XTERIUM_REFRESH_BALANCE",
-                    publicKey: connectedWallet.public_key,
-                    token
-                  },
-                  "*"
-                )
-                window.postMessage({ type: "XTERIUM_TRANSFER_SUCCESS", response }, "*")
-                isTransferInProgress = false
-              })
-              .catch((err) => {
-                if (document.body.contains(processingOverlay)) {
-                  document.body.removeChild(processingOverlay)
-                }
-                window.postMessage({ type: "XTERIUM_TRANSFER_FAILED", error: err }, "*")
-                isTransferInProgress = false
-              })
-
             break
           }
 
@@ -1189,8 +1116,6 @@
         break
       case "XTERIUM_ALL_BALANCES_RESPONSE":
         if (event.data.publicKey === connectedWallet?.public_key) {
-          console.log("Received balances:", event.data.balances)
-
           if (event.data.error) {
             console.error("Error fetching balances:", event.data.error)
           }
