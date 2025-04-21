@@ -231,18 +231,13 @@ window.addEventListener("message", async (event) => {
     }
     case "XTERIUM_TRANSFER_REQUEST": {
       const { token, owner, recipient, value, password } = event.data.payload;
-    
-      console.log("Value", token)
-      console.log("Value", owner)
-      console.log("Value", recipient)
-      console.log("Value", value)
-      console.log("Password", password)
-
       try {
+        const apiInstance = await connectToRPC();
+        console.log("✅ Connected to RPC.");
+
         if (!token || !token.type) {
           throw new Error("Invalid token data.");
         }
-    
     
         const walletModel = await walletService.getWallet(owner);
         if (!walletModel) {
@@ -253,51 +248,52 @@ window.addEventListener("message", async (event) => {
           password,
           walletModel.mnemonic_phrase
         );
+    
         const keyring = new Keyring({ type: "sr25519" });
         const signature = keyring.addFromUri(decryptedMnemonicPhrase);
+        
+        console.log("Signature", signature)
+
+        
     
-        const apiInstance = await connectToRPC();
-        console.log("✅ Connected to RPC successfully.");
+        console.log("🚀 Initiating transfer", { from: signature, to: recipient, amount: value })
     
-        console.log("🚀 Initiating transfer with:", {
-          token,
-          owner,
-          recipient,
-          value
-        });
+        // balanceService.transfer(
+        //   apiInstance,
+        //   token,
+        //   signature,
+        //   recipient,
+        //   Number(value),
+        //   (transferResult) => {
+        //     console.log("[Transfer] Result received:", transferResult);
     
-        balanceService.transfer(
-          apiInstance,
-          token,
-          owner,
-          recipient,
-          Number(value),
-          (transferResult) => {
-            console.log("[Transfer] Result:", transferResult);
-    
-            if (transferResult.status.isFinalized || transferResult.status.isInBlock) {
-              window.postMessage(
-                {
-                  type: "XTERIUM_TRANSFER_RESPONSE",
-                  response: transferResult,
-                },
-                "*"
-              );
-            }
-    
-            if (transferResult.isError || transferResult.status.isInvalid) {
-              window.postMessage(
-                {
-                  type: "XTERIUM_TRANSFER_RESPONSE",
-                  error: "Transaction failed or invalid",
-                },
-                "*"
-              );
-            }
-          },
-        );
+        //     if (transferResult.status?.isFinalized || transferResult.status?.isInBlock) {
+        //       console.log("✅ Transfer finalized or in block.");
+        //       window.postMessage(
+        //         {
+        //           type: "XTERIUM_TRANSFER_RESPONSE",
+        //           response: {
+        //             blockHash: transferResult.status.asFinalized?.toString?.() || null,
+        //             events: transferResult.events?.map((e) => e.toHuman?.()),
+        //           },
+        //         },
+        //         "*"
+        //       );
+        //     } else if (transferResult.isError || transferResult.status?.isInvalid) {
+        //       console.error("❌ Transfer failed or invalid.");
+        //       window.postMessage(
+        //         {
+        //           type: "XTERIUM_TRANSFER_RESPONSE",
+        //           error: "Transaction failed or was invalid.",
+        //         },
+        //         "*"
+        //       );
+        //     }
+        //   },
+        //   signature 
+        // );
       } catch (error) {
-        console.error("[Content.js] Transfer failed:", error);
+        console.error("[XTERIUM_TRANSFER_REQUEST] Transfer failed:", error);
         window.postMessage(
           {
             type: "XTERIUM_TRANSFER_RESPONSE",
@@ -306,6 +302,7 @@ window.addEventListener("message", async (event) => {
           "*"
         );
       }
+    
       break;
     }
     

@@ -661,19 +661,18 @@
         window.removeEventListener("message", handlePasswordResponse);
 
         if (event.data.isAuthenticated) {
-          const pendingTransferDetails = {
-            token: details.token,
-            owner: details.owner,
-            recipient: details.recipient,
-            value: Number(details.value),
-            password: passwordInput.value
-          };
-    
+          storedPassword = passwordInput.value;
           document.body.removeChild(overlay);
           window.postMessage(
             {
               type: "XTERIUM_TRANSFER_APPROVED",
-              transferDetails: pendingTransferDetails
+              transferDetails: {
+                token: details.token,
+                owner: details.owner,
+                recipient: details.recipient,
+                value: Number(details.value)
+              },
+              password: passwordInput.value
             },
             "*"
           );
@@ -682,7 +681,7 @@
           alert("Invalid password. Please try again.");
         }
       };
-       
+
       window.addEventListener("message", handlePasswordResponse);
       
       window.postMessage(
@@ -886,260 +885,216 @@
   }
 
   // Initiates a token transfer.
-  function transfer(token, recipient, value) {
+  function transfer(token, recipient, value, password) {
     return new Promise((resolve, reject) => {
+      // ✅ Check connection
       if (!isConnected || !connectedWallet) {
-        console.error("No wallet connected.")
-        return reject("No wallet connected. Please connect your wallet first.")
-      }
-      if (!token) {
-        console.error("Token parameter is required.")
-        return reject("Token parameter is required.")
+        console.error("No wallet connected.");
+        return reject("No wallet connected. Please connect your wallet first.");
       }
   
-      let tokenSymbol = ""
+      // ✅ Validate token
+      let tokenSymbol = "";
       if (typeof token === "string") {
-        tokenSymbol = token.trim()
+        tokenSymbol = token.trim();
       } else if (token && token.symbol) {
-        tokenSymbol = token.symbol
+        tokenSymbol = token.symbol;
       } else {
-        return reject(
-          "Invalid token parameter. Must be a string or object with a symbol property."
-        )
+        return reject("Invalid token parameter. Must be a string or object with a symbol property.");
       }
   
-      const nativeTokenSymbol = "XON"
+      const nativeTokenSymbol = "XON";
       let tokenObj = {
         symbol: tokenSymbol,
-        type:
-          tokenSymbol.toUpperCase() === nativeTokenSymbol.toUpperCase()
-            ? "Native"
-            : "Asset"
-      }
-
-      
-      console.log("🔍 Looking for token:", tokenSymbol, tokenObj.type);
-      
-
+        type: tokenSymbol.toUpperCase() === nativeTokenSymbol.toUpperCase() ? "Native" : "Asset",
+      };
+  
+      // ✅ Validate recipient and amount
       if (!recipient || recipient.trim() === "") {
-        console.error("Recipient address is required.")
-        return reject("Recipient address is required.")
+        return reject("Recipient address is required.");
       }
       if (!value || isNaN(value) || Number(value) <= 0) {
-        console.error("Transfer value must be a positive number.")
-        return reject("Transfer value must be a positive number.")
+        return reject("Transfer value must be a positive number.");
       }
   
-      const owner = connectedWallet.public_key
-  
+      const owner = connectedWallet.public_key;
       if (recipient === owner) {
-        return reject("You cannot transfer to your own wallet.")
+        return reject("You cannot transfer to your own wallet.");
       }
   
+      // ✅ Step 1: Check balance
       getBalance(owner)
         .then((balances) => {
-
-          const matched = balances.find((b) => {
-            return (
-              b.token?.symbol?.toUpperCase() === tokenSymbol.toUpperCase() &&
-              b.token?.type?.toLowerCase() === tokenObj.type.toLowerCase()
-            )
-          })
-          
-          if (!matched) {
-            return reject("No available balance found for token.")
-          }
-      
-          const available = parseFloat(matched.freeBalance)
-          const toSend = parseFloat((Number(value) / 1e12).toFixed(12))
-      
-          console.log("Balances", available)
-
+          const matched = balances.find((b) =>
+            b.token?.symbol?.toUpperCase() === tokenSymbol.toUpperCase() &&
+            b.token?.type?.toLowerCase() === tokenObj.type.toLowerCase()
+          );
+  
+          if (!matched) return Promise.reject("No available balance found for token.");
+  
+          const available = parseFloat(matched.freeBalance);
+          const toSend = parseFloat((Number(value) / 1e12).toFixed(12));
+  
           if (toSend > available) {
-            return reject(`Not enough balance. You have ${available}, trying to send ${toSend}`)
+            return Promise.reject(`Not enough balance. You have ${available}, trying to send ${toSend}`);
           }
-     
-          return getTokenList()
+  
+          return getTokenList();
         })
+  
+        // ✅ Step 2: Match token from list
         .then((tokenList) => {
           if (Array.isArray(tokenList)) {
-            const foundToken = tokenList.find(
-              (t) => t.symbol.toUpperCase() === tokenSymbol.toUpperCase()
-            )
+            const foundToken = tokenList.find((t) => t.symbol.toUpperCase() === tokenSymbol.toUpperCase());
             if (foundToken) {
-              tokenObj = foundToken
+              tokenObj = { ...tokenObj, ...foundToken };
             } else {
-              console.error("Unknown token type:", tokenSymbol)
-              return Promise.reject("Unknown token type. Please select a valid token.")
+              return Promise.reject("Unknown token type. Please select a valid token.");
             }
           }
-          return getEstimateFee(owner, Number(value), recipient, { token: tokenObj })
+  
+          return getEstimateFee(owner, Number(value), recipient, { token: tokenObj });
         })
+  
+        // ✅ Step 3: Post transfer request message
         .then(() => {
           function handleTransferResponse(event) {
-            console.log("Processing...", event);
             const data = event.data;
-        
             if (data?.type === "XTERIUM_TRANSFER_RESPONSE") {
               window.removeEventListener("message", handleTransferResponse);
-        
-              if (data.error) {
-                console.error("Transfer failed:", data.error);
-                reject(data.error);
-              } else if (data.response) {
-                console.log("Transfer successful:", data.response);
-                resolve(data.response);
-              } else {
-                console.error("Invalid response data:", data);
-                reject("Unexpected response format.");
-              }
+              if (data.error) return reject(data.error);
+              if (data.response) return resolve(data.response);
+              return reject("Unexpected response format.");
             }
           }
-
-          window.addEventListener("message", handleTransferResponse);
-
-          const transferDetails = {
-            token: tokenObj,
-            owner,
-            recipient,
-            value: Number(value),
-          };
   
-          console.log("🚀 Sending XTERIUM_TRANSFER_REQUEST to window", transferDetails);
+          window.addEventListener("message", handleTransferResponse);
           window.postMessage(
             {
               type: "XTERIUM_TRANSFER_REQUEST",
-              payload: transferDetails
+              payload: { token: tokenObj, owner, recipient, value: Number(value), password },
             },
             "*"
           );
-        })        
+        })
+  
         .catch((err) => {
-          console.error("Fee estimation or transfer error:", err);
+          console.error("Transfer failed:", err);
           reject(err);
         });
     });
   }
   
   (() => {
-    let isTransferInProgress = false
+    let isTransferInProgress = false;
+  
     function initiateTransfer(details) {
       if (isTransferInProgress) return;
-  
-      isTransferInProgress = true
+      isTransferInProgress = true;
   
       if (!details.fee) {
-        if (details.feeEstimationInProgress) {
-          return
+        if (details.feeEstimationInProgress) return;
+  
+        details.feeEstimationInProgress = true;
+  
+        const safeValue = BigInt(Math.floor(Number(details.value)));
+        if (isNaN(Number(details.value))) {
+          console.error("Value is not a number:", details.value);
+          return;
         }
   
-        details.feeEstimationInProgress = true
-  
-        getEstimateFee(details.owner, BigInt(details.value), details.recipient, {
-          token: details.token
-        })
+        getEstimateFee(details.owner, safeValue, details.recipient, { token: details.token })
           .then((fee) => {
-            details.fee = fee.partialFee
-            details.feeEstimationInProgress = false
-            setTimeout(() => showTransferSignAndVerify(details), 0)
+            details.fee = fee.partialFee;
+            details.feeEstimationInProgress = false;
+            setTimeout(() => showTransferSignAndVerify(details), 0);
           })
           .catch((err) => {
-            console.error("Fee estimation failed:", err)
-            details.feeEstimationInProgress = false
-            isTransferInProgress = false
-          })
+            console.error("Fee estimation failed:", err);
+            details.feeEstimationInProgress = false;
+            isTransferInProgress = false;
+          });
   
-        return
+        return;
       }
-  
-      // showTransferSignAndVerify(details)
     }
   
     if (!window.xteriumMessageListenerAdded) {
       window.addEventListener("message", async (event) => {
-        if (!event.data || event.source !== window) return
+        if (!event.data || event.source !== window) return;
   
         switch (event.data.type) {
-          case "XTERIUM_TRANSFER_REQUEST":
-            const transferDetails = event.data.payload
-            if (document.getElementById("xterium-transfer-approval-overlay")) {
-              return
+          case "XTERIUM_UI_TRANSFER_REQUEST": {
+            const transferDetails = event.data.payload;
+            if (!document.getElementById("xterium-transfer-approval-overlay")) {
+              initiateTransfer(transferDetails);
             }
+            break;
+          }
   
-            initiateTransfer(transferDetails)
-            
-            break
-  
-          case "XTERIUM_TRANSFER_APPROVED":
-            const processingOverlay = showTransferProcessing()
+          case "XTERIUM_TRANSFER_APPROVED": {
 
+            console.log("Process .......")
+            const processingOverlay = showTransferProcessing();
             const details = event.data.transferDetails;
+            const password = event.data.password;
+            
+            console.log("Details", details)
 
-            if (!details) {
-              console.error("No transfer details found in XTERIUM_TRANSFER_APPROVED event.");
+            console.log("Password", password)
+
+            if (!details || !password) {
+              console.error("Missing transfer details or password.");
               if (document.body.contains(processingOverlay)) {
                 document.body.removeChild(processingOverlay);
               }
-              window.postMessage(
-                { type: "XTERIUM_TRANSFER_FAILED", error: "Missing transfer details" },
-                "*"
-              );
+              window.postMessage({ type: "XTERIUM_TRANSFER_FAILED", error: "Missing transfer details or password" }, "*");
               break;
             }
-
-            const { token, recipient, value } = details
-      
-            transfer(token, recipient, value )
-                .then((response) => {
-                  if (document.body.contains(processingOverlay)) {
-                    document.body.removeChild(processingOverlay);
-                  }
-                  showTransferSuccess(processingOverlay);
-                  window.postMessage(
-                    {
-                      type: "XTERIUM_REFRESH_BALANCE",
-                      publicKey: connectedWallet.public_key,
-                      token,
-                    },
-                    "*"
-                  );
-                  window.postMessage({ type: "XTERIUM_TRANSFER_SUCCESS", response }, "*");
-                  isTransferInProgress = false;
-                })
-                .catch((err) => {
-                  if (document.body.contains(processingOverlay)) {
-                    document.body.removeChild(processingOverlay);
-                  }
-                  window.postMessage({ type: "XTERIUM_TRANSFER_FAILED", error: err }, "*");
-                  isTransferInProgress = false;
-                });
-              break;
-              
-          case "XTERIUM_GET_WALLET_BALANCE":
-              const publicKey = event.data.publicKey
-              getBalance(publicKey)
-                  .then((balance) => {
-                      window.postMessage(
-                          { type: "XTERIUM_BALANCE_RESPONSE", publicKey, balance },
-                          "*"
-                      )
-                  })
-                  .catch((error) => {
-                      window.postMessage(
-                          { type: "XTERIUM_BALANCE_RESPONSE", publicKey, error: error },
-                          "*"
-                      )
-                  })
-              break
+  
+            const { token, recipient, value } = details;
+  
+            transfer(token, recipient, value, password)
+              .then((response) => {
+                if (document.body.contains(processingOverlay)) {
+                  document.body.removeChild(processingOverlay);
+                }
+                showTransferSuccess(processingOverlay);
+                window.postMessage({ type: "XTERIUM_REFRESH_BALANCE", publicKey: connectedWallet.public_key, token }, "*");
+                window.postMessage({ type: "XTERIUM_TRANSFER_SUCCESS", response }, "*");
+                isTransferInProgress = false;
+              })
+              .catch((err) => {
+                if (document.body.contains(processingOverlay)) {
+                  document.body.removeChild(processingOverlay);
+                }
+                window.postMessage({ type: "XTERIUM_TRANSFER_FAILED", error: err }, "*");
+                isTransferInProgress = false;
+              });
+  
+            break;
+          }
+  
+          case "XTERIUM_GET_WALLET_BALANCE": {
+            const publicKey = event.data.publicKey;
+            getBalance(publicKey)
+              .then((balance) => {
+                window.postMessage({ type: "XTERIUM_BALANCE_RESPONSE", publicKey, balance }, "*");
+              })
+              .catch((error) => {
+                window.postMessage({ type: "XTERIUM_BALANCE_RESPONSE", publicKey, error }, "*");
+              });
+            break;
+          }
   
           default:
-              break
+            break;
         }
-      })
-      window.xteriumMessageListenerAdded = true
-    }
-  })()
+      });
   
+      window.xteriumMessageListenerAdded = true;
+    }
+  })();
 
   window.addEventListener("message", async (event) => {
     if (!event.data || event.source !== window) return
