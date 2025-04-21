@@ -286,25 +286,45 @@ window.addEventListener("message", async (event) => {
           value: Number(value)
         })
 
+        let transferTx
+        if (token.type === "Native") {
+          transferTx = apiInstance.tx.balances.transfer(recipient, value)
+        } else if (token.type === "Asset") {
+          if (token.token_id === undefined || token.token_id === null) {
+            throw new Error("Missing token_id for Asset token.")
+          }
+          transferTx = apiInstance.tx.assets.transfer(token.token_id, recipient, value)
+        } else {
+          throw new Error(`Unsupported token type: ${token.type}`)
+        }
+
         // 8. Execute transfer
-        const unsub = await apiInstance.tx.balances
-          .transfer(recipient, value)
-          .signAndSend(keypair, { signer }, ({ status, events }) => {
+        const unsub = await transferTx.signAndSend(
+          keypair,
+          { signer },
+          ({ status, events }) => {
             if (status.isInBlock || status.isFinalized) {
+              const blockHash = status.isFinalized
+                ? status.asFinalized.toString()
+                : status.asInBlock.toString()
+
               console.log("Transfer included in block")
+
               window.postMessage(
                 {
                   type: "XTERIUM_TRANSFER_RESPONSE",
                   response: {
-                    blockHash: status.asFinalized.toString(),
+                    blockHash,
                     events: events.map((e) => e.toHuman())
                   }
                 },
                 "*"
               )
+
               unsub()
             }
-          })
+          }
+        )
       } catch (error) {
         console.error("Transfer failed:", error)
         window.postMessage(
