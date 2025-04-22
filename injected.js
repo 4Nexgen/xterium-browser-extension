@@ -156,6 +156,9 @@
         connectedWallet = wallet
         saveConnectionState()
         showSuccessConnectWalletMessage(wallet)
+        setTimeout(() => {
+          window.location.reload()
+        }, 1500)
       })
       .catch((error) => {
         console.error("Wallet connection failed:", error)
@@ -631,6 +634,12 @@
           return
         }
 
+        const passwordVerified = await verifyPassword(passwordInput.value)
+        if (!passwordVerified) {
+          alert("Wrong password. Please try again")
+          return
+        }
+
         document.body.removeChild(overlay)
 
         const processingOverlay = showTransferProcessing()
@@ -650,6 +659,7 @@
               setTimeout(() => {
                 document.body.removeChild(processingOverlay)
                 resolve()
+                window.location.reload()
               }, 2000)
             }
           }
@@ -711,6 +721,34 @@
     })
   }
 
+  // Helper function to verify password
+  function verifyPassword(password) {
+    return new Promise((resolve) => {
+      const timeoutId = setTimeout(() => {
+        window.removeEventListener("message", handlePasswordResponse)
+        resolve(false)
+      }, 5000)
+
+      const handlePasswordResponse = (event) => {
+        if (!event.data || event.data.type !== "XTERIUM_PASSWORD_RESPONSE") return
+
+        clearTimeout(timeoutId)
+        window.removeEventListener("message", handlePasswordResponse)
+        resolve(event.data.isAuthenticated)
+      }
+
+      window.addEventListener("message", handlePasswordResponse)
+
+      window.postMessage(
+        {
+          type: "XTERIUM_GET_PASSWORD",
+          password: password
+        },
+        "*"
+      )
+    })
+  }
+
   // Displays a processing overlay during transfer
   function showTransferProcessing() {
     const overlay = document.createElement("div")
@@ -739,25 +777,65 @@
       console.error("Overlay is undefined. Cannot show transfer success.")
       return
     }
-    overlay.innerHTML = ""
-    const container = document.createElement("div")
-    container.classList.add("showTransferSuccess-animation-container")
 
-    const checkContainer = document.createElement("div")
-    checkContainer.classList.add("check-container")
+    const animationOverlay = document.createElement("div")
+    animationOverlay.style.position = "fixed"
+    animationOverlay.style.top = "0"
+    animationOverlay.style.left = "0"
+    animationOverlay.style.width = "100%"
+    animationOverlay.style.height = "100%"
+    animationOverlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)"
+    animationOverlay.style.zIndex = "10000"
+    animationOverlay.style.display = "flex"
+    animationOverlay.style.justifyContent = "center"
+    animationOverlay.style.alignItems = "center"
+
+    const successContainer = document.createElement("div")
+    successContainer.style.display = "flex"
+    successContainer.style.flexDirection = "column"
+    successContainer.style.alignItems = "center"
+    successContainer.style.justifyContent = "center"
+    successContainer.style.backgroundColor = "#1C3240"
+    successContainer.style.borderRadius = "12px"
+    successContainer.style.padding = "20px"
+    successContainer.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.2)"
+    successContainer.style.opacity = "0"
+    successContainer.style.transform = "scale(0.8)"
 
     const checkMark = document.createElement("div")
-    checkMark.classList.add("check-mark")
     checkMark.innerText = "✓"
-    checkContainer.appendChild(checkMark)
-    container.appendChild(checkContainer)
+    checkMark.style.color = "white"
+    checkMark.style.fontSize = "50px"
+    checkMark.style.fontWeight = "bold"
+    checkMark.style.marginBottom = "10px"
 
     const successText = document.createElement("div")
-    successText.classList.add("success-text")
     successText.innerText = "Transfer Successful"
-    container.appendChild(successText)
+    successText.style.color = "white"
+    successText.style.fontSize = "20px"
+    successText.style.fontWeight = "500"
 
-    overlay.appendChild(container)
+    successContainer.appendChild(checkMark)
+    successContainer.appendChild(successText)
+    animationOverlay.appendChild(successContainer)
+    document.body.appendChild(animationOverlay)
+
+    successContainer.animate(
+      [
+        { opacity: 0, transform: "scale(0.8)" },
+        { opacity: 1, transform: "scale(1)" },
+        { opacity: 1, transform: "scale(1)" },
+        { opacity: 0, transform: "scale(1.2)" }
+      ],
+      {
+        duration: 1500,
+        easing: "ease-in-out"
+      }
+    ).onfinish = () => {
+      if (document.body.contains(animationOverlay)) {
+        document.body.removeChild(animationOverlay)
+      }
+    }
   }
 
   // ----------------------------
