@@ -1,4 +1,5 @@
 import { Keyring } from "@polkadot/api"
+
 import { BalanceServices } from "../src/services/balance.service"
 import { EncryptionService } from "../src/services/encryption.service"
 import { NetworkService } from "../src/services/network.service"
@@ -203,7 +204,6 @@ window.addEventListener("message", async (event) => {
           },
           "*"
         )
-
       } catch (error) {
         console.error("Error estimating fee:", error)
 
