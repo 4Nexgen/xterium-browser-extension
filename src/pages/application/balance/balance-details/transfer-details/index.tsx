@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { BalanceModel } from "@/models/balance.model"
 import { NetworkModel } from "@/models/network.model"
+import { TokenModel } from "@/models/token.model"
 import { BalanceServices } from "@/services/balance.service"
 import { EncryptionService } from "@/services/encryption.service"
 import { TokenService } from "@/services/token.service"
@@ -40,6 +41,7 @@ const IndexTransferDetails = ({
   const [network, setNetwork] = useState<NetworkModel>(null)
   const [wsAPI, setWsAPI] = useState<ApiPromise | null>(null)
 
+  const [nativeToken, setNativeToken] = useState<TokenModel | null>(null)
   const [balanceData, setBalanceData] = useState<BalanceModel | null>(null)
 
   const [quantity, setQuantity] = useState<number>(0)
@@ -103,6 +105,17 @@ const IndexTransferDetails = ({
       return `${formattedInteger}.${trimmedDecimal}`
     }
   }
+
+  useEffect(() => {
+    const fetchNativeToken = async () => {
+      if (network && wsAPI) {
+        const token = await tokenService.getToken(network, wsAPI, 0)
+        setNativeToken(token)
+      }
+    }
+
+    fetchNativeToken()
+  }, [network, wsAPI, tokenService])
 
   const sendTransfer = async () => {
     if (!quantity || quantity <= 0) {
@@ -407,7 +420,7 @@ const IndexTransferDetails = ({
                   <Label className="pb-2">
                     {t("Fees of")}
                     <span className="p-2 font-extrabold text-input-primary">
-                      {estimatedFee.toFixed(12)} XON
+                      {estimatedFee.toFixed(12)} {nativeToken?.symbol}
                     </span>
                     {t("will be applied to the submission")}
                   </Label>
