@@ -844,7 +844,7 @@
   // ----------------------------
 
   // Retrieves wallets via postMessage.
-  function getWallet() {
+  function getWallets() {
     return new Promise((resolve, reject) => {
       if (isConnected && connectedWallet) {
         return resolve([connectedWallet.public_key])
@@ -1248,7 +1248,7 @@
 
   // Expose the public API methods...
   window.xterium = {
-    getWallet,
+    getWallets,
     getBalance,
     transfer
   }

@@ -193,7 +193,7 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
             </div>
           </div>
         </div>
-        <div className="px-4 pt-16 -mt-8 flex-1 max-h-[calc(100% - 150px)] bg-red-500 background-box overflow-hidden">
+        <div className="px-4 pt-16 md:pt-28 -mt-8 flex-1 max-h-[calc(100% - 150px)] bg-red-500 background-box overflow-hidden">
           {loading ? (
             <div className="flex flex-col items-center w-full h-30 gap-4 mt-10">
               <LoaderCircle className="animate-spin h-12 w-12 text-muted" />
@@ -204,7 +204,7 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
           ) : tokens.length ? (
             <>
               <h1 className="text-center text-xl mb-4">Tokens</h1>
-              <ScrollArea className="bg-background border dark:border-muted border-4 rounded-lg p-2 h-[calc(100%-60px)]">
+              <ScrollArea className="bg-background mr-0 md:mr-4 border dark:border-muted border-4 rounded-lg p-2 h-[calc(100%-60px)]">
                 {tokens
                   .filter((token) => token.type === "Asset" || token.type === "Pump")
                   .map((token) => (
