@@ -768,6 +768,7 @@
 
     overlay.appendChild(container)
     document.body.appendChild(overlay)
+
     return overlay
   }
 
@@ -843,7 +844,7 @@
   // ----------------------------
 
   // Retrieves wallets via postMessage.
-  function getWallets() {
+  function getWallet() {
     return new Promise((resolve, reject) => {
       if (isConnected && connectedWallet) {
         return resolve([connectedWallet.public_key])
@@ -898,6 +899,8 @@
         return reject("No wallet connected.")
       }
 
+      console.log("Fetching balance...")
+
       const handleResponse = (event) => {
         const data = event.data
 
@@ -914,8 +917,10 @@
         clearTimeout(timeoutId)
 
         if (data.error) {
+          console.error("Error fetching balance:", data.error)
           reject(data.error)
         } else {
+          console.log("Balance fetched successfully")
           resolve(data.balances)
         }
       }
@@ -978,8 +983,13 @@
         return reject("You cannot transfer to your own wallet.")
       }
 
+      const originalConsoleLog = console.log
+      console.log = function () {}
+
       getBalance(owner)
         .then((balances) => {
+          console.log = originalConsoleLog;
+
           const matched = balances.find(
             (b) =>
               b.token?.symbol?.toUpperCase() === tokenSymbol.toUpperCase() &&
@@ -988,40 +998,68 @@
 
           if (!matched) return Promise.reject("No available balance found for token.")
 
-          const available = parseFloat(matched.freeBalance)
-          const toSend = parseFloat((Number(value) / 1e12).toFixed(12))
+          const decimals = matched.token?.decimals || 12
 
-          if (toSend > available) {
+          const rawValue = BigInt(Math.floor(Number(value) * Math.pow(10, decimals)))
+          const available = BigInt(
+            Math.floor(parseFloat(matched.freeBalance) * Math.pow(10, decimals))
+          )
+
+          if (rawValue > available) {
             return Promise.reject(
-              `Not enough balance. You have ${available}, trying to send ${toSend}`
+              `Not enough balance. You have ${matched.freeBalance}, trying to send ${value}`
             )
           }
 
-          return getTokenList()
+          console.log(`Preparing transfer...`)
+          return getTokenList().then((tokenList) => ({ tokenList, rawValue, decimals }))
         })
 
-        .then((tokenList) => {
+        .then(({ tokenList, rawValue, decimals }) => {
           if (Array.isArray(tokenList)) {
             const foundToken = tokenList.find(
               (t) => t.symbol.toUpperCase() === tokenSymbol.toUpperCase()
             )
             if (foundToken) {
               tokenObj = { ...tokenObj, ...foundToken }
+              if (foundToken.decimals !== undefined) {
+                decimals = foundToken.decimals
+              }
             } else {
               return Promise.reject("Unknown token type. Please select a valid token.")
             }
           }
 
-          return getEstimateFee(owner, Number(value), recipient, { token: tokenObj })
+          return getEstimateFee(owner, rawValue.toString(), recipient, {
+            token: tokenObj
+          }).then((fee) => ({ rawValue, decimals, fee }))
         })
-
-        .then(() => {
+        .then(({ rawValue }) => {
+          let transferCompleted = false
+          const transferTimeout = setTimeout(() => {
+            if (!transferCompleted) {
+              return false
+            }
+          }, 10000)
           function handleTransferResponse(event) {
             const data = event.data
             if (data?.type === "XTERIUM_TRANSFER_RESPONSE") {
+              clearTimeout(transferTimeout)
+              transferCompleted = true
               window.removeEventListener("message", handleTransferResponse)
-              if (data.error) return reject(data.error)
-              if (data.response) return resolve(data.response)
+
+              if (data.error) {
+                console.error(`[Xterium] Transfer failed: ${data.error}`)
+                return reject(data.error)
+              }
+
+              if (data.response) {
+                console.log(`Transfer successful!`)
+                console.log(`Transaction details:`, data.response)
+                return resolve(data.response)
+              }
+
+              console.error("[Xterium] Unexpected response format")
               return reject("Unexpected response format.")
             }
           }
@@ -1034,14 +1072,13 @@
                 token: tokenObj,
                 owner,
                 recipient,
-                value: Number(value),
+                value: rawValue.toString(),
                 password
               }
             },
             "*"
           )
         })
-
         .catch((err) => {
           console.error("Transfer failed:", err)
           reject(err)
@@ -1211,7 +1248,7 @@
 
   // Expose the public API methods...
   window.xterium = {
-    getWallets,
+    getWallet,
     getBalance,
     transfer
   }

@@ -220,7 +220,6 @@ window.addEventListener("message", async (event) => {
     }
     case "XTERIUM_TRANSFER_REQUEST": {
       const { token, owner, recipient, value, password } = event.data.payload
-
       try {
         if (!token?.type || !owner || !recipient || !value) {
           throw new Error("Missing required transfer parameters")
@@ -284,12 +283,16 @@ window.addEventListener("message", async (event) => {
                 ? status.asFinalized.toString()
                 : status.asInBlock.toString()
 
+              const response = {
+                blockHash,
+                events: events.map((e) => e.toHuman()),
+                status: status.isFinalized ? "finalized" : "inBlock"
+              }
               window.postMessage(
                 {
                   type: "XTERIUM_TRANSFER_RESPONSE",
                   response: {
-                    blockHash,
-                    events: events.map((e) => e.toHuman())
+                    response
                   }
                 },
                 "*"
