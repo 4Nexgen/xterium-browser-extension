@@ -76,10 +76,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
       title: t("Pump"),
       url: "#",
       icon: Coins
-    }
-  ]
-
-  const setupItems = [
+    },
     {
       title: t("Wallets"),
       url: "#",
@@ -160,19 +157,23 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <img src={XteriumLogo} className="w-full p-4" alt="Xterium Logo" />
+              <img
+                src={XteriumLogo}
+                className="w-[200px] mx-auto p-4"
+                alt="Xterium Logo"
+              />
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>{t("Application")}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {applicationItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       asChild
+                      className="h-[45px]"
                       onClick={() => {
                         setActiveItem(item.title)
                         onSetCurrentPage(item.title)
@@ -181,59 +182,10 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
                       <a
                         href={item.url}
                         className={cn(
-                          "flex items-center space-x-2 p-3 text-sm",
-                          activeItem === item.title ? "text-purple bg-sidebar-accent" : ""
-                        )}>
-                        <div
-                          className={cn(
-                            "rounded ",
-                            activeItem === item.title
-                              ? "text-white bg-[var(--sidebar-icon-background)]"
-                              : "bg-transparent primary"
-                          )}>
-                          <item.icon
-                            className={cn(
-                              activeItem === item.title ? "primary" : "primary",
-                              "rounded",
-                              "px-1"
-                            )}
-                          />
-                        </div>
-                        <span
-                          className={cn(
-                            activeItem === item.title ? "text-purple" : "primary"
-                          )}>
-                          {item.title}
-                        </span>
-                        {activeItem === item.title && (
-                          <div className="absolute right-2 w-1 h-4 rounded active-item" />
-                        )}
-                      </a>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-
-          <SidebarGroup>
-            <SidebarGroupLabel>{t("Setup")}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {setupItems.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      onClick={() => {
-                        setActiveItem(item.title)
-                        onSetCurrentPage(item.title)
-                        retractSidebar()
-                      }}>
-                      <a
-                        href={item.url}
-                        className={cn(
-                          "flex items-center space-x-2 p-3 text-sm",
-                          activeItem === item.title ? "text-purple bg-sidebar-accent" : ""
+                          "flex items-center space-x-2 px-3 text-sm",
+                          activeItem === item.title
+                            ? "text-purple bg-[#0fb8b2]"
+                            : "bg-[#0fb8b247]"
                         )}>
                         <div
                           className={cn(
@@ -273,7 +225,7 @@ const ApplicationSidebar = ({ onSetCurrentPage, onSetIsLogout }) => {
             <SidebarMenuItem>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton>
+                  <SidebarMenuButton className="bg-[#0fb8b247] border-2 border-muted h-[45px]">
                     <Settings /> {t("Settings")}
                     <ChevronUp className="ml-auto" />
                   </SidebarMenuButton>

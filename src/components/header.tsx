@@ -96,30 +96,26 @@ const Header = ({
       className={`flex top-0 h-[60px] shrink-0 items-center gap-2 px-4 ${variant == "outside" && "justify-end"}`}>
       {variant !== "outside" && (
         <>
-          <SidebarTrigger className="p-2 rounded" />
-          <Separator
-            orientation="vertical"
-            className={`mr-2 h-4 ${theme === "light" ? "" : "bg-white"}`}
-          />
-          <Breadcrumb className="w-full tracking-[0.15em]">
+          <SidebarTrigger className="rounded" />
+          <Breadcrumb className="flex-1 tracking-[0.15em]">
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbPage>
-                  <b>{t(currentPage)}</b>
+                  <span className="text-muted">{t(currentPage)}</span>
                 </BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </>
       )}
-      <div className="w-[200px] min-w-[200px]">
+      <div className="w-[200px] min-w-[200px] flex justify-end">
         <Popover open={openNetworks} onOpenChange={setOpenNetworks}>
           <PopoverTrigger asChild>
             <Button
               variant="roundedOutline"
               role="combobox"
               aria-expanded={openNetworks}
-              className="w-full justify-between text-input-primary p-3 hover:bg-accent"
+              className="w-full h-[30px] justify-between text-input-primary px-2 border-[#3E7596] bg-transparent w-[100px]"
               size="lg">
               <div className="flex items-center">
                 <div className="w-5 h-5 mr-2 relative">
@@ -130,7 +126,9 @@ const Header = ({
                     style={{ objectFit: "contain" }}
                   />
                 </div>
-                {selectedNetwork ? selectedNetwork.name : "Select Network"}
+                <span className="text-muted font-normal">
+                  {selectedNetwork ? selectedNetwork.name : "Select Network"}
+                </span>
               </div>
             </Button>
           </PopoverTrigger>
