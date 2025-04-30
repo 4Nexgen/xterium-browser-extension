@@ -1,4 +1,7 @@
+import { Keyring } from "@polkadot/api"
+
 import { BalanceServices } from "../src/services/balance.service"
+import { EncryptionService } from "../src/services/encryption.service"
 import { NetworkService } from "../src/services/network.service"
 import { TokenService } from "../src/services/token.service"
 import { UserService } from "../src/services/user.service"
@@ -9,6 +12,7 @@ const walletService = new WalletService()
 const balanceService = new BalanceServices(walletService)
 const networkService = new NetworkService()
 const userService = new UserService()
+const encryptionService = new EncryptionService()
 
 let api = null
 async function connectToRPC() {
@@ -39,9 +43,6 @@ window.addEventListener("message", async (event) => {
       try {
         const password = event.data.password
         const isPasswordStored = await userService.login(password)
-
-        console.log("🔑 Input Password:", password)
-        console.log("✅ Password Match:", isPasswordStored)
 
         window.postMessage(
           {
@@ -187,6 +188,7 @@ window.addEventListener("message", async (event) => {
 
       try {
         const apiInstance = await connectToRPC()
+
         const fee = await balanceService.getEstimateTransferFee(
           apiInstance,
           token,
@@ -194,7 +196,6 @@ window.addEventListener("message", async (event) => {
           recipient,
           Number(value)
         )
-
         window.postMessage(
           {
             type: "XTERIUM_ESTIMATE_FEE_RESPONSE",
@@ -205,6 +206,7 @@ window.addEventListener("message", async (event) => {
         )
       } catch (error) {
         console.error("Error estimating fee:", error)
+
         window.postMessage(
           {
             type: "XTERIUM_ESTIMATE_FEE_RESPONSE",
@@ -217,40 +219,99 @@ window.addEventListener("message", async (event) => {
       break
     }
     case "XTERIUM_TRANSFER_REQUEST": {
-      const { token, owner, recipient, value } = event.data.payload
+      const { token, owner, recipient, value, password } = event.data.payload
+
       try {
-        if (!token || !token.type) {
-          throw new Error("Invalid token data")
+        if (!token?.type || !owner || !recipient || !value) {
+          throw new Error("Missing required transfer parameters")
         }
 
         const apiInstance = await connectToRPC()
-        const result = await balanceService.transfer(
-          apiInstance,
-          token,
-          owner,
-          recipient,
-          Number(value)
-        )
 
-        window.postMessage(
-          {
-            type: "XTERIUM_TRANSFER_RESPONSE",
-            response: result
+        const walletModel = await walletService.getWallet(owner)
+        if (!walletModel?.mnemonic_phrase) {
+          throw new Error("Wallet not found")
+        }
+
+        let decryptedMnemonic
+        try {
+          decryptedMnemonic = encryptionService.decrypt(
+            password,
+            walletModel.mnemonic_phrase
+          )
+          if (!decryptedMnemonic) throw new Error("Decryption failed")
+        } catch (decryptError) {
+          console.error("Decryption error:", decryptError)
+          throw new Error("Invalid password")
+        }
+
+        const keyring = new Keyring({ type: "sr25519" })
+        const keypair = keyring.addFromUri(decryptedMnemonic)
+
+        const signer = {
+          signPayload: async (payload) => {
+            const payloadU8a = apiInstance.registry
+              .createType("ExtrinsicPayload", payload)
+              .toU8a()
+            return keypair.sign(payloadU8a)
           },
-          "*"
+          signRaw: async ({ data }) => {
+            const dataU8a = apiInstance.registry.createType("Bytes", data).toU8a()
+            return { signature: keypair.sign(dataU8a) }
+          }
+        }
+
+        apiInstance.setSigner(signer)
+
+        let transferTx
+        if (token.type === "Native") {
+          transferTx = apiInstance.tx.balances.transfer(recipient, value)
+        } else if (token.type === "Asset") {
+          if (token.token_id === undefined || token.token_id === null) {
+            throw new Error("Missing token_id for Asset token.")
+          }
+          transferTx = apiInstance.tx.assets.transfer(token.token_id, recipient, value)
+        } else {
+          throw new Error(`Unsupported token type: ${token.type}`)
+        }
+
+        const unsub = await transferTx.signAndSend(
+          keypair,
+          { signer },
+          ({ status, events }) => {
+            if (status.isInBlock || status.isFinalized) {
+              const blockHash = status.isFinalized
+                ? status.asFinalized.toString()
+                : status.asInBlock.toString()
+
+              window.postMessage(
+                {
+                  type: "XTERIUM_TRANSFER_RESPONSE",
+                  response: {
+                    blockHash,
+                    events: events.map((e) => e.toHuman())
+                  }
+                },
+                "*"
+              )
+
+              unsub()
+            }
+          }
         )
       } catch (error) {
-        console.error("[Content.js] Transfer failed:", error)
+        console.error("Transfer failed:", error)
         window.postMessage(
           {
             type: "XTERIUM_TRANSFER_RESPONSE",
-            error: error.toString()
+            error: error.message || "Transfer failed"
           },
           "*"
         )
       }
       break
     }
+
     case "XTERIUM_REFRESH_BALANCE": {
       const { publicKey, token } = event.data
       try {
