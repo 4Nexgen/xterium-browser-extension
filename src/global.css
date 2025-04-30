@@ -123,6 +123,12 @@ body {
   background-position: top center;
 }
 
+.vector {
+  background: url("../assets/covers/vector2.png") no-repeat;
+  background-size: contain;
+  background-position: top left;
+}
+
 /* HTML: <div class="loader"></div> */
 .loader {
   margin-left: 14px;

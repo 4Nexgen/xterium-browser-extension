@@ -21,11 +21,12 @@ import { NetworkModel } from "@/models/network.model"
 import type { TokenModel } from "@/models/token.model"
 import { WalletModel } from "@/models/wallet.model"
 import { BalanceServices } from "@/services/balance.service"
+import { PriceService } from "@/services/price.service"
+import { initializeSocket } from "@/services/socket.service"
 import { TokenService } from "@/services/token.service"
 import { WalletService } from "@/services/wallet.service"
 import { ApiPromise } from "@polkadot/api"
-import totalBalanceBackground from "data-base64:/assets/app-logo/xterium-logo.png"
-import totalBalanceBackground from "data-base64:/assets/totalBalancebg.png"
+import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
 import { Coins, DollarSign, LoaderCircle, X } from "lucide-react"
 import Image from "next/image"
 import React, { useEffect, useMemo, useState } from "react"
@@ -38,6 +39,11 @@ interface IndexBalanceProps {
   currentWsAPI: ApiPromise | null
 }
 
+interface PriceServiceData {
+  currencies: Record<string, number>
+  tokenPrices: Record<string, Record<string, number>>
+}
+
 const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
   const { t } = useTranslation()
 
@@ -46,6 +52,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
   const walletService = useMemo(() => new WalletService(), [])
   const balanceServices = useMemo(() => new BalanceServices(), [])
   const tokenService = useMemo(() => new TokenService(), [])
+  const priceService = useMemo(() => new PriceService(), [])
 
   const [network, setNetwork] = useState<NetworkModel>(null)
   const [wsAPI, setWsAPI] = useState<ApiPromise | null>(null)
@@ -54,13 +61,29 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
   const [wallets, setWallets] = useState<WalletModel[]>([])
   const [selectedWallet, setSelectedWallet] = useState<WalletModel | null>(null)
   const [balances, setBalances] = useState<BalanceModel[]>([])
+  const [prices, setPrices] = useState<PriceServiceData | null>(null)
+  const [selectedCurrency, setSelectedCurrency] = useState("$")
 
   const [tokenLogoMap, setTokenLogoMap] = useState<{ [key: string]: string }>({})
   const [loadingTokens, setLoadingTokens] = useState<boolean>(true)
   const [loadingPerToken, setLoadingPerToken] = useState({})
+  const [tokenPrices, setTokenPrices] = useState<Record<string, number>>({})
 
   const [isTokenDetailDrawerOpen, setIsTokenDetailDrawerOpen] = useState<boolean>(false)
   const [selectedBalance, setSelectedBalance] = useState<BalanceModel | null>(null)
+
+  const fetchPrices = async () => {
+    try {
+      const fetchedPrices = await priceService.getPrices()
+      setPrices(fetchedPrices)
+    } catch (err) {
+      console.error("Error fetching prices:", err)
+    }
+  }
+
+  useEffect(() => {
+    fetchPrices()
+  }, [])
 
   useEffect(() => {
     setLoadingTokens(true)
@@ -84,9 +107,31 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
 
   useEffect(() => {
     if (wsAPI !== null) {
+      fetchPrices()
       getWallets()
     }
   }, [wsAPI])
+
+  const totalPortfolioValue = useMemo(() => {
+    if (!prices) return 0
+
+    return balances.reduce((total, balance) => {
+      const tokenPrice = prices.tokenPrices[balance.token.symbol]?.[selectedCurrency] || 0
+
+      const actualBalance = balance.freeBalance
+
+      return total + actualBalance * tokenPrice
+    }, 0)
+  }, [balances, prices, selectedCurrency])
+
+  const tokenValues = useMemo(() => {
+    const values: Record<string, number> = {}
+    balances.forEach((balance) => {
+      values[balance.token.symbol] =
+        balance.freeBalance * (tokenPrices[balance.token.symbol] || 0)
+    })
+    return values
+  }, [balances, tokenPrices])
 
   const formatBalance = (value: number): string => {
     return value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -240,14 +285,19 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
     <>
       <div className="flex flex-col justify-between h-full gap-4 overflow-hidden">
         <div className="p-4 h-[150px] z-10 flex flex-col items-center justify-center">
-          <div className="w-[300px] border-4 border-primary rounded-lg p-[2px] mb-2 bg-[#173f44]">
-            <div className="w-full rounded p-[2px] bg-[#141a25] relative text-white">
-              <img src={totalBalanceBackground} className="w-full" alt="Xterium Logo" />
-              <span className="absolute top-1 left-2 text-xs">Total Amount</span>
-              <span className="absolute top-5 left-1 text-xl w-full text-center font-bold">$0.000</span>
+          {/* <img src={XteriumLogo} className="w-[150px]" alt="Xterium Logo" /> */}
+          <div className="rounded-lg bg-[#0A4A6B] p-0.5 border-2 border-[#2EA0DB] w-[300px] mx-auto">
+            <div className="rounded-lg bg-gradient-to-b from-[#2E1E4A] to-[#09295A] border-2 border-[#0E1D24]">
+              <div className="text-xs font-semibold px-1 vector p-0 text-[#0ABAB5]">
+                Total Amount:
+              </div>
+              <div className="text-3xl px-4 font-bold">
+                {selectedCurrency}
+                {totalPortfolioValue.toFixed(3)}
+              </div>
             </div>
           </div>
-          <div className="rounded-lg bg-[#0ABBB5] p-4 w-[300px] mx-auto">
+          <div className="rounded-lg bg-[#0ABBB5] p-4 w-[300px] mx-auto mt-2">
             <div className="px-2 py-1 rounded-sm bg-background border-2 border-[#3E7596]">
               {/* <Label className="text-primary text-[9px] mb-0">{t("Address")}</Label> */}
               <Popover open={openWallets} onOpenChange={setOpenWallets}>
@@ -315,7 +365,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
             </div>
           </div>
         </div>
-        <div className="px-4 pt-16 md:pt-28 -mt-8 flex-1 max-h-[calc(100% - 150px)] bg-red-500 background-box overflow-hidden">
+        <div className="px-4 pt-16 -mt-8 flex-1 max-h-[calc(100% - 150px)] bg-red-500 background-box overflow-hidden">
           {loadingTokens ? (
             <div className="flex flex-col items-center w-full h-30 gap-4 mt-10">
               <LoaderCircle className="animate-spin h-12 w-12 text-muted" />
@@ -327,7 +377,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
             <>
               <h1 className="text-center text-xl mb-4">Balance</h1>
               {balances.length > 0 ? (
-                <ScrollArea className="bg-background mr-0 md:mr-4 border dark:border-muted border-4 rounded-lg p-2 h-[calc(100%-60px)]">
+                <ScrollArea className="bg-background border dark:border-muted border-4 rounded-lg p-2 h-[calc(100%-60px)]">
                   <>
                     {balances
                       .sort((a, b) => {
@@ -337,80 +387,92 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                           return 1
                         return 0
                       })
-                      .map((balance, index) => (
-                        <div key={index}>
-                          <Card className="mb-1.5 border dark:border-muted bg-[#183F44] rounded-sm">
-                            <Table>
-                              <TableBody>
-                                <TableRow
-                                  onClick={() => {
-                                    if (
-                                      !loadingPerToken[balance.token.symbol] &&
-                                      balance.freeBalance !== 0
-                                    ) {
-                                      selectBalance(balance)
-                                    }
+                      .map((balance, index) => {
+                        const rawBalance = balance.freeBalance
+                        const tokenPrice =
+                          prices?.tokenPrices[balance.token.symbol]?.[selectedCurrency] ||
+                          0
+                        const formattedTokenPrice = `${selectedCurrency}${tokenPrice}`
+                        const tokenValue = tokenPrice * rawBalance
+                        const formattedTokenValue = `${selectedCurrency}${tokenValue.toFixed(4)}`
 
-                                    if (balance.freeBalance === 0) {
-                                      toast({
-                                        description: (
-                                          <div className="flex items-center">
-                                            <X className="mr-2 text-white-500" />
-                                            {t("Zero balance")}
-                                          </div>
-                                        ),
-                                        variant: "destructive"
-                                      })
-                                    }
-                                  }}
-                                  className={`cursor-pointer hover-bg-custom ${
-                                    loadingPerToken[balance.token.symbol]
-                                      ? "cursor-not-allowed"
-                                      : ""
-                                  }`}>
-                                  <TableCell className="w-[50px] justify-center">
-                                    <Image
-                                      src={
-                                        tokenLogoMap[balance.token.symbol] ||
-                                        "/assets/tokens/default.png"
+                        return (
+                          <div key={index}>
+                            <Card className="mb-1.5 border dark:border-muted bg-[#183F44] rounded-sm">
+                              <Table>
+                                <TableBody>
+                                  <TableRow
+                                    onClick={() => {
+                                      if (
+                                        !loadingPerToken[balance.token.symbol] &&
+                                        balance.freeBalance !== 0
+                                      ) {
+                                        selectBalance(balance)
                                       }
-                                      width={40}
-                                      height={40}
-                                      alt={balance.token.symbol}
-                                      className="ml-1"
-                                    />
-                                  </TableCell>
-                                  <TableCell>
-                                    <div className="mb-[2px]">
-                                      <span className="text-lg font-bold">
-                                        {balance.token.symbol.length > 10
-                                          ? balance.token.symbol.substring(0, 10) + "..."
-                                          : balance.token.symbol}
-                                      </span>
-                                    </div>
-                                    <Badge>
-                                      {balance.token.name.length > 10
-                                        ? balance.token.name.substring(0, 10) + "..."
-                                        : balance.token.name}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell className="w-[50px] justify-end pr-2 text-right">
-                                    <span className="text-lg font-bold text-purple">
-                                      {loadingPerToken[balance.token.symbol] ? (
-                                        <span className="text-sm text-white font-normal opacity-100">
-                                          Loading...
+
+                                      if (balance.freeBalance === 0) {
+                                        toast({
+                                          description: (
+                                            <div className="flex items-center">
+                                              <X className="mr-2 text-white-500" />
+                                              {t("Zero balance")}
+                                            </div>
+                                          ),
+                                          variant: "destructive"
+                                        })
+                                      }
+                                    }}
+                                    className={`cursor-pointer hover-bg-custom ${
+                                      loadingPerToken[balance.token.symbol]
+                                        ? "cursor-not-allowed"
+                                        : ""
+                                    }`}>
+                                    <TableCell className="w-[50px] justify-center">
+                                      <Image
+                                        src={
+                                          tokenLogoMap[balance.token.symbol] ||
+                                          "/assets/tokens/default.png"
+                                        }
+                                        width={40}
+                                        height={40}
+                                        alt={balance.token.symbol}
+                                        className="ml-1"
+                                      />
+                                    </TableCell>
+                                    <TableCell>
+                                      <div className="mb-[2px]">
+                                        <span className="text-lg font-bold">
+                                          {balance.token.symbol.length > 10
+                                            ? balance.token.symbol.substring(0, 10) +
+                                              "..."
+                                            : balance.token.symbol}
                                         </span>
-                                      ) : (
-                                        formatBalance(balance.freeBalance)
-                                      )}
-                                    </span>
-                                  </TableCell>
-                                </TableRow>
-                              </TableBody>
-                            </Table>
-                          </Card>
-                        </div>
-                      ))}
+                                      </div>
+                                      <span className="inline-block text-white text-sm font-bold rounded-full">
+                                        {formattedTokenPrice}
+                                      </span>
+                                    </TableCell>
+                                    <TableCell className="w-[50px] justify-end pr-2 text-right">
+                                      <span className="text-lg font-bold text-purple">
+                                        {loadingPerToken[balance.token.symbol] ? (
+                                          <span className="text-sm text-white font-normal opacity-100">
+                                            Loading...
+                                          </span>
+                                        ) : (
+                                          formatBalance(balance.freeBalance)
+                                        )}
+                                      </span>
+                                      <span className="inline-block text-white text-sm font-bold rounded-full">
+                                        {formattedTokenValue}
+                                      </span>
+                                    </TableCell>
+                                  </TableRow>
+                                </TableBody>
+                              </Table>
+                            </Card>
+                          </div>
+                        )
+                      })}
                   </>
                 </ScrollArea>
               ) : (
