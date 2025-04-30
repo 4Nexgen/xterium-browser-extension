@@ -234,9 +234,9 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
                                   </span>
                                 </div>
                                 <Badge>
-                                  {token.description.length > 20
-                                    ? token.description.substring(0, 20) + "..."
-                                    : token.description}
+                                  {token.name.length > 20
+                                    ? token.name.substring(0, 20) + "..."
+                                    : token.name}
                                 </Badge>
                               </TableCell>
                               <TableCell className="w-[30px] justify-center text-center pr-4">
