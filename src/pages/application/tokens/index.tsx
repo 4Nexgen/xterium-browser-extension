@@ -204,7 +204,7 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
           ) : tokens.length ? (
             <>
               <h1 className="text-center text-xl mb-4">Tokens</h1>
-              <ScrollArea className="bg-background border dark:border-muted border-4 rounded-lg p-2 h-[calc(100%-60px)]">
+              <ScrollArea className="bg-background border dark:border-muted border-4 rounded p-2 h-[calc(100%-60px)]">
                 {tokens
                   .filter((token) => token.type === "Asset" || token.type === "Pump")
                   .map((token) => (

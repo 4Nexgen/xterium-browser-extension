@@ -173,7 +173,7 @@ const IndexWallet = ({
               </p>
             </div>
           ) : wallets.length > 0 ? (
-            <ScrollArea className="bg-background border dark:border-muted border-4 rounded-lg p-2 h-[300px]">
+            <ScrollArea className="bg-background border dark:border-muted border-4 rounded p-2 h-[300px]">
               {wallets.map((wallet, index) => (
                 <div key={index}>
                   <Card className="mb-1.5 border dark:border-muted bg-[#183F44] rounded-sm">

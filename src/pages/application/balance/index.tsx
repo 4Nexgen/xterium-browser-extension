@@ -327,7 +327,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
             <>
               <h1 className="text-center text-xl mb-4">Balance</h1>
               {balances.length > 0 ? (
-                <ScrollArea className="bg-background mr-0 md:mr-4 border dark:border-muted border-4 rounded-lg p-2 h-[calc(100%-60px)]">
+                <ScrollArea className="bg-background mr-0 md:mr-4 border dark:border-muted border-4 rounded p-2 h-[calc(100%-60px)]">
                   <>
                     {balances
                       .sort((a, b) => {
