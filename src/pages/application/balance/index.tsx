@@ -24,7 +24,8 @@ import { BalanceServices } from "@/services/balance.service"
 import { TokenService } from "@/services/token.service"
 import { WalletService } from "@/services/wallet.service"
 import { ApiPromise } from "@polkadot/api"
-import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
+import totalBalanceBackground from "data-base64:/assets/app-logo/xterium-logo.png"
+import totalBalanceBackground from "data-base64:/assets/totalBalancebg.png"
 import { Coins, DollarSign, LoaderCircle, X } from "lucide-react"
 import Image from "next/image"
 import React, { useEffect, useMemo, useState } from "react"
@@ -239,7 +240,13 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
     <>
       <div className="flex flex-col justify-between h-full gap-4 overflow-hidden">
         <div className="p-4 h-[150px] z-10 flex flex-col items-center justify-center">
-          <img src={XteriumLogo} className="w-[150px]" alt="Xterium Logo" />
+          <div className="w-[300px] border-4 border-primary rounded-lg p-[2px] mb-2 bg-[#173f44]">
+            <div className="w-full rounded p-[2px] bg-[#141a25] relative text-white">
+              <img src={totalBalanceBackground} className="w-full" alt="Xterium Logo" />
+              <span className="absolute top-1 left-2 text-xs">Total Amount</span>
+              <span className="absolute top-5 left-1 text-xl w-full text-center font-bold">$0.000</span>
+            </div>
+          </div>
           <div className="rounded-lg bg-[#0ABBB5] p-4 w-[300px] mx-auto">
             <div className="px-2 py-1 rounded-sm bg-background border-2 border-[#3E7596]">
               {/* <Label className="text-primary text-[9px] mb-0">{t("Address")}</Label> */}
