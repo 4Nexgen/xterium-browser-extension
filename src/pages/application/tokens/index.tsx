@@ -1,3 +1,4 @@
+import Loader from "@/components/loader"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -195,12 +196,7 @@ const IndexTokens = ({ currentNetwork, currentWsAPI }: IndexTokensProps) => {
         </div>
         <div className="px-4 pt-16 -mt-8 flex-1 max-h-[calc(100% - 150px)] bg-red-500 background-box overflow-hidden">
           {loading ? (
-            <div className="flex flex-col items-center w-full h-30 gap-4 mt-10">
-              <LoaderCircle className="animate-spin h-12 w-12 text-muted" />
-              <p className="text-muted ml-2 text-lg">
-                {loading ? t("Loading...") : t("Loading...")}
-              </p>
-            </div>
+            <Loader />
           ) : tokens.length ? (
             <>
               <h1 className="text-center text-xl mb-4">Tokens</h1>

@@ -1,3 +1,4 @@
+import Loader from "@/components/loader.jsx"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
@@ -166,12 +167,7 @@ const IndexWallet = ({
         </div>
         <div className="p-4 flex-1 flex flex-col gap-4">
           {loading ? (
-            <div className="flex flex-col items-center w-full h-30 gap-4 mt-10">
-              <LoaderCircle className="animate-spin h-12 w-12 text-muted" />
-              <p className="text-muted ml-2 text-lg">
-                {loading ? t("Loading...") : t("Loading...")}
-              </p>
-            </div>
+            <Loader />
           ) : wallets.length > 0 ? (
             <ScrollArea className="bg-background border dark:border-muted border-4 rounded p-2 h-[300px]">
               {wallets.map((wallet, index) => (

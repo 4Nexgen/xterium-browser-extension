@@ -32,6 +32,7 @@ import React, { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import IndexBalanceDetails from "./balance-details"
+import Loader from "@/components/loader"
 
 interface IndexBalanceProps {
   currentNetwork: NetworkModel | null
@@ -317,12 +318,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
         </div>
         <div className="px-4 pt-16 md:pt-28 -mt-8 flex-1 max-h-[calc(100% - 150px)] bg-red-500 background-box overflow-hidden">
           {loadingTokens ? (
-            <div className="flex flex-col items-center w-full h-30 gap-4 mt-10">
-              <LoaderCircle className="animate-spin h-12 w-12 text-muted" />
-              <p className="text-muted ml-2 text-lg">
-                {loadingTokens ? t("Loading...") : t("Loading...")}
-              </p>
-            </div>
+            <Loader />
           ) : (
             <>
               <h1 className="text-center text-xl mb-4">Balance</h1>
