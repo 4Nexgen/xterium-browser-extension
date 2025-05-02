@@ -282,14 +282,14 @@ const IndexAddWallet = ({
                 handleInputChange("mnemonic_phrase", e.target.value)
                 onUserInput(e)
               }}
-              className="w-full p-2 rounded bg-input text-sm font-semibold"
+              className="w-full p-2 rounded bg-input border border-muted text-sm font-semibold"
               rows={2}></textarea>
           </div>
         </div>
         <div className="mb-2 flex items-center justify-center">
           <Button
             type="button"
-            className="w-[250px] border border-transparent dark:border-white"
+            className="w-full border bg-input border-transparent dark:border-white"
             variant="outline"
             onClick={generateMnemonic}>
             <RefreshCcw />
@@ -302,7 +302,7 @@ const IndexAddWallet = ({
             placeholder={t("Secret Key")}
             value={wallet.secret_key}
             onChange={(e) => handleInputChange("secret_key", e.target.value)}
-            className="w-full p-2 bg-input rounded text-sm font-semibold"
+            className="w-full p-2 bg-input border border-muted rounded text-sm font-semibold"
             rows={3}
             readOnly></textarea>
         </div>
