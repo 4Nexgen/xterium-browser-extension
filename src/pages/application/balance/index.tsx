@@ -1,3 +1,5 @@
+import Loader from "@/components/loader"
+import MessageBox from "@/components/message-box"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -14,6 +16,7 @@ import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
+import { MessageBoxController } from "@/controllers/message-box-controller"
 import { ChainAssetFiles } from "@/data/chains/chain-asset-files"
 import { useToast } from "@/hooks/use-toast"
 import { BalanceModel } from "@/models/balance.model"
@@ -24,7 +27,6 @@ import { BalanceServices } from "@/services/balance.service"
 import { TokenService } from "@/services/token.service"
 import { WalletService } from "@/services/wallet.service"
 import { ApiPromise } from "@polkadot/api"
-import totalBalanceBackground from "data-base64:/assets/app-logo/xterium-logo.png"
 import totalBalanceBackground from "data-base64:/assets/totalBalancebg.png"
 import { Coins, DollarSign, LoaderCircle, X } from "lucide-react"
 import Image from "next/image"
@@ -32,7 +34,6 @@ import React, { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import IndexBalanceDetails from "./balance-details"
-import Loader from "@/components/loader"
 
 interface IndexBalanceProps {
   currentNetwork: NetworkModel | null
@@ -239,13 +240,16 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
 
   return (
     <>
+      <MessageBox />
       <div className="flex flex-col justify-between h-full gap-4 overflow-hidden">
         <div className="p-4 h-[150px] z-10 flex flex-col items-center justify-center">
           <div className="w-[300px] border-4 border-primary rounded-lg p-[2px] mb-2 bg-[#173f44]">
             <div className="w-full rounded p-[2px] bg-[#141a25] relative text-white">
               <img src={totalBalanceBackground} className="w-full" alt="Xterium Logo" />
               <span className="absolute top-1 left-2 text-xs">Total Amount</span>
-              <span className="absolute top-5 left-1 text-xl w-full text-center font-bold">$0.000</span>
+              <span className="absolute top-5 left-1 text-xl w-full text-center font-bold">
+                $0.000
+              </span>
             </div>
           </div>
           <div className="rounded-lg bg-[#0ABBB5] p-4 w-[300px] mx-auto">
@@ -348,15 +352,18 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                                     }
 
                                     if (balance.freeBalance === 0) {
-                                      toast({
-                                        description: (
-                                          <div className="flex items-center">
-                                            <X className="mr-2 text-white-500" />
-                                            {t("Zero balance")}
-                                          </div>
-                                        ),
-                                        variant: "destructive"
-                                      })
+                                      MessageBoxController.show(
+                                        "This token has zero balance available."
+                                      )
+                                      // toast({
+                                      //   description: (
+                                      //     <div className="flex items-center">
+                                      //       <X className="mr-2 text-white-500" />
+                                      //       {t("Zero balance")}
+                                      //     </div>
+                                      //   ),
+                                      //   variant: "destructive"
+                                      // })
                                     }
                                   }}
                                   className={`cursor-pointer hover-bg-custom ${
