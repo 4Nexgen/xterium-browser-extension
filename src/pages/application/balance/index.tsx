@@ -217,15 +217,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
 
   const selectBalance = (data: BalanceModel) => {
     if (data.status === "Frozen") {
-      toast({
-        description: (
-          <div className="flex items-center">
-            <X className="mr-2 text-white-500" />
-            {t("This asset was frozen and cannot be transferred.")}
-          </div>
-        ),
-        variant: "destructive"
-      })
+      MessageBoxController.show("This asset was frozen and cannot be transferred.")
       return
     }
 
@@ -355,15 +347,6 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                                       MessageBoxController.show(
                                         "This token has zero balance available."
                                       )
-                                      // toast({
-                                      //   description: (
-                                      //     <div className="flex items-center">
-                                      //       <X className="mr-2 text-white-500" />
-                                      //       {t("Zero balance")}
-                                      //     </div>
-                                      //   ),
-                                      //   variant: "destructive"
-                                      // })
                                     }
                                   }}
                                   className={`cursor-pointer hover-bg-custom ${
