@@ -1,3 +1,4 @@
+
 ;(function () {
   // ----------------------------
   // Private Helpers & Initialization
@@ -25,7 +26,7 @@
   // ----------------------------
   // Private State Variables
   // ----------------------------
-  const extensionId = "klfhdmiebenifpdmdmkjicdohjilabdg"
+  const extensionId = "fiafdhcmleelgciojaimjgbabhmbffmj"
   isConnected = false
   connectedWallet = null
 
@@ -507,7 +508,7 @@
   }
 
   // Displays a UI overlay to confirm transfer details and sign/verify.
-  function showTransferSignAndVerify(details) {
+  function showTransferSignAndVerify(details, txhash) {
     if (document.getElementById("xterium-transfer-approval-overlay")) {
       return Promise.resolve()
     }
@@ -515,15 +516,6 @@
     if (!details.fee) {
       return
     }
-
-    let numValue = Number(details.value)
-    if (numValue >= 1e12) {
-      numValue /= 1e12
-    }
-
-    const formattedAmount = (Number(details.value) / 1e12)
-      .toFixed(12)
-      .replace(/\.?0+$/, "")
 
     return new Promise((resolve, reject) => {
       const overlay = document.createElement("div")
@@ -547,26 +539,9 @@
       outerContainer.appendChild(headerContainer)
 
       const title = document.createElement("div")
-      title.innerText = "Confirm Transfer"
+      title.innerText = "Sign Transaction"
       title.classList.add("inject-header")
       container.appendChild(title)
-
-      if (details.sender && details.recipient) {
-        const addressesDiv = document.createElement("div")
-        addressesDiv.classList.add("transfer-address")
-
-        const senderDiv = document.createElement("div")
-        senderDiv.innerText = formatWalletAddress(details.sender)
-        senderDiv.classList.add("sender-circle")
-
-        const recipientDiv = document.createElement("div")
-        recipientDiv.innerText = formatWalletAddress(details.recipient)
-        recipientDiv.classList.add("recipient-circle")
-
-        addressesDiv.appendChild(senderDiv)
-        addressesDiv.appendChild(recipientDiv)
-        container.appendChild(addressesDiv)
-      }
 
       const detailsDiv = document.createElement("div")
       detailsDiv.classList.add("details-container")
@@ -577,13 +552,10 @@
         field.innerHTML = `${label}: <strong> ${value} </strong>`
         return field
       }
-
-      detailsDiv.appendChild(createStyledField("Token Symbol", details.token.symbol))
-      detailsDiv.appendChild(
-        createStyledField("Recipient", formatWalletAddress(details.recipient))
-      )
-      detailsDiv.appendChild(createStyledField("Amount", formattedAmount))
+      
+      detailsDiv.appendChild(createStyledField("Transaction Hash", txhash))
       detailsDiv.appendChild(createStyledField("Fee", details.fee))
+
       container.appendChild(detailsDiv)
 
       const passwordContainer = document.createElement("div")
@@ -937,7 +909,33 @@
       )
     })
   }
-
+  
+  function sendTransaction(details) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (!details || !details.recipient || !details.value) {
+          reject(new Error("Invalid transaction details"));
+          return;
+        }
+  
+        const tx = {
+          from: details.owner,  
+          to: details.recipient, 
+          value: details.value, 
+          fee: details.fee || 1000, 
+        };
+  
+        setTimeout(() => {
+          const simulatedTxHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+  
+          resolve({ txHash: simulatedTxHash, transaction: tx });
+        }, 1000);
+      } catch (error) {
+        reject(new Error(`Transaction failed: ${error.message}`));
+      }
+    });
+  }
+  
   // Initiates a token transfer.
   function transfer(token, recipient, value, password) {
     return new Promise((resolve, reject) => {
@@ -1073,8 +1071,13 @@
           .then((fee) => {
             details.fee = fee.partialFee
             details.feeEstimationInProgress = false
-            setTimeout(() => showTransferSignAndVerify(details), 0)
+
+            return sendTransaction(details);
           })
+          .then(({ txHash, transaction }) => {
+            setTimeout(() => showTransferSignAndVerify(transaction, txHash), 0);
+          })
+
           .catch((err) => {
             console.error("Fee estimation failed:", err)
             details.feeEstimationInProgress = false

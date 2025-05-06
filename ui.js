@@ -195,6 +195,9 @@ export function injectCSS() {
       font-family: Arial, sans-serif;
       font-size: 14px;
       color: white;
+      white-space: normal;     
+      word-wrap: break-word; 
+      overflow-wrap: break-word; 
     }
     .approve-button,
     .cancel-button,
