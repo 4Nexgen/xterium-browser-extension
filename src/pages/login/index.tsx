@@ -1,6 +1,5 @@
 "use client"
 
-import MessageBox from "@/components/message-box"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -84,7 +83,6 @@ const IndexLogin = ({ handleSetCurrentPage }: IndexLoginProps) => {
 
   return (
     <>
-      <MessageBox />
       <div className="sm:bg-background-sheet sm:flex justify-center items-center">
         <OutsideLayout headerVariant="outside">
           <Form {...form}>

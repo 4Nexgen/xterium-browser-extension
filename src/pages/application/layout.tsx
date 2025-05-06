@@ -1,4 +1,5 @@
 import ApplicationSidebar from "@/components/application-sidebar"
+import MessageBox from "@/components/message-box"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { Toaster } from "@/components/ui/toaster"
 import { UserService } from "@/services/user.service"
@@ -27,8 +28,8 @@ const Layout = ({ children, onSetCurrentPage }) => {
         />
         <SidebarInset>{children}</SidebarInset>
       </SidebarProvider>
-
       <Toaster />
+      <MessageBox />
     </>
   )
 }

@@ -1,5 +1,4 @@
 import Loader from "@/components/loader"
-import MessageBox from "@/components/message-box"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -228,7 +227,6 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
 
   return (
     <>
-      <MessageBox />
       <div className="flex flex-col justify-between h-full gap-4 overflow-hidden">
         <div className="p-4 h-[150px] z-10 flex flex-col items-center justify-center">
           <div className="w-[300px] border-4 border-primary rounded-lg p-[2px] mb-2 bg-[#173f44]">

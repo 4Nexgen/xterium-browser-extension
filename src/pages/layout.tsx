@@ -1,6 +1,7 @@
 "use client"
 
 import Header from "@/components/header"
+import MessageBox from "@/components/message-box"
 import { Toaster } from "@/components/ui/toaster"
 import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
 
@@ -25,6 +26,7 @@ const Layout = ({ children, headerVariant }) => {
         </div>
 
         <Toaster />
+        <MessageBox />
       </main>
     </>
   )
