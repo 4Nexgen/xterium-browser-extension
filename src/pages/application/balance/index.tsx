@@ -23,6 +23,7 @@ import { WalletModel } from "@/models/wallet.model"
 import { BalanceServices } from "@/services/balance.service"
 import { TokenService } from "@/services/token.service"
 import { WalletService } from "@/services/wallet.service"
+import { PriceService } from "@/services/price.service"
 import { ApiPromise } from "@polkadot/api"
 import totalBalanceBackground from "data-base64:/assets/totalBalancebg.png"
 import { Coins, DollarSign, LoaderCircle, X } from "lucide-react"
@@ -35,6 +36,11 @@ import IndexBalanceDetails from "./balance-details"
 interface IndexBalanceProps {
   currentNetwork: NetworkModel | null
   currentWsAPI: ApiPromise | null
+}
+
+interface PriceServiceData {
+  currencies: Record<string, number>
+  tokenPrices: Record<string, Record<string, number>>
 }
 
 const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
@@ -51,6 +57,8 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
   const [wallets, setWallets] = useState<WalletModel[]>([])
   const [selectedWallet, setSelectedWallet] = useState<WalletModel | null>(null)
   const [balances, setBalances] = useState<BalanceModel[]>([])
+  const [prices, setPrices] = useState<PriceServiceData | null>(null)
+  const [selectedCurrency, setSelectedCurrency] = useState("$")
 
   const [tokenLogoMap, setTokenLogoMap] = useState<{ [key: string]: string }>({})
   const [loadingTokens, setLoadingTokens] = useState<boolean>(true)
@@ -114,6 +122,17 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
       )
     )
   }
+  const totalPortfolioValue = useMemo(() => {
+    if (!prices) return 0
+
+    return balances.reduce((total, balance) => {
+      const tokenPrice = prices.tokenPrices[balance.token.symbol]?.[selectedCurrency] || 0
+
+      const actualBalance = balance.freeBalance
+
+      return total + actualBalance * tokenPrice
+    }, 0)
+  }, [balances, prices, selectedCurrency])
 
   const getBalances = async () => {
     try {
@@ -192,6 +211,19 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
   }
 
   useEffect(() => {
+    const priceSocketService = new PriceService();
+
+    priceSocketService.onPriceUpdate((data: PriceServiceData) => {
+      setPrices(data);
+    });
+
+    return () => {
+      priceSocketService.close();
+    };
+  }, []);
+
+
+  useEffect(() => {
     if (selectedWallet !== null) {
       getBalances()
     }
@@ -234,7 +266,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
               <img src={totalBalanceBackground} className="w-full" alt="Xterium Logo" />
               <span className="absolute top-1 left-2 text-xs">Total Amount</span>
               <span className="absolute top-5 left-1 text-xl w-full text-center font-bold">
-                $0.000
+                ${totalPortfolioValue.toFixed(3)}
               </span>
             </div>
           </div>
@@ -323,7 +355,16 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                           return 1
                         return 0
                       })
-                      .map((balance, index) => (
+                      .map((balance, index) => {
+                        const rawBalance = balance.freeBalance
+                        const tokenPrice =
+                          prices?.tokenPrices[balance.token.symbol]?.[selectedCurrency] ||
+                          0
+                        const formattedTokenPrice = `${selectedCurrency}${tokenPrice}`
+                        const tokenValue = tokenPrice * rawBalance
+                        const formattedTokenValue = `${selectedCurrency}${tokenValue.toFixed(3)}`
+
+                        return (
                         <div key={index}>
                           <Card className="mb-1.5 border dark:border-muted bg-[#183F44] rounded-sm">
                             <Table>
@@ -368,11 +409,9 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                                           : balance.token.symbol}
                                       </span>
                                     </div>
-                                    <Badge>
-                                      {balance.token.name.length > 10
-                                        ? balance.token.name.substring(0, 10) + "..."
-                                        : balance.token.name}
-                                    </Badge>
+                                    <span className="inline-block text-white text-sm font-bold rounded-full">
+                                      {formattedTokenPrice}
+                                    </span>
                                   </TableCell>
                                   <TableCell className="w-[50px] justify-end pr-2 text-right">
                                     <span className="text-lg font-bold text-purple">
@@ -384,13 +423,17 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                                         formatBalance(balance.freeBalance)
                                       )}
                                     </span>
+                                    <span className="inline-block text-white text-sm font-bold rounded-full">
+                                      {formattedTokenValue}
+                                    </span>
                                   </TableCell>
                                 </TableRow>
                               </TableBody>
                             </Table>
                           </Card>
                         </div>
-                      ))}
+                        )
+                      })}
                   </>
                 </ScrollArea>
               ) : (
