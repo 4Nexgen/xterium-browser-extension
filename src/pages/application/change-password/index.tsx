@@ -1,12 +1,13 @@
+import MessageBox from "@/components/message-box"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useToast } from "@/hooks/use-toast"
+import { MessageBoxController } from "@/controllers/message-box-controller"
 import type { WalletModel } from "@/models/wallet.model"
 import { EncryptionService } from "@/services/encryption.service"
 import { UserService } from "@/services/user.service"
 import { WalletService } from "@/services/wallet.service"
-import { Check, Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff } from "lucide-react"
 import React, { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
@@ -32,8 +33,6 @@ const IndexChangePassword = ({ handleCallbackDataUpdates }: IndexChangePasswordP
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
-
-  const { toast } = useToast()
 
   const toggleShowOldPassword = () => {
     setShowOldPassword(!showOldPassword)
@@ -106,16 +105,7 @@ const IndexChangePassword = ({ handleCallbackDataUpdates }: IndexChangePasswordP
       if (updatePassword) {
         const reencryptWallets = await walletService.reencryptWallets(newEcryptedWallets)
         if (reencryptWallets) {
-          toast({
-            description: (
-              <div className="flex items-center">
-                <Check className="mr-2 text-green-500" />
-                {t("Password Changed Successful!")}
-              </div>
-            ),
-            variant: "default"
-          })
-
+          MessageBoxController.show("Password Changed Successful!")
           setError(null)
           setIsProcessing(false)
 
@@ -130,6 +120,7 @@ const IndexChangePassword = ({ handleCallbackDataUpdates }: IndexChangePasswordP
 
   return (
     <>
+      <MessageBox />
       <div className="p-6">
         <div className="mb-3">
           <Label className="font-bold">{t("Enter old password")}:</Label>

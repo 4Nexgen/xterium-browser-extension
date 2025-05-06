@@ -1,9 +1,9 @@
+import MessageBox from "@/components/message-box"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { useToast } from "@/hooks/use-toast"
+import { MessageBoxController } from "@/controllers/message-box-controller"
 import type { WalletModel } from "@/models/wallet.model"
 import { WalletService } from "@/services/wallet.service"
-import { Check, X } from "lucide-react"
 import React, { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -13,8 +13,6 @@ interface IndexExportWalletProps {
 
 const IndexExportWallet = ({ selectedWallet }: IndexExportWalletProps) => {
   const { t } = useTranslation()
-
-  const { toast } = useToast()
 
   const walletService = useMemo(() => new WalletService(), [])
   const [wallet, setWallet] = useState<WalletModel | null>(null)
@@ -50,20 +48,13 @@ const IndexExportWallet = ({ selectedWallet }: IndexExportWalletProps) => {
       a.click()
       document.body.removeChild(a)
 
-      toast({
-        description: (
-          <div className="flex items-center">
-            <Check className="mr-2 text-green-500" />
-            {t("Wallet Exported Successfully!")}
-          </div>
-        ),
-        variant: "default"
-      })
+      MessageBoxController.show(`${t("Wallet Exported Successfully!")}`)
     }
   }
 
   return (
     <>
+      <MessageBox />
       {wallet && (
         <div className="p-6">
           <div className="mb-8">

@@ -1,15 +1,16 @@
 "use client"
 
+import MessageBox from "@/components/message-box"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Toaster } from "@/components/ui/toaster"
-import { useToast } from "@/hooks/use-toast"
+import { MessageBoxController } from "@/controllers/message-box-controller"
 import i18n from "@/i18n"
 import type { WalletModel } from "@/models/wallet.model"
 import { LanguageTranslationService } from "@/services/language-translation.service"
 import { WalletService } from "@/services/wallet.service"
-import { ArrowLeft, Check, X } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -19,8 +20,6 @@ interface IndexImportWalletPageProps {
 
 const IndexImportWalletPage = ({ handleSetCurrentPage }: IndexImportWalletPageProps) => {
   const { t } = useTranslation()
-
-  const { toast } = useToast()
 
   const walletService = useMemo(() => new WalletService(), [])
   const languageTranslationService = useMemo(() => new LanguageTranslationService(), [])
@@ -67,15 +66,9 @@ const IndexImportWalletPage = ({ handleSetCurrentPage }: IndexImportWalletPagePr
       setIsNameDuplicate(isDuplicate)
 
       if (isDuplicate) {
-        toast({
-          description: (
-            <div className="flex items-center">
-              <X className="mr-2 text-red-500" />
-              {t("A wallet with this name already exists. Please enter a unique name.")}
-            </div>
-          ),
-          variant: "destructive"
-        })
+        MessageBoxController.show(
+          `${t("A wallet with this name already exists. Please enter a unique name.")}`
+        )
       }
     }
 
@@ -95,15 +88,7 @@ const IndexImportWalletPage = ({ handleSetCurrentPage }: IndexImportWalletPagePr
           const uploadedWallet = jsonData as unknown as WalletModel
           setWallet(uploadedWallet)
         } catch (error) {
-          toast({
-            description: (
-              <div className="flex items-center">
-                <X className="mr-2 text-red-500" />
-                {t("Failed to read the JSON file!")}
-              </div>
-            ),
-            variant: "destructive"
-          })
+          MessageBoxController.show(`${t("Failed to read the JSON file!")}`)
         }
       }
       reader.readAsText(file)
@@ -116,15 +101,7 @@ const IndexImportWalletPage = ({ handleSetCurrentPage }: IndexImportWalletPagePr
       setIsPublicKeyDuplicate(isDuplicate)
 
       if (isDuplicate) {
-        toast({
-          description: (
-            <div className="flex items-center">
-              <X className="mr-2 text-red-500" />
-              {t("This wallet is already exists.")}
-            </div>
-          ),
-          variant: "destructive"
-        })
+        MessageBoxController.show(`${t("This wallet is already exists.")}`)
       }
     }
 
@@ -135,42 +112,20 @@ const IndexImportWalletPage = ({ handleSetCurrentPage }: IndexImportWalletPagePr
     setIsProcessing(true)
 
     if (isNameDuplicate) {
-      toast({
-        description: (
-          <div className="flex items-center">
-            <X className="mr-2 text-red-500" />
-            {t("A wallet with this name already exists. Please enter a unique name.")}
-          </div>
-        ),
-        variant: "destructive"
-      })
+      MessageBoxController.show(
+        `${t("A wallet with this name already exists. Please enter a unique name.")}`
+      )
       return
     }
 
     if (isPublicKeyDuplicate) {
-      toast({
-        description: (
-          <div className="flex items-center">
-            <X className="mr-2 text-red-500" />
-            {t("A wallet with this key already exists.")}
-          </div>
-        ),
-        variant: "destructive"
-      })
+      MessageBoxController.show(`${t("A wallet with this key already exists.")}`)
       return
     }
 
     const createWallet = await walletService.createWallet(wallet)
     if (createWallet) {
-      toast({
-        description: (
-          <div className="flex items-center">
-            <Check className="mr-2 text-green-500" />
-            {t("Wallet Imported Successfully!")}
-          </div>
-        ),
-        variant: "default"
-      })
+      MessageBoxController.show(`${t("Wallet Imported Successfully!")}`)
 
       setIsProcessing(false)
       handleSetCurrentPage(t("Wallets"))
@@ -183,6 +138,7 @@ const IndexImportWalletPage = ({ handleSetCurrentPage }: IndexImportWalletPagePr
 
   return (
     <>
+      <MessageBox />
       <div className="bg-background-sheet flex justify-center items-center">
         <div className="bg-white background-inside-theme h-screen max-w-xl w-full">
           <header className=" p-6 flex items-center border-b border-border-1">

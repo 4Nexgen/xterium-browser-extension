@@ -1,4 +1,5 @@
 import Loader from "@/components/loader.jsx"
+import MessageBox from "@/components/message-box"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
@@ -10,13 +11,13 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "@/components/ui/tooltip"
-import { useToast } from "@/hooks/use-toast"
+import { MessageBoxController } from "@/controllers/message-box-controller"
 import type { NetworkModel } from "@/models/network.model"
 import type { WalletModel } from "@/models/wallet.model"
 import { WalletService } from "@/services/wallet.service"
 import type { ApiPromise } from "@polkadot/api"
 import XteriumLogo from "data-base64:/assets/app-logo/xterium-logo.png"
-import { Check, Copy, Download, LoaderCircle, Trash, Wallet } from "lucide-react"
+import { Copy, Download, Trash, Wallet } from "lucide-react"
 import React, { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -36,8 +37,6 @@ const IndexWallet = ({
   handleSetCurrentPage
 }: IndexWalletProps) => {
   const { t } = useTranslation()
-
-  const { toast } = useToast()
 
   const walletService = useMemo(() => new WalletService(), [])
 
@@ -116,15 +115,7 @@ const IndexWallet = ({
 
   const copyWallet = async (value: string) => {
     await navigator.clipboard.writeText(value)
-    toast({
-      description: (
-        <div className="flex items-center">
-          <Check className="mr-2 text-green-500" />
-          {t("Copied to clipboard!")}
-        </div>
-      ),
-      variant: "default"
-    })
+    MessageBoxController.show(`${t("Copied to clipboard!")}`)
   }
 
   const exportWallet = (data) => {
@@ -161,6 +152,7 @@ const IndexWallet = ({
 
   return (
     <>
+      <MessageBox />
       <div className="py-4 flex flex-col justify-between h-full">
         <div className="p-4">
           <img src={XteriumLogo} className="w-[150px] mx-auto" alt="Xterium Logo" />

@@ -1,5 +1,6 @@
 "use client"
 
+import MessageBox from "@/components/message-box"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -10,10 +11,10 @@ import {
   FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useToast } from "@/hooks/use-toast"
+import { MessageBoxController } from "@/controllers/message-box-controller"
 import { UserService } from "@/services/user.service"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Eye, EyeOff, X } from "lucide-react"
+import { Eye, EyeOff } from "lucide-react"
 import { useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
@@ -35,8 +36,6 @@ const IndexCreatePassword = ({ handleSetCurrentPage }: IndexCreatePasswordProps)
   const [passwordStrength, setPasswordStrength] = useState<string>("")
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
-
-  const { toast } = useToast()
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword)
@@ -90,21 +89,10 @@ const IndexCreatePassword = ({ handleSetCurrentPage }: IndexCreatePasswordProps)
       if (isValid) {
         handleSetCurrentPage("application")
       } else {
-        toast({
-          description: (
-            <div className="flex items-center">
-              <X className="mr-2 text-white-500" />
-              {t("Incorrect password!")}
-            </div>
-          ),
-          variant: "destructive"
-        })
+        MessageBoxController.show(`${t("Incorrect password!")}`)
       }
     } catch (error) {
-      toast({
-        description: t("An error occurred while creating the password. "),
-        variant: "destructive"
-      })
+      MessageBoxController.show(`${t("An error occurred while creating the password. ")}`)
     } finally {
       setIsLoading(false)
     }
@@ -112,6 +100,7 @@ const IndexCreatePassword = ({ handleSetCurrentPage }: IndexCreatePasswordProps)
 
   return (
     <>
+      <MessageBox />
       <div className="sm:bg-background-sheet sm:flex justify-center items-center">
         <Layout headerVariant="outside">
           <Form {...form}>

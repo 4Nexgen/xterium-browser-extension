@@ -1,8 +1,9 @@
+import MessageBox from "@/components/message-box"
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useToast } from "@/hooks/use-toast"
+import { MessageBoxController } from "@/controllers/message-box-controller"
 import type { WalletModel } from "@/models/wallet.model"
 import { WalletService } from "@/services/wallet.service"
 import { u8aToHex } from "@polkadot/util"
@@ -14,7 +15,7 @@ import {
   mnemonicValidate,
   sr25519PairFromSeed
 } from "@polkadot/util-crypto"
-import { Check, RefreshCcw, X } from "lucide-react"
+import { RefreshCcw } from "lucide-react"
 import React, { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -37,8 +38,6 @@ const IndexAddWallet = ({
   handleCallbackDataUpdates
 }: IndexAddWalletProps) => {
   const { t } = useTranslation()
-
-  const { toast } = useToast()
 
   const walletService = useMemo(() => new WalletService(), [])
   const userService = useMemo(() => new UserService(), [])
@@ -93,15 +92,9 @@ const IndexAddWallet = ({
       setIsNameDuplicate(isDuplicate)
 
       if (isDuplicate) {
-        toast({
-          description: (
-            <div className="flex items-center">
-              <X className="mr-2 text-red-500" />
-              {t("A wallet with this name already exists. Please enter a unique name.")}
-            </div>
-          ),
-          variant: "destructive"
-        })
+        MessageBoxController.show(
+          `${t("A wallet with this name already exists. Please enter a unique name.")}`
+        )
       }
     }
 
@@ -110,15 +103,7 @@ const IndexAddWallet = ({
       setIsPublicKeyDuplicate(isDuplicate)
 
       if (isDuplicate) {
-        toast({
-          description: (
-            <div className="flex items-center">
-              <X className="mr-2 text-red-500" />
-              {t("A wallet with this key already exists.")}
-            </div>
-          ),
-          variant: "destructive"
-        })
+        MessageBoxController.show(`${t("A wallet with this key already exists.")}`)
       }
     }
 
@@ -167,30 +152,18 @@ const IndexAddWallet = ({
 
   const saveWallet = async () => {
     if (isNameDuplicate) {
-      toast({
-        description: (
-          <div className="flex items-center">
-            <X className="mr-2 text-red-500" />
-            {t("A wallet with this name already exists. Please enter a unique name.")}
-          </div>
-        ),
-        variant: "destructive"
-      })
+      MessageBoxController.show(
+        `${t("A wallet with this name already exists. Please enter a unique name.")}`
+      )
       return
     }
 
     if (isPublicKeyDuplicate) {
-      toast({
-        description: (
-          <div className="flex items-center">
-            <X className="mr-2 text-red-500" />
-            {t(
-              "A wallet with this mnemonic phrase already exists. Please enter a unique mnemonic phrase."
-            )}
-          </div>
-        ),
-        variant: "destructive"
-      })
+      MessageBoxController.show(
+        `${t(
+          "A wallet with this mnemonic phrase already exists. Please enter a unique mnemonic phrase."
+        )}`
+      )
       return
     }
 
@@ -200,15 +173,7 @@ const IndexAddWallet = ({
       !wallet.secret_key ||
       !wallet.public_key
     ) {
-      toast({
-        description: (
-          <div className="flex items-center">
-            <X className="mr-2 text-red-500" />
-            {t("All fields must be filled out!")}
-          </div>
-        ),
-        variant: "destructive"
-      })
+      MessageBoxController.show(`${t("All fields must be filled out!")}`)
 
       return
     }
@@ -230,15 +195,7 @@ const IndexAddWallet = ({
 
       const createWallet = await walletService.createWallet(wallet)
       if (createWallet) {
-        toast({
-          description: (
-            <div className="flex items-center">
-              <Check className="mr-2 text-green-500" />
-              {t("Wallet Saved Successfully!")}
-            </div>
-          ),
-          variant: "default"
-        })
+        MessageBoxController.show(`${t("Wallet Saved Successfully!")}`)
 
         setIsUserPasswordOpen(false)
         setIsProcessing(false)
@@ -246,15 +203,7 @@ const IndexAddWallet = ({
         handleCallbackDataUpdates()
       }
     } else {
-      toast({
-        description: (
-          <div className="flex items-center">
-            <X className="mr-2 text-white-500" />
-            {t("Incorrect password!")}
-          </div>
-        ),
-        variant: "destructive"
-      })
+      MessageBoxController.show(`${t("Incorrect password!")}`)
 
       setIsProcessing(false)
     }
@@ -262,6 +211,7 @@ const IndexAddWallet = ({
 
   return (
     <>
+      <MessageBox />
       <div className="p-6">
         <div className="mb-3">
           <Label>{t("Enter a unique wallet name")}:</Label>

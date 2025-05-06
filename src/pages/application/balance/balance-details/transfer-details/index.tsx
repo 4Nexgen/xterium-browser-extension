@@ -1,8 +1,9 @@
+import MessageBox from "@/components/message-box"
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useToast } from "@/hooks/use-toast"
+import { MessageBoxController } from "@/controllers/message-box-controller"
 import { BalanceModel } from "@/models/balance.model"
 import { NetworkModel } from "@/models/network.model"
 import { BalanceServices } from "@/services/balance.service"
@@ -12,7 +13,6 @@ import { UserService } from "@/services/user.service"
 import { WalletService } from "@/services/wallet.service"
 import { ApiPromise, Keyring } from "@polkadot/api"
 import type { ExtrinsicStatus, RuntimeDispatchInfo } from "@polkadot/types/interfaces"
-import { Check, X } from "lucide-react"
 import React, { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -53,8 +53,6 @@ const IndexTransferDetails = ({
   const [confirmTransferLabel, setConfirmTransferLabel] = useState<string>("CONFIRM")
   const [isConfirmTransferInProgress, setIsConfirmTransferInProgress] =
     useState<boolean>(false)
-
-  const { toast } = useToast()
 
   const [userPassword, setUserPassword] = useState<string>("")
   const [isUserPasswordOpen, setIsUserPasswordOpen] = useState<boolean>(false)
@@ -106,41 +104,21 @@ const IndexTransferDetails = ({
 
   const sendTransfer = async () => {
     if (!quantity || quantity <= 0) {
-      toast({
-        description: (
-          <div className="flex items-center">
-            <X className="mr-2 text-red-500" />
-            {t("Quantity must be greater than zero and cannot be empty!")}
-          </div>
-        ),
-        variant: "destructive"
-      })
+      MessageBoxController.show(
+        `${t("Quantity must be greater than zero and cannot be empty!")}`
+      )
       return
     }
 
     if (!transferTo.trim()) {
-      toast({
-        description: (
-          <div className="flex items-center">
-            <X className="mr-2 text-red-500" />
-            {t("Recipient address cannot be empty!")}
-          </div>
-        ),
-        variant: "destructive"
-      })
+      MessageBoxController.show(`${t("Recipient address cannot be empty!")}`)
       return
     }
 
     if (transferTo.trim() === balanceData.owner.public_key) {
-      toast({
-        description: (
-          <div className="flex items-center">
-            <X className="mr-2 text-red-500" />
-            {t("Sender and recipient addresses must be different!")}
-          </div>
-        ),
-        variant: "destructive"
-      })
+      MessageBoxController.show(
+        `${t("Sender and recipient addresses must be different!")}`
+      )
       return
     }
 
@@ -160,15 +138,7 @@ const IndexTransferDetails = ({
 
     if (balanceData.token.type === "Native") {
       if (quantity + estimatedFee > balanceData.freeBalance) {
-        toast({
-          description: (
-            <div className="flex items-center">
-              <X className="mr-2 text-red-500" />
-              {t("Not enough balance.")}
-            </div>
-          ),
-          variant: "destructive"
-        })
+        MessageBoxController.show("Not enough balance.")
 
         setIsSendInProgress(false)
         setSendLabel(t("SEND"))
@@ -191,15 +161,7 @@ const IndexTransferDetails = ({
           quantity > balanceData.freeBalance ||
           estimatedFee > fixBalance(ownerFreeBalance, 12)
         ) {
-          toast({
-            description: (
-              <div className="flex items-center">
-                <X className="mr-2 text-red-500" />
-                {t("Not enough balance.")}
-              </div>
-            ),
-            variant: "destructive"
-          })
+          MessageBoxController.show("Not enough balance.")
 
           setIsSendInProgress(false)
           setSendLabel(t("SEND"))
@@ -211,15 +173,7 @@ const IndexTransferDetails = ({
           await balanceServices.getBalanceWithoutCallback(wsAPI, nativeToken, recipient)
 
         if (fixBalance(recipientFreeBalance, 12) <= 0) {
-          toast({
-            description: (
-              <div className="flex items-center">
-                <X className="mr-2 text-red-500" />
-                {t("The recipient does not have an existential balance.")}
-              </div>
-            ),
-            variant: "destructive"
-          })
+          MessageBoxController.show("The recipient does not have an existential balance.")
 
           setIsSendInProgress(false)
           setSendLabel(t("SEND"))
@@ -274,43 +228,21 @@ const IndexTransferDetails = ({
         amount,
         (extrinsicResults) => {
           if (extrinsicResults.isInBlock) {
-            toast({
-              description: (
-                <div className="flex items-center">
-                  <Check className="mr-2 text-green-500" />
-                  {t("Transfer Successful!")}
-                </div>
-              ),
-              variant: "default"
-            })
+            MessageBoxController.show("Transfer Successful!")
 
             setIsProcessing(false)
             setIsUserPasswordOpen(false)
           } else if (extrinsicResults.isError) {
-            toast({
-              description: (
-                <div className="flex items-center">
-                  <X className="mr-2 text-red-500" />
-                  {t("Error: ")}: {extrinsicResults.dispatchError.toString()}
-                </div>
-              ),
-              variant: "destructive"
-            })
+            MessageBoxController.show(
+              `${t("Error: ")}: ${extrinsicResults.dispatchError.toString()}`
+            )
           }
 
           handleTransferStatusCallbacks(extrinsicResults.status)
         }
       )
     } else {
-      toast({
-        description: (
-          <div className="flex items-center">
-            <X className="mr-2 text-white-500" />
-            {t("Incorrect password!")}
-          </div>
-        ),
-        variant: "destructive"
-      })
+      MessageBoxController.show("Incorrect password!")
 
       setIsProcessing(false)
     }
@@ -318,6 +250,7 @@ const IndexTransferDetails = ({
 
   return (
     <>
+      <MessageBox />
       {balanceData !== null && (
         <>
           <div className="p-4 mt-5 rounded-md border border-2 table-border m-4">

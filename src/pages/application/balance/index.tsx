@@ -12,13 +12,11 @@ import {
   CommandList
 } from "@/components/ui/command"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
-import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import { MessageBoxController } from "@/controllers/message-box-controller"
 import { ChainAssetFiles } from "@/data/chains/chain-asset-files"
-import { useToast } from "@/hooks/use-toast"
 import { BalanceModel } from "@/models/balance.model"
 import { NetworkModel } from "@/models/network.model"
 import type { TokenModel } from "@/models/token.model"
@@ -42,8 +40,6 @@ interface IndexBalanceProps {
 
 const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
   const { t } = useTranslation()
-
-  const { toast } = useToast()
 
   const walletService = useMemo(() => new WalletService(), [])
   const balanceServices = useMemo(() => new BalanceServices(), [])
