@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label"
 import { MessageBoxController } from "@/controllers/message-box-controller"
 import { BalanceModel } from "@/models/balance.model"
 import { NetworkModel } from "@/models/network.model"
+import { TokenModel } from "@/models/token.model"
 import { BalanceServices } from "@/services/balance.service"
 import { EncryptionService } from "@/services/encryption.service"
 import { TokenService } from "@/services/token.service"
@@ -41,6 +42,8 @@ const IndexTransferDetails = ({
   const [wsAPI, setWsAPI] = useState<ApiPromise | null>(null)
 
   const [balanceData, setBalanceData] = useState<BalanceModel | null>(null)
+
+  const [nativeToken, setNativeToken] = useState<TokenModel | null>(null);
 
   const [quantity, setQuantity] = useState<number>(0)
   const [transferTo, setTransferTo] = useState<string>("")
@@ -124,6 +127,9 @@ const IndexTransferDetails = ({
 
     setIsSendInProgress(true)
     setSendLabel(t("CALCULATING FEES..."))
+
+    const nativeToken = await tokenService.getToken(network, wsAPI, 0)
+    setNativeToken(nativeToken)
 
     const owner = balanceData.owner
     const recipient = transferTo
@@ -340,7 +346,7 @@ const IndexTransferDetails = ({
                   <Label className="pb-2">
                     {t("Fees of")}
                     <span className="p-2 font-extrabold text-input-primary">
-                      {estimatedFee.toFixed(12)} XON
+                    {estimatedFee.toFixed(12)} {nativeToken?.symbol || "XON"}
                     </span>
                     {t("will be applied to the submission")}
                   </Label>
