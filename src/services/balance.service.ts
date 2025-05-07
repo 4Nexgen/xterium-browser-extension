@@ -90,17 +90,19 @@ export class BalanceServices {
   
     let dispatchInfo: RuntimeDispatchInfo | null = null
   
+    const adjustedAmount = isPaseo ? amount / Math.pow(10, 2) : amount
+  
     if (token.type === "Native") {
       const tx = isPaseo
-        ? wsAPI.tx.balances.transferAllowDeath(recipient, amount)
-        : wsAPI.tx.balances.transfer(recipient, amount)
+        ? wsAPI.tx.balances.transferAllowDeath(recipient, adjustedAmount)
+        : wsAPI.tx.balances.transfer(recipient, adjustedAmount)
   
       dispatchInfo = await tx.paymentInfo(owner)
     }
   
     if (token.type === "Asset" || token.type === "Pump") {
       const assetId = token.token_id
-      const bigIntAmount = BigInt(amount)
+      const bigIntAmount = BigInt(adjustedAmount)
       const formattedAmount = wsAPI.createType("Compact<u128>", bigIntAmount)
   
       dispatchInfo = await wsAPI.tx.assets
@@ -110,7 +112,7 @@ export class BalanceServices {
   
     if (dispatchInfo !== null) {
       const rawFee = BigInt(dispatchInfo.partialFee.toString())
-      return Number(rawFee) / Math.pow(10, 12)
+      return isPaseo ? Number(rawFee) / Math.pow(10, 10) : Number(rawFee) / Math.pow(10, 12)
     }
   
     return 0
@@ -127,10 +129,12 @@ export class BalanceServices {
     const chain = await wsAPI.rpc.system.chain()
     const isPaseo = chain.toString().toLowerCase().includes("paseo")
   
+    const adjustedAmount = isPaseo ? amount / Math.pow(10, 2) : amount
+  
     if (token.type === "Native") {
       const tx = isPaseo
-        ? wsAPI.tx.balances.transferAllowDeath(recipient, amount)
-        : wsAPI.tx.balances.transfer(recipient, amount)
+        ? wsAPI.tx.balances.transferAllowDeath(recipient, adjustedAmount)
+        : wsAPI.tx.balances.transfer(recipient, adjustedAmount)
   
       tx.signAndSend(signature, (result) => {
         onResult(result)
@@ -138,7 +142,7 @@ export class BalanceServices {
     }
   
     if (token.type === "Asset" || token.type === "Pump") {
-      const bigIntAmount = BigInt(amount)
+      const bigIntAmount = BigInt(adjustedAmount)
       const formattedAmount = wsAPI.createType("Compact<u128>", bigIntAmount)
   
       wsAPI.tx.assets
