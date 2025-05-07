@@ -12,8 +12,6 @@ export class BalanceServices {
         const assetDetails = await wsAPI.query.assets.asset(assetId)
         const parsedDetails = assetDetails.toHuman() as { status?: string } | null
 
-        console.log(parsedDetails)
-
         if (!parsedDetails) {
           resolve("unknown")
           return
