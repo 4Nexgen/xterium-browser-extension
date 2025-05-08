@@ -86,14 +86,16 @@ export class BalanceServices {
     amount: number
   ): Promise<number> {
     const chain = await wsAPI.rpc.system.chain()
-    const isPaseo = chain.toString().toLowerCase().includes("paseo")
+    const chainName = chain.toString().toLowerCase()
+    const isPaseo = chainName.includes("paseo")
+    const isPolkadot = chainName.includes("polkadot")
   
     let dispatchInfo: RuntimeDispatchInfo | null = null
   
-    const adjustedAmount = isPaseo ? amount / Math.pow(10, 2) : amount
+    const adjustedAmount = isPaseo || isPolkadot ? amount / Math.pow(10, 2) : amount
   
     if (token.type === "Native") {
-      const tx = isPaseo
+      const tx = (isPaseo || isPolkadot)
         ? wsAPI.tx.balances.transferAllowDeath(recipient, adjustedAmount)
         : wsAPI.tx.balances.transfer(recipient, adjustedAmount)
   
@@ -102,7 +104,7 @@ export class BalanceServices {
   
     if (token.type === "Asset" || token.type === "Pump") {
       const assetId = token.token_id
-      const bigIntAmount = BigInt(adjustedAmount)
+      const bigIntAmount = BigInt(amount)
       const formattedAmount = wsAPI.createType("Compact<u128>", bigIntAmount)
   
       dispatchInfo = await wsAPI.tx.assets
@@ -112,11 +114,13 @@ export class BalanceServices {
   
     if (dispatchInfo !== null) {
       const rawFee = BigInt(dispatchInfo.partialFee.toString())
-      return isPaseo ? Number(rawFee) / Math.pow(10, 10) : Number(rawFee) / Math.pow(10, 12)
+      return (isPaseo || isPolkadot)
+        ? Number(rawFee) / Math.pow(10, 10)
+        : Number(rawFee) / Math.pow(10, 12)
     }
   
     return 0
-  }
+  }  
   
   async transfer(
     wsAPI: ApiPromise,
@@ -127,12 +131,14 @@ export class BalanceServices {
     onResult: (status: ISubmittableResult) => void
   ): Promise<void> {
     const chain = await wsAPI.rpc.system.chain()
-    const isPaseo = chain.toString().toLowerCase().includes("paseo")
+    const chainName = chain.toString().toLowerCase()
+    const isPaseo = chainName.includes("paseo")
+    const isPolkadot = chainName.includes("polkadot")
   
-    const adjustedAmount = isPaseo ? amount / Math.pow(10, 2) : amount
+    const adjustedAmount = isPaseo || isPolkadot ? amount / Math.pow(10, 2) : amount
   
     if (token.type === "Native") {
-      const tx = isPaseo
+      const tx = (isPaseo || isPolkadot)
         ? wsAPI.tx.balances.transferAllowDeath(recipient, adjustedAmount)
         : wsAPI.tx.balances.transfer(recipient, adjustedAmount)
   
@@ -142,7 +148,7 @@ export class BalanceServices {
     }
   
     if (token.type === "Asset" || token.type === "Pump") {
-      const bigIntAmount = BigInt(adjustedAmount)
+      const bigIntAmount = BigInt(amount)
       const formattedAmount = wsAPI.createType("Compact<u128>", bigIntAmount)
   
       wsAPI.tx.assets
