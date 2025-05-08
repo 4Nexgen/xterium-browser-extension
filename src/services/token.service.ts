@@ -92,7 +92,7 @@ export class TokenService {
 
               // Special Case - Need more modification on this line
               if (network.name === "Polkadot - Asset Hub") {
-                if (metadata.symbol !== "DOT" && metadata.symbol !== "MPC" && metadata.id !== 50000111) {
+                if (metadata.symbol !== "DOT" && metadata.symbol !== "MPC" && metadata.id !== 50000111 && metadata.id !== 1984) {
                   return
                 }
               }
