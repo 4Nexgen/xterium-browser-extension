@@ -43,6 +43,18 @@ export default function NetworkSelection({
     return networkImages.getLogo(imageName)
   }
 
+  const groupedNetworks = networks.reduce(
+    (groups, network) => {
+      const category = network.category || "Others"
+      if (!groups[category]) {
+        groups[category] = []
+      }
+      groups[category].push(network)
+      return groups
+    },
+    {} as Record<string, NetworkModel[]>
+  )
+
   const getNetwork = async () => {
     const data = await networkService.getNetwork()
     if (data) {
@@ -101,33 +113,36 @@ export default function NetworkSelection({
           <div className="p-4">
             <h2 className="text-center text-xl font-bold mb-4">Select Network</h2>
             <ul>
-              {networks.map((network) => (
-                <li
-                  key={network.name}
-                  onClick={() => {
-                    setChosenNetwork(
-                      networks.find((priority) => priority.name === network.name) || null
-                    )
-                    setOpenNetworks(false)
-                    setIsChangeNetwork(true)
-                  }}
-                  className={`py-2 px-4 rounded mb-2 cursor-pointer ${
-                    selectedNetwork?.name === network.name
-                      ? "bg-muted text-black"
-                      : "bg-gray-700 hover:bg-accent"
-                  }`}>
-                  <div className="flex items-center">
-                    <div className="w-5 h-5 mr-2 relative">
-                      <Image
-                        src={getNetworkLogo(network.name)}
-                        alt="XON Logo"
-                        style={{ objectFit: "contain" }}
-                        fill
-                      />
-                    </div>
-                    {network.name}
-                  </div>
-                </li>
+              {Object.entries(groupedNetworks).map(([category, nets]) => (
+                <div key={category} className="mb-4">
+                  <h3 className="text-muted-foreground font-semibold mb-2">{category}</h3>
+                  {nets.map((network) => (
+                    <li
+                      key={network.name}
+                      onClick={() => {
+                        setChosenNetwork(network)
+                        setOpenNetworks(false)
+                        setIsChangeNetwork(true)
+                      }}
+                      className={`py-2 px-4 rounded mb-2 cursor-pointer ${
+                        selectedNetwork?.name === network.name
+                          ? "bg-muted text-black"
+                          : "bg-gray-700 hover:bg-accent"
+                      }`}>
+                      <div className="flex items-center">
+                        <div className="w-5 h-5 mr-2 relative">
+                          <Image
+                            src={getNetworkLogo(network.name)}
+                            alt="Network Logo"
+                            fill
+                            style={{ objectFit: "contain" }}
+                          />
+                        </div>
+                        {network.name}
+                      </div>
+                    </li>
+                  ))}
+                </div>
               ))}
             </ul>
           </div>

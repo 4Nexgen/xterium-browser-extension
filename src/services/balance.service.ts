@@ -12,8 +12,6 @@ export class BalanceServices {
         const assetDetails = await wsAPI.query.assets.asset(assetId)
         const parsedDetails = assetDetails.toHuman() as { status?: string } | null
 
-        console.log(parsedDetails)
-
         if (!parsedDetails) {
           resolve("unknown")
           return
@@ -87,32 +85,43 @@ export class BalanceServices {
     recipient: string,
     amount: number
   ): Promise<number> {
+    const chain = await wsAPI.rpc.system.chain()
+    const chainName = chain.toString().toLowerCase()
+    const isPaseo = chainName.includes("paseo")
+    const isPolkadot = chainName.includes("polkadot")
+  
     let dispatchInfo: RuntimeDispatchInfo | null = null
-
+  
+    const adjustedAmount = isPaseo || isPolkadot ? amount / Math.pow(10, 2) : amount
+  
     if (token.type === "Native") {
-      dispatchInfo = await wsAPI.tx.balances
-        .transfer(recipient, amount)
-        .paymentInfo(owner)
+      const tx = (isPaseo || isPolkadot)
+        ? wsAPI.tx.balances.transferAllowDeath(recipient, adjustedAmount)
+        : wsAPI.tx.balances.transfer(recipient, adjustedAmount)
+  
+      dispatchInfo = await tx.paymentInfo(owner)
     }
-
+  
     if (token.type === "Asset" || token.type === "Pump") {
       const assetId = token.token_id
       const bigIntAmount = BigInt(amount)
       const formattedAmount = wsAPI.createType("Compact<u128>", bigIntAmount)
-
+  
       dispatchInfo = await wsAPI.tx.assets
         .transfer(assetId, recipient, formattedAmount)
         .paymentInfo(owner)
     }
-
+  
     if (dispatchInfo !== null) {
       const rawFee = BigInt(dispatchInfo.partialFee.toString())
-      return Number(rawFee) / Math.pow(10, 12)
+      return (isPaseo || isPolkadot)
+        ? Number(rawFee) / Math.pow(10, 10)
+        : Number(rawFee) / Math.pow(10, 12)
     }
-
+  
     return 0
-  }
-
+  }  
+  
   async transfer(
     wsAPI: ApiPromise,
     token: TokenModel,
@@ -121,23 +130,32 @@ export class BalanceServices {
     amount: number,
     onResult: (status: ISubmittableResult) => void
   ): Promise<void> {
+    const chain = await wsAPI.rpc.system.chain()
+    const chainName = chain.toString().toLowerCase()
+    const isPaseo = chainName.includes("paseo")
+    const isPolkadot = chainName.includes("polkadot")
+  
+    const adjustedAmount = isPaseo || isPolkadot ? amount / Math.pow(10, 2) : amount
+  
     if (token.type === "Native") {
-      wsAPI.tx.balances
-        .transferAllowDeath(recipient, amount)
-        .signAndSend(signature, (result) => {
-          onResult(result)
-        })
+      const tx = (isPaseo || isPolkadot)
+        ? wsAPI.tx.balances.transferAllowDeath(recipient, adjustedAmount)
+        : wsAPI.tx.balances.transfer(recipient, adjustedAmount)
+  
+      tx.signAndSend(signature, (result) => {
+        onResult(result)
+      })
     }
-
+  
     if (token.type === "Asset" || token.type === "Pump") {
       const bigIntAmount = BigInt(amount)
       const formattedAmount = wsAPI.createType("Compact<u128>", bigIntAmount)
-
+  
       wsAPI.tx.assets
         .transfer(token.token_id, recipient, formattedAmount)
         .signAndSend(signature, (result) => {
           onResult(result)
         })
     }
-  }
+  }  
 }

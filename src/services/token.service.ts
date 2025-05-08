@@ -97,6 +97,12 @@ export class TokenService {
                 }
               }
 
+              if (network.name === "Paseo - Asset Hub") {
+                if (metadata.symbol !== "PAS") {
+                  return
+                }
+              }
+
               if (nativeTokenSymbol !== metadata.symbol) {
                 const assetProps = asset[1].toHuman()
                 tokens.push({
