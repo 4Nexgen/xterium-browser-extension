@@ -211,7 +211,6 @@ const IndexAddWallet = ({
 
   return (
     <>
-      <MessageBox />
       <div className="p-6">
         <div className="mb-3">
           <Label>{t("Enter a unique wallet name")}:</Label>
@@ -286,6 +285,7 @@ const IndexAddWallet = ({
 
       <Drawer open={isUserPasswordOpen} onOpenChange={setIsUserPasswordOpen}>
         <DrawerContent className="border-0">
+          <MessageBox />
           <DrawerHeader>
             <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
               {t("ENTER YOUR PASSWORD")}

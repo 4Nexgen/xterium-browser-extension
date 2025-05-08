@@ -250,7 +250,6 @@ const IndexTransferDetails = ({
 
   return (
     <>
-      <MessageBox />
       {balanceData !== null && (
         <>
           <div className="p-4 mt-5 rounded-md border border-2 table-border m-4">
@@ -329,6 +328,7 @@ const IndexTransferDetails = ({
             onOpenChange={setIsEstimatedFeesDrawerOpen}
             dismissible={!isConfirmTransferInProgress}>
             <DrawerContent className="border-0">
+              <MessageBox />
               <DrawerHeader>
                 <DrawerTitle>
                   {t("SEND ")}
