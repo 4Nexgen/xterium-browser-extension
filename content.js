@@ -219,99 +219,100 @@ window.addEventListener("message", async (event) => {
       break
     }
     case "XTERIUM_TRANSFER_REQUEST": {
-      const { token, owner, recipient, value, password } = event.data.payload
-
+      const { token, owner, recipient, value, password } = event.data.payload;
+    
       try {
         if (!token?.type || !owner || !recipient || !value) {
-          throw new Error("Missing required transfer parameters")
+          throw new Error("Missing required transfer parameters");
         }
-
-        const apiInstance = await connectToRPC()
-
-        const walletModel = await walletService.getWallet(owner)
+    
+        const apiInstance = await connectToRPC();
+        const walletModel = await walletService.getWallet(owner);
+    
         if (!walletModel?.mnemonic_phrase) {
-          throw new Error("Wallet not found")
+          throw new Error("Wallet not found");
         }
-
-        let decryptedMnemonic
+    
+        let decryptedMnemonic;
         try {
-          decryptedMnemonic = encryptionService.decrypt(
-            password,
-            walletModel.mnemonic_phrase
-          )
-          if (!decryptedMnemonic) throw new Error("Decryption failed")
+          decryptedMnemonic = encryptionService.decrypt(password, walletModel.mnemonic_phrase);
+          if (!decryptedMnemonic) throw new Error("Decryption failed");
         } catch (decryptError) {
-          console.error("Decryption error:", decryptError)
-          throw new Error("Invalid password")
+          console.error("Decryption error:", decryptError);
+          throw new Error("Invalid password");
         }
-
-        const keyring = new Keyring({ type: "sr25519" })
-        const keypair = keyring.addFromUri(decryptedMnemonic)
-
-        const signer = {
-          signPayload: async (payload) => {
-            const payloadU8a = apiInstance.registry
-              .createType("ExtrinsicPayload", payload)
-              .toU8a()
-            return keypair.sign(payloadU8a)
-          },
-          signRaw: async ({ data }) => {
-            const dataU8a = apiInstance.registry.createType("Bytes", data).toU8a()
-            return { signature: keypair.sign(dataU8a) }
-          }
-        }
-
-        apiInstance.setSigner(signer)
-
-        let transferTx
+    
+        const keyring = new Keyring({ type: "sr25519" });
+        const keypair = keyring.addFromUri(decryptedMnemonic);
+    
+        const chain = await apiInstance.rpc.system.chain();
+        const chainName = chain.toString().toLowerCase();
+        const isPaseo = chainName.includes("paseo");
+        const isPolkadot = chainName.includes("polkadot");
+    
+        const adjustedValue = (token.type === "Native" && (isPaseo || isPolkadot))
+          ? BigInt(value) / BigInt(10 ** 2)
+          : BigInt(value);
+    
+        let transferTx;
+    
         if (token.type === "Native") {
-          transferTx = apiInstance.tx.balances.transfer(recipient, value)
-        } else if (token.type === "Asset") {
+          transferTx = (isPaseo || isPolkadot)
+            ? apiInstance.tx.balances.transferAllowDeath(recipient, adjustedValue)
+            : apiInstance.tx.balances.transfer(recipient, adjustedValue);
+        } else if (token.type === "Asset" || token.type === "Pump") {
           if (token.token_id === undefined || token.token_id === null) {
-            throw new Error("Missing token_id for Asset token.")
+            throw new Error("Missing token_id for Asset token.");
           }
-          transferTx = apiInstance.tx.assets.transfer(token.token_id, recipient, value)
+    
+          const bigIntAmount = BigInt(value);
+          const formattedAmount = apiInstance.createType("Compact<u128>", bigIntAmount);
+    
+          transferTx = apiInstance.tx.assets.transfer(token.token_id, recipient, formattedAmount);
         } else {
-          throw new Error(`Unsupported token type: ${token.type}`)
+          throw new Error(`Unsupported token type: ${token.type}`);
         }
+    
+        const signedTx = await transferTx.signAsync(keypair);
+        const extrinsicHash = signedTx.hash.toHex();
 
-        const unsub = await transferTx.signAndSend(
-          keypair,
-          { signer },
-          ({ status, events }) => {
-            if (status.isInBlock || status.isFinalized) {
-              const blockHash = status.isFinalized
-                ? status.asFinalized.toString()
-                : status.asInBlock.toString()
+        const unsub = await signedTx.send(({ status, events }) => {
+          if (status.isInBlock || status.isFinalized) {
+            const blockHash = status.isFinalized
+              ? status.asFinalized.toString()
+              : status.asInBlock.toString();
 
-              window.postMessage(
-                {
-                  type: "XTERIUM_TRANSFER_RESPONSE",
-                  response: {
-                    blockHash,
-                    events: events.map((e) => e.toHuman())
-                  }
+              console.log("Tx Hash",extrinsicHash )
+              console.log("BLock Hash",blockHash )
+
+            window.postMessage(
+              {
+                type: "XTERIUM_TRANSFER_RESPONSE",
+                response: {
+                  blockHash,
+                  txHash: extrinsicHash,
+                  events: events.map((e) => e.toHuman()),
                 },
-                "*"
-              )
+              },
+              "*"
+            );
 
-              unsub()
-            }
+            unsub();
           }
-        )
+        }
+      );
       } catch (error) {
-        console.error("Transfer failed:", error)
+        console.error("Transfer failed:", error);
         window.postMessage(
           {
             type: "XTERIUM_TRANSFER_RESPONSE",
-            error: error.message || "Transfer failed"
+            error: error.message || "Transfer failed",
           },
           "*"
-        )
+        );
       }
-      break
+      break;
     }
-
     case "XTERIUM_REFRESH_BALANCE": {
       const { publicKey, token } = event.data
       try {

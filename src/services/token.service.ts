@@ -1,7 +1,6 @@
+import type { NetworkModel } from "@/models/network.model"
 import { TokenModel } from "@/models/token.model"
 import { ApiPromise } from "@polkadot/api"
-
-import type { NetworkModel } from "@/models/network.model"
 
 import pumpTokens from "../data/chains/xode/pump-tokens.json"
 
@@ -62,7 +61,7 @@ export class TokenService {
       const assetMetadataEntries = await queryAssets.metadata.entries()
       if (assetMetadataEntries.length > 0) {
         assetMetadataEntries.map((metadata) => {
-          const assetId = parseInt(metadata[0].toHuman().toString().replace(/,/g, ''))
+          const assetId = parseInt(metadata[0].toHuman().toString().replace(/,/g, ""))
           const assetData = metadata[1].toHuman()
 
           assetMetadatas.push({
@@ -80,25 +79,25 @@ export class TokenService {
         const assetEntries = await queryAssets.asset.entries()
         if (assetEntries.length > 0) {
           assetEntries.map((asset) => {
-            const assetId = parseInt(asset[0].toHuman().toString().replace(/,/g, ''))
+            const assetId = parseInt(asset[0].toHuman().toString().replace(/,/g, ""))
             const metadata = assetMetadatas.filter((d) => d.id === assetId)[0]
 
-            let pumpToken: TokenModel = null;
+            let pumpToken: TokenModel = null
             if (pumpTokens.length > 0) {
-              pumpToken = pumpTokens.filter(d => d.network === network.name && d.token_id === assetId)[0]
+              pumpToken = pumpTokens.filter(
+                (d) => d.network === network.name && d.token_id === assetId
+              )[0]
             }
 
             if (metadata !== undefined) {
-
               // Special Case - Need more modification on this line
               if (network.name === "Polkadot - Asset Hub") {
-                if (metadata.symbol !== "DOT" && metadata.symbol !== "MPC" && metadata.id !== 50000111 && metadata.id !== 1984) {
-                  return
-                }
-              }
-
-              if (network.name === "Paseo - Asset Hub") {
-                if (metadata.symbol !== "PAS") {
+                if (
+                  metadata.symbol !== "DOT" &&
+                  metadata.symbol !== "MPC" &&
+                  metadata.id !== 50000111 &&
+                  metadata.id !== 1984
+                ) {
                   return
                 }
               }
@@ -130,7 +129,6 @@ export class TokenService {
                   created_at: pumpToken ? pumpToken.created_at : ""
                 })
               }
-
             }
           })
         }
@@ -140,7 +138,11 @@ export class TokenService {
     return tokens
   }
 
-  async getToken(network: NetworkModel, wsAPI: ApiPromise, token_id: number): Promise<TokenModel | null> {
+  async getToken(
+    network: NetworkModel,
+    wsAPI: ApiPromise,
+    token_id: number
+  ): Promise<TokenModel | null> {
     const pumpTokens = this.pumpTokens()
 
     if (token_id === 0) {
@@ -198,9 +200,11 @@ export class TokenService {
           const asset = await queryAssets.asset(token_id)
           if (asset) {
             if (metadata !== undefined) {
-              let pumpToken: TokenModel = null;
+              let pumpToken: TokenModel = null
               if (pumpTokens.length > 0) {
-                pumpToken = pumpTokens.filter(d => d.network === network.name && d.token_id === token_id)[0]
+                pumpToken = pumpTokens.filter(
+                  (d) => d.network === network.name && d.token_id === token_id
+                )[0]
               }
 
               const assetProps = asset.toHuman()
@@ -239,15 +243,28 @@ export class TokenService {
     return null
   }
 
-  async createToken(network: NetworkModel, wsAPI: ApiPromise, data: TokenModel): Promise<string> {
+  async createToken(
+    network: NetworkModel,
+    wsAPI: ApiPromise,
+    data: TokenModel
+  ): Promise<string> {
     return "Token created successfully"
   }
 
-  async updateToken(network: NetworkModel, wsAPI: ApiPromise, token_id: number, data: TokenModel): Promise<string> {
+  async updateToken(
+    network: NetworkModel,
+    wsAPI: ApiPromise,
+    token_id: number,
+    data: TokenModel
+  ): Promise<string> {
     return "Token updated successfully"
   }
 
-  async deleteToken(network: NetworkModel, wsAPI: ApiPromise, token_id: number): Promise<boolean> {
+  async deleteToken(
+    network: NetworkModel,
+    wsAPI: ApiPromise,
+    token_id: number
+  ): Promise<boolean> {
     return true
   }
 }

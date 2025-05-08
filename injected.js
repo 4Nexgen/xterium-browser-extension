@@ -643,6 +643,7 @@
           {
             type: "XTERIUM_TRANSFER_REQUEST",
             payload: {
+              txhash: txhash,
               token: details.token,
               owner: details.owner,
               recipient: details.recipient,
@@ -870,6 +871,8 @@
         return reject("No wallet connected.")
       }
 
+      console.log("Fetching balance...")
+
       const handleResponse = (event) => {
         const data = event.data
 
@@ -886,8 +889,10 @@
         clearTimeout(timeoutId)
 
         if (data.error) {
+          console.error("Error fetching balance:", data.error)
           reject(data.error)
         } else {
+          console.log("Balance fetched successfully")
           resolve(data.balances)
         }
       }
@@ -910,32 +915,6 @@
     })
   }
   
-  function sendTransaction(details) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        if (!details || !details.recipient || !details.value) {
-          reject(new Error("Invalid transaction details"));
-          return;
-        }
-  
-        const tx = {
-          from: details.owner,  
-          to: details.recipient, 
-          value: details.value, 
-          fee: details.fee || 1000, 
-        };
-  
-        setTimeout(() => {
-          const simulatedTxHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
-  
-          resolve({ txHash: simulatedTxHash, transaction: tx });
-        }, 1000);
-      } catch (error) {
-        reject(new Error(`Transaction failed: ${error.message}`));
-      }
-    });
-  }
-  
   // Initiates a token transfer.
   function transfer(token, recipient, value, password) {
     return new Promise((resolve, reject) => {
@@ -943,7 +922,7 @@
         console.error("No wallet connected.")
         return reject("No wallet connected. Please connect your wallet first.")
       }
-
+  
       let tokenSymbol = ""
       if (typeof token === "string") {
         tokenSymbol = token.trim()
@@ -954,50 +933,55 @@
           "Invalid token parameter. Must be a string or object with a symbol property."
         )
       }
-
-      const nativeTokenSymbol = "XON"
+  
+      const nativeTokenSymbols = ["PAS", "XON", "DOT"];
       let tokenObj = {
         symbol: tokenSymbol,
-        type:
-          tokenSymbol.toUpperCase() === nativeTokenSymbol.toUpperCase()
-            ? "Native"
-            : "Asset"
-      }
-
+        type: nativeTokenSymbols.includes(tokenSymbol.toUpperCase())
+          ? "Native"
+          : "Asset"
+      };
+        
       if (!recipient || recipient.trim() === "") {
         return reject("Recipient address is required.")
       }
       if (!value || isNaN(value) || Number(value) <= 0) {
         return reject("Transfer value must be a positive number.")
       }
-
+  
       const owner = connectedWallet.public_key
       if (recipient === owner) {
         return reject("You cannot transfer to your own wallet.")
       }
-
+  
+      let rawValue = BigInt(0)
+  
       getBalance(owner)
         .then((balances) => {
+          console.log("Balance", balances)
           const matched = balances.find(
             (b) =>
               b.token?.symbol?.toUpperCase() === tokenSymbol.toUpperCase() &&
               b.token?.type?.toLowerCase() === tokenObj.type.toLowerCase()
           )
-
-          if (!matched) return Promise.reject("No available balance found for token.")
-
+  
+          if (!matched) {
+            return Promise.reject("No available balance found for token.")
+          }
+  
           const available = parseFloat(matched.freeBalance)
-          const toSend = parseFloat((Number(value) / 1e12).toFixed(12))
-
+          const toSend = parseFloat((Number(value)).toFixed(12))
+  
           if (toSend > available) {
             return Promise.reject(
               `Not enough balance. You have ${available}, trying to send ${toSend}`
             )
           }
-
+  
+          rawValue = BigInt(Math.floor(Number(value) * Math.pow(10, 12)))
+  
           return getTokenList()
         })
-
         .then((tokenList) => {
           if (Array.isArray(tokenList)) {
             const foundToken = tokenList.find(
@@ -1010,9 +994,8 @@
             }
           }
 
-          return getEstimateFee(owner, Number(value), recipient, { token: tokenObj })
+          return getEstimateFee(owner, rawValue.toString(), recipient, { token: tokenObj })
         })
-
         .then(() => {
           function handleTransferResponse(event) {
             const data = event.data
@@ -1023,8 +1006,9 @@
               return reject("Unexpected response format.")
             }
           }
-
+  
           window.addEventListener("message", handleTransferResponse)
+  
           window.postMessage(
             {
               type: "XTERIUM_TRANSFER_REQUEST",
@@ -1032,60 +1016,118 @@
                 token: tokenObj,
                 owner,
                 recipient,
-                value: Number(value),
+                value: rawValue.toString(),
                 password
               }
             },
             "*"
           )
         })
-
         .catch((err) => {
           console.error("Transfer failed:", err)
           reject(err)
         })
     })
   }
-
   ;(() => {
-    let isTransferInProgress = false
+    let isTransferInProgress = false;
 
-    function initiateTransfer(details) {
-      if (isTransferInProgress) return
-      isTransferInProgress = true
+    function sendTransaction(details) {
+      return new Promise(async (resolve, reject) => {
+        try {
+          if (!details || !details.owner || !details.recipient || !details.value || !details.fee) {
+            console.error("sendTransaction: Invalid transaction details", {
+              owner: details?.owner,
+              recipient: details?.recipient,
+              value: details?.value,
+              fee: details?.fee,
+            });
+    
+            reject(new Error("Invalid transaction details"));
+            return;
+          }
+    
+          const tx = {
+            from: details.owner,
+            to: details.recipient,
+            value: details.value,
+            fee: details.fee,
+          };
+    
+          setTimeout(() => {
+            const simulatedTxHash = '0x' + Array.from({ length: 64 }, () =>
+              Math.floor(Math.random() * 16).toString(16)
+            ).join('');
+    
+            resolve({ txHash: simulatedTxHash, transaction: tx });
+          }, 1000);
+        } catch (error) {
+          console.error("sendTransaction failed:", error);
+          reject(new Error(`Transaction failed: ${error.message}`));
+        }
+      });
+    }
+
+function initiateTransfer(inputDetails)
+  {
+      if (isTransferInProgress) return;
+
+      const details = { ...inputDetails };
+
+      if (!details.owner || !details.recipient || !details.value || !details.token) {
+        console.error("Missing required fields in transfer details:", details);
+        return;
+      }
+
+      const valueNumber = Number(details.value);
+      if (isNaN(valueNumber)) {
+        console.error("Invalid value. Not a number:", details.value);
+        return;
+      }
+
+      isTransferInProgress = true;
 
       if (!details.fee) {
-        if (details.feeEstimationInProgress) return
+        if (details.feeEstimationInProgress) return;
 
-        details.feeEstimationInProgress = true
+        details.feeEstimationInProgress = true;
 
-        const safeValue = BigInt(Math.floor(Number(details.value)))
-        if (isNaN(Number(details.value))) {
-          console.error("Value is not a number:", details.value)
-          return
-        }
+        const safeValue = BigInt(Math.floor(valueNumber));
 
         getEstimateFee(details.owner, safeValue, details.recipient, {
-          token: details.token
+          token: details.token,
         })
           .then((fee) => {
-            details.fee = fee.partialFee
-            details.feeEstimationInProgress = false
+            const txDetails = {
+              ...details,
+              fee: fee.partialFee
+            };
 
-            return sendTransaction(details);
-          })
-          .then(({ txHash, transaction }) => {
-            setTimeout(() => showTransferSignAndVerify(transaction, txHash), 0);
-          })
+            details.feeEstimationInProgress = false;
 
+            return sendTransaction(txDetails).then(({ txHash }) => {
+              isTransferInProgress = false;
+              setTimeout(() => showTransferSignAndVerify(txDetails, txHash), 0);
+            });
+          })
           .catch((err) => {
-            console.error("Fee estimation failed:", err)
-            details.feeEstimationInProgress = false
-            isTransferInProgress = false
-          })
+            console.error("Fee estimation or transaction failed:", err);
+            details.feeEstimationInProgress = false;
+            isTransferInProgress = false;
+          });
 
-        return
+        return;
       }
+
+      sendTransaction(details)
+        .then(({ txHash, transaction }) => {
+          isTransferInProgress = false;
+          setTimeout(() => showTransferSignAndVerify(transaction, txHash), 0);
+        })
+        .catch((err) => {
+          console.error("Transaction failed:", err);
+          isTransferInProgress = false;
+        });
     }
 
     if (!window.xteriumMessageListenerAdded) {
