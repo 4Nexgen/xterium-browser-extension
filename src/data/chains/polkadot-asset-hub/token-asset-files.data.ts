@@ -5,6 +5,7 @@ import DefaultLogo from "data-base64:/assets/tokens/default.png";
 import DOTLogo from "data-base64:/assets/tokens/polkadot-asset-hub/dot.png";
 import MPCLogo from "data-base64:/assets/tokens/polkadot-asset-hub/mpc.png";
 import DONLogo from "data-base64:/assets/tokens/polkadot-asset-hub/don.png";
+import USDTLogo from "data-base64:/assets/tokens/polkadot-asset-hub/usdt.png";
 
 export class TokenAssetFiles extends ChainAssetFiles {
   getTokenLogo(imageName: string): string {
@@ -12,6 +13,7 @@ export class TokenAssetFiles extends ChainAssetFiles {
       case "DOT": return DOTLogo;
       case "MPC": return MPCLogo;
       case "DON": return DONLogo;
+      case "USDt": return USDTLogo;
       default: return DefaultLogo;
     }
   }
