@@ -61,7 +61,7 @@ export default function NetworkSelection({
       setSelectedNetwork(data)
       if (handleCurrentNetwork) handleCurrentNetwork(data)
     } else {
-      const defaultNetwork = networks.find((network) => network.name === "Xode")
+      const defaultNetwork = networks.find((network) => network.name === "Xode - Kusama")
       if (defaultNetwork) {
         setSelectedNetwork(defaultNetwork)
         networkService.setNetwork(defaultNetwork)

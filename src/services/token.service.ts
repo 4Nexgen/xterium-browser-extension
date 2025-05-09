@@ -2,7 +2,7 @@ import type { NetworkModel } from "@/models/network.model"
 import { TokenModel } from "@/models/token.model"
 import { ApiPromise } from "@polkadot/api"
 
-import pumpTokens from "../data/chains/xode/pump-tokens.json"
+import pumpTokens from "../data/chains/xode-kusama/pump-tokens.json"
 
 export class TokenService {
   pumpTokens(): TokenModel[] {
