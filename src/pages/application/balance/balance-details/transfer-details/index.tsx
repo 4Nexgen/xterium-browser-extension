@@ -480,7 +480,7 @@ const IndexTransferDetails = ({
                     rel="noopener noreferrer"
                     className="w-full block text-center"
                   >
-                    {t("View in Scanner")}
+                    {t("View on Scanner")}
                   </a>
                 </Button>
               </div>
