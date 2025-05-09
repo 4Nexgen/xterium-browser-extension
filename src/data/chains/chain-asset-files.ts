@@ -3,7 +3,8 @@ export abstract class ChainAssetFiles {
     string,
     () => Promise<{ TokenAssetFiles: new () => ChainAssetFiles }>
   > = {
-    Xode: () => import("./xode/token-asset-files.data"),
+    "Xode - Kusama": () => import("./xode/token-asset-files.data"),
+    "Xode - Polkadot": () => import("./xode/token-asset-files.data"),
     "Polkadot - Asset Hub": () => import("./polkadot-asset-hub/token-asset-files.data"),
     "Kusama - Asset Hub": () => import("./kusama-asset-hub/token-asset-files.data"),
     "Paseo - Asset Hub": () => import("./paseo-asset-hub/token-asset-files.data")

@@ -10,7 +10,8 @@ export class NetworkLogos {
         switch (imageName) {
             case "Polkadot - Asset Hub": return Polkadot
             case "Kusama - Asset Hub": return Kusama
-            case "Xode": return Xode
+            case "Xode - Polkadot": return Xode
+            case "Xode - Kusama": return Xode
             case "Paseo - Asset Hub": return Paseo
             default: return DefaultLogo
         }
