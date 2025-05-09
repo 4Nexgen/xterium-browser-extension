@@ -886,8 +886,7 @@
         }
 
         window.removeEventListener("message", handleResponse)
-        clearTimeout(timeoutId)
-
+        
         if (data.error) {
           console.error("Error fetching balance:", data.error)
           reject(data.error)
@@ -898,12 +897,6 @@
       }
 
       window.addEventListener("message", handleResponse)
-
-      const timeoutId = setTimeout(() => {
-        console.warn("⏰ Timeout fired")
-        window.removeEventListener("message", handleResponse)
-        reject("Timeout: No response received from wallet.")
-      }, 15000)
 
       window.postMessage(
         {
@@ -958,7 +951,6 @@
   
       getBalance(owner)
         .then((balances) => {
-          console.log("Balance", balances)
           const matched = balances.find(
             (b) =>
               b.token?.symbol?.toUpperCase() === tokenSymbol.toUpperCase() &&
