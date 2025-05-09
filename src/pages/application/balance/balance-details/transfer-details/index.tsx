@@ -1,6 +1,6 @@
 import MessageBox from "@/components/message-box"
 import { Button } from "@/components/ui/button"
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { MessageBoxController } from "@/controllers/message-box-controller"
@@ -14,6 +14,7 @@ import { UserService } from "@/services/user.service"
 import { WalletService } from "@/services/wallet.service"
 import { ApiPromise, Keyring } from "@polkadot/api"
 import type { ExtrinsicStatus, RuntimeDispatchInfo } from "@polkadot/types/interfaces"
+import { Copy } from "lucide-react"
 import React, { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -61,6 +62,11 @@ const IndexTransferDetails = ({
   const [isUserPasswordOpen, setIsUserPasswordOpen] = useState<boolean>(false)
 
   const [isProcessing, setIsProcessing] = useState(false)
+
+  const [isTxSuccessDrawerOpen, setIsTxSuccessDrawerOpen] = useState(false)
+  const [txHash, setTxHash] = useState<string | null>(null)
+  const [blockHash, setBlockHash] = useState<string | null>(null)
+
 
   useEffect(() => {
     setSendLabel(t("SEND"))
@@ -232,10 +238,14 @@ const IndexTransferDetails = ({
         signature,
         recipient,
         amount,
-        (extrinsicResults) => {
+        (extrinsicResults, txHash, blockHash) => {
           if (extrinsicResults.isInBlock) {
             MessageBoxController.show("Transfer Successful!")
-
+      
+            setTxHash(txHash || null)
+            setBlockHash(blockHash || null)
+            setIsTxSuccessDrawerOpen(true)
+      
             setIsProcessing(false)
             setIsUserPasswordOpen(false)
           } else if (extrinsicResults.isError) {
@@ -243,10 +253,12 @@ const IndexTransferDetails = ({
               `${t("Error: ")}: ${extrinsicResults.dispatchError.toString()}`
             )
           }
-
-          handleTransferStatusCallbacks(extrinsicResults.status)
+          
+          setTimeout(() => {
+            handleTransferStatusCallbacks(extrinsicResults.status)
+          }, 10000) 
         }
-      )
+      )          
     } else {
       MessageBoxController.show("Incorrect password!")
 
@@ -395,6 +407,84 @@ const IndexTransferDetails = ({
                 {t("CONFIRM")}
               </Button>
             </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      <Drawer open={isTxSuccessDrawerOpen} onOpenChange={setIsTxSuccessDrawerOpen}>
+        <DrawerContent className="border-0">
+          <DrawerHeader>
+            <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
+              {t("Transaction Submitted")}
+            </DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4 pb-6">
+            <Label className="block font-semibold text-muted-foreground text-sm mt-6">
+              {t("Transaction Hash")}:
+            </Label>
+            <div className="relative mt-2 p-3 font-mono text-xs text-muted break-words bg-background rounded-lg max-w-full overflow-hidden pr-10 border border-border">
+              {txHash && (
+                <a
+                  href={
+                    network?.name === "Paseo - Asset Hub"
+                      ? `https://assethub-paseo.subscan.io/extrinsic/${txHash}`
+                      : network?.name === "Polkadot - Asset Hub"
+                      ? `https://assethub-polkadot.subscan.io/extrinsic/${txHash}`
+                      : network?.name === "Kusama - Asset Hub"
+                      ? `https://assethub-kusama.subscan.io/extrinsic/${txHash}`
+                      : network?.name === "Xode - Kusama"
+                      ? `https://node.xode.net/transactions?search=${txHash}`
+                      : network?.name === "Xode - Polkadot"
+                      ? `https://node.xode.net/transactions?search=${txHash}`
+                      : "#"
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline break-all"
+                >
+                  {txHash}
+                </a>
+              )}
+              <button
+                onClick={() => txHash && navigator.clipboard.writeText(txHash)}
+                className="absolute top-2 right-2 text-muted-foreground hover:text-foreground transition"
+                type="button"
+                aria-label="Copy Tx Hash"
+              >
+                <Copy size={16} />
+              </button>
+            </div>
+
+            <p className="text-xs text-muted-foreground mt-2 italic">
+              {t("Will automatically close in 10 seconds.")}
+            </p>
+
+            {txHash && (
+              <div className="mt-4">
+                <Button variant="jelly" className="w-full" asChild>
+                  <a
+                    href={
+                      network?.name === "Paseo - Asset Hub"
+                        ? `https://assethub-paseo.subscan.io/extrinsic/${txHash}`
+                        : network?.name === "Polkadot - Asset Hub"
+                        ? `https://assethub-polkadot.subscan.io/extrinsic/${txHash}`
+                        : network?.name === "Kusama - Asset Hub"
+                        ? `https://assethub-kusama.subscan.io/extrinsic/${txHash}`
+                        : network?.name === "Xode - Kusama"
+                        ? `https://node.xode.net/transactions?search=${txHash}`
+                        : network?.name === "Xode - Polkadot"
+                        ? `https://node.xode.net/transactions?search=${txHash}`
+                        : "#"
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full block text-center"
+                  >
+                    {t("View in Scanner")}
+                  </a>
+                </Button>
+              </div>
+            )}
           </div>
         </DrawerContent>
       </Drawer>
