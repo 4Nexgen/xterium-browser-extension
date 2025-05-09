@@ -26,7 +26,7 @@
   // ----------------------------
   // Private State Variables
   // ----------------------------
-  const extensionId = "fiafdhcmleelgciojaimjgbabhmbffmj"
+  const extensionId = "klfhdmiebenifpdmdmkjicdohjilabdg"
   isConnected = false
   connectedWallet = null
 
