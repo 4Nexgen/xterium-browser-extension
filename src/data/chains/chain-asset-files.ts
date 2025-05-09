@@ -5,9 +5,9 @@ export abstract class ChainAssetFiles {
   > = {
     "Xode - Kusama": () => import("./xode-kusama/token-asset-files.data"),
     "Xode - Polkadot": () => import("./xode-polkadot/token-asset-files.data"),
-    "Polkadot - Asset Hub": () => import("./polkadot-asset-hub/token-asset-files.data"),
-    "Kusama - Asset Hub": () => import("./kusama-asset-hub/token-asset-files.data"),
-    "Paseo - Asset Hub": () => import("./paseo-asset-hub/token-asset-files.data")
+    "Asset Hub - Polkadot": () => import("./polkadot-asset-hub/token-asset-files.data"),
+    "Asset Hub - Kusama": () => import("./kusama-asset-hub/token-asset-files.data"),
+    "Asset Hub - Paseo": () => import("./paseo-asset-hub/token-asset-files.data")
   }
 
   static async load(network: string): Promise<ChainAssetFiles> {

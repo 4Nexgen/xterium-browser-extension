@@ -91,7 +91,7 @@ export class TokenService {
 
             if (metadata !== undefined) {
               // Special Case - Need more modification on this line
-              if (network.name === "Polkadot - Asset Hub") {
+              if (network.name === "Asset Hub - Polkadot") {
                 if (
                   metadata.symbol !== "DOT" &&
                   metadata.symbol !== "MPC" &&

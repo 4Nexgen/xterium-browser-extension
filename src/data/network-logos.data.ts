@@ -8,11 +8,11 @@ import Paseo from "data-base64:/assets/networks/pas.png"
 export class NetworkLogos {
     getLogo(imageName: string) {
         switch (imageName) {
-            case "Polkadot - Asset Hub": return Polkadot
-            case "Kusama - Asset Hub": return Kusama
+            case "Asset Hub - Polkadot": return Polkadot
+            case "Asset Hub - Kusama": return Kusama
             case "Xode - Polkadot": return Xode
             case "Xode - Kusama": return Xode
-            case "Paseo - Asset Hub": return Paseo
+            case "Asset Hub - Paseo": return Paseo
             default: return DefaultLogo
         }
     }

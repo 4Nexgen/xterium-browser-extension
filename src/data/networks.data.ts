@@ -11,17 +11,17 @@ export const networkData = [
   },
   {
     category: "Live",
-    name: "Polkadot - Asset Hub",
+    name: "Asset Hub - Polkadot",
     rpc: "wss://polkadot-asset-hub-rpc.polkadot.io"
   },
   {
     category: "Live",
-    name: "Kusama - Asset Hub",
+    name: "Asset Hub - Kusama",
     rpc: "wss://kusama-asset-hub-rpc.polkadot.io"
   },
   {
     category: "Test",
-    name: "Paseo - Asset Hub",
+    name: "Asset Hub - Paseo",
     rpc: "wss://asset-hub-paseo-rpc.dwellir.com"
   }
 ]

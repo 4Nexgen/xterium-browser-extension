@@ -426,11 +426,11 @@ const IndexTransferDetails = ({
               {txHash && (
                 <a
                   href={
-                    network?.name === "Paseo - Asset Hub"
+                    network?.name === "Asset Hub - Paseo"
                       ? `https://assethub-paseo.subscan.io/extrinsic/${txHash}`
-                      : network?.name === "Polkadot - Asset Hub"
+                      : network?.name === "Asset Hub - Polkadot"
                       ? `https://assethub-polkadot.subscan.io/extrinsic/${txHash}`
-                      : network?.name === "Kusama - Asset Hub"
+                      : network?.name === "Asset Hub - Kusama"
                       ? `https://assethub-kusama.subscan.io/extrinsic/${txHash}`
                       : network?.name === "Xode - Kusama"
                       ? `https://node.xode.net/transactions?search=${txHash}`
@@ -464,11 +464,11 @@ const IndexTransferDetails = ({
                 <Button variant="jelly" className="w-full" asChild>
                   <a
                     href={
-                      network?.name === "Paseo - Asset Hub"
+                      network?.name === "Asset Hub - Paseo"
                         ? `https://assethub-paseo.subscan.io/extrinsic/${txHash}`
-                        : network?.name === "Polkadot - Asset Hub"
+                        : network?.name === "Asset Hub - Polkadot"
                         ? `https://assethub-polkadot.subscan.io/extrinsic/${txHash}`
-                        : network?.name === "Kusama - Asset Hub"
+                        : network?.name === "Asset Hub - Kusama"
                         ? `https://assethub-kusama.subscan.io/extrinsic/${txHash}`
                         : network?.name === "Xode - Kusama"
                         ? `https://node.xode.net/transactions?search=${txHash}`
