@@ -257,7 +257,7 @@ const IndexTransferDetails = ({
 
   return (
     <>
-      {isSendInProgress ?? <Loader />}
+      {isSendInProgress && <Loader />}
       {balanceData !== null && (
         <>
           <div className="p-4 mt-5 rounded-md border border-2 table-border m-4">
