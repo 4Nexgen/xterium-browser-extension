@@ -102,6 +102,28 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
     return parseFloat(value) / multiplier
   }
 
+  const formatCompactPrice = (
+    value: number,
+    threshold: number = 3
+  ): string => {
+    if (value === 0) return "0";
+    if (value >= Math.pow(10, -threshold)) {
+      return value.toString();
+    }
+  
+    const str = value.toFixed(20);
+    const [integer, fraction] = str.split('.');
+    
+    if (!fraction) return integer;
+  
+    const leadingZeros = fraction.match(/^0+/)?.[0]?.length || 0;
+    const significantDigits = fraction.slice(leadingZeros).replace(/0+$/, '');
+  
+    return leadingZeros >= threshold
+      ? `0.0{${leadingZeros}}${significantDigits}`
+      : str.replace(/0+$/, '');
+  };
+
   const updateBalances = (balance: BalanceModel) => {
     setLoadingPerToken((prevLoadingPerToken) => ({
       ...prevLoadingPerToken,
@@ -359,7 +381,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                         const tokenPrice =
                           prices?.tokenPrices[balance.token.symbol]?.[selectedCurrency] ||
                           0
-                        const formattedTokenPrice = `${selectedCurrency}${tokenPrice}`
+                        const formattedTokenPrice = `${selectedCurrency}${formatCompactPrice(tokenPrice)}`
                         const tokenValue = tokenPrice * rawBalance
                         const formattedTokenValue = `${selectedCurrency}${tokenValue.toFixed(3)}`
 
