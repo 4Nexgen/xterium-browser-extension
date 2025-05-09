@@ -287,8 +287,8 @@ const IndexAddWallet = ({
         <DrawerContent className="border-0">
           <MessageBox />
           <DrawerHeader>
-            <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
-              {t("ENTER YOUR PASSWORD")}
+            <DrawerTitle className="text-white border-b border-border-1/20 pb-4">
+              {t("Enter Your Password")}
             </DrawerTitle>
           </DrawerHeader>
           <div className="p-6">

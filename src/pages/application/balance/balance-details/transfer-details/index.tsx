@@ -366,7 +366,7 @@ const IndexTransferDetails = ({
         dismissible={userPassword === ""}>
         <DrawerContent className="border-0">
           <DrawerHeader>
-            <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
+            <DrawerTitle className="text-white border-b border-border-1/20 pb-4">
               {t("Confirm Transfer")}
             </DrawerTitle>
           </DrawerHeader>

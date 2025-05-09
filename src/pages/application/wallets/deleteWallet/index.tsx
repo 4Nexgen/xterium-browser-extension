@@ -1,4 +1,3 @@
-import MessageBox from "@/components/message-box"
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
@@ -68,7 +67,6 @@ const IndexDeleteWallet = ({
 
   return (
     <>
-      <MessageBox />
       {wallet && (
         <div className="p-6">
           <div className="mb-8">
@@ -89,8 +87,8 @@ const IndexDeleteWallet = ({
       <Drawer open={isUserPasswordOpen} onOpenChange={setIsUserPasswordOpen}>
         <DrawerContent className="border-0">
           <DrawerHeader>
-            <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
-              {t("ENTER YOUR PASSWORD")}
+            <DrawerTitle className="text-white border-b border-border-1/20 pb-4">
+              {t("Enter Your Password")}
             </DrawerTitle>
           </DrawerHeader>
           <div className="p-6">

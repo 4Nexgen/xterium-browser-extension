@@ -258,8 +258,8 @@ const IndexWallet = ({
         <Drawer open={isAddWalletDrawerOpen} onOpenChange={setIsAddWalletDrawerOpen}>
           <DrawerContent className="border-0">
             <DrawerHeader>
-              <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
-                {t("ADD NEW WALLET")}
+              <DrawerTitle className="text-white border-b border-border-1/20 pb-4">
+                {t("Add New Wallet")}
               </DrawerTitle>
             </DrawerHeader>
             <IndexAddWallet
@@ -275,8 +275,8 @@ const IndexWallet = ({
           onOpenChange={setIsExportWalletDrawerOpen}>
           <DrawerContent className="border-0">
             <DrawerHeader>
-              <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
-                {t("EXPORT WALLET")}
+              <DrawerTitle className="text-white border-b border-border-1/20 pb-4">
+                {t("Export Wallet")}
               </DrawerTitle>
             </DrawerHeader>
             <IndexExportWallet selectedWallet={selectedWallet} />
@@ -288,8 +288,8 @@ const IndexWallet = ({
           onOpenChange={setIsDeleteWalletDrawerOpen}>
           <DrawerContent className="border-0">
             <DrawerHeader>
-              <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
-                {t("DELETE WALLET")}
+              <DrawerTitle className="text-white border-b border-border-1/20 pb-4">
+                {t("Delete Wallet")}
               </DrawerTitle>
             </DrawerHeader>
             <IndexDeleteWallet
