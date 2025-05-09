@@ -40,8 +40,17 @@ const IndexDeleteWallet = ({
     setUserPassword(value)
   }
 
-  const deleteWallet = () => {
-    setIsUserPasswordOpen(true)
+  const deleteWallet = async () => {
+    // setIsUserPasswordOpen(true)
+    const deleteWallet = await walletService.deleteWallet(wallet.public_key)
+    if (deleteWallet) {
+      MessageBoxController.show(`${t("Wallet Deleted Successfully!")}`)
+
+      setIsProcessing(false)
+      setIsUserPasswordOpen(false)
+
+      handleCallbackDataUpdates()
+    }
   }
 
   const confirmDelete = async () => {
