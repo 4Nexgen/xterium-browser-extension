@@ -1,3 +1,4 @@
+import Loader from "@/components/loader"
 import { Label } from "@/components/ui/label"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import type { NetworkModel } from "@/models/network.model"
@@ -87,60 +88,66 @@ const IndexNetworkStatus = ({
 
   return (
     <>
-      <div className="py-4 flex flex-col justify-between h-full">
-        <div className="py-4">
-          <img src={XteriumLogo} className="w-[150px] mx-auto" alt="Xterium Logo" />
+      {loading ? (
+        <Loader label="Initializing network..." />
+      ) : (
+        <div className="py-4 flex flex-col justify-between h-full">
+          <div className="py-4">
+            <img src={XteriumLogo} className="w-[150px] mx-auto" alt="Xterium Logo" />
+          </div>
+          <ScrollArea className="p-4 flex-1">
+            {loading ? (
+              <div className="flex flex-col items-center w-full h-30 gap-4 mt-10">
+                <LoaderCircle className="animate-spin h-12 w-12 text-muted" />
+                <p className="text-muted ml-2 text-lg">
+                  {loading ? t("Loading...") : t("Loading...")}
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-wrap w-[352px] mx-auto">
+                <div className="flex items-center justify-center h-full w-1/2 p-2">
+                  <div className="text-center py-10 w-full relative network-box h-full">
+                    <Blocks className="absolute top-0 left-0 ml-1 mt-1" size="25" />
+                    <p className="text-2xl font-extrabold mt-6 text-primary dark:text-[#FFADFB]">
+                      {formatNumber(networkStatus.totalBlocks)}
+                    </p>
+                    <Label className="text-sm opacity-50">{t("Total Blocks")}</Label>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center h-full w-1/2 p-2">
+                  <div className="text-center py-10 w-full relative network-box h-full">
+                    <Wallet className="absolute top-0 left-0 ml-1 mt-1" size="25" />
+                    <p className="text-2xl font-extrabold mt-6 text-primary dark:text-[#FFADFB]">
+                      {formatNumber(networkStatus.totalAddresses)}
+                    </p>
+                    <Label className="text-sm opacity-50">{t("Total Addresses")}</Label>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center h-full w-1/2 p-2">
+                  <div className="text-center py-10 w-full relative network-box h-full">
+                    <Hourglass className="absolute top-0 left-0 ml-1 mt-1" size="25" />
+                    <p className="text-2xl font-extrabold mt-6 text-primary dark:text-[#FFADFB]">
+                      {networkStatus.avgBlockInterval} secs
+                    </p>
+                    <Label className="text-sm opacity-50">
+                      {t("AVG Block Intervals")}
+                    </Label>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center h-full w-1/2 p-2">
+                  <div className="text-center py-10 w-full relative network-box h-full">
+                    <HandCoins className="absolute top-0 left-0 ml-1 mt-1" size="25" />
+                    <p className="text-2xl font-extrabold mt-6 text-primary dark:text-[#FFADFB]">
+                      {networkStatus.lastGasFee}
+                    </p>
+                    <Label className="text-sm opacity-50">{t("Last Gas Fee")}</Label>
+                  </div>
+                </div>
+              </div>
+            )}
+          </ScrollArea>
         </div>
-        <ScrollArea className="p-4 flex-1">
-          {loading ? (
-            <div className="flex flex-col items-center w-full h-30 gap-4 mt-10">
-              <LoaderCircle className="animate-spin h-12 w-12 text-muted" />
-              <p className="text-muted ml-2 text-lg">
-                {loading ? t("Loading...") : t("Loading...")}
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-wrap w-[352px] mx-auto">
-              <div className="flex items-center justify-center h-full w-1/2 p-2">
-                <div className="text-center py-10 w-full relative network-box h-full">
-                  <Blocks className="absolute top-0 left-0 ml-1 mt-1" size="25" />
-                  <p className="text-2xl font-extrabold mt-6 text-primary dark:text-[#FFADFB]">
-                    {formatNumber(networkStatus.totalBlocks)}
-                  </p>
-                  <Label className="text-sm opacity-50">{t("Total Blocks")}</Label>
-                </div>
-              </div>
-              <div className="flex items-center justify-center h-full w-1/2 p-2">
-                <div className="text-center py-10 w-full relative network-box h-full">
-                  <Wallet className="absolute top-0 left-0 ml-1 mt-1" size="25" />
-                  <p className="text-2xl font-extrabold mt-6 text-primary dark:text-[#FFADFB]">
-                    {formatNumber(networkStatus.totalAddresses)}
-                  </p>
-                  <Label className="text-sm opacity-50">{t("Total Addresses")}</Label>
-                </div>
-              </div>
-              <div className="flex items-center justify-center h-full w-1/2 p-2">
-                <div className="text-center py-10 w-full relative network-box h-full">
-                  <Hourglass className="absolute top-0 left-0 ml-1 mt-1" size="25" />
-                  <p className="text-2xl font-extrabold mt-6 text-primary dark:text-[#FFADFB]">
-                    {networkStatus.avgBlockInterval} secs
-                  </p>
-                  <Label className="text-sm opacity-50">{t("AVG Block Intervals")}</Label>
-                </div>
-              </div>
-              <div className="flex items-center justify-center h-full w-1/2 p-2">
-                <div className="text-center py-10 w-full relative network-box h-full">
-                  <HandCoins className="absolute top-0 left-0 ml-1 mt-1" size="25" />
-                  <p className="text-2xl font-extrabold mt-6 text-primary dark:text-[#FFADFB]">
-                    {networkStatus.lastGasFee}
-                  </p>
-                  <Label className="text-sm opacity-50">{t("Last Gas Fee")}</Label>
-                </div>
-              </div>
-            </div>
-          )}
-        </ScrollArea>
-      </div>
+      )}
     </>
   )
 }
