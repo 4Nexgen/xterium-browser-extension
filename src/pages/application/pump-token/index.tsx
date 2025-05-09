@@ -1,3 +1,4 @@
+import Loader from "@/components/loader"
 import { Button } from "@/components/ui/button"
 import {
   Command,
@@ -16,7 +17,7 @@ import type { NetworkModel } from "@/models/network.model"
 import type { TokenModel } from "@/models/token.model"
 import { TokenService } from "@/services/token.service"
 import type { ApiPromise } from "@polkadot/api"
-import { Coins, LoaderCircle, Search } from "lucide-react"
+import { Coins, Search } from "lucide-react"
 import Image from "next/image"
 import React, { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -104,12 +105,7 @@ const IndexPumpToken = ({ currentNetwork, currentWsAPI }: IndexPumpTokenProps) =
       <div className="p-4 flex flex-col justify-between h-full">
         <div className="py-4">
           {loading ? (
-            <div className="flex flex-col items-center w-full h-30 gap-4 mt-10">
-              <LoaderCircle className="animate-spin h-12 w-12 text-muted" />
-              <p className="text-muted ml-2 text-lg">
-                {loading ? t("Loading...") : t("Loading...")}
-              </p>
-            </div>
+            <Loader />
           ) : (
             <>
               <div className="mb-3">
