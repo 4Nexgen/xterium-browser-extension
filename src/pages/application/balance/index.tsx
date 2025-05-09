@@ -279,11 +279,11 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                     variant="roundedOutline"
                     role="combobox"
                     aria-expanded={openWallets}
-                    className="w-full justify-between text-input-primary p-3 font-bold hover:bg-accent"
+                    className="w-full justify-between text-white p-3 hover:bg-accent"
                     size="lg">
                     {selectedWallet ? (
                       <>
-                        <span className="text-muted">
+                        <span className="text-white text-xs opacity-50">
                           {selectedWallet.name} &nbsp;
                           {"("}
                           {selectedWallet.public_key.slice(0, 6)}...
@@ -292,7 +292,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                         </span>
                       </>
                     ) : (
-                      <span className="text-muted opacity-70 text-xs">
+                      <span className="text-white opacity-50 text-xs">
                         {t("Select wallet")}
                       </span>
                     )}
