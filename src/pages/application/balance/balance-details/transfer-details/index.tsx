@@ -1,3 +1,4 @@
+import Loader from "@/components/loader"
 import MessageBox from "@/components/message-box"
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
@@ -43,7 +44,7 @@ const IndexTransferDetails = ({
 
   const [balanceData, setBalanceData] = useState<BalanceModel | null>(null)
 
-  const [nativeToken, setNativeToken] = useState<TokenModel | null>(null);
+  const [nativeToken, setNativeToken] = useState<TokenModel | null>(null)
 
   const [quantity, setQuantity] = useState<number>(0)
   const [transferTo, setTransferTo] = useState<string>("")
@@ -256,6 +257,7 @@ const IndexTransferDetails = ({
 
   return (
     <>
+      {isSendInProgress ?? <Loader />}
       {balanceData !== null && (
         <>
           <div className="p-4 mt-5 rounded-md border border-2 table-border m-4">
@@ -336,23 +338,20 @@ const IndexTransferDetails = ({
             <DrawerContent className="border-0">
               <MessageBox />
               <DrawerHeader>
-                <DrawerTitle>
-                  {t("SEND ")}
-                  {balanceData.token.symbol}
-                </DrawerTitle>
+                <DrawerTitle>{t("Estimated Fees")}</DrawerTitle>
               </DrawerHeader>
               <div className="p-6">
                 <div className="mb-8">
                   <Label className="pb-2">
                     {t("Fees of")}
                     <span className="p-2 font-extrabold text-input-primary">
-                    {estimatedFee.toFixed(12)} {nativeToken?.symbol || "XON"}
+                      {estimatedFee.toFixed(12)} {nativeToken?.symbol || "XON"}
                     </span>
                     {t("will be applied to the submission")}
                   </Label>
                   <hr className="mt-4 mb-4" />
                   <Button variant="jelly" onClick={transfer} className="w-full">
-                    {t("TRANSFER")}
+                    {t("PROCEED")}
                   </Button>
                 </div>
               </div>
@@ -368,10 +367,11 @@ const IndexTransferDetails = ({
         <DrawerContent className="border-0">
           <DrawerHeader>
             <DrawerTitle className="text-muted border-b border-border-1/20 pb-4">
-              {t("ENTER YOUR PASSWORD")}
+              {t("Confirm Transfer")}
             </DrawerTitle>
           </DrawerHeader>
-          <div className="p-6">
+          <div className="py-2 px-6">
+            <p className="text-center mb-2">{t("Enter your password:")}</p>
             <div className="mb-3">
               <Input
                 type="password"
@@ -392,7 +392,7 @@ const IndexTransferDetails = ({
                 variant="jelly"
                 onClick={confirmTransfer}
                 disabled={userPassword === "" || isProcessing}>
-                {t("CONFIRM")}
+                {isProcessing ? t("CONFIRMING...") : t("CONFIRM")}
               </Button>
             </div>
           </div>
