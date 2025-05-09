@@ -994,7 +994,10 @@
             if (data?.type === "XTERIUM_TRANSFER_RESPONSE") {
               window.removeEventListener("message", handleTransferResponse)
               if (data.error) return reject(data.error)
-              if (data.response) return resolve(data.response)
+              if (data.response) {
+                console.log("Transfer successful")
+                return resolve(data.response)
+              }
               return reject("Unexpected response format.")
             }
           }
