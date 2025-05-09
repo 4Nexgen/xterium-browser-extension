@@ -21,9 +21,9 @@ import { NetworkModel } from "@/models/network.model"
 import type { TokenModel } from "@/models/token.model"
 import { WalletModel } from "@/models/wallet.model"
 import { BalanceServices } from "@/services/balance.service"
+import { PriceService } from "@/services/price.service"
 import { TokenService } from "@/services/token.service"
 import { WalletService } from "@/services/wallet.service"
-import { PriceService } from "@/services/price.service"
 import { ApiPromise } from "@polkadot/api"
 import totalBalanceBackground from "data-base64:/assets/totalBalancebg.png"
 import { Coins, DollarSign, LoaderCircle, X } from "lucide-react"
@@ -211,17 +211,16 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
   }
 
   useEffect(() => {
-    const priceSocketService = new PriceService();
+    const priceSocketService = new PriceService()
 
     priceSocketService.onPriceUpdate((data: PriceServiceData) => {
-      setPrices(data);
-    });
+      setPrices(data)
+    })
 
     return () => {
-      priceSocketService.close();
-    };
-  }, []);
-
+      priceSocketService.close()
+    }
+  }, [])
 
   useEffect(() => {
     if (selectedWallet !== null) {
@@ -265,7 +264,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
             <div className="w-full rounded p-[2px] bg-[#141a25] relative text-white">
               <img src={totalBalanceBackground} className="w-full" alt="Xterium Logo" />
               <span className="absolute top-1 left-2 text-xs">Total Amount</span>
-              <span className="absolute top-5 left-1 text-xl w-full text-center font-bold">
+              <span className="absolute top-5 left-6 text-xl w-full text-left font-bold">
                 ${totalPortfolioValue.toFixed(3)}
               </span>
             </div>
@@ -365,73 +364,74 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
                         const formattedTokenValue = `${selectedCurrency}${tokenValue.toFixed(3)}`
 
                         return (
-                        <div key={index}>
-                          <Card className="mb-1.5 border dark:border-muted bg-[#183F44] rounded-sm">
-                            <Table>
-                              <TableBody>
-                                <TableRow
-                                  onClick={() => {
-                                    if (
-                                      !loadingPerToken[balance.token.symbol] &&
-                                      balance.freeBalance !== 0
-                                    ) {
-                                      selectBalance(balance)
-                                    }
-
-                                    if (balance.freeBalance === 0) {
-                                      MessageBoxController.show(
-                                        "This token has zero balance available."
-                                      )
-                                    }
-                                  }}
-                                  className={`cursor-pointer hover-bg-custom ${
-                                    loadingPerToken[balance.token.symbol]
-                                      ? "cursor-not-allowed"
-                                      : ""
-                                  }`}>
-                                  <TableCell className="w-[50px] justify-center">
-                                    <Image
-                                      src={
-                                        tokenLogoMap[balance.token.symbol] ||
-                                        "/assets/tokens/default.png"
+                          <div key={index}>
+                            <Card className="mb-1.5 border dark:border-muted bg-[#183F44] rounded-sm">
+                              <Table>
+                                <TableBody>
+                                  <TableRow
+                                    onClick={() => {
+                                      if (
+                                        !loadingPerToken[balance.token.symbol] &&
+                                        balance.freeBalance !== 0
+                                      ) {
+                                        selectBalance(balance)
                                       }
-                                      width={40}
-                                      height={40}
-                                      alt={balance.token.symbol}
-                                      className="ml-1"
-                                    />
-                                  </TableCell>
-                                  <TableCell>
-                                    <div className="mb-[2px]">
-                                      <span className="text-lg font-bold">
-                                        {balance.token.symbol.length > 10
-                                          ? balance.token.symbol.substring(0, 10) + "..."
-                                          : balance.token.symbol}
-                                      </span>
-                                    </div>
-                                    <span className="inline-block text-white text-sm font-bold rounded-full">
-                                      {formattedTokenPrice}
-                                    </span>
-                                  </TableCell>
-                                  <TableCell className="w-[50px] justify-end pr-2 text-right">
-                                    <span className="text-lg font-bold text-purple">
-                                      {loadingPerToken[balance.token.symbol] ? (
-                                        <span className="text-sm text-white font-normal opacity-100">
-                                          Loading...
+
+                                      if (balance.freeBalance === 0) {
+                                        MessageBoxController.show(
+                                          "This token has zero balance available."
+                                        )
+                                      }
+                                    }}
+                                    className={`cursor-pointer hover-bg-custom ${
+                                      loadingPerToken[balance.token.symbol]
+                                        ? "cursor-not-allowed"
+                                        : ""
+                                    }`}>
+                                    <TableCell className="w-[50px] justify-center">
+                                      <Image
+                                        src={
+                                          tokenLogoMap[balance.token.symbol] ||
+                                          "/assets/tokens/default.png"
+                                        }
+                                        width={40}
+                                        height={40}
+                                        alt={balance.token.symbol}
+                                        className="ml-1"
+                                      />
+                                    </TableCell>
+                                    <TableCell>
+                                      <div className="mb-[2px]">
+                                        <span className="text-lg font-bold">
+                                          {balance.token.symbol.length > 10
+                                            ? balance.token.symbol.substring(0, 10) +
+                                              "..."
+                                            : balance.token.symbol}
                                         </span>
-                                      ) : (
-                                        formatBalance(balance.freeBalance)
-                                      )}
-                                    </span>
-                                    <span className="inline-block text-white text-sm font-bold rounded-full">
-                                      {formattedTokenValue}
-                                    </span>
-                                  </TableCell>
-                                </TableRow>
-                              </TableBody>
-                            </Table>
-                          </Card>
-                        </div>
+                                      </div>
+                                      <span className="inline-block text-white text-sm font-bold rounded-full">
+                                        {formattedTokenPrice}
+                                      </span>
+                                    </TableCell>
+                                    <TableCell className="w-[50px] justify-end pr-2 text-right">
+                                      <span className="text-lg font-bold text-purple">
+                                        {loadingPerToken[balance.token.symbol] ? (
+                                          <span className="text-sm text-white font-normal opacity-100">
+                                            Loading...
+                                          </span>
+                                        ) : (
+                                          formatBalance(balance.freeBalance)
+                                        )}
+                                      </span>
+                                      <span className="inline-block text-white text-sm font-bold rounded-full">
+                                        {formattedTokenValue}
+                                      </span>
+                                    </TableCell>
+                                  </TableRow>
+                                </TableBody>
+                              </Table>
+                            </Card>
+                          </div>
                         )
                       })}
                   </>
