@@ -282,9 +282,6 @@ window.addEventListener("message", async (event) => {
               ? status.asFinalized.toString()
               : status.asInBlock.toString();
 
-              console.log("Tx Hash",extrinsicHash )
-              console.log("BLock Hash",blockHash )
-
             window.postMessage(
               {
                 type: "XTERIUM_TRANSFER_RESPONSE",
@@ -296,7 +293,6 @@ window.addEventListener("message", async (event) => {
               },
               "*"
             );
-
             unsub();
           }
         }

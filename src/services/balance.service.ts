@@ -128,7 +128,7 @@ export class BalanceServices {
     signature: KeyringPair,
     recipient: string,
     amount: number,
-    onResult: (status: ISubmittableResult) => void
+    onResult: (status: ISubmittableResult, txHash?: string, blockHash?: string) => void
   ): Promise<void> {
     const chain = await wsAPI.rpc.system.chain()
     const chainName = chain.toString().toLowerCase()
@@ -137,14 +137,29 @@ export class BalanceServices {
   
     const adjustedAmount = isPaseo || isPolkadot ? amount / Math.pow(10, 2) : amount
   
+    const onTxResult = (result: ISubmittableResult) => {
+      let txHash: string | undefined
+      let blockHash: string | undefined
+  
+      if (result.status.isInBlock) {
+        txHash = result.txHash?.toHex()
+        blockHash = result.status.asInBlock.toHex()
+        onResult(result, txHash, blockHash)
+      } else if (result.status.isFinalized) {
+        txHash = result.txHash?.toHex()
+        blockHash = result.status.asFinalized.toHex()
+        onResult(result, txHash, blockHash)
+      } else {
+        onResult(result)
+      }
+    }
+  
     if (token.type === "Native") {
       const tx = (isPaseo || isPolkadot)
         ? wsAPI.tx.balances.transferAllowDeath(recipient, adjustedAmount)
         : wsAPI.tx.balances.transfer(recipient, adjustedAmount)
   
-      tx.signAndSend(signature, (result) => {
-        onResult(result)
-      })
+      tx.signAndSend(signature, onTxResult)
     }
   
     if (token.type === "Asset" || token.type === "Pump") {
@@ -153,9 +168,7 @@ export class BalanceServices {
   
       wsAPI.tx.assets
         .transfer(token.token_id, recipient, formattedAmount)
-        .signAndSend(signature, (result) => {
-          onResult(result)
-        })
+        .signAndSend(signature, onTxResult)
     }
   }  
 }
