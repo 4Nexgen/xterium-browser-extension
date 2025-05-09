@@ -279,7 +279,10 @@ const IndexWallet = ({
                 {t("Export Wallet")}
               </DrawerTitle>
             </DrawerHeader>
-            <IndexExportWallet selectedWallet={selectedWallet} />
+            <IndexExportWallet 
+            selectedWallet={selectedWallet} 
+            handleCallbackDataUpdates={handleCallbackDataUpdates}
+            />
           </DrawerContent>
         </Drawer>
 
