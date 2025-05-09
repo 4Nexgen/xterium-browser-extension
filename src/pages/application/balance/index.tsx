@@ -465,7 +465,7 @@ const IndexBalance = ({ currentNetwork, currentWsAPI }: IndexBalanceProps) => {
               ) : (
                 <div>{t("No Image")}</div>
               )}
-              <DrawerTitle>
+              <DrawerTitle className="text-[#5d11a5]">
                 {selectedBalance ? selectedBalance.token.symbol : ""}
               </DrawerTitle>
             </div>

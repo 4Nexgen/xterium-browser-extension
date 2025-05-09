@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { Label } from "@/components/ui/label"
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import type { BalanceModel } from "@/models/balance.model"
 import { NetworkModel } from "@/models/network.model"
 import type { ApiPromise } from "@polkadot/api"
@@ -55,8 +54,8 @@ const IndexBalanceDetails = ({
   }
 
   const formatBalance = (value: number): string => {
-    return value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  };
+    return value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  }
 
   const handleTransferStatusCallbacks = (status: ExtrinsicStatus) => {
     if (status.isInBlock) {
@@ -71,36 +70,24 @@ const IndexBalanceDetails = ({
         {t("Your Balance")}
       </Label>
       {balanceData && (
-        <Table className="w-full">
-          <TableBody>
-            <TableRow className="flex flex-col gap-4 hover:bg-transparent hover:cursor-default p-6">
-              <TableCell className="w-full h-12 flex items-center justify-center text-center bg-tablecell-detail rounded-lg relative border-2 border-primary dark:border-[#16514d] dark:border-border dark:bg-muted/50">
-                <div className="text-center">
-                  <p className="text-lg font-bold text-purple">
-                    {formatBalance(
-                      (balanceData.freeBalance + balanceData.reservedBalance)
-                    )}
-                  </p>
-                  <Label className="text-xs font-semibold">{t("Total")}</Label>
-                </div>
-              </TableCell>
-              <TableCell className="w-full h-12 flex items-center justify-center bg-tablecell-detail rounded-lg relative border-2 border-primary dark:border-[#16514d] dark:border-border dark:bg-muted/50">
-                <div className="text-center">
-                  <p className="text-lg font-bold text-purple">
-                    {formatBalance(balanceData.freeBalance)}
-                  </p>
-                  <Label className="text-xs font-semibold">{t("Transferable")}</Label>
-                </div>
-              </TableCell>
-              <TableCell className="w-full h-12 flex items-center justify-center bg-tablecell-detail rounded-lg relative border-2 border-primary dark:border-[#16514d] dark:border-border dark:bg-muted/50">
-                <div className="text-center">
-                  <p className="text-lg font-bold text-purple">0.00</p>
-                  <Label className="text-xs font-semibold">{t("Locked")}</Label>
-                </div>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+        <div className="flex flex-col items-center justify-center gap-2 w-full p-6">
+          <div className="border-2 border-border w-full py-1 px-6 rounded-lg bg-muted/30 flex flex-col items-center justify-center">
+            <p className="text-lg font-bold text-purple">
+              {formatBalance(balanceData.freeBalance + balanceData.reservedBalance)}
+            </p>
+            <Label className="text-xs font-semibold">{t("Total")}</Label>
+          </div>
+          <div className="border-2 border-border w-full py-1 px-6 rounded-lg bg-muted/30 flex flex-col items-center justify-center">
+            <p className="text-lg font-bold text-purple">
+              {formatBalance(balanceData.freeBalance)}
+            </p>
+            <Label className="text-xs font-semibold">{t("Transferable")}</Label>
+          </div>
+          <div className="border-2 border-border w-full py-1 px-6 rounded-lg bg-muted/30 flex flex-col items-center justify-center">
+            <p className="text-lg font-bold text-purple">0.00</p>
+            <Label className="text-xs font-semibold">{t("Locked")}</Label>
+          </div>
+        </div>
       )}
       <div className="p-6 pt-0">
         {balanceData && (
